@@ -1,0 +1,16 @@
+{
+	"id" : "alexa-api",
+	"name" : "Alexa - API",
+	"description" : "Plugin pour interface Alexa",
+	"licence" : "AGPL",
+	"author" : "Sigalou",
+	"require" : "3.2",
+	"category" : "communication",
+  "hasDependency" : 1,
+  "hasOwnDeamon" : 1,
+	"language" : ["fr_FR","en_US"],
+	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile"],
+	"maxDependancyInstallTime" : 0,
+	"changelog" : "",
+	"documentation" : ""
+}
