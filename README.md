@@ -8,6 +8,8 @@ git clone https://github.com/sigalou/jeedom_alexaapi
 
 mv jeedom_alexaapi alexaapi
 
+chown -R www-data:www-data alexaapi
+
 Puis allez dans Jeedom / Plugins / Gestion des plugins
 
 Allez sur Alexa-API
