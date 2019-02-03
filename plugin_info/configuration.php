@@ -52,11 +52,23 @@ if (!isConnect()) {
           ?>:3456/speak?device=salon&text=coucou
         </div>
       </div>
-
-
-
     </fieldset>
   </form>
-
-
+<form class="form-horizontal">
+    <fieldset>
+    <legend><i class="icon loisir-darth"></i> {{Génération manuelle du cookie Amazon}}</legend>
+		 <div class="form-group">
+	<label class="col-lg-4"></label>
+	<div class="col-lg-8">
+		<a class="btn btn-warning" id="bt_backupsZwave"><i class="fa fa-cogs"></i> {{Lancer la génération}}</a>
+	</div>
+</fieldset>
+</form>
 </div>
+
+<script>
+	$('#bt_backupsZwave').on('click', function () {
+		$('#md_modal2').dialog({title: "{{Génération cookie Amazon}}"});
+		$('#md_modal2').load('index.php?v=d&plugin=alexaapi&modal=cookie').dialog('open');
+	});
+</script>

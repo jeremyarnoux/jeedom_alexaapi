@@ -20,13 +20,82 @@ try {
     require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
     include_file('core', 'authentification', 'php');
 
-    if (!isConnect('admin')) {
-        throw new Exception(__('401 - {{AccÃ¨s non autorisÃ©}}', __FILE__));
+
+/*$eqLogics = alexaapi::byType('alexaapi');
+foreach ($eqLogics as $eqLogic) {
+    log::add('alexaapi', 'info', $eqLogic->getConfiguration('ip'));
+}
+*/
+
+   if (!isConnect('admin')) {
+        throw new \Exception('401 Unauthorized');
+    }
+    log::add('alexaapi', 'info', 'Lancement Serveur pour Cookie');
+
+    switch (init('action')){
+        
+		
+		case 'createCookie':
+    //log::add('alexaapi', 'info', 'Debut');
+
+    $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
+
+//Par sécurité, on Kill un éventuel précédent proessus cookie.js
+	$cmd = 'kill $(ps aux | grep "/cookie.js" | awk \'{print $2}\')';
+    log::add('alexaapi', 'debug', '---- Kill cookie.js: ' . $cmd);
+    $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
+//    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexa-remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
+    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexa-remote-http/cookie.js '.config::byKey('internalAddr');
+
+    log::add('alexaapi', 'debug', '---- Lancement dÃ©mon Alexa-API-Cookie sur port 3457 : ' . $cmd);
+    
+	    $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
+    
+	if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) 
+	{
+      log::add('alexaapi', 'error', $result);
+      return false;
     }
 
-    throw new Exception(__('{{Aucune methode correspondante Ã }} : ', __FILE__) . init('action'));
-    /*     * *********Catch exeption*************** */
-} catch (Exception $e) {
-    ajax::error(displayExeption($e), $e->getCode());
+
+     log::add('alexaapi', 'info', 'Fin lancement Serveur pour Cookie');
+                //throw new \Exception(__('Impossible', __FILE__));
+           ajax::success();
+        break;
+
+		case 'closeCookie':
+    //log::add('alexaapi', 'info', 'Debut');
+
+    $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
+
+//Par sécurité, on Kill un éventuel précédent proessus cookie.js
+	$cmd = 'kill $(ps aux | grep "/cookie.js" | awk \'{print $2}\')';
+    log::add('alexaapi', 'debug', '---- Kill cookie.js: ' . $cmd);
+    $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
+
+
+     log::add('alexaapi', 'info', 'Fin lancement Serveur pour Cookie');
+                //throw new \Exception(__('Impossible', __FILE__));
+           ajax::success();
+        break;
+
+
+
+
+
+
+
+
+
+    }
+    throw new \Exception('Aucune methode correspondante');
+} catch (\Exception $e) {
+    ajax::error(displayException($e), $e->getCode());
+      log::add('alexaapi', 'error', $e);
 }
-?>
+
+
+
+
+
+
