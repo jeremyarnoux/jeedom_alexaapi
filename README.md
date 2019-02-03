@@ -17,17 +17,11 @@ Allez sur Alexa-API
 Activer le.
 
 
-Installer les dépendances, si tout se passe bien, vous aurez dans le log "Alexaapi_dep" :
+Installer les dépendances
 
+Allez sur Lancer la génération pour générer le Cookie Amazon, il suffit de suivre les étapes.
 
-Début de l'installation
-Suppression du dossier : alexaapi/ressources/alexa-remote-http
-Récupération de la derniere version de alexa-remote-http
-Cloning into 'alexa-remote-http'...
-Installation npm
-npm notice created a lockfile as package-lock.json. You should commit this file.
-added 179 packages from 143 contributors and audited 1172 packages in 24.35s
-found 0 vulnerabilities
-Fin de l'installation
+Pour l'instant, le développement est arrivé à ce point.
+A ce stade, une fois le Cookie généré, et le démon lancé, vous pouvez tester dans votre navigateur avec une commande du genre :
 
-Attention, à compter de là, pour lancer le serveur, il faut le JSON cookie d'Alexa dans alexa-cookie.json
+http://VOTREIP:3456/speak?device=VOTREDEVICE&text=coucou 
