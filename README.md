@@ -17,11 +17,11 @@ Allez sur Alexa-API
 Activer le.
 
 
-Installer les dépendances
+Important : RÃ©-Installer les dÃ©pendances
 
-Allez sur Lancer la génération pour générer le Cookie Amazon, il suffit de suivre les étapes.
+Allez sur Lancer la gÃ©nÃ©ration pour gÃ©nÃ©rer le Cookie Amazon, il suffit de suivre les Ã©tapes.
 
-Pour l'instant, le développement est arrivé à ce point.
-A ce stade, une fois le Cookie généré, et le démon lancé, vous pouvez tester dans votre navigateur avec une commande du genre :
+Pour l'instant, le dÃ©veloppement est arrivÃ© Ã  ce point.
+A ce stade, une fois le Cookie gÃ©nÃ©rÃ©, et le dÃ©mon lancÃ©, vous pouvez tester dans votre navigateur avec une commande du genre :
 
 http://VOTREIP:3456/speak?device=VOTREDEVICE&text=coucou 
