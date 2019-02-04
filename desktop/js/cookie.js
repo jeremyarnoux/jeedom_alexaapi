@@ -94,11 +94,3 @@ catch(error)
         });
 
 });
-
-$('#bt_webespeasy').on('click', function () {
-  var nodeId = $('#idespeasy').value();
-  $('#md_modal').dialog({title: "{{Identification Amazon}}"});
-//  $('#md_modal').load('index.php?v=d&plugin=espeasy&modal=web&ip=' + nodeId).dialog('open');
-  $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=web&ip=192.168.0.21').dialog('open');
-});
-

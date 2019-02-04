@@ -35,7 +35,7 @@ if (!isConnect('admin')) {
         <div class="form-group">
             <label class="col-sm-4 col-xs-6 control-label">{{Etape 2 : }}</label>
             <div class="col-sm-4 col-xs-6">
-                <a class="btn btn-default" href="http://192.168.0.21:3457"  onclick="open('http://192.168.0.21:3457', 'Popup', 'scrollbars=1,resizable=1,height=560,width=770'); return false;" ><i class="fa fa-cogs"></i> Identifiez vous sur Amazon</a>
+                <a class="btn btn-default" href="http://<?php print config::byKey('internalAddr')?>:3457"  onclick="open('http://<?php print config::byKey('internalAddr')?>:3457', 'Popup', 'scrollbars=1,resizable=1,height=560,width=770'); return false;" ><i class="fa fa-cogs"></i> Identifiez vous sur Amazon</a>
 
             </div>
         </div>
