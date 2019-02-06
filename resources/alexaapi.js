@@ -6,7 +6,7 @@ let alexa = new Alexa();
 /* Configuration */
 const config =
 {
-  cookieLocation: '/tmp/alexa-cookie.json',
+  cookieLocation: __dirname + '/data/alexa-cookie.json',
   cookieRefreshInterval: 7*24*60*1000,
   logger: console.log,
   alexaServiceHost: 'alexa.amazon.fr',

@@ -1,13 +1,13 @@
 let Alexa = require('./lib/alexa-remote');
 let alexa = new Alexa();
 
-let cookieLocation = '/tmp/alexa-cookie.json';
+let cookieLocation = __dirname + '/data/alexa-cookie.json';
 var fs = require('fs');
 
 alexa.init({
   proxyOnly: true,
   proxyOwnIp: process.argv[2],
-  proxyPort: 3456,
+  proxyPort: 3457,
   proxyLogLevel: 'info',
   logger: console.log,
   alexaServiceHost: 'alexa.amazon.fr'
