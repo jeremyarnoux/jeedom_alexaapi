@@ -1,50 +1,181 @@
-var http = require('http'),
-    url = require("url"),
-    request = require('request'),
-    ipaddr = process.argv[2],
-    urlJeedom = process.argv[3],
-    debug = process.argv[4] || 0;
+const express = require('express');
+const fs = require('fs');
+const Alexa = require('./lib/alexa-remote.js');
+let alexa = new Alexa();
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+/* Configuration */
+const config =
+{
+  cookieLocation: '/tmp/alexa-cookie.json',
+  cookieRefreshInterval: 7*24*60*1000,
+  logger: console.log,
+  alexaServiceHost: 'alexa.amazon.fr',
+  listeningPort: 3456
+};
 
-function answer(req, res) {
-    var ipString = req.connection.remoteAddress;
-    console.log("We've got a request for " + req.url + " from " + ipString);
-    urlj = urlJeedom + "&" + req.url.replace("/", "") + "&ip=" + ipString;
-    if (debug == 1) {console.log("Calling Jeedom " + urlj);}
-  	request({
-  		url: urlj,
-  		method: 'PUT',
-  	},
-  	function (error, response, body) {
-  		if (!error && response.statusCode == 200) {
-  			if (debug == 1) {console.log((new Date()) + "Got response Value: " + response.statusCode);}
-  		}else{
-  			console.log((new Date()) + " - Error : "  + error );
-  		}
-  	});
+/* Routing */
+const app = express();
+let server = null;
 
-    // HTTP response header - the content will be HTML MIME type
-    res.writeHead(200, {'Content-Type': 'text/html'});
+/**** Alexa.Speak *****/
+app.get('/speak', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Alexa.Speak');
+  res.type('json');
 
-    // Write out the HTTP response body
-    res.write('<html><body>' +
-    '<h1>Jeedom receive<h1>'+
-    '</body></html>');
+  if ('device' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
 
-    // End of HTTP response
-    res.end();
+  if ('text' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
+  config.logger && config.logger('Alexa-API: text: ' + req.query.text);
+
+  alexa.sendSequenceCommand(req.query.device, 'speak', req.query.text, function(err)
+  {
+    if (err)
+      return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', err));
+    res.status(200).json({});
+  });
+});
+
+/***** Alexa.DeviceControls.Volume *****/
+app.get('/volume', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Alexa.DeviceControls.Volume');
+  res.type('json');
+
+  if ('device' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
+  if ('value' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "value"'));
+  config.logger && config.logger('Alexa-API: value: ' + req.query.value);
+
+  alexa.sendSequenceCommand(req.query.device, 'volume', req.query.value, function(err)
+  {
+    if (err)
+      return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
+    res.status(200).json({});
+  });
+});
+
+/***** Alexa.Notifications.SendMobilePush *****/
+app.get('/push', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Alexa.Notifications.SendMobilePush');
+  res.type('json');
+
+  if ('device' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.SendMobilePush', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
+  if ('text' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.SendMobilePush', 'Missing parameter "text"'));
+  config.logger && config.logger('Alexa-API: text: ' + req.query.text);
+
+  alexa.sendSequenceCommand(req.query.device, 'notification', req.query.text, function(err)
+  {
+    if (err)
+      return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.SendMobilePush', err));
+    res.status(200).json({});
+  });
+});
+
+/***** create a reminder *****/
+app.get('/reminder', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Alexa.Reminder');
+  res.type('json');
+
+  if ('device' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
+  if ('text' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "text"'));
+  config.logger && config.logger('Alexa-API: text: ' + req.query.text);
+
+  if ('when' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "when"'));
+  config.logger && config.logger('Alexa-API: when: ' + req.query.when);
+
+  // when: YYYY-MM-DD HH:MI:SS
+  let dateValues = req.query.when.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+  if (dateValues === null)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
+  let when = new Date(dateValues[1], dateValues[2], dateValues[3], dateValues[4], dateValues[5], dateValues[6])
+  config.logger && config.logger('Alexa-API: when: ' + when);
+
+  alexa.setReminder(req.query.device, when.getTime(), req.query.text, function(err)
+  {
+    if (err)
+      return res.status(500).json(error(500, req.route.path, 'createReminder', err));
+    res.status(200).json({});
+  });
+});
+
+/***** Stop the server *****/
+app.get('/stop', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Shuting down');
+  res.status(200).json({});
+  server.close(() =>
+  {
+    process.exit(0);
+  });
+});
+
+/* Main */
+fs.readFile(config.cookieLocation, 'utf8', (err, data) =>
+{
+  if (err)
+  {
+    config.logger && config.logger('Alexa-API: Error while loading the file: ' + config.cookieLocation);
+    config.logger && config.logger('Alexa-API: ' + err);
+    process.exit(-1);
+  }
+
+  config.cookie = JSON.parse(data);
+  startServer();
+});
+
+function startServer()
+{
+  alexa.init(
+  {
+    cookie: config.cookie,
+    logger: config.logger,
+    alexaServiceHost: config.alexaServiceHost,
+    cookieRefreshInterval: config.cookieRefreshInterval
+  },
+  (err) =>
+  {
+    if (err)
+    {
+      config.logger && config.logger('Alexa-API: Error while initializing alexa');
+      config.logger && config.logger('Alexa-API: ' + err);
+      process.exit(-1);
+    }
+
+    server = app.listen(config.listeningPort, () =>
+    {
+      config.logger && config.logger('Alexa-API: Server listening on port ' + server.address().port);
+    });
+  });
 }
 
-/************************/
-/*  START THE SERVER    */
-/************************/
+function error(status, source, title, detail)
+{
+  let error =
+  {
+    'status': status,
+    'source': {pointer: source},
+    'title': title,
+    'detail': detail
+  };
 
-// Create the HTTP server
-var server = http.createServer(answer);
-
-// Turn server on - now listening for requests on localIP and port
-server.listen(8121, ipaddr);
-
-// print message to terminal that server is running
-console.log('Server running');
+  config.logger && config.logger('Alexa-API: ' + title + ': ' + detail);
+  return error;
+}
