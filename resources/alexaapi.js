@@ -152,7 +152,8 @@ app.get('/reminder', (req, res) =>
 
   Return the list of Alexa devices
   [{
-    name: String - name of the device. Use this name to call as "device" parameter of others methods
+    serial - String - Serial number of the device (unique identifier)
+    name: String - name of the device. Use this name (or serial) to call as "device" parameter of others methods
     type: String - Device family as defined by Amazon. Known type: TABLET (for tablet device), ECHO (for ECHO device), WHA (for group of devices), VOX (for smartphone? Webpage?)
     online: Boolean - true when the device is connected, false otherwise,
     capabilities: [String] - List of available capabilties of the device, few example: VOLUME_SETTING, REMINDERS, MICROPHONE, TUNE_IN, ...
@@ -173,13 +174,15 @@ app.get('/devices', (req, res) =>
     // to refresh internal state of alexa-remote like it is done in initDeviceState
     // Here, we qre sync with alexa-remote but alexa-remote is maybe unsync with reality.
     // It require to restart the server to refresh the list of devices.
-    for (var name in alexa.names)
+    for (var serial in alexa.serialNumbers)
     {
+      var device = alexa.serialNumbers[serial];
       toReturn.push({
-        'name': name,
-        'type': alexa.names[name].deviceFamily,
-        'online': alexa.names[name].online,
-        'capabilities' : alexa.names[name].capabilities
+        'serial': serial,
+        'name': device.accountName,
+        'type': device.deviceFamily,
+        'online': device.online,
+        'capabilities' : device.capabilities
       });
     }
     res.status(200).json(toReturn);
