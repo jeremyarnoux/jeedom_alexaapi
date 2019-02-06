@@ -1,23 +1,16 @@
 # jeedom_alexaapi
 
-Pour installer manuellement ce plugin, en ligne de commande :
+Pour installer manuellement ce plugin :
 
-cd /var/www/html/plugins
+jeedom -> plugins -> gestion des plugins -> ajouter un plugin -> type de source: github
 
-git clone https://github.com/sigalou/jeedom_alexaapi
+ID logique du plugin -> alexaapi
 
-mv jeedom_alexaapi alexaapi
+Utilisateur ou organisation du dépôt -> sigalou
 
-chown -R www-data:www-data alexaapi
+Nom du dépôt -> jeedom_alexaapi
 
-Puis allez dans Jeedom / Plugins / Gestion des plugins
-
-Allez sur Alexa-API
-
-Activer le.
-
-
-Important : Ré-Installer les dépendances
+Branche -> master
 
 Allez sur Lancer la génération pour générer le Cookie Amazon, il suffit de suivre les étapes.
 
