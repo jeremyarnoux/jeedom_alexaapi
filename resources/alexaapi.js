@@ -17,7 +17,15 @@ const config =
 const app = express();
 let server = null;
 
-/**** Alexa.Speak *****/
+/**** Alexa.Speak *****
+  URL: /speak?device=?&text=?
+    device - String - name of the device
+    text - String - Text to speech
+
+  Return an empty object if the function succeed.
+  Otherwise, an error object is returned.
+  FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
+*/
 app.get('/speak', (req, res) =>
 {
   config.logger && config.logger('Alexa-API: Alexa.Speak');
@@ -39,7 +47,15 @@ app.get('/speak', (req, res) =>
   });
 });
 
-/***** Alexa.DeviceControls.Volume *****/
+/***** Alexa.DeviceControls.Volume *****
+  URL: /volume?device=?&value=?
+    device - String - name of the device
+    value - Integer - Determine the volume level between 0 to 100 (0 is mute and 100 is max)
+
+  Return an empty object if the function succeed.
+  Otherwise, an error object is returned.
+  FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
+*/
 app.get('/volume', (req, res) =>
 {
   config.logger && config.logger('Alexa-API: Alexa.DeviceControls.Volume');
@@ -61,7 +77,14 @@ app.get('/volume', (req, res) =>
   });
 });
 
-/***** Alexa.Notifications.SendMobilePush *****/
+/***** Alexa.Notifications.SendMobilePush *****
+  URL /push?device=?&text=?
+    device - String - name of the device
+    text - String - Text to display in the push notification
+
+  Return an empty object if the function succeed.
+  Otherwise, an error object is returned.
+*/
 app.get('/push', (req, res) =>
 {
   config.logger && config.logger('Alexa-API: Alexa.Notifications.SendMobilePush');
@@ -83,7 +106,15 @@ app.get('/push', (req, res) =>
   });
 });
 
-/***** create a reminder *****/
+/***** Create a reminder *****
+  URL /reminder?device=?&text=?&when=?
+    device - String - name of the device
+    text - String - Content of the reminder
+    when - String - Date at which the reminder should occur. Date format: YYYY-MM-DD HH24:MI:SS
+
+  Return an empty object if the function succeed.
+  Otherwise, an error object is returned.
+*/
 app.get('/reminder', (req, res) =>
 {
   config.logger && config.logger('Alexa-API: Alexa.Reminder');
@@ -113,6 +144,45 @@ app.get('/reminder', (req, res) =>
     if (err)
       return res.status(500).json(error(500, req.route.path, 'createReminder', err));
     res.status(200).json({});
+  });
+});
+
+/***** Get devices *****
+  URL: /devices
+
+  Return the list of Alexa devices
+  [{
+    name: String - name of the device. Use this name to call as "device" parameter of others methods
+    type: String - Device family as defined by Amazon. Known type: TABLET (for tablet device), ECHO (for ECHO device), WHA (for group of devices), VOX (for smartphone? Webpage?)
+    online: Boolean - true when the device is connected, false otherwise,
+    capabilities: [String] - List of available capabilties of the device, few example: VOLUME_SETTING, REMINDERS, MICROPHONE, TUNE_IN, ...
+  }]
+*/
+app.get('/devices', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Devices');
+  res.type('json');
+
+  alexa.getDevices(function(err, data)
+  {
+    if (err)
+      return res.status(500).json(error(500, req.route, 'Devices', err));
+
+    var toReturn = [];
+    // FIXME: It should be better to use alexa.getDevices and force this method
+    // to refresh internal state of alexa-remote like it is done in initDeviceState
+    // Here, we qre sync with alexa-remote but alexa-remote is maybe unsync with reality.
+    // It require to restart the server to refresh the list of devices.
+    for (var name in alexa.names)
+    {
+      toReturn.push({
+        'name': name,
+        'type': alexa.names[name].deviceFamily,
+        'online': alexa.names[name].online,
+        'capabilities' : alexa.names[name].capabilities
+      });
+    }
+    res.status(200).json(toReturn);
   });
 });
 
@@ -152,6 +222,7 @@ function startServer()
   },
   (err) =>
   {
+    // Unable to init alexa
     if (err)
     {
       config.logger && config.logger('Alexa-API: Error while initializing alexa');
@@ -159,6 +230,7 @@ function startServer()
       process.exit(-1);
     }
 
+    // Start the server
     server = app.listen(config.listeningPort, () =>
     {
       config.logger && config.logger('Alexa-API: Server listening on port ' + server.address().port);
