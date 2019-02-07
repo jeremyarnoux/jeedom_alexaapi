@@ -1,0 +1,31 @@
+{
+  "name": "alexa-remote-http",
+  "version": "1.0.0",
+  "description": "Command your Alexa device with HTTP request",
+  "main": "alexaapi.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sx-1/alexa-remote-http.git"
+  },
+  "keywords": [
+    "alexa;api;http;tts"
+  ],
+  "author": "SX-1",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sx-1/alexa-remote-http/issues"
+  },
+  "homepage": "https://github.com/sx-1/alexa-remote-http#readme",
+  "dependencies": {
+    "cookie": "^0.3.1",
+    "express": "^4.16.4",
+    "extend": "^3.0.2",
+    "http-proxy-middleware": "^0.19.1",
+    "http-proxy-response-rewrite": "0.0.1",
+    "https": "^1.0.0",
+    "querystring": "^0.2.0"
+  }
+}
