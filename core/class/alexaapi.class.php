@@ -104,7 +104,7 @@ class alexaapi extends eqLogic {
     $return = array();
     $return['log'] = 'alexaapi_dep';
     //$serialport = realpath(dirname(__FILE__) . '/../../resources/node_modules/http');
-    $request = realpath(dirname(__FILE__) . '/../../resources/alexa-remote-http');
+    $request = realpath(dirname(__FILE__) . '/../../resources/node_modules');
     //$request = realpath(dirname(__FILE__) . '/../../resources/node_modules/request');
     $return['progress_file'] = '/tmp/alexaapi_dep';
  //   if (is_dir($serialport) && is_dir($request)) {
