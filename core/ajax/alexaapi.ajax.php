@@ -45,7 +45,7 @@ foreach ($eqLogics as $eqLogic) {
     log::add('alexaapi', 'debug', '---- Kill cookie.js: ' . $cmd);
     $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
 //    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexa-remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
-    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexa-remote-http/cookie.js '.config::byKey('internalAddr');
+    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/initCookie.js '.config::byKey('internalAddr');
 
     log::add('alexaapi', 'debug', '---- Lancement dÃ©mon Alexa-API-Cookie sur port 3457 : ' . $cmd);
     
@@ -69,7 +69,7 @@ foreach ($eqLogics as $eqLogic) {
     $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
 
 //Par sécurité, on Kill un éventuel précédent proessus cookie.js
-	$cmd = 'kill $(ps aux | grep "/cookie.js" | awk \'{print $2}\')';
+	$cmd = 'kill $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')';
     log::add('alexaapi', 'debug', '---- Kill cookie.js: ' . $cmd);
     $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
 
