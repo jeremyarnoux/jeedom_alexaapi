@@ -31,7 +31,7 @@ class alexaapi extends eqLogic {
     $return = array();
     $return['log'] = 'alexaapi_node';
     $return['state'] = 'nok';
-    $pid = trim( shell_exec ('ps ax | grep "alexaapi/resources/alexa-remote-http/alexaapi.js" | grep -v "grep" | wc -l') );
+    $pid = trim( shell_exec ('ps ax | grep "alexaapi/resources/alexaapi.js" | grep -v "grep" | wc -l') );
     if ($pid != '' && $pid != '0') {
       $return['state'] = 'ok';
     }
@@ -57,7 +57,7 @@ class alexaapi extends eqLogic {
     $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
 
 //    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexa-remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
-    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexa-remote-http/alexaapi.js ';
+    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ';
 
     log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
 
