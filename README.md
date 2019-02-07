@@ -4,7 +4,7 @@ Pour installer manuellement ce plugin :
 
 jeedom -> plugins -> gestion des plugins -> ajouter un plugin -> type de source: github
 
-(Si github n'est pas proposé, allez dans Admin/Configuration/Mise à jour/Github et cochez "Activer Github"
+(Si github n'est pas proposé, allez dans Admin/Configuration/Mise à jour/Github et cochez "Activer Github")
 
 ID logique du plugin -> alexaapi
 
