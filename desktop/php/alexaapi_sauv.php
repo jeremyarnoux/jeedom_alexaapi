@@ -44,12 +44,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
           <span
                   style="font-size : 1.1em;position:relative; top : 23px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#94ca02"><center>{{Scan}}</center></span>
         </div>
-  <div class="cursor" id="bt_sante" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-    <center>
-      <i class="fa fa-medkit" style="font-size : 6em;color:#767676;"></i>
-    </center>
-    <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Santé}}</center></span>
-  </div>
+
         <!-- Bouton d acc�s � la configuration -->
         <div class="cursor eqLogicAction" data-action="gotoPluginConf"
              style="background-color : #ffffff; height : 140px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
@@ -63,31 +58,21 @@ $eqLogics = eqLogic::byType($plugin->getId());
       <!-- D�but de la liste des objets -->
       <legend><i class="fa fa-table"></i> {{Mes Amazon Echo}}</legend>
       <!-- Container de la liste -->
-
-<div class="eqLogicThumbnailContainer">
-  <?php
-foreach ($eqLogics as $eqLogic) {
-	$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-	echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
-	echo "<center>";
-	$alternateImg = $eqLogic->getConfiguration('type');
-	if (file_exists(dirname(__FILE__) . '/../../core/config/devices/' . $alternateImg . '.png')) {
-		echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/' . $alternateImg . '.png" height="105" width="105" />';
-	} elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/default.png')) {
-		echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" height="105" width="105" />';
-	} else {
-		echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="105" />';
-	}
-	echo "</center>";
-	echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
-	echo '</div>';
-}
-?>
-</div>
-</div>
-
-	
-	</div>
+      <div class="eqLogicThumbnailContainer">
+        <!-- Boucle sur les objects -->
+        <?php
+        foreach ($eqLogics as $eqLogic) : ?>
+          <div class="eqLogicDisplayCard cursor" data-eqLogic_id="<?php echo $eqLogic->getId(); ?>"
+               style="background-color : #ffffff; height : 140px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
+            <center>
+              <i class="fa fa-cube" style="font-size : 6em;color:#767676;"></i>
+            </center>
+            <span
+                    style="font-size : 1.1em;position:relative; top : 23px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center><?php echo $eqLogic->getHumanName(true, true); ?></center></span>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
     <!-- Container du panneau de contr�le -->
     <div class="col-lg-10 col-md-9 col-sm-8 eqLogic"
          style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
@@ -111,6 +96,9 @@ foreach ($eqLogics as $eqLogic) {
                                                   data-toggle="tab"><i
                     class="fa fa-tachometer"></i> {{Equipement}}</a></li>
         <!-- Onglet "Commandes" -->
+		<?php
+        // print '<li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Commandes}}</a></li>';
+					?>
       </ul>
       <!-- Container du contenu des onglets -->
    <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
@@ -120,18 +108,16 @@ foreach ($eqLogics as $eqLogic) {
         <div class="col-sm-7">
             <form class="form-horizontal">
                 <fieldset>
-                                <div class="form-group">
+                    <div class="form-group">
                         <label class="col-sm-4 control-label">{{Nom de l'équipement}}</label>
-                <div class="col-sm-8">
-                    <span class="eqLogicAttr" data-l1key="name"></span>
-                </div>
-            </div>
-        <!-- Onglet "Objet Parent" -->
-
+                        <div class="col-sm-6">
+                            <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;"/>
+                            <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement}}"/>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-sm-4 control-label">{{Objet parent}}</label>
                         <div class="col-sm-6">
-                            <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;"/>
                             <select class="eqLogicAttr form-control" data-l1key="object_id">
                                 <option value="">{{Aucun}}</option>
                                 <?php
@@ -142,8 +128,6 @@ foreach (object::all() as $object) {
                            </select>
                        </div>
                    </div>
-				           <!-- Cat�gorie" -->
-
                    <div class="form-group">
                     <label class="col-sm-4 control-label">{{Catégorie}}</label>
                     <div class="col-sm-8">
@@ -156,13 +140,17 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
 ?>
                    </div>
                </div>
-			           <!-- Onglet "Active Visible" -->
-
                <div class="form-group">
                 <label class="col-sm-4 control-label"></label>
                 <div class="col-sm-8">
                     <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked/>{{Activer}}</label>
                     <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-4 control-label">{{Node ID}}</label>
+                <div class="col-sm-2">
+                    <input type="text" class="eqLogicAttr form-control" data-l1key="logicalId"/>
                 </div>
             </div>
         </fieldset>
@@ -172,33 +160,64 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
     <form class="form-horizontal">
         <fieldset>
             <div class="form-group">
-                <label class="col-sm-2 control-label">{{ID}}</label>
+                <label class="col-sm-2 control-label">{{Informations}}</label>
                 <div class="col-sm-8">
-                    <span class="eqLogicAttr" data-l1key="logicalId"></span>
+                    <a id="bt_autoDetectModule" class="btn btn-danger"><i class="fa fa-search"></i> {{Recharger configuration}}</a>
+                    <a id="bt_displayZwaveData" class="btn btn-default"><i class="fa fa-tree"></i> {{Arbre Z-Wave}}</a>
+                    <span class="label label-warning isPending" style="font-size:0.6em;cursor:default;position:relative;top:-4px;left:20px;" title="{{Il faut réveiller le module s'il est sur batterie ou vérifier le paramétrage}}"></span>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label">{{Type}}</label>
                 <div class="col-sm-8">
-                    <span class="eqLogicAttr" data-l1key="configuration" data-l2key="type"></span>
+                    <select class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="fileconf"></select>
                 </div>
             </div>
-
-			        <!-- Onglet "Image" -->
-
             <div class="form-group">
+                <label class="col-sm-2 control-label">{{Modèle}}</label>
                 <div class="col-sm-10">
-<center>
-  <img src="core/img/no_image.gif" data-original=".jpg" id="img_device" class="img-responsive" style="max-height : 250px;"  onerror="this.src='plugins/alexaapi/core/config/devices/default.png'"/>
-</center>
-			            </div>
+                  <span class="label label-default" style='font-size : 1em;'>
+                    <span class="eqLogicAttr" data-l1key="configuration" data-l2key="product_name"></span>
+                    <span class="eqLogicAttr" data-l1key="configuration" data-l2key="conf_version" title="{{Version de la configuration}}"></span>
+                </span>
+            <img src="core/img/no_image.gif" data-original=".jpg" id="img_device" class="img-responsive" style="max-height : 120px;margin-top: 10px"/>
+            </div>
+			
+               
         </div>
-
+        <div class="form-group">
+            <label class="col-sm-2 control-label">{{Paramètres}}</label>
+            <div class="col-sm-10">
+                <a class="btn btn-primary" id="bt_configureDevice" title='{{Configurer}}'><i class="fa fa-wrench"></i> {{Configuration}}</a>
+                <a class="btn btn-info" id="bt_deviceAssistant" title='{{Assistant de configuration spécifique}}' style="display:none;"><i class="fa fa-magic"></i> {{Assistant}}</a>
+                <a class="btn btn-default" id="bt_deviceDocumentation" title='{{Documentation du module}}' target="_blank" style="display:none;"><i class="fa fa-book"></i>{{Documentation}} </a>
+                <a class="btn btn-warning" id="bt_deviceRecommended" title="{{Appliquer le jeu de configuration recommandée par l'équipe Jeedom}}" style="display:none;"><i class="fa fa-thumbs-up"></i> {{Configuration recommandée}}</a>
+            </div>
+        </div>
         
     </fieldset>
 </form>
 </div>
 </div>
-
+        <!-- Panneau des commandes de l objet -->
+        <div role="tabpanel" class="tab-pane" id="commandtab">
+          <!-- Bouton d ajout d une commande -->
+          <a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top:5px;"> <i
+                    class="fa fa-plus-circle"></i> {{Commandes}}</a>
+          <br/><br/>
+          <!-- Tableau des commandes -->
+          <table id="table_cmd" class="table table-bordered table-condensed">
+            <thead>
+            <tr>
+              <th style="width: 300px;">{{Nom}}</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 <?php include_file('desktop', 'alexaapi', 'js', 'alexaapi'); ?>
 <?php include_file('core', 'plugin.template', 'js'); ?>

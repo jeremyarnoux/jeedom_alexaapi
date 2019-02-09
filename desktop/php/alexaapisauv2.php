@@ -44,12 +44,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
           <span
                   style="font-size : 1.1em;position:relative; top : 23px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#94ca02"><center>{{Scan}}</center></span>
         </div>
-  <div class="cursor" id="bt_sante" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-    <center>
-      <i class="fa fa-medkit" style="font-size : 6em;color:#767676;"></i>
-    </center>
-    <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Sant√©}}</center></span>
-  </div>
+
         <!-- Bouton d accËs ‡ la configuration -->
         <div class="cursor eqLogicAction" data-action="gotoPluginConf"
              style="background-color : #ffffff; height : 140px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
@@ -63,31 +58,26 @@ $eqLogics = eqLogic::byType($plugin->getId());
       <!-- DÈbut de la liste des objets -->
       <legend><i class="fa fa-table"></i> {{Mes Amazon Echo}}</legend>
       <!-- Container de la liste -->
+      <div class="eqLogicThumbnailContainer">
+        <!-- Boucle sur les objects -->
+        <?php
+        foreach ($eqLogics as $eqLogic) : 
+			
+		$alternateImg = $eqLogic->getConfiguration('type');
 
-<div class="eqLogicThumbnailContainer">
-  <?php
-foreach ($eqLogics as $eqLogic) {
-	$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-	echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
-	echo "<center>";
-	$alternateImg = $eqLogic->getConfiguration('type');
-	if (file_exists(dirname(__FILE__) . '/../../core/config/devices/' . $alternateImg . '.png')) {
-		echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/' . $alternateImg . '.png" height="105" width="105" />';
-	} elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/default.png')) {
-		echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" height="105" width="105" />';
-	} else {
-		echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="105" />';
-	}
-	echo "</center>";
-	echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
-	echo '</div>';
-}
-?>
-</div>
-</div>
-
-	
-	</div>
+		
+		?>
+          <div class="eqLogicDisplayCard cursor" data-eqLogic_id="<?php echo $eqLogic->getId(); ?>"
+               style="background-color : #ffffff; height : 140px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
+            <center>
+              <i class="fa fa-cube" style="font-size : 6em;color:#767676;"></i>
+            </center>
+            <span
+                    style="font-size : 1.1em;position:relative; top : 23px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center><?php echo $eqLogic->getHumanName(true, true); ?></center></span>
+          </div>
+        <?php endforeach; ?>
+      </div>
+    </div>
     <!-- Container du panneau de contrÙle -->
     <div class="col-lg-10 col-md-9 col-sm-8 eqLogic"
          style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">

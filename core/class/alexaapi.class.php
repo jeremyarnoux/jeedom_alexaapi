@@ -116,6 +116,47 @@ class alexaapi extends eqLogic {
     return $return;
   }
 
+
+	public static function ScanAmazonAlexa($_logical_id = null, $_exclusion = 0)
+{
+			
+$json=file_get_contents("http://192.168.0.21:3456/devices");
+$json = json_decode($json,true);
+
+foreach($json as $item)
+	{
+
+
+
+		$device = $item['name'];
+		$serial = $item['serial'];
+		$type = $item['type'];
+		$online = $item['online'];
+
+		$alexaapi = alexaapi::byLogicalId($serial, 'alexaapi');
+		if (!is_object($alexaapi)) {
+			$alexaapi = new alexaapi();
+			$alexaapi->setName($device);
+			$alexaapi->setLogicalId($serial); 
+			$alexaapi->setEqType_name('alexaapi');
+			$alexaapi->setIsEnable(1);
+			$alexaapi->setIsVisible(1);
+		}
+		$alexaapi->setConfiguration('serial',$serial); 
+		$alexaapi->setConfiguration('device',$device);
+		$alexaapi->setConfiguration('type',$type);
+		$alexaapi->setStatus('online',$online);
+		$alexaapi->save();
+ }			
+			event::add('jeedom::alert', array(
+				'level' => 'success',
+				'page' => 'alexaapi',
+				'message' => __('Scan en cours...', __FILE__),
+			));
+			return;
+}
+
+
   public static function dependancy_install() {
     log::add('alexaapi','info','Installation des dépéndances : alexa-remote-http');
     $resource_path = realpath(dirname(__FILE__) . '/../../resources');
@@ -123,13 +164,17 @@ class alexaapi extends eqLogic {
   }
 
   public function preUpdate() {
-    if ($this->getConfiguration('ip') == '') {
-      throw new Exception(__('L\'adresse ne peut etre vide',__FILE__));
-    }
+    //if ($this->getConfiguration('ip') == '') {throw new Exception(__('L\'adresse ne peut etre vide',__FILE__)); }
+  }
+  
+  public function postSave() {
+
+     // $this->refresh();
+	  //throw new Exception(__('L\'adresse ne peut etre vide',__FILE__));
   }
 
   public function preSave() {
-    $this->setLogicalId($this->getConfiguration('ip'));
+    //$this->setLogicalId($this->getConfiguration('ip'));
   }
 }
 

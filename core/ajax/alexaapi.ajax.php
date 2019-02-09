@@ -79,13 +79,11 @@ foreach ($eqLogics as $eqLogic) {
            ajax::success();
         break;
 
-
-
-
-
-
-
-
+		case 'ScanAmazonAlexa':
+		alexaapi::ScanAmazonAlexa();
+		//throw new \Exception(__('Impossible', __FILE__));
+		ajax::success();
+        break;
 
     }
     throw new \Exception('Aucune methode correspondante');
