@@ -120,12 +120,11 @@ class alexaapi extends eqLogic {
 	public static function ScanAmazonAlexa($_logical_id = null, $_exclusion = 0)
 {
 			
-$json=file_get_contents("http://192.168.0.21:3456/devices");
+$json=file_get_contents("http://".config::byKey('internalAddr').":3456/devices");
 $json = json_decode($json,true);
 
 foreach($json as $item)
 	{
-
 
 
 		$device = $item['name'];
