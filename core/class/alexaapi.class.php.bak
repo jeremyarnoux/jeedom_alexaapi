@@ -18,7 +18,7 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 class alexaapi extends eqLogic {
     public static function sendCommand($name, $value) {
-        $url = 'http://' . config::byKey('internalAddr') . ':3456/' . $value . "&device=" . $name;
+        $url = 'http://' . config::byKey('internalAddr') . ':3456/' . $value . "&device=" . urlencode($name);
         $retour = file_get_contents($url);
         throw new Exception(__('>>' . $url . '>>' . $retour, __FILE__));
     }
@@ -102,20 +102,15 @@ class alexaapi extends eqLogic {
         return $return;
     }
     public static function ScanAmazonAlexa($_logical_id = null, $_exclusion = 0) {
-        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
-        $json = file_get_contents("http://".config::byKey('internalAddr').":3456/devices");
+        $json = file_get_contents("http://192.168.0.21:3456/devices");
         $json = json_decode($json, true);
-		$nbdedevice=0;
-		$nbdedevicenouveau=0;
         foreach ($json as $item) {
-			$nbdedevice++;
             $device = $item['name'];
             $serial = $item['serial'];
             $type = $item['type'];
             $online = $item['online'];
             $alexaapi = alexaapi::byLogicalId($serial, 'alexaapi');
             if (!is_object($alexaapi)) {
-			$nbdedevicenouveau++;
                 $alexaapi = new alexaapi();
                 $alexaapi->setName($device);
                 $alexaapi->setLogicalId($serial);
@@ -129,7 +124,7 @@ class alexaapi extends eqLogic {
             $alexaapi->setStatus('online', $online);
             $alexaapi->save();
         }
-        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. '.$nbdedevice.' équipements mis a jour dont '.$nbdedevicenouveau.' ajouté(s)', __FILE__),));
+        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
         return;
     }
     public static function dependancy_install() {
@@ -152,7 +147,7 @@ class alexaapi extends eqLogic {
     }
 }
 class alexaapiCmd extends cmd {
-    public function executex($_options = null) {
+    public function execute($_options = null) {
         switch ($this->getType()) {
             case 'info':
                 return $this->getConfiguration('value');
@@ -194,20 +189,17 @@ class alexaapiCmd extends cmd {
             
         }
     }
-    public function execute($_options = null) {
+    public function executeeeeee($_options = null) {
         if ($this->getLogicalId() == 'refresh') {
             $this->getEqLogic()->refresh();
             return;
         }
-        $eqLogic = $this->getEqLogic();
-		$device=$eqLogic->getName();
-		//throw new Exception(__('On est LA -->>>>>>'.$device."*".$this->getConfiguration('request')."<<<<<<<<--", __FILE__) . print_r($this, true));
         $result = false;
         $request = str_replace('#API#', config::byKey('api'), $this->getConfiguration('request'));
         if (trim($request) == '') {
             throw new Exception(__('La requête ne peut pas être vide : ', __FILE__) . print_r($this, true));
         }
-       if ($_options != null) {
+        if ($_options != null) {
             switch ($this->getType()) {
                 case 'action':
                     switch ($this->getSubType()) {
@@ -245,12 +237,9 @@ class alexaapiCmd extends cmd {
         $request = scenarioExpression::setTags($request);
         $replace = array('\'' => '', '#eqLogic_id#' => $this->getEqLogic_id(), '#cmd_id#' => $this->getId(),);
         $request = str_replace(array_keys($replace), $replace, $request);
-		//******************************
-		$request ="http://".config::byKey('internalAddr').":3456/".$request."&device=".$device;
-		//******************************
-        log::add('alexaapi', 'debug', 'Request : ' . $request);
-
-				$request = str_replace('"', '%22', $request);
+        switch ($this->getConfiguration('requestType')) {
+            case 'http':
+                $request = str_replace('"', '%22', $request);
                 $request = str_replace(' ', '%20', $request);
                 if ($this->getConfiguration('http_username') != '' && $this->getConfiguration('http_password') != '') {
                     $request_http = new com_http($request, $this->getConfiguration('http_username'), $this->getConfiguration('http_password'));
@@ -275,7 +264,131 @@ class alexaapiCmd extends cmd {
                 if (trim($this->getConfiguration('reponseMustContain')) != '' && strpos($result, trim($this->getConfiguration('reponseMustContain'))) === false) {
                     throw new Exception(__('La réponse ne contient pas "', __FILE__) . $this->getConfiguration('reponseMustContain') . '" : "' . $result . '"');
                 }
-
+            break;
+            case 'script':
+                if (strpos($request, '.php') !== false) {
+                    $request_shell = new com_shell('php ' . $request . ' 2>&1');
+                } elseif (strpos($request, '.rb') !== false) {
+                    $request_shell = new com_shell('ruby ' . $request . ' 2>&1');
+                } elseif (strpos($request, '.py') !== false) {
+                    $request_shell = new com_shell('python ' . $request . ' 2>&1');
+                } elseif (strpos($request, '.pl') !== false) {
+                    $request_shell = new com_shell('perl ' . $request . ' 2>&1');
+                } else {
+                    $request_shell = new com_shell($request . ' 2>&1');
+                }
+                log::add('script', 'debug', 'Execution de : ' . $request_shell->getCmd());
+                if (isset($_options['speedAndNoErrorReport']) && $_options['speedAndNoErrorReport'] == true) {
+                    $request_shell->setBackground(true);
+                }
+                $result = trim($request_shell->exec());
+            break;
+            case 'xml':
+                $request = str_replace('"', '', $request);
+                if ($this->getConfiguration('xml_username') != '' && $this->getConfiguration('xml_password') != '') {
+                    $request_http = new com_http($this->getConfiguration('urlXml'), $this->getConfiguration('xml_username'), $this->getConfiguration('xml_password'));
+                } else {
+                    $request_http = new com_http($this->getConfiguration('urlXml'));
+                }
+                if ($this->getConfiguration('xmlNoSslCheck') == 1) {
+                    $request_http->setNoSslCheck(true);
+                }
+                $xml = trim($request_http->exec($this->getConfiguration('xmlTimeout', 2), $this->getConfiguration('maxXmlRetry', 3)));
+                try {
+                    $xml = new SimpleXMLElement($xml);
+                }
+                catch(Exception $e) {
+                    if ($this->getConfiguration('xml_username') != '' && $this->getConfiguration('xml_password') != '') {
+                        $request_http = new com_http($this->getConfiguration('urlXml'), $this->getConfiguration('xml_username'), $this->getConfiguration('xml_password'));
+                    } else {
+                        $request_http = new com_http($this->getConfiguration('urlXml'));
+                    }
+                    if ($this->getConfiguration('xmlNoSslCheck') == 1) {
+                        $request_http->setNoSslCheck(true);
+                    }
+                    $xml = trim($request_http->exec($this->getConfiguration('xmlTimeout', 2), $this->getConfiguration('maxXmlRetry', 3)));
+                    $xml = new SimpleXMLElement($xml);
+                }
+                $json = json_decode(json_encode($xml), TRUE);
+                $tags = explode('>', $request);
+                foreach ($tags as $tag) {
+                    $tag = trim($tag);
+                    if (isset($json[$tag])) {
+                        $json = $json[$tag];
+                    } elseif (is_numeric(intval($tag)) && isset($json[intval($tag) ])) {
+                        $json = $json[intval($tag) ];
+                    } elseif (is_numeric(intval($tag)) && intval($tag) < 0 && isset($json[count($json) + intval($tag) ])) {
+                        $json = $json[count($json) + intval($tag) ];
+                    } else {
+                        $json = '';
+                        break;
+                    }
+                }
+                $result = (is_array($json)) ? '' : $json;
+                return $result;
+            case 'json':
+                $request = str_replace('"', '', $request);
+                if ($this->getConfiguration('json_username') != '' && $this->getConfiguration('json_password') != '') {
+                    $request_http = new com_http($this->getConfiguration('urlJson'), $this->getConfiguration('json_username'), $this->getConfiguration('json_password'));
+                } else {
+                    $request_http = new com_http($this->getConfiguration('urlJson'));
+                }
+                if ($this->getConfiguration('jsonNoSslCheck') == 1) {
+                    $request_http->setNoSslCheck(true);
+                }
+                $json_str = trim($request_http->exec($this->getConfiguration('jsonTimeout', 2), $this->getConfiguration('maxJsonRetry', 3)));
+                try {
+                    $json = json_decode($json_str, true);
+                }
+                catch(Exception $e) {
+                    if ($this->getConfiguration('json_username') != '' && $this->getConfiguration('json_username') != '') {
+                        $request_http = new com_http($this->getConfiguration('urlJson'), $this->getConfiguration('json_username'), $this->getConfiguration('json_username'));
+                    } else {
+                        $request_http = new com_http($this->getConfiguration('urlJson'));
+                    }
+                    if ($this->getConfiguration('jsonNoSslCheck') == 1) {
+                        $request_http->setNoSslCheck(true);
+                    }
+                    $json_str = trim($request_http->exec($this->getConfiguration('jsonTimeout', 2), $this->getConfiguration('maxJsonRetry', 3)));
+                    $json = json_decode($json_str, true);
+                }
+                if ($json === null) {
+                    throw new Exception(__('Json invalide ou non décodable : ', __FILE__) . $json_str);
+                }
+                $tags = explode('>', $request);
+                foreach ($tags as $tag) {
+                    $tag = trim($tag);
+                    if (isset($json[$tag])) {
+                        $json = $json[$tag];
+                    } elseif (is_numeric(intval($tag)) && isset($json[intval($tag) ])) {
+                        $json = $json[intval($tag) ];
+                    } elseif (is_numeric(intval($tag)) && intval($tag) < 0 && isset($json[count($json) + intval($tag) ])) {
+                        $json = $json[count($json) + intval($tag) ];
+                    } else {
+                        $json = '';
+                        break;
+                    }
+                }
+                if (is_array($json)) {
+                    $result = json_encode($json);
+                } else {
+                    $result = $json;
+                }
+                return $result;
+            case 'html':
+                $request = str_replace('"', '', $request);
+                if ($this->getConfiguration('html_username') != '' && $this->getConfiguration('html_password') != '') {
+                    $request_http = new com_http($this->getConfiguration('urlHtml'), $this->getConfiguration('html_username'), $this->getConfiguration('html_password'));
+                } else {
+                    $request_http = new com_http($this->getConfiguration('urlHtml'));
+                }
+                if ($this->getConfiguration('htmlNoSslCheck') == 1) {
+                    $request_http->setNoSslCheck(true);
+                }
+                $html = $request_http->exec($this->getConfiguration('htmlTimeout', 2), $this->getConfiguration('maxHtmlRetry', 3));
+                phpQuery::newDocumentHTML($html);
+                return pq(trim($request))->html();
+        }
         if ($this->getType() == 'action') {
             foreach ($this->getEqLogic()->getCmd('info') as $cmd) {
                 $value = $cmd->execute();
@@ -284,7 +397,7 @@ class alexaapiCmd extends cmd {
                 }
             }
         }
-        log::add('alexaapi', 'debug', 'Result : ' . $result);
+        log::add('script', 'debug', 'Result : ' . $result);
         return $result;
     }
 }

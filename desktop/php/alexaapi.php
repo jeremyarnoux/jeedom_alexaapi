@@ -18,20 +18,23 @@ $eqLogics = eqLogic::byType($plugin->getId());
       <!-- Container du menu latÈral -->
       <div class="bs-sidebar">
         <!-- Menu latÈral -->
-        <ul id="ul_eqLogic" class="nav nav-list bs-sidenav">
-        </ul>
-      </div>
+<ul id="ul_eqLogic" class="nav nav-list bs-sidenav">
+  <!-- Filtre des objets -->
+  <li class="filter" style="margin-bottom: 5px; width: 100%"><input class="filter form-control input-sm" placeholder="{{Rechercher}}"/></li>
+  <!-- Liste des objets -->
+  <?php foreach ($eqLogics as $eqLogic) : ?>
+  <li class="cursor li_eqLogic" data-eqLogic_id="<?php echo $eqLogic->getId(); ?>">
+    <a><?php echo $eqLogic->getHumanName(true); ?></a>
+  </li>
+  <?php endforeach; ?>
+</ul>      </div>
     </div>
-	
-
 <script>
 	$('#bt_backupsZwave').on('click', function () {
 		$('#md_modal2').dialog({title: "{{G√©n√©ration cookie Amazon}}"});
 		$('#md_modal2').load('index.php?v=d&plugin=alexaapi&modal=cookie').dialog('open');
 	});
 </script>
-
-
     <!-- Container des listes de commandes / ÈlÈments -->
     <div class="col-lg-10 col-md-9 col-sm-8 eqLogicThumbnailDisplay">
       <legend><i class="fa fa-cog"></i> {{Gestion}}</legend>
@@ -60,10 +63,10 @@ $eqLogics = eqLogic::byType($plugin->getId());
                   style="font-size : 1.1em;position:relative; top : 23px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Configuration}}</center></span>
         </div>
       </div>
+
       <!-- DÈbut de la liste des objets -->
       <legend><i class="fa fa-table"></i> {{Mes Amazon Echo}}</legend>
       <!-- Container de la liste -->
-
 <div class="eqLogicThumbnailContainer">
   <?php
 foreach ($eqLogics as $eqLogic) {
@@ -85,9 +88,6 @@ foreach ($eqLogics as $eqLogic) {
 ?>
 </div>
 </div>
-
-	
-	</div>
     <!-- Container du panneau de contrÙle -->
     <div class="col-lg-10 col-md-9 col-sm-8 eqLogic"
          style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
@@ -111,6 +111,8 @@ foreach ($eqLogics as $eqLogic) {
                                                   data-toggle="tab"><i
                     class="fa fa-tachometer"></i> {{Equipement}}</a></li>
         <!-- Onglet "Commandes" -->
+        <li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i
+                    class="fa fa-list-alt"></i> {{Commandes}}</a></li>
       </ul>
       <!-- Container du contenu des onglets -->
    <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
@@ -157,7 +159,6 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
                    </div>
                </div>
 			           <!-- Onglet "Active Visible" -->
-
                <div class="form-group">
                 <label class="col-sm-4 control-label"></label>
                 <div class="col-sm-8">
@@ -183,9 +184,7 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
                     <span class="eqLogicAttr" data-l1key="configuration" data-l2key="type"></span>
                 </div>
             </div>
-
 			        <!-- Onglet "Image" -->
-
             <div class="form-group">
                 <div class="col-sm-10">
 <center>
@@ -193,12 +192,42 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
 </center>
 			            </div>
         </div>
-
-        
     </fieldset>
 </form>
 </div>
-</div>
+    </div>
+      </div>
+
+      <div role="tabpanel" class="tab-pane" id="commandtab">
+      <form class="form-horizontal">
+        <fieldset>
+          <div class="form-actions">
+            <a class="btn btn-success btn-sm cmdAction" id="bt_addespeasyAction"><i class="fa fa-plus-circle"></i> {{Ajouter une commande action}}</a>
+          </div>
+        </fieldset>
+      </form>
+      <br />
+
+      <table id="table_cmd" class="table table-bordered table-condensed">
+        <thead>
+          <tr>
+            <th style="width: 50px;">#</th>
+            <th style="width: 150px;">{{Nom}}</th>
+            <th style="width: 150px;">{{Type}}</th>
+            <th style="width: 250px;">{{Task et Variable}}</th>
+            <th>{{Valeur}}</th>
+            <th style="width: 100px;">{{Min/Max}}</th>
+            <th style="width: 150px;">{{Param√®tres}}</th>
+            <th style="width: 100px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
 
 <?php include_file('desktop', 'alexaapi', 'js', 'alexaapi'); ?>
+<?php include_file('desktop', 'alexaapi', 'css', 'alexaapi'); ?>
 <?php include_file('core', 'plugin.template', 'js'); ?>

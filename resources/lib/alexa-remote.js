@@ -61,6 +61,10 @@ class AlexaRemote extends EventEmitter {
     }
 
     init(cookie, callback) {
+
+
+
+
         if (typeof cookie === 'object') {
             this._options = cookie;
             if (!this._options.userAgent) {
@@ -80,7 +84,7 @@ class AlexaRemote extends EventEmitter {
 
             cookie = this._options.cookie;
         }
-        this._options.logger && this._options.logger('Alexa-Remote: Use as User-Agent: ' + this._options.userAgent);
+       this._options.logger && this._options.logger('Alexa-Remote: Use as User-Agent: ' + this._options.userAgent);
         this._options.logger && this._options.logger('Alexa-Remote: Use as Login-Amazon-URL: ' + this._options.amazonPage);
         if (this._options.alexaServiceHost) this.baseUrl = this._options.alexaServiceHost;
         this._options.logger && this._options.logger('Alexa-Remote: Use as Base-URL: ' + this.baseUrl);
