@@ -177,3 +177,66 @@ if (init(_cmd.type) == 'action') {
 
 }
 }
+
+jeedom.plugin.getDeamonCookieInfo = function(_params) {
+    var paramsRequired = ['id'];
+    var paramsSpecifics = {
+        global: false,
+    };
+    try {
+        jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+    } catch (e) {
+        (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+        return;
+    }
+    var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
+    var paramsAJAX = jeedom.private.getParamsAJAX(params);
+    paramsAJAX.url = 'plugins/alexaapi/core/ajax/alexaapi.ajax.php';
+    paramsAJAX.data = {
+        action: 'getDeamonCookieInfo',
+        id: _params.id
+    };
+    $.ajax(paramsAJAX);
+};
+
+jeedom.plugin.deamonCookieStart = function(_params) {
+    var paramsRequired = ['id'];
+    var paramsSpecifics = {};
+    try {
+        jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+    } catch (e) {
+        (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+        return;
+    }
+    var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
+    var paramsAJAX = jeedom.private.getParamsAJAX(params);
+    paramsAJAX.url = 'plugins/alexaapi/core/ajax/alexaapi.ajax.php';
+    paramsAJAX.data = {
+        action: 'deamonCookieStart',
+        id: _params.id,
+        debug: _params.debug || 0,
+        forceRestart: _params.forceRestart || 0
+    };
+    $.ajax(paramsAJAX);
+};
+
+jeedom.plugin.deamonCookieStop = function(_params) {
+    var paramsRequired = ['id'];
+    var paramsSpecifics = {};
+    try {
+        jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+    } catch (e) {
+        (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+        return;
+    }
+    var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
+    var paramsAJAX = jeedom.private.getParamsAJAX(params);
+    paramsAJAX.url = 'plugins/alexaapi/core/ajax/alexaapi.ajax.php';
+    paramsAJAX.data = {
+        action: 'deamonCookieStop',
+        id: _params.id
+    };
+    $.ajax(paramsAJAX);
+};
+
+

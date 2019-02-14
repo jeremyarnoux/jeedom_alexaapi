@@ -22,15 +22,28 @@ class alexaapi extends eqLogic {
         $retour = file_get_contents($url);
         throw new Exception(__('>>' . $url . '>>' . $retour, __FILE__));
     }
+    //*********** Demon ***************
     public static function deamon_info() {
         $return = array();
         $return['log'] = 'alexaapi_node';
-        $return['state'] = 'nok';
+        $return['state'] = 'nok'; // bien ecrire en municules
+		// Regarder si alexaapi.js est lanc�
         $pid = trim(shell_exec('ps ax | grep "alexaapi/resources/alexaapi.js" | grep -v "grep" | wc -l'));
         if ($pid != '' && $pid != '0') {
             $return['state'] = 'ok';
         }
-        $return['launchable'] = 'ok';
+        // Regarder si le cookie existe :alexa-cookie.json
+		
+		$request = realpath(dirname(__FILE__) . '/../../resources/data/alexa-cookie.json');
+        if (file_exists($request)) {
+            $return['launchable'] = 'ok';
+        } else {
+            $return['launchable'] = 'nok';
+			$return['launchable_message'] = "Cookie Amazon ABSENT ";
+
+        }
+            //$return['launchable'] = 'ok'; //////////////!!!!!!!!!!!
+
         return $return;
     }
     public static function deamon_start($_debug = false) {
@@ -86,7 +99,55 @@ class alexaapi extends eqLogic {
             exec('sudo kill -9 $(ps aux | grep "/alexaapi.js" | awk \'{print $2}\')');
         }
     }
+    //*********** Demon Cookie***************
+
+	public static function deamonCookie_start($_debug = false) {
+
+        self::deamonCookie_stop();
+        
+		$deamon_info = self::deamon_info();
+
+        log::add('alexaapi_cookie', 'info', 'Lancement du démon cookie');
+        //      $url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/alexaapi/core/api/jeealexaapi.php?apikey=' .jeedom::getApiKey('alexaapi');
+        if ($_debug = true) {
+            $log = "1";
+        } else {
+            $log = "0";
+        }
+            $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
+            //Par s�curit�, on Kill un �ventuel pr�c�dent proessus initCookie.js
+            $cmd = "kill $(ps aux | grep 'initCookie.js' | awk '{print $2}')";
+            log::add('alexaapi', 'debug', '---- Kill initCookie.js: ' . $cmd);
+            //$result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
+            //    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexa-remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
+		//throw new Exception(__('ICI', __FILE__));
+            $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/initCookie.js ' . config::byKey('internalAddr');
+            log::add('alexaapi', 'debug', '---- Lancement démon Alexa-API-Cookie sur port 3457 : ' . $cmd);
+            $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
+            if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
+                log::add('alexaapi', 'error', $result);
+                return false;
+            }
+
+        message::removeAll('alexaapi', 'unableStartDeamonCookie');
+        log::add('alexaapi_cookie', 'info', 'Démon cookie lancé');
+        return true;
+    }
+
+
+    public static function deamonCookie_stop() {
+        exec('kill $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')');
+        log::add('alexaapi', 'info', 'Arrêt du service cookie');
+        $deamon_info = self::deamon_info();
+        if ($deamon_info['stateCookie'] == 'ok') {
+            sleep(1);
+            exec('kill -9 $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')');
+        }
+
+    }
+    //************D�pendances ***********
     public static function dependancy_info() {
+      log::add('alexaapi','info','Controle dependances');
         $return = array();
         $return['log'] = 'alexaapi_dep';
         //$serialport = realpath(dirname(__FILE__) . '/../../resources/node_modules/http');
@@ -98,24 +159,25 @@ class alexaapi extends eqLogic {
             $return['state'] = 'ok';
         } else {
             $return['state'] = 'nok';
+
         }
         return $return;
     }
     public static function ScanAmazonAlexa($_logical_id = null, $_exclusion = 0) {
         event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
-        $json = file_get_contents("http://".config::byKey('internalAddr').":3456/devices");
+        $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
         $json = json_decode($json, true);
-		$nbdedevice=0;
-		$nbdedevicenouveau=0;
+        $nbdedevice = 0;
+        $nbdedevicenouveau = 0;
         foreach ($json as $item) {
-			$nbdedevice++;
+            $nbdedevice++;
             $device = $item['name'];
             $serial = $item['serial'];
             $type = $item['type'];
             $online = $item['online'];
             $alexaapi = alexaapi::byLogicalId($serial, 'alexaapi');
             if (!is_object($alexaapi)) {
-			$nbdedevicenouveau++;
+                $nbdedevicenouveau++;
                 $alexaapi = new alexaapi();
                 $alexaapi->setName($device);
                 $alexaapi->setLogicalId($serial);
@@ -129,7 +191,7 @@ class alexaapi extends eqLogic {
             $alexaapi->setStatus('online', $online);
             $alexaapi->save();
         }
-        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. '.$nbdedevice.' équipements mis a jour dont '.$nbdedevicenouveau.' ajouté(s)', __FILE__),));
+        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $nbdedevice . ' équipements mis a jour dont ' . $nbdedevicenouveau . ' ajouté(s)', __FILE__),));
         return;
     }
     public static function dependancy_install() {
@@ -200,14 +262,14 @@ class alexaapiCmd extends cmd {
             return;
         }
         $eqLogic = $this->getEqLogic();
-		$device=$eqLogic->getName();
-		//throw new Exception(__('On est LA -->>>>>>'.$device."*".$this->getConfiguration('request')."<<<<<<<<--", __FILE__) . print_r($this, true));
+        $device = $eqLogic->getName();
+        //throw new Exception(__('On est LA -->>>>>>'.$device."*".$this->getConfiguration('request')."<<<<<<<<--", __FILE__) . print_r($this, true));
         $result = false;
         $request = str_replace('#API#', config::byKey('api'), $this->getConfiguration('request'));
         if (trim($request) == '') {
             throw new Exception(__('La requête ne peut pas être vide : ', __FILE__) . print_r($this, true));
         }
-       if ($_options != null) {
+        if ($_options != null) {
             switch ($this->getType()) {
                 case 'action':
                     switch ($this->getSubType()) {
@@ -245,37 +307,35 @@ class alexaapiCmd extends cmd {
         $request = scenarioExpression::setTags($request);
         $replace = array('\'' => '', '#eqLogic_id#' => $this->getEqLogic_id(), '#cmd_id#' => $this->getId(),);
         $request = str_replace(array_keys($replace), $replace, $request);
-		//******************************
-		$request ="http://".config::byKey('internalAddr').":3456/".$request."&device=".$device;
-		//******************************
+        //******************************
+        $request = "http://" . config::byKey('internalAddr') . ":3456/" . $request . "&device=" . $device;
+        //******************************
         log::add('alexaapi', 'debug', 'Request : ' . $request);
-
-				$request = str_replace('"', '%22', $request);
-                $request = str_replace(' ', '%20', $request);
-                if ($this->getConfiguration('http_username') != '' && $this->getConfiguration('http_password') != '') {
-                    $request_http = new com_http($request, $this->getConfiguration('http_username'), $this->getConfiguration('http_password'));
-                } else {
-                    $request_http = new com_http($request);
-                }
-                if ($this->getConfiguration('allowEmptyResponse') == 1) {
-                    $request_http->setAllowEmptyReponse(true);
-                }
-                if ($this->getConfiguration('noSslCheck') == 1) {
-                    $request_http->setNoSslCheck(true);
-                }
-                if ($this->getConfiguration('doNotReportHttpError') == 1) {
-                    $request_http->setNoReportError(true);
-                }
-                if (isset($_options['speedAndNoErrorReport']) && $_options['speedAndNoErrorReport'] == true) {
-                    $request_http->setNoReportError(true);
-                    $request_http->exec(0.1, 1);
-                    return;
-                }
-                $result = trim($request_http->exec($this->getConfiguration('timeout', 2), $this->getConfiguration('maxHttpRetry', 3)));
-                if (trim($this->getConfiguration('reponseMustContain')) != '' && strpos($result, trim($this->getConfiguration('reponseMustContain'))) === false) {
-                    throw new Exception(__('La réponse ne contient pas "', __FILE__) . $this->getConfiguration('reponseMustContain') . '" : "' . $result . '"');
-                }
-
+        $request = str_replace('"', '%22', $request);
+        $request = str_replace(' ', '%20', $request);
+        if ($this->getConfiguration('http_username') != '' && $this->getConfiguration('http_password') != '') {
+            $request_http = new com_http($request, $this->getConfiguration('http_username'), $this->getConfiguration('http_password'));
+        } else {
+            $request_http = new com_http($request);
+        }
+        if ($this->getConfiguration('allowEmptyResponse') == 1) {
+            $request_http->setAllowEmptyReponse(true);
+        }
+        if ($this->getConfiguration('noSslCheck') == 1) {
+            $request_http->setNoSslCheck(true);
+        }
+        if ($this->getConfiguration('doNotReportHttpError') == 1) {
+            $request_http->setNoReportError(true);
+        }
+        if (isset($_options['speedAndNoErrorReport']) && $_options['speedAndNoErrorReport'] == true) {
+            $request_http->setNoReportError(true);
+            $request_http->exec(0.1, 1);
+            return;
+        }
+        $result = trim($request_http->exec($this->getConfiguration('timeout', 2), $this->getConfiguration('maxHttpRetry', 3)));
+        if (trim($this->getConfiguration('reponseMustContain')) != '' && strpos($result, trim($this->getConfiguration('reponseMustContain'))) === false) {
+            throw new Exception(__('La réponse ne contient pas "', __FILE__) . $this->getConfiguration('reponseMustContain') . '" : "' . $result . '"');
+        }
         if ($this->getType() == 'action') {
             foreach ($this->getEqLogic()->getCmd('info') as $cmd) {
                 $value = $cmd->execute();

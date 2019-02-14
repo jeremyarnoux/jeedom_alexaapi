@@ -1,5 +1,8 @@
 <?php
-
+if (!isConnect()) {
+  include_file('desktop', '404', 'php');
+  die();
+}
 /* This file is part of Jeedom.
 *
 * Jeedom is free software: you can redistribute it and/or modify
@@ -16,22 +19,19 @@
 * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 */
 
+//print $_GET['plugin'];
+//print $_GET['configure'];
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 include_file('core', 'authentification', 'php');
-if (!isConnect()) {
-  include_file('desktop', '404', 'php');
-  die();
-}
+include_file('plugin_info', 'configuration2', 'configuration', 'alexaapi');
 ?>
-
-
+    <legend><i class="icon fa fa-spinner"></i> {{Informations complémentaires}}</legend>
 <form class="form-horizontal">
   <div class="form-group">
     <fieldset>
-
       <div class="form-group">
         <label class="col-lg-4 control-label">{{IP Controleur de l'API Alexa}} :</label>
-        <div class="col-lg-4">
+        <div class="col-lg-4" style="position:relative;top:+8px;">
           <?php
             echo config::byKey('internalAddr');
           ?>
@@ -39,8 +39,8 @@ if (!isConnect()) {
       </div>
 
       <div class="form-group">
-        <label class="col-lg-4 control-label">{{Port Controleur à utiliser}} :</label>
-        <div class="col-lg-4">
+        <label class="col-lg-4 control-label">{{port Controleur à utiliser}} :</label>
+        <div class="col-lg-4" style="position:relative;top:+8px;">
           3456
         </div>
       </div>
@@ -54,21 +54,4 @@ if (!isConnect()) {
       </div>
     </fieldset>
   </form>
-<form class="form-horizontal">
-    <fieldset>
-    <legend><i class="icon loisir-darth"></i> {{Génération manuelle du cookie Amazon}}</legend>
-		 <div class="form-group">
-	<label class="col-lg-4"></label>
-	<div class="col-lg-8">
-		<a class="btn btn-warning" id="bt_backupsZwave"><i class="fa fa-cogs"></i> {{Lancer la génération}}</a>
-	</div>
-</fieldset>
-</form>
 </div>
-
-<script>
-	$('#bt_backupsZwave').on('click', function () {
-		$('#md_modal2').dialog({title: "{{Génération cookie Amazon}}"});
-		$('#md_modal2').load('index.php?v=d&plugin=alexaapi&modal=cookie').dialog('open');
-	});
-</script>
