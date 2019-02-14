@@ -122,10 +122,17 @@ foreach ($eqLogics as $eqLogic) {
         <div class="col-sm-7">
             <form class="form-horizontal">
                 <fieldset>
+				            <div class="form-group">
+              <label class="col-sm-4 control-label">{{Nom de l'équipement Jeedom}}</label>
+              <div class="col-sm-8">
+                <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement Amazon}}"/>
+              </div>
+            </div>
+
                                 <div class="form-group">
-                        <label class="col-sm-4 control-label">{{Nom de l'équipement}}</label>
-                <div class="col-sm-8">
-                    <span class="eqLogicAttr" data-l1key="name"></span>
+                        <label class="col-sm-4 control-label">{{Nom de l'équipement Amazon}}</label> 
+                <div class="col-sm-8"> 
+                    <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="device"> </span>
                 </div>
             </div>
         <!-- Onglet "Objet Parent" -->
@@ -214,8 +221,8 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
             <th style="width: 50px;">#</th>
             <th style="width: 150px;">{{Nom}}</th>
             <th style="width: 150px;">{{Type}}</th>
-            <th style="width: 250px;">{{Task et Variable}}</th>
-            <th>{{Valeur}}</th>
+            <th style="width: 250px;">{{Commande & Variable}}</th>
+            <th>{{Commande envoyée}}</th>
             <th style="width: 100px;">{{Min/Max}}</th>
             <th style="width: 150px;">{{Paramètres}}</th>
             <th style="width: 100px;"></th>

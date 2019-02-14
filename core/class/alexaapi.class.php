@@ -184,12 +184,32 @@ class alexaapi extends eqLogic {
                 $alexaapi->setEqType_name('alexaapi');
                 $alexaapi->setIsEnable(1);
                 $alexaapi->setIsVisible(1);
+				$alexaapi->setConfiguration('device', $device);
+				$alexaapi->save();
+				$cmd = new alexaapiCmd();
+				$cmd->setType('action');
+				$cmd->setSubType('message');
+				$cmd->setEqLogic_id($alexaapi->getId());
+				$cmd->setName('Speak');
+				$cmd->setConfiguration('request', 'speak?text=#message#');
+				$cmd->save();
+				$cmd = new alexaapiCmd();
+				$cmd->setType('action');
+				$cmd->setSubType('slider');
+				$cmd->setEqLogic_id($alexaapi->getId());
+				$cmd->setName('Volume');
+				$cmd->setConfiguration('request', 'volume?value=#slider#');
+				$cmd->setConfiguration('minValue', '0');
+				$cmd->setConfiguration('maxValue', '100');
+				$cmd->save();
             }
             $alexaapi->setConfiguration('serial', $serial);
             $alexaapi->setConfiguration('device', $device);
             $alexaapi->setConfiguration('type', $type);
             $alexaapi->setStatus('online', $online);
             $alexaapi->save();
+
+
         }
         event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $nbdedevice . ' équipements mis a jour dont ' . $nbdedevicenouveau . ' ajouté(s)', __FILE__),));
         return;
@@ -250,8 +270,8 @@ class alexaapiCmd extends cmd {
     public function preSave() {
         if ($this->getType() == "action") {
             $eqLogic = $this->getEqLogic();
-            log::add('alexaapi', 'info', 'http://' . config::byKey('internalAddr') . ':3456/' . $this->getConfiguration('request') . "&device=" . $eqLogic->getName());
-            $this->setConfiguration('value', 'http://' . config::byKey('internalAddr') . ':3456/' . $this->getConfiguration('request') . "&device=" . $eqLogic->getName());
+            log::add('alexaapi', 'info', 'http://' . config::byKey('internalAddr') . ':3456/' . $this->getConfiguration('request') . "&device=" . $eqLogic->getConfiguration('device'));
+            $this->setConfiguration('value', 'http://' . config::byKey('internalAddr') . ':3456/' . $this->getConfiguration('request') . "&device=" . $eqLogic->getConfiguration('device'));
             //$this->save();
             
         }
@@ -262,7 +282,8 @@ class alexaapiCmd extends cmd {
             return;
         }
         $eqLogic = $this->getEqLogic();
-        $device = $eqLogic->getName();
+        //$device = $eqLogic->getName();
+        $device = $eqLogic->getConfiguration('device');
         //throw new Exception(__('On est LA -->>>>>>'.$device."*".$this->getConfiguration('request')."<<<<<<<<--", __FILE__) . print_r($this, true));
         $result = false;
         $request = str_replace('#API#', config::byKey('api'), $this->getConfiguration('request'));
