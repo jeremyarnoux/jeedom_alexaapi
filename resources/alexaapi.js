@@ -233,6 +233,17 @@ function startServer()
       process.exit(-1);
     }
 
+    fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) =>
+    {
+      if (err)
+      {
+        config.logger && config.logger('Alexa-API - Error while saving the cookie to: ' + config.cookieLocation);
+        config.logger && config.logger('Alexa-API - ' + err);
+      }
+
+      config.logger && config.logger('Alexa-API - New cookie saved to:' + config.cookieLocation);
+    });
+
     // Start the server
     server = app.listen(config.listeningPort, () =>
     {

@@ -35,71 +35,78 @@ class AlexaRemote extends EventEmitter {
         this.baseUrl = 'alexa.amazon.fr';
     }
 
-    setCookie(_cookie) {
-        if (!_cookie) return;
-        if (typeof _cookie === 'string') {
+    setCookie(_cookie)
+    {
+        if (!_cookie)
+          return;
+
+        if (typeof _cookie === 'string')
+        {
             this.cookie = _cookie;
         }
-        else if (_cookie && _cookie.cookie && typeof _cookie.cookie === 'string') {
+        else if(_cookie && _cookie.cookie && typeof _cookie.cookie === 'string')
+        {
             this.cookie = _cookie.cookie;
         }
-        else if (_cookie && _cookie.localCookie && typeof _cookie.localCookie === 'string') {
+        else if(_cookie && _cookie.localCookie && typeof _cookie.localCookie === 'string')
+        {
             this.cookie = _cookie.localCookie;
             this._options.formerRegistrationData = this.cookieData = _cookie;
         }
-        else if (_cookie && _cookie.cookie && typeof _cookie.cookie === 'object') {
+        else if(_cookie && _cookie.cookie && typeof _cookie.cookie === 'object')
+        {
             return this.setCookie(_cookie.cookie);
         }
 
         let ar = this.cookie.match(/csrf=([^;]+)/);
-        if (!ar || ar.length < 2) ar = this.cookie.match(/csrf=([^;]+)/);
-        if (!this.csrf && ar && ar.length >= 2) {
+        if (!ar || ar.length < 2)
+          ar = this.cookie.match(/csrf=([^;]+)/);
+
+        if (!this.csrf && ar && ar.length >= 2)
             this.csrf = ar[1];
-        }
+
         this._options.csrf = this.csrf;
         this._options.cookie = this.cookie;
     }
 
-    init(cookie, callback) {
-
-
-
-
-        if (typeof cookie === 'object') {
+    init(cookie, callback)
+    {
+        if (typeof cookie === 'object')
+        {
             this._options = cookie;
-            if (!this._options.userAgent) {
+            if (!this._options.userAgent)
+            {
                 let platform = os.platform();
-                if (platform === 'win32') {
+                if (platform === 'win32') 
                     this._options.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0';
-                }
-                /*else if (platform === 'darwin') {
-                    this._options.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
-                }*/
-                else {
+                else 
                     this._options.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
-                }
             }
             this._options.amazonPage = this._options.amazonPage || 'amazon.fr';
             this.baseUrl = 'alexa.' + this._options.amazonPage;
 
             cookie = this._options.cookie;
         }
-       this._options.logger && this._options.logger('Alexa-Remote: Use as User-Agent: ' + this._options.userAgent);
+        this._options.logger && this._options.logger('Alexa-Remote: Use as User-Agent: ' + this._options.userAgent);
         this._options.logger && this._options.logger('Alexa-Remote: Use as Login-Amazon-URL: ' + this._options.amazonPage);
-        if (this._options.alexaServiceHost) this.baseUrl = this._options.alexaServiceHost;
+        if (this._options.alexaServiceHost)
+            this.baseUrl = this._options.alexaServiceHost;
         this._options.logger && this._options.logger('Alexa-Remote: Use as Base-URL: ' + this.baseUrl);
         this._options.alexaServiceHost = this.baseUrl;
-        if (this._options.refreshCookieInterval !== 0) {
+        if (this._options.refreshCookieInterval !== 0)
             this._options.refreshCookieInterval = this._options.refreshCookieInterval || 7*24*60*1000; // Auto Refresh after 7 days
-        }
 
         const self = this;
-        function getCookie(callback) {
-            if (!self.cookie) {
+        function getCookie(callback)
+        {
+            if (!self.cookie)
+            {
                 self._options.logger && self._options.logger('Alexa-Remote: No cookie given, generate one');
                 self._options.cookieJustCreated = true;
-                self.generateCookie(self._options.email, self._options.password, function(err, res) {
-                    if (!err && res) {
+                self.generateCookie(self._options.email, self._options.password, function(err, res)
+                {
+                    if (!err && res)
+                    {
                         self.setCookie(res); // update
                         self.alexaCookie.stopProxyServer();
                         return callback (null);
@@ -107,54 +114,73 @@ class AlexaRemote extends EventEmitter {
                     callback(err);
                 });
             }
-            else {
+            else
+            {
                 self._options.logger && self._options.logger('Alexa-Remote: cookie was provided');
-                if (self._options.formerRegistrationData) {
+                if (self._options.formerRegistrationData)
+                {
                     const tokensValidSince = Date.now() - self._options.formerRegistrationData.tokenDate;
-                    if (tokensValidSince < 24 * 60 * 60 * 1000) {
+                    if (tokensValidSince < 24 * 60 * 60 * 1000)
                         return callback(null);
-                    }
+
                     self._options.logger && self._options.logger('Alexa-Remote: former registration data exist, try refresh');
-                    self._options.logger && self._options.logger(JSON.stringify(self._options.formerRegistrationData));
-                    self.refreshCookie(function(err, res) {
-                        if (err || !res) {
+                    self.refreshCookie(function(err, res)
+                    {
+                        if (err || !res)
+                        {
                             self._options.logger && self._options.logger('Alexa-Remote: Error from refreshing cookies');
                             self.cookie = null;
                             return getCookie(callback); // error on refresh
                         }
+
                         self.setCookie(res); // update
                         return callback(null);
                     });
                 }
-                else {
+                else
+                {
                     callback(null);
                 }
             }
         }
 
         this.setCookie(cookie); // set initial cookie
-        getCookie((err) => {
-            if (typeof callback === 'function') callback = callback.bind(this);
-            if (err) {
+        getCookie((err) =>
+        {
+            if (typeof callback === 'function')
+                callback = callback.bind(this);
+
+            if (err)
+            {
                 this._options.logger && this._options.logger('Alexa-Remote: Error from retrieving cookies');
                 return callback && callback(err);
             }
-            if (!this.csrf) return callback && callback(new Error('no csrf found'));
-            this.checkAuthentication((authenticated) => {
+
+            if (!this.csrf)
+                return callback && callback(new Error('no csrf found'));
+
+            this.checkAuthentication((authenticated) =>
+            {
                 this._options.logger && this._options.logger('Alexa-Remote: Authentication checked: ' + authenticated);
-                if (! authenticated && !this._options.cookieJustCreated) {
+                if (! authenticated && !this._options.cookieJustCreated)
+                {
                     this._options.logger && this._options.logger('Alexa-Remote: Cookie was set, but authentication invalid');
                     delete this._options.cookie;
                     delete this._options.csrf;
                     return this.init(this._options, callback);
                 }
+
                 this.lastAuthCheck = new Date().getTime();
-                if (this.cookieRefreshTimeout) {
+                if (this.cookieRefreshTimeout)
+                {
                     clearTimeout(this.cookieRefreshTimeout);
                     this.cookieRefreshTimeout = null;
                 }
-                if (this._options.cookieRefreshInterval) {
-                    this.cookieRefreshTimeout = setTimeout(() => {
+
+                if (this._options.cookieRefreshInterval)
+                {
+                    this.cookieRefreshTimeout = setTimeout(() =>
+                    {
                         this.cookieRefreshTimeout = null;
                         this._options.cookie = this.cookieData;
                         delete this._options.csrf;
@@ -385,7 +411,6 @@ class AlexaRemote extends EventEmitter {
         path = path.replace(/[\n ]/g, '');
         if (!path.startsWith('/')) {
             path = path.replace(/^https:\/\//, '');
-            //let ar = path.match(/^([^\/]+)(\/.*$)/);
             let ar = path.match(/^([^\/]+)([\/]*.*$)/);
             options.host = ar[1];
             path = ar[2];
@@ -417,35 +442,39 @@ class AlexaRemote extends EventEmitter {
                 body += chunk;
             });
 
-            res.on('end', () => {
+            res.on('end', () =>
+            {
                 let ret;
-                if (typeof callback === 'function') {
-                    if (!body) {
+                if (typeof callback === 'function')
+                {
+                    if (!body)
+                    {
                         this._options.logger && this._options.logger('Alexa-Remote: Response: No body');
-                        return callback/*.length >= 2*/ && callback(new Error('no body'), null);
+                        return callback && callback(null, null);
                     }
-                    try {
+                    try
+                    {
                         ret = JSON.parse(body);
-                    } catch(e) {
+                    } catch(e)
+                    {
                         this._options.logger && this._options.logger('Alexa-Remote: Response: No/Invalid JSON');
                         this._options.logger && this._options.logger(body);
-                        if (callback/*.length >= 2*/) return callback (new Error('no JSON'), body);
+                        return callback && callback(new Error('no JSON'), body);
                     }
                     this._options.logger && this._options.logger('Alexa-Remote: Response: ' + JSON.stringify(ret));
-                    if (callback/*.length >= 2*/) return callback (null, ret);
-                    callback(ret);
+                    return callback && callback (null, ret);
                 }
             });
         });
 
-        req.on('error', function(e) {
-            if(typeof callback === 'function'/* && callback.length >= 2*/) {
+        req.on('error', function(e)
+        {
+            if(typeof callback === 'function')
                 return callback (e, null);
-            }
         });
-        if (flags && flags.data) {
+
+        if (flags && flags.data)
             req.write(flags.data);
-        }
         req.end();
     }
 
