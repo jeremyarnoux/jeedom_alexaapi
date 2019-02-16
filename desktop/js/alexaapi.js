@@ -15,170 +15,174 @@
 
 */
 
-$("#bt_addespeasyAction").on('click', function(event) {
+$("#bt_addespeasyAction").on('click', function(event)
+{
   var _cmd = {type: 'action'};
   addCmdToTable(_cmd);
 });
 
-
-
-$('#bt_sante').on('click', function () {
-$('#md_modal').dialog({title: "{{Liste Amazon Echo}}"});
-$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=health').dialog('open');
+$('#bt_sante').on('click', function ()
+{
+  $('#md_modal').dialog({title: "{{Liste Amazon Echo}}"});
+  $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=health').dialog('open');
 });
 
  $('#bt_scan').on('click', function () {
-    ScanAmazonAlexa();
+    scanAmazonAlexa();
 });
 
-
- $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').on('change', function () {
-
- //$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=health').dialog('open');
-   //$('#img_device').attr("src",'plugins/alexaapi/core/config/devices/ECHO.jpg');
-$icon = $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value();
-		if($icon != '' && $icon != null)
-		{
-		$('#img_device').attr("src", 'plugins/alexaapi/core/config/devices/'+$icon+'.png');
-		}
-
-
- //$('#div_alert').showAlert({message: 'Message :'+$icon, level: 'success'});
-   /* if (!confirm('{{Génération des équipements Amazon Echo. Voulez-vous continuer ?}}')) {
-        return;
-    }
-
-    if (!confirm('{{Dommage !!! Pas encore fait !}}')) {
-        return;
-    }
-*/
-
+$('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').on('change', function ()
+{
+  $icon = $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value();
+  if($icon != '' && $icon != null)
+    $('#img_device').attr("src", 'plugins/alexaapi/core/config/devices/' + $icon + '.png');
 });
 
-function ScanAmazonAlexa() {
-    $.ajax({
-        type: "POST", 
-        url: "plugins/alexaapi/core/ajax/alexaapi.ajax.php", 
-        data: {
-            action: "ScanAmazonAlexa",
-        },
-        dataType: 'json',
-        error: function (request, status, error) {
-            handleAjaxError(request, status, error);
-        },
-        success: function (data) { 
-            if (data.state != 'ok') {
-                $('#div_alert').showAlert({message: data.result, level: 'danger'});
-                return;
-            }
-            window.location.reload();
-        }
-    });
+function scanAmazonAlexa()
+{
+  $.ajax({
+      type: "POST", 
+      url: "plugins/alexaapi/core/ajax/alexaapi.ajax.php", 
+      data:
+      {
+          action: "scanAmazonAlexa",
+      },
+      dataType: 'json',
+      error: function (request, status, error)
+      {
+          handleAjaxError(request, status, error);
+      },
+      success: function (data)
+      { 
+          if (data.state != 'ok') {
+              $('#div_alert').showAlert({message: data.result, level: 'danger'});
+              return;
+          }
+          window.location.reload();
+      }
+  });
 }
 
-function addCmdToTable(_cmd) {
-  if (!isset(_cmd)) {
-        var _cmd = {configuration: {}};
+function addCmdToTable(_cmd)
+{
+  if (!isset(_cmd))
+    var _cmd = {configuration: {}};
+
+  if (init(_cmd.type) == 'info')
+  {
+    var tr =
+       '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">'
+     +   '<td>'
+     +     '<span class="cmdAttr" data-l1key="id"></span>'
+     +   '</td>'
+     +   '<td>'
+     +     '<input class="cmdAttr form-control input-sm" data-l1key="name" style="width : 140px;" placeholder="{{Nom du capteur}}"></td>'
+     +   '<td>'
+     +     '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
+     +     '<span class="subType" subType="' + init(_cmd.subType) + '"></span>'
+     +   '</td>'
+     +   '<td>'
+     +     '<span class="cmdAttr"  data-l1key="configuration" data-l2key="cmd"></span> (Task <span class="cmdAttr"  data-l1key="configuration" data-l2key="taskid"></span>)'
+     +   '</td>'
+     +   '<td>'
+     +     '<span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span>'
+     +   '</td>'
+     +   '<td>'
+     +     '<input class="cmdAttr form-control input-sm" data-l1key="unite" style="width : 90px;" placeholder="{{Unite}}">'
+     +   '</td>'
+     +   '<td>'
+     +     '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></span> '
+     +     '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> '
+     +   '</td>'
+     + '<td>';
+
+    if (is_numeric(_cmd.id))
+    {
+      tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fa fa-cogs"></i></a> '
+          + '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
     }
 
-  if (init(_cmd.type) == 'info') {
-    var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
-    tr += '<td>';
-    tr += '<span class="cmdAttr" data-l1key="id"></span>';
-    tr += '</td>';
-    tr += '<td>';
-    tr += '<input class="cmdAttr form-control input-sm" data-l1key="name" style="width : 140px;" placeholder="{{Nom du capteur}}"></td>';
-    tr += '<td>';
-    tr += '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>';
-    tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
-    tr += '</td>';
-    tr += '<td>';
-    tr += '<span class="cmdAttr"  data-l1key="configuration" data-l2key="cmd"></span> (Task <span class="cmdAttr"  data-l1key="configuration" data-l2key="taskid"></span>)';
-    tr += '</td><td>';
-    tr += '<span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span>';
-    tr += '</td><td>';
-    tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite" style="width : 90px;" placeholder="{{Unite}}">';
-    tr += '</td><td>';
-    tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></span> ';
-    tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ';
-    tr += '</td>';
-    tr += '<td>';
-    if (is_numeric(_cmd.id)) {
-      tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fa fa-cogs"></i></a> ';
-      tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
-    }
-    tr += '<i class="fa fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i></td>';
-    tr += '</tr>';
+    tr += '<i class="fa fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>'
+     +   '</td>'
+     + '</tr>';
+
     $('#table_cmd tbody').append(tr);
     $('#table_cmd tbody tr:last').setValues(_cmd, '.cmdAttr');
-    /*if (isset(_cmd.type)) {
-    $('#table_cmd tbody tr:last .cmdAttr[data-l1key=type]').value(init(_cmd.type));
   }
-  jeedom.cmd.changeType($('#table_cmd tbody tr:last'), init(_cmd.subType));*/
-}
 
-if (init(_cmd.type) == 'action') {
-  var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
-  tr += '<td>';
-  tr += '<span class="cmdAttr" data-l1key="id"></span>';
-  tr += '</td>';
-  tr += '<td>';
-  tr += '<div class="row">';
-  tr += '<div class="col-lg-6">';
-  tr += '<a class="cmdAction btn btn-default btn-sm" data-l1key="chooseIcon"><i class="fa fa-flag"></i> Icone</a>';
-  tr += '<span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>';
-  tr += '</div>';
-  tr += '<div class="col-lg-6">';
-  tr += '<input class="cmdAttr form-control input-sm" data-l1key="name">';
-  tr += '</div>';
-  tr += '</div>';
-  tr += '<select class="cmdAttr form-control tooltips input-sm" data-l1key="value" style="display : none;margin-top : 5px;" title="{{La valeur de la commande vaut par dÃ©faut la commande}}">';
-  tr += '<option value="">Aucune</option>';
-  tr += '</select>';
-  tr += '</td>';
-  tr += '<td>';
-  tr += '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>';
-  tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
-  tr += '</td>';
-  tr += '<td>';
-  tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="request">';
-  tr += '</td><td>';
-  tr += '<span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span>';
-  tr += '</td><td>';
-   tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite"  style="width : 100px;" placeholder="{{Unité}}" title="{{Unité}}" >';
- tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}} style="margin-top : 3px;"> ';
- tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">';
-  tr += '</td><td>';
-  tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ';
-  tr += '</td>';
-  tr += '<td>';
-  if (is_numeric(_cmd.id)) {
-    tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fa fa-cogs"></i></a> ';
-    tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
-  }
-  tr += '<i class="fa fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i></td>';
-  tr += '</tr>';
+  if (init(_cmd.type) == 'action')
+  {
+    var tr =
+       '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">'
+     +   '<td>'
+     +     '<span class="cmdAttr" data-l1key="id"></span>'
+     +   '</td>'
+     +   '<td>'
+     +     '<div class="row">'
+     +       '<div class="col-lg-6">'
+     +         '<a class="cmdAction btn btn-default btn-sm" data-l1key="chooseIcon"><i class="fa fa-flag"></i> Icone</a>'
+     +         '<span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>'
+     +       '</div>'
+     +       '<div class="col-lg-6">'
+     +         '<input class="cmdAttr form-control input-sm" data-l1key="name">'
+     +       '</div>'
+     +     '</div>'
+     +     '<select class="cmdAttr form-control tooltips input-sm" data-l1key="value" style="display : none;margin-top : 5px;" title="{{La valeur de la commande vaut par défaut la commande}}">'
+     +       '<option value="">Aucune</option>'
+     +     '</select>'
+     +   '</td>'
+     +   '<td>'
+     +     '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
+     +     '<span class="subType" subType="' + init(_cmd.subType) + '"></span>'
+     +   '</td>'
+     +   '<td>'
+     +     '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="request">'
+     +   '</td>'
+     +   '<td>'
+     +     '<span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span>'
+     +   '</td>'
+     +   '<td>'
+     +     '<input class="cmdAttr form-control input-sm" data-l1key="unite"  style="width : 100px;" placeholder="{{Unité}}" title="{{Unité}}" >'
+     +     '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}} style="margin-top : 3px;"> '
+     +     '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">'
+     +   '</td>'
+     +   '<td>'
+     +     '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> '
+     +   '</td>'
+     + '<td>';
 
-  $('#table_cmd tbody').append(tr);
-  //$('#table_cmd tbody tr:last').setValues(_cmd, '.cmdAttr');
-  var tr = $('#table_cmd tbody tr:last');
-  jeedom.eqLogic.builSelectCmd({
-    id: $(".li_eqLogic.active").attr('data-eqLogic_id'),
-    filter: {type: 'info'},
-    error: function (error) {
-      $('#div_alert').showAlert({message: error.message, level: 'danger'});
-    },
-    success: function (result) {
-      tr.find('.cmdAttr[data-l1key=value]').append(result);
-      tr.setValues(_cmd, '.cmdAttr');
-      jeedom.cmd.changeType(tr, init(_cmd.subType));
+    if (is_numeric(_cmd.id))
+    {
+      tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fa fa-cogs"></i></a> '
+          + '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
     }
-  });
 
-}
+    tr += '<i class="fa fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>'
+     + '  </td>'
+     + '</tr>';
+
+    $('#table_cmd tbody').append(tr);
+    var tr = $('#table_cmd tbody tr:last');
+    jeedom.eqLogic.builSelectCmd(
+    {
+      id: $(".li_eqLogic.active").attr('data-eqLogic_id'),
+      filter: {type: 'info'},
+      error: function (error)
+      {
+        $('#div_alert').showAlert({message: error.message, level: 'danger'});
+      },
+      success: function (result)
+      {
+        tr.find('.cmdAttr[data-l1key=value]').append(result);
+        tr.setValues(_cmd, '.cmdAttr');
+        jeedom.cmd.changeType(tr, init(_cmd.subType));
+      }
+    });
+  }
 }
 
-jeedom.plugin.getDeamonCookieInfo = function(_params) {
+jeedom.plugin.getDeamonCookieInfo = function(_params)
+{
     var paramsRequired = ['id'];
     var paramsSpecifics = {
         global: false,
@@ -199,7 +203,8 @@ jeedom.plugin.getDeamonCookieInfo = function(_params) {
     $.ajax(paramsAJAX);
 };
 
-jeedom.plugin.deamonCookieStart = function(_params) {
+jeedom.plugin.deamonCookieStart = function(_params)
+{
     var paramsRequired = ['id'];
     var paramsSpecifics = {};
     try {
@@ -220,7 +225,8 @@ jeedom.plugin.deamonCookieStart = function(_params) {
     $.ajax(paramsAJAX);
 };
 
-jeedom.plugin.deamonCookieStop = function(_params) {
+jeedom.plugin.deamonCookieStop = function(_params)
+{
     var paramsRequired = ['id'];
     var paramsSpecifics = {};
     try {

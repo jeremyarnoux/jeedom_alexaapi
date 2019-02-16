@@ -1,5 +1,6 @@
 <?php
-if (!isConnect()) {
+if (!isConnect())
+{
   include_file('desktop', '404', 'php');
   die();
 }
@@ -22,19 +23,18 @@ if (!isConnect()) {
 //print $_GET['plugin'];
 //print $_GET['configure'];
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
+
 include_file('core', 'authentification', 'php');
 include_file('plugin_info', 'configuration2', 'configuration', 'alexaapi');
 ?>
-    <legend><i class="icon fa fa-spinner"></i> {{Informations complémentaires}}</legend>
+<legend><i class="icon fa fa-spinner"></i> {{Informations complémentaires}}</legend>
 <form class="form-horizontal">
   <div class="form-group">
     <fieldset>
       <div class="form-group">
         <label class="col-lg-4 control-label">{{IP Controleur de l'API Alexa}} :</label>
         <div class="col-lg-4" style="position:relative;top:+8px;">
-          <?php
-            echo config::byKey('internalAddr');
-          ?>
+          <?php echo config::byKey('internalAddr'); ?>
         </div>
       </div>
 
@@ -47,9 +47,8 @@ include_file('plugin_info', 'configuration2', 'configuration', 'alexaapi');
 
       <div class="form-group">
         <label class="col-lg-4 control-label">{{Exemple de commande }} :</label>
-        <div class="col-lg-4"><?php
-            echo config::byKey('internalAddr');
-          ?>:3456/speak?device=salon&text=coucou
+        <div class="col-lg-4" style="position:relative;top:+8px;">
+          <?php echo config::byKey('internalAddr'); ?>:3456/speak?device=salon&amp;text=coucou
         </div>
       </div>
     </fieldset>

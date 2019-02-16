@@ -257,7 +257,6 @@ function error(status, source, title, detail)
   let error =
   {
     'status': status,
-    'source': {pointer: source},
     'title': title,
     'detail': detail
   };
