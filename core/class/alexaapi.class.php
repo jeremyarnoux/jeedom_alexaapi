@@ -220,13 +220,23 @@ class alexaapi extends eqLogic
       $cmd->setConfiguration('request', 'speak?text=#message#');
       $cmd->save();
 
+      // Speak command
+      $cmd = new alexaapiCmd();
+      $cmd->setType('action');
+      $cmd->setSubType('message');
+      $cmd->setEqLogic_id($device->getId());
+      $cmd->setName('Speak+Volume');
+      $cmd->setConfiguration('request', 'speak?text=#message#&volume=#volume#');
+      $cmd->setIsVisible(false);
+      $cmd->save();
+
       // Volume command
       $cmd = new alexaapiCmd();
       $cmd->setType('action');
       $cmd->setSubType('slider');
       $cmd->setEqLogic_id($device->getId());
       $cmd->setName('Volume');
-      $cmd->setConfiguration('request', 'volume?value=#slider#');
+      $cmd->setConfiguration('request', 'volume?value=#volume#');
       $cmd->setConfiguration('minValue', '0');
       $cmd->setConfiguration('maxValue', '100');
       $cmd->save();
@@ -318,12 +328,14 @@ class alexaapiCmd extends cmd
         if ($this->getType() != 'action')
           return $this->getConfiguration('request');
 
-        switch ($this->getSubType())
+        list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
+        
+        switch ($command)
         {
-            case 'slider':
+            case 'volume':
                 $request = $this->buildVolumeRequest($_options);
                 break;
-            case 'message':
+            case 'speak':
                 $request = $this->buildSpeakRequest($_options);
                 break;
             default:
@@ -354,6 +366,13 @@ class alexaapiCmd extends cmd
         if (!isset($_options['message']) || $_options['message'] == '')
             throw new Exception(__('Le message ne peut pas être vide', __FILE__));
 
-        return str_replace('#message#', urlencode($_options['message']), $request);
+        return str_replace(
+          array(
+            '#message#',
+            '#volume#'
+          ), array(
+            urlencode($_options['message']),
+            40
+          ), $request);
     }
 }

@@ -21,6 +21,8 @@ let server = null;
   URL: /speak?device=?&text=?
     device - String - name of the device
     text - String - Text to speech
+    volume - Integer - Determine the volume level between 0 to 100 (0 is mute and 100 is max).
+                       This parameter is optional. If not specified, the volume level will not be altered.
 
   Return an empty object if the function succeed.
   Otherwise, an error object is returned.
@@ -38,6 +40,16 @@ app.get('/speak', (req, res) =>
   if ('text' in req.query === false)
     return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
   config.logger && config.logger('Alexa-API: text: ' + req.query.text);
+
+  if ('volume' in req.query)
+  {
+    config.logger && config.logger('Alexa-API: volume: ' + req.query.volume);
+    alexa.sendSequenceCommand(req.query.device, 'volume', req.query.volume, function(err)
+    {
+      if (err)
+        return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
+    });
+  }
 
   alexa.sendSequenceCommand(req.query.device, 'speak', req.query.text, function(err)
   {
@@ -233,22 +245,24 @@ function startServer()
       process.exit(-1);
     }
 
-    fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) =>
+    if (alexa.cookieData)
     {
-      if (err)
+      fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) =>
       {
-        config.logger && config.logger('Alexa-API - Error while saving the cookie to: ' + config.cookieLocation);
-        config.logger && config.logger('Alexa-API - ' + err);
-      }
-
-      config.logger && config.logger('Alexa-API - New cookie saved to:' + config.cookieLocation);
-    });
-
-    // Start the server
-    server = app.listen(config.listeningPort, () =>
-    {
-      config.logger && config.logger('Alexa-API: Server listening on port ' + server.address().port);
-    });
+        if (err)
+        {
+          config.logger && config.logger('Alexa-API - Error while saving the cookie to: ' + config.cookieLocation);
+          config.logger && config.logger('Alexa-API - ' + err);
+        }
+        config.logger && config.logger('Alexa-API - New cookie saved to:' + config.cookieLocation);
+        
+        // Start the server
+        server = app.listen(config.listeningPort, () =>
+        {
+          config.logger && config.logger('Alexa-API: Server listening on port ' + server.address().port);
+        });
+      });
+    }
   });
 }
 
