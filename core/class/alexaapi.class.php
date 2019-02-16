@@ -179,7 +179,6 @@ class alexaapi extends eqLogic
             }
 
             // Update device configuration
-            $device->setConfiguration('serial', $item['serial']);
             $device->setConfiguration('device', $item['name']);
             $device->setConfiguration('type', $item['type']);
             $device->setStatus('online', $item['online']);
@@ -204,6 +203,7 @@ class alexaapi extends eqLogic
       $newDevice->setIsEnable(1);
       $newDevice->setIsVisible(1);
       $newDevice->setConfiguration('device', $deviceName);
+      $newDevice->setConfiguration('serial', $deviceSerial);
       $newDevice->save();
 
       return $newDevice;
