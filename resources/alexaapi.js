@@ -10,12 +10,38 @@ const config =
   cookieRefreshInterval: 7*24*60*1000,
   logger: console.log,
   alexaServiceHost: 'alexa.amazon.fr',
-  listeningPort: 3456
+  listeningPort: 3457
 };
 
 /* Routing */
 const app = express();
 let server = null;
+
+/* Apply callback on every cluster's membre (for multiroom device) */
+function forEachDevices(nameOrSerial, callback)
+{
+  var device = alexa.find(nameOrSerial);
+  if (device === undefined)
+    return ['Device not found'];
+
+  if (device.clusterMembers.length == 0)
+  {
+    var err = callback(device.serialNumber);
+    if (err)
+      return [err];
+    return [];
+  }
+
+  var errorMessages = [];
+  for(var i in device.clusterMembers)
+  {
+    var err = callback(device.clusterMembers[i]);
+    if (err)
+      errorMessages.push(err);
+  }
+
+  return errorMessages;
+}
 
 /**** Alexa.Speak *****
   URL: /speak?device=?&text=?
@@ -44,19 +70,24 @@ app.get('/speak', (req, res) =>
   if ('volume' in req.query)
   {
     config.logger && config.logger('Alexa-API: volume: ' + req.query.volume);
-    alexa.sendSequenceCommand(req.query.device, 'volume', req.query.volume, function(err)
+    var err = forEachDevices(req.query.device, (serial) =>
     {
-      if (err)
-        return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
+      alexa.sendSequenceCommand(serial, 'volume', req.query.volume, (err) => {return err;});
     });
+
+    if (err.length != 0)
+      return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
   }
 
-  alexa.sendSequenceCommand(req.query.device, 'speak', req.query.text, function(err)
+  var err = forEachDevices(req.query.device, (serial) =>
   {
-    if (err)
-      return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', err));
-    res.status(200).json({});
+    alexa.sendSequenceCommand(serial, 'speak', req.query.text, (err) => {return err;});
   });
+
+  if (err.length != 0)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', err));
+
+  res.status(200).json({});
 });
 
 /***** Alexa.DeviceControls.Volume *****
@@ -81,12 +112,14 @@ app.get('/volume', (req, res) =>
     return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "value"'));
   config.logger && config.logger('Alexa-API: value: ' + req.query.value);
 
-  alexa.sendSequenceCommand(req.query.device, 'volume', req.query.value, function(err)
+  var err = forEachDevices(req.query.device, (serial) =>
   {
-    if (err)
-      return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
-    res.status(200).json({});
+    alexa.sendSequenceCommand(serial, 'volume', req.query.value, (err) => {return err;});
   });
+
+  if (err.length != 0)
+    return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
+  res.status(200).json({});
 });
 
 /***** Alexa.Notifications.SendMobilePush *****
