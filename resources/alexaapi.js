@@ -209,19 +209,12 @@ app.get('/devices', (req, res) =>
   config.logger && config.logger('Alexa-API: Devices');
   res.type('json');
 
-  alexa.getDevices(function(err, data)
+  alexa.getDevices(function(devices)
   {
-    if (err)
-      return res.status(500).json(error(500, req.route, 'Devices', err));
-
     var toReturn = [];
-    // FIXME: It should be better to use alexa.getDevices and force this method
-    // to refresh internal state of alexa-remote like it is done in initDeviceState
-    // Here, we qre sync with alexa-remote but alexa-remote is maybe unsync with reality.
-    // It require to restart the server to refresh the list of devices.
-    for (var serial in alexa.serialNumbers)
+    for (var serial in devices)
     {
-      var device = alexa.serialNumbers[serial];
+      var device = devices[serial];
       toReturn.push({
         'serial': serial,
         'name': device.accountName,
