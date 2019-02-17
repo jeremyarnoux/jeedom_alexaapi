@@ -219,9 +219,10 @@ class alexaapi extends eqLogic
       $cmd->setEqLogic_id($device->getId());
       $cmd->setName('Speak');
       $cmd->setConfiguration('request', 'speak?text=#message#');
+      $cmd->setDisplay('title_disable', 1);
       $cmd->save();
 
-      // Speak command
+      // Speak + Volume command
       $cmd = new alexaapiCmd();
       $cmd->setType('action');
       $cmd->setSubType('message');
@@ -229,6 +230,7 @@ class alexaapi extends eqLogic
       $cmd->setName('Speak+Volume');
       $cmd->setConfiguration('request', 'speak?text=#message#&volume=#volume#');
       $cmd->setIsVisible(false);
+      $cmd->setDisplay('title_disable', 1);
       $cmd->save();
 
       // Volume command
