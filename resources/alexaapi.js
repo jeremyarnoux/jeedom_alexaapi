@@ -227,7 +227,8 @@ app.get('/devices', (req, res) =>
         'name': device.accountName,
         'type': device.deviceFamily,
         'online': device.online,
-        'capabilities' : device.capabilities
+        'capabilities' : device.capabilities,
+        'members': device.clusterMembers
       });
     }
     res.status(200).json(toReturn);

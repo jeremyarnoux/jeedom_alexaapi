@@ -10,7 +10,47 @@ $plugin = plugin::byId('alexaapi');
 sendVarToJS('eqType', $plugin->getId());
 // Accéder aux données du plugin
 $eqLogics = eqLogic::byType($plugin->getId());
+
+$logicalIdToId = array();
+$logicalIdToHumanReadable = array();
+foreach ($eqLogics as $eqLogic)
+{
+  $logicalIdToId[$eqLogic->getLogicalId()] = intval($eqLogic->getId());
+  $logicalIdToHumanReadable[$eqLogic->getLogicalId()] = $eqLogic->getHumanName(true, false);
+}
 ?>
+
+<script>
+var logicalIdToId = <?php echo json_encode($logicalIdToId); ?>;
+var logicalIdToHumanReadable = <?php echo json_encode($logicalIdToHumanReadable); ?>
+
+function printEqLogic(data)
+{
+  $('#multiroom-members').empty();
+  if (data.configuration.members === undefined)
+  {
+     $('#multiroom-members').append('Configuration incomplete.');
+     return;
+  }
+  if (data.configuration.members.length === 0)
+  {
+    $('#multiroom-members').parent().hide();
+    return;
+  }
+
+  var html = '<ul style="list-style-type: none;">';
+  for (var i in data.configuration.members)
+  {
+    var logicalId = data.configuration.members[i];
+    if (logicalId in logicalIdToId)
+      html += '<li style="margin-top: 5px;">' + logicalIdToHumanReadable[logicalId] + '</li>';
+  }
+  html += '</ul>';
+
+  $('#multiroom-members').parent().show();
+  $('#multiroom-members').append(html);
+}
+</script>
 
 <!-- Container global (Ligne bootstrap) -->
 <div class="row row-overflow">
@@ -189,6 +229,14 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
                     <center>
                       <img src="core/img/no_image.gif" data-original=".jpg" id="img_device" class="img-responsive" style="max-height : 250px;"  onerror="this.src='plugins/alexaapi/core/config/devices/default.png'"/>
                     </center>
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">{{Multiroom}}</label>
+                  <div class="col-sm-8" id="multiroom-members">
+                  <!-- Liste des membres du multiroom -->
+
                   </div>
                 </div>
               </fieldset>
