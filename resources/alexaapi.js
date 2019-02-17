@@ -10,7 +10,7 @@ const config =
   cookieRefreshInterval: 7*24*60*1000,
   logger: console.log,
   alexaServiceHost: 'alexa.amazon.fr',
-  listeningPort: 3457
+  listeningPort: 3456
 };
 
 /* Routing */
