@@ -11,17 +11,15 @@ sendVarToJS('eqType', $plugin->getId());
 // AccÈder aux donnÈes du plugin
 $eqLogics = eqLogic::byType($plugin->getId());
 
-$logicalIdToId = array();
+
 $logicalIdToHumanReadable = array();
 foreach ($eqLogics as $eqLogic)
 {
-  $logicalIdToId[$eqLogic->getLogicalId()] = intval($eqLogic->getId());
   $logicalIdToHumanReadable[$eqLogic->getLogicalId()] = $eqLogic->getHumanName(true, false);
 }
 ?>
 
 <script>
-var logicalIdToId = <?php echo json_encode($logicalIdToId); ?>;
 var logicalIdToHumanReadable = <?php echo json_encode($logicalIdToHumanReadable); ?>
 
 function printEqLogic(data)
@@ -42,8 +40,10 @@ function printEqLogic(data)
   for (var i in data.configuration.members)
   {
     var logicalId = data.configuration.members[i];
-    if (logicalId in logicalIdToId)
+    if (logicalId in logicalIdToHumanReadable)
       html += '<li style="margin-top: 5px;">' + logicalIdToHumanReadable[logicalId] + '</li>';
+    else
+      html += '<li style="margin-top: 5px;"><span class="label label-default" style="text-shadow : none;"><i>(Non configur√©)</i></span> ' + logicalId + '</li>';
   }
   html += '</ul>';
 
