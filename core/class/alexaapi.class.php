@@ -356,7 +356,7 @@ class alexaapiCmd extends cmd
         if (!isset($_options['slider']))
             throw new Exception(__('Le slider ne peut pas être vide', __FILE__));
 
-        return str_replace('#slider#', $_options['slider'], $request);
+        return str_replace('#volume#', $_options['slider'], $request);
     }
 
     private function buildSpeakRequest($_options = array())
