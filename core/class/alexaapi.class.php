@@ -332,7 +332,6 @@ class alexaapiCmd extends cmd
           return $this->getConfiguration('request');
 
         list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
-        
         switch ($command)
         {
             case 'volume':
@@ -375,7 +374,20 @@ class alexaapiCmd extends cmd
             '#volume#'
           ), array(
             urlencode($_options['message']),
-            40
+            isset($_options['volume']) ? $_options['volume'] : $_options['slider']
           ), $request);
+    }
+
+    /***********************Methode d'instance************************* */
+    public function getWidgetTemplateCode($_version = 'dashboard', $_noCustom = false)
+    {
+      //echo '** ' + $_version + ' **';
+      if ($_version != 'scenario')
+        return parent::getWidgetTemplateCode($_version, $_noCustom);
+
+      list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
+      if ($command == 'speak' && strpos($arguments, '#volume#') !== false)
+        return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
+      return parent::getWidgetTemplateCode($_version, $_noCustom);
     }
 }
