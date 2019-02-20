@@ -22,25 +22,13 @@ function forEachDevices(nameOrSerial, callback)
 {
   var device = alexa.find(nameOrSerial);
   if (device === undefined)
-    return ['Device not found'];
+    return;
 
   if (device.clusterMembers.length == 0)
-  {
-    var err = callback(device.serialNumber);
-    if (err)
-      return [err];
-    return [];
-  }
+    callback(device.serialNumber);
 
-  var errorMessages = [];
   for(var i in device.clusterMembers)
-  {
-    var err = callback(device.clusterMembers[i]);
-    if (err)
-      errorMessages.push(err);
-  }
-
-  return errorMessages;
+    callback(device.clusterMembers[i]);
 }
 
 /**** Alexa.Speak *****
@@ -70,24 +58,37 @@ app.get('/speak', (req, res) =>
   if ('volume' in req.query)
   {
     config.logger && config.logger('Alexa-API: volume: ' + req.query.volume);
-    var err = forEachDevices(req.query.device, (serial) =>
+    var hasError = false;
+    forEachDevices(req.query.device, (serial) =>
     {
-      alexa.sendSequenceCommand(serial, 'volume', req.query.volume, (err) => {return err;});
+      alexa.sendSequenceCommand(serial, 'volume', req.query.volume, (err) =>
+      {
+        if (err)
+          hasError = true;
+      });
     });
-
-    if (err.length != 0)
-      return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
+    if (hasError)
+      return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err.message));
   }
 
-  var err = forEachDevices(req.query.device, (serial) =>
+  var hasError = false;
+  var errorMessage = '';
+  forEachDevices(req.query.device, (serial) =>
   {
-    alexa.sendSequenceCommand(serial, 'speak', req.query.text, (err) => {return err;});
+    alexa.sendSequenceCommand(serial, 'speak', req.query.text, (err) =>
+    {
+      if (err)
+      {
+        errorMessage = err.message;
+        hasError = true;
+      }
+    });
   });
 
-  if (err.length != 0)
-    return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', err));
-
-  res.status(200).json({});
+  if (hasError)
+    res.status(500).json(error(500, req.route.path, 'Alexa.Speak', errorMessage));
+  else
+    res.status(200).json({});
 });
 
 /***** Alexa.DeviceControls.Volume *****
@@ -282,8 +283,14 @@ function startServer()
           config.logger && config.logger('Alexa-API - ' + err);
         }
         config.logger && config.logger('Alexa-API - New cookie saved to:' + config.cookieLocation);
-        
+
         // Start the server
+        if (server)
+        {
+          config.logger && config.logger('Alexa-API: Server is already listening on port ' + server.address().port);
+          return;
+        }
+
         server = app.listen(config.listeningPort, () =>
         {
           config.logger && config.logger('Alexa-API: Server listening on port ' + server.address().port);

@@ -1211,7 +1211,8 @@ class AlexaRemote extends EventEmitter {
         this.sendSequenceCommand(serialOrName, sequenceObj, callback);
     }
 
-    sendSequenceCommand(serialOrName, command, value, callback) {
+    sendSequenceCommand(serialOrName, command, value, callback)
+    {
         let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
 
