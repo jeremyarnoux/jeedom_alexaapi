@@ -54,7 +54,7 @@ foreach($json as $item)
 
 $eqLogics = alexaapi::byType('alexaapi');
 ?>
-<table class="table table-condensed tablesorter" id="table_healthalexaapi">
+<table class="table table-condensed tablesorter" id="table_healthNetwork">
 	<thead>
 		<tr>
 			<th>{{Module}}</th>
@@ -62,8 +62,7 @@ $eqLogics = alexaapi::byType('alexaapi');
 			<th>{{Device}}</th>
 			<th>{{Serial}}</th>
 			<th>{{Type}}</th>
-			<th>{{Présent}}</th>
-			<th>{{Dernière communication}}</th>
+			<th>{{Présent *}}</th>
 			<th>{{Date création}}</th>
 		</tr>
 	</thead>
@@ -85,9 +84,9 @@ foreach ($eqLogics as $eqLogic) {
 	echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('serial') . '</span></td>';
 	echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('type') . '</span></td>';
 	echo '<td>' . $present . '</td>';
-	echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getStatus('lastCommunication') . '</span></td>';
 	echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('createtime') . '</span></td></tr>';
 }
 ?>
 	</tbody>
-</table><br><br>** Penser a ajouter un bouton de Refresh pour "Present" **
+</table>
+* Pour actualiser la colonne <B>Présent</B>, Faites un <B>Scan</B> sur l'écran précédent.

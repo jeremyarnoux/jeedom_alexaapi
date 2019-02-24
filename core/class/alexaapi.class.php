@@ -157,7 +157,14 @@ class alexaapi extends eqLogic
 
     public static function scanAmazonAlexa($_logical_id = null, $_exclusion = 0)
     {
-        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
+        
+        $deamon_info = self::deamon_info();
+		if ($deamon_info['launchable'] != "ok"){
+		event::add('jeedom::alert', array('level' => 'danger', 'page' => 'alexaapi', 'message' => __('Cookie Amazon Absent, allez dans la Configuration du plugin', __FILE__),));
+		return;
+		}
+		
+		event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
         $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
         $json = json_decode($json, true);
 
