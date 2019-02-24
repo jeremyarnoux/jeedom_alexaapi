@@ -208,10 +208,13 @@ class alexaapi extends eqLogic
       $newDevice->setName($deviceName);
       $newDevice->setLogicalId($deviceSerial);
       $newDevice->setEqType_name('alexaapi');
-      $newDevice->setIsEnable(1);
       $newDevice->setIsVisible(1);
       $newDevice->setConfiguration('device', $deviceName);
       $newDevice->setConfiguration('serial', $deviceSerial);
+            if (($deviceName == 'Tous les appareils') || (strstr($deviceName, "Alexa Apps")))
+			  $newDevice->setIsEnable(0);
+			else
+			  $newDevice->setIsEnable(1);
       $newDevice->save();
 
       return $newDevice;
