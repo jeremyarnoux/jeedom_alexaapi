@@ -25,32 +25,99 @@ if (!isConnect())
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 include_file('core', 'authentification', 'php');
-include_file('plugin_info', 'configuration2', 'configuration', 'alexaapi');
+include_file('desktop', 'alexaapi', 'js', 'alexaapi');
+
+
 ?>
-<legend><i class="icon fa fa-spinner"></i> {{Informations complémentaires}}</legend>
-<form class="form-horizontal">
-  <div class="form-group">
-    <fieldset>
-      <div class="form-group">
-        <label class="col-lg-4 control-label">{{IP Controleur de l'API Alexa}} :</label>
-        <div class="col-lg-4" style="position:relative;top:+8px;">
-          <?php echo config::byKey('internalAddr'); ?>
-        </div>
-      </div>
 
-      <div class="form-group">
-        <label class="col-lg-4 control-label">{{port Controleur à utiliser}} :</label>
-        <div class="col-lg-4" style="position:relative;top:+8px;">
-          3456
-        </div>
-      </div>
+<legend><i class="icon divers-triangular42"></i> {{Génération manuelle du cookie Amazon}}</legend>
 
-      <div class="form-group">
-        <label class="col-lg-4 control-label">{{Exemple de commande }} :</label>
-        <div class="col-lg-4" style="position:relative;top:+8px;">
-          <?php echo config::byKey('internalAddr'); ?>:3456/speak?device=salon&amp;text=coucou
-        </div>
-      </div>
-    </fieldset>
-  </form>
-</div>
+		<?php
+//On va tester si les d�pendances sont install�es
+		if (!(is_dir(realpath(dirname(__FILE__) . '/../resources/node_modules'))))
+		{
+		print "<B>Dépendances non présentes, génération manuelle du cookie Amazon impossible !!</B>";	
+		print "<br><small>Le dossier <I>".dirname(__FILE__) . "/../resources/node_modules</I> est introuvable</small>";	
+		}
+else
+		{
+		?>
+		<table class="table table-condensed">
+		  <tr>
+			<th style="width: 30%">Le Controleur de l'API Cookie-Alexa est :</th>
+			<th style="width: 70%" class="deamonCookieState"> <span class="label label-warning" style="font-size:1em;">Non utilisé</span></td>
+		  </tr>
+		  <tr>
+			<th style="position:relative;top:+8px;">Commande(s) du controleur de l'API Cookie-Alexa disponible : </th>
+			<th>
+				<a class="btn btn-success btn-sm bt_startDeamonCookie"><i class="fa fa-play"></i>
+				<a class="btn btn-danger btn-sm bt_stopDeamonCookie"><i class="fa fa-stop"></i></a> <a class="btn btn-warning btn-sm bt_identificationCookie" href="http://<?php print config::byKey('internalAddr')?>:3457" onclick="open('http://<?php print config::byKey('internalAddr')?>:3457', 'Popup', 'scrollbars=1,resizable=1,height=560,width=770'); return false;" ><i class="fa fa-cogs"></i> Identifiez vous sur Amazon</a>
+				<a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fa fa-cogs"></i> Patientez quelques secondes que le Démon s'initialise. Dès que "Configuration" devient OK, Lancez le Démon avec (Re)Démarrer</a>
+			</th>
+		  </tr>
+		</table>
+
+		<?php
+		}
+?>
+<script>
+  var timeout_refreshDeamonCookieInfo = null;
+  $('.bt_stopDeamonCookie').hide();
+  $('.bt_identificationCookie').hide();
+  $('.bt_identificationCookie2').hide();
+
+  // On appuie sur Le lancement du serveur... on lance "deamonCookieStart" via action=deamonCookieStart dans alexaapi.ajax.php
+  $('.bt_startDeamonCookie').on('click',function()
+  {
+    clearTimeout(timeout_refreshDeamonInfo);
+    jeedom.plugin.deamonCookieStart(
+    {
+      id : plugin_id,
+      forceRestart: 1,
+      error: function (error)
+      {
+        $('#div_alert').showAlert({message: error.message, level: 'danger'});
+        refreshDeamonInfo();
+        timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
+      },
+      success:function(){
+        refreshDeamonInfo();
+        $('.deamonCookieState').empty().append('<span class="label label-success" style="font-size:1em;">{{OK}}</span>');
+        $('.bt_startDeamonCookie').hide();
+        $('.bt_stopDeamonCookie').show();
+        $('.bt_identificationCookie').show();
+        timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
+      }
+    });
+  });
+
+  $('.bt_stopDeamonCookie').on('click',function()
+  {
+    clearTimeout(timeout_refreshDeamonInfo);
+    jeedom.plugin.deamonCookieStop(
+    {
+      id : plugin_id,
+      error: function (error)
+      {
+        $('#div_alert').showAlert({message: error.message, level: 'danger'});
+        refreshDeamonInfo();
+        timeout_refreshDeamonCookieInfo = setTimeout(refreshDeamonInfo, 5000);
+      },
+      success:function()
+      {
+        refreshDeamonInfo();
+        $('.deamonCookieState').empty().append('<span class="label label-danger" style="font-size:1em;">{{NOK}}</span>');
+        $('.bt_startDeamonCookie').show();
+        $('.bt_stopDeamonCookie').hide();
+        $('.bt_identificationCookie').hide();
+        timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
+      }
+    });
+  });
+
+  $('.bt_identificationCookie').on('click',function()
+  {
+    $('.bt_identificationCookie').hide();
+    $('.bt_identificationCookie2').show();
+  });
+</script>
