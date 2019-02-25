@@ -211,10 +211,7 @@ class alexaapi extends eqLogic
       $newDevice->setIsVisible(1);
       $newDevice->setConfiguration('device', $deviceName);
       $newDevice->setConfiguration('serial', $deviceSerial);
-            if (($deviceName == 'Tous les appareils') || (strstr($deviceName, "Alexa Apps")))
-			  $newDevice->setIsEnable(0);
-			else
-			  $newDevice->setIsEnable(1);
+	  $newDevice->setIsEnable(1);
       $newDevice->save();
 
       return $newDevice;
@@ -222,6 +219,26 @@ class alexaapi extends eqLogic
 
     private static function importDefaultCommandTo($device)
     {
+
+
+     /*       if ($device->getName() == 'Tous les appareils')
+        {
+            return;
+		}*/
+	if (strstr($device->getName(), "Alexa Apps"))
+        {
+      // Push command
+      $cmd = new alexaapiCmd();
+      $cmd->setType('action');
+      $cmd->setSubType('message');
+      $cmd->setEqLogic_id($device->getId());
+      $cmd->setName('Push');
+      $cmd->setConfiguration('request', 'push?text=#message#');
+      $cmd->setDisplay('title_disable', 1);
+      $cmd->save();
+            return;
+		}
+
       // Speak command
       $cmd = new alexaapiCmd();
       $cmd->setType('action');
@@ -287,6 +304,7 @@ class alexaapiCmd extends cmd
             $this->getEqLogic()->refresh();
             return;
         }
+          
 
         $request = $this->buildRequest($_options);
         log::add('alexaapi', 'info', 'Request : ' . $request);
