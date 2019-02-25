@@ -368,6 +368,9 @@ class alexaapiCmd extends cmd
             case 'speak':
                 $request = $this->buildSpeakRequest($_options);
                 break;
+            case 'push':
+                $request = $this->buildPushRequest($_options);
+                break;
             default:
                 $request = '';
         }
@@ -403,6 +406,21 @@ class alexaapiCmd extends cmd
           ), array(
             urlencode($_options['message']),
             isset($_options['volume']) ? $_options['volume'] : $_options['slider']
+          ), $request);
+    }
+
+    private function buildPushRequest($_options = array())
+    {
+        log::add('alexaapi', 'debug', 'buildPushRequest');
+        $request = $this->getConfiguration('request');
+        if (!isset($_options['message']) || $_options['message'] == '')
+            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
+
+        return str_replace(
+          array(
+            '#message#'
+          ), array(
+            urlencode($_options['message'])
           ), $request);
     }
 
