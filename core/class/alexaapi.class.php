@@ -101,6 +101,18 @@ class alexaapi extends eqLogic {
         }
         return $return;
     }
+    public static function reinstallNodeJS() {
+	$pluginalexaapi = plugin::byId('alexaapi');
+	log::add('alexaapi', 'info', 'Suppression du Code NodeJS');
+	$cmd = system::getCmdSudo() . 'rm -rf '.dirname(__FILE__) . '/../../resources/node_modules &>/dev/null';
+	log::add('alexaapi', 'info', 'Suppression de NodeJS');
+	$cmd = system::getCmdSudo() . 'apt-get -y --purge autoremove nodejs npm';
+	exec($cmd);
+	log::add('alexaapi', 'info', 'Réinstallation des dependances');
+	$pluginalexaapi->dependancy_install();
+		
+	return true;
+    }		
     public static function ScanAmazonAlexa($_logical_id = null, $_exclusion = 0) {
         event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
         $json = file_get_contents("http://".config::byKey('internalAddr').":3456/devices");
