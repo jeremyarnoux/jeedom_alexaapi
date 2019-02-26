@@ -64,6 +64,16 @@ if (!isConnect()) {
 	</div>
 </fieldset>
 </form>
+<form class="form-horizontal">	
+<fieldset>
+	<div class="form-group">
+		<label class="col-lg-4 control-label">{{Réparation}}</label>
+		<div class="col-lg-3" style="padding-left:0px;padding-right:0px;">
+			<div><a class="btn btn-danger" style="width:70%;float:right;" id="bt_reinstallNodeJS"><i class="fa fa-erase"></i> {{Réparation de NodeJS}}</a></div>
+		</div>
+	</div>	
+</fieldset>
+</form>
 </div>
 
 <script>
@@ -71,4 +81,32 @@ if (!isConnect()) {
 		$('#md_modal2').dialog({title: "{{Génération cookie Amazon}}"});
 		$('#md_modal2').load('index.php?v=d&plugin=alexaapi&modal=cookie').dialog('open');
 	});
+	$('#bt_reinstallNodeJS').on('click', function() {
+		bootbox.confirm('{{Etes-vous sûr de vouloir supprimer et reinstaller NodeJS ?}}', function(result) {
+			if (result) {
+				$.ajax({
+					type : 'POST',
+					url : 'plugins/alexaapi/core/ajax/alexaapi.ajax.php',
+					data : {
+						action : 'reinstallNodeJS',
+					},
+					dataType : 'json',
+					global : false,
+					error : function(request, status, error) {
+						$('#div_alert').showAlert({
+							message : error.message,
+							level : 'danger'
+						});
+					},
+					success : function(data) {
+						$('li.li_plugin.active').click();
+						$('#div_alert').showAlert({
+							message : "{{Réinstallation NodeJS effectuée, merci de patienter jusqu'à la fin de l'installation des dépendances}}",
+							level : 'success'
+						});
+					}
+				});
+			}
+		});
+	});	
 </script>
