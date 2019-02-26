@@ -1128,7 +1128,7 @@ class AlexaRemote extends EventEmitter {
                 }
                 seqNode.operationPayload.notificationMessage = value;
                 seqNode.operationPayload.alexaUrl = '#v2/behaviors';
-                seqNode.operationPayload.title = 'ioBroker';
+                seqNode.operationPayload.title = 'Jeedom';
                 delete seqNode.operationPayload.deviceType;
                 delete seqNode.operationPayload.deviceSerialNumber;
                 delete seqNode.operationPayload.locale;
