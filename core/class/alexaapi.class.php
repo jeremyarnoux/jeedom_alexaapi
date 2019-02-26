@@ -56,6 +56,17 @@ class alexaapi extends eqLogic
         $log = $_debug ? '1' : '0';
 
         $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
+
+        
+		// Ferme le serveur de cookie sur port 3457 s'il est lancÈ (supprimÈ se ferme ‡ la fin de l'identification)
+		/*$pid = trim(shell_exec('ps ax | grep "/initCookie.js" | grep -v "grep" | wc -l'));
+        if ($pid != '' && $pid != '0')
+		{
+		$cmd = 'kill $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')';
+        log::add('alexaapi', 'debug', 'Fermeture serveur Cookie : ' . $cmd);
+        $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
+		}
+		*/
         //    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexa-remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
         $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ';
         log::add('alexaapi', 'debug', 'Lancement d√©mon alexaapi : ' . $cmd);

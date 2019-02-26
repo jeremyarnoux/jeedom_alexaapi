@@ -42,20 +42,8 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 else
 		{
 		?>
-		<table class="table table-condensed">
-		  <tr>
-			<th style="width: 30%">Le Controleur de l'API Cookie-Alexa est :</th>
-			<th style="width: 70%" class="deamonCookieState"> <span class="label label-warning" style="font-size:1em;">Non utilisé</span></td>
-		  </tr>
-		  <tr>
-			<th style="position:relative;top:+8px;">Commande(s) du controleur de l'API Cookie-Alexa disponible : </th>
-			<th>
-				<a class="btn btn-success btn-sm bt_startDeamonCookie"><i class="fa fa-play"></i>
-				<a class="btn btn-danger btn-sm bt_stopDeamonCookie"><i class="fa fa-stop"></i></a> <a class="btn btn-warning btn-sm bt_identificationCookie" href="http://<?php print config::byKey('internalAddr')?>:3457" onclick="open('http://<?php print config::byKey('internalAddr')?>:3457', 'Popup', 'scrollbars=1,resizable=1,height=560,width=770'); return false;" ><i class="fa fa-cogs"></i> Identifiez vous sur Amazon</a>
-				<a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fa fa-cogs"></i> Patientez quelques secondes que le Démon s'initialise. Dès que "Configuration" devient OK, Lancez le Démon avec (Re)Démarrer</a>
-			</th>
-		  </tr>
-		</table>
+				<center><a class="btn btn-success btn-sm bt_startDeamonCookie" href="http://<?php print config::byKey('internalAddr')?>:3457" onclick="open('http://<?php print config::byKey('internalAddr')?>:3457', 'Popup', 'scrollbars=1,resizable=1,height=560,width=770'); return false;" >Identifiez-vous sur Amazon pour créer le cookie d'identification</a>
+				<a class="btn btn-success btn-sm bt_identificationCookie"><i class="fa fa-clock-o"></i> Patientez quelques secondes que le cookie se charge. Dès que "<B>Configuration</B>" du Démon devient <B>OK</B> (<I>c'est que le cookie est présent</I>), Lancez le Démon avec le bouton <B>(Re)Démarrer</B></a><br><small>(Si vous obtenez le message <B>La connexion a échoué</B>, cliquez sur <B>Réessayer</B> dans la fenetre Popup.</small></center>
 
 		<?php
 		}
@@ -82,10 +70,11 @@ else
       },
       success:function(){
         refreshDeamonInfo();
-        $('.deamonCookieState').empty().append('<span class="label label-success" style="font-size:1em;">{{OK}}</span>');
+        //$('.deamonCookieState').empty().append('<span class="label label-success" style="font-size:1em;">{{OK}}</span>');
         $('.bt_startDeamonCookie').hide();
-        $('.bt_stopDeamonCookie').show();
+        //$('.bt_stopDeamonCookie').show();
         $('.bt_identificationCookie').show();
+        //$('.bt_identificationCookie2').show();
         timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
       }
     });
@@ -117,7 +106,6 @@ else
 
   $('.bt_identificationCookie').on('click',function()
   {
-    $('.bt_identificationCookie').hide();
-    $('.bt_identificationCookie2').show();
   });
+
 </script>
