@@ -17,10 +17,26 @@ const config =
 const app = express();
 let server = null;
 
+/* Apply callback on every cluster's membre (for multiroom device) */
+function forEachDevices(nameOrSerial, callback)
+{
+  var device = alexa.find(nameOrSerial);
+  if (device === undefined)
+    return;
+
+  if (device.clusterMembers.length == 0)
+    callback(device.serialNumber);
+
+  for(var i in device.clusterMembers)
+    callback(device.clusterMembers[i]);
+}
+
 /**** Alexa.Speak *****
   URL: /speak?device=?&text=?
     device - String - name of the device
     text - String - Text to speech
+    volume - Integer - Determine the volume level between 0 to 100 (0 is mute and 100 is max).
+                       This parameter is optional. If not specified, the volume level will not be altered.
 
   Return an empty object if the function succeed.
   Otherwise, an error object is returned.
@@ -39,12 +55,40 @@ app.get('/speak', (req, res) =>
     return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
   config.logger && config.logger('Alexa-API: text: ' + req.query.text);
 
-  alexa.sendSequenceCommand(req.query.device, 'speak', req.query.text, function(err)
+  if ('volume' in req.query)
   {
-    if (err)
-      return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', err));
-    res.status(200).json({});
+    config.logger && config.logger('Alexa-API: volume: ' + req.query.volume);
+    var hasError = false;
+    forEachDevices(req.query.device, (serial) =>
+    {
+      alexa.sendSequenceCommand(serial, 'volume', req.query.volume, (err) =>
+      {
+        if (err)
+          hasError = true;
+      });
+    });
+    if (hasError)
+      return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err.message));
+  }
+
+  var hasError = false;
+  var errorMessage = '';
+  forEachDevices(req.query.device, (serial) =>
+  {
+    alexa.sendSequenceCommand(serial, 'speak', req.query.text, (err) =>
+    {
+      if (err)
+      {
+        errorMessage = err.message;
+        hasError = true;
+      }
+    });
   });
+
+  if (hasError)
+    res.status(500).json(error(500, req.route.path, 'Alexa.Speak', errorMessage));
+  else
+    res.status(200).json({});
 });
 
 /***** Alexa.DeviceControls.Volume *****
@@ -69,12 +113,14 @@ app.get('/volume', (req, res) =>
     return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "value"'));
   config.logger && config.logger('Alexa-API: value: ' + req.query.value);
 
-  alexa.sendSequenceCommand(req.query.device, 'volume', req.query.value, function(err)
+  var err = forEachDevices(req.query.device, (serial) =>
   {
-    if (err)
-      return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
-    res.status(200).json({});
+    alexa.sendSequenceCommand(serial, 'volume', req.query.value, (err) => {return err;});
   });
+
+  if (err.length != 0)
+    return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
+  res.status(200).json({});
 });
 
 /***** Alexa.Notifications.SendMobilePush *****
@@ -164,25 +210,19 @@ app.get('/devices', (req, res) =>
   config.logger && config.logger('Alexa-API: Devices');
   res.type('json');
 
-  alexa.getDevices(function(err, data)
+  alexa.getDevices(function(devices)
   {
-    if (err)
-      return res.status(500).json(error(500, req.route, 'Devices', err));
-
     var toReturn = [];
-    // FIXME: It should be better to use alexa.getDevices and force this method
-    // to refresh internal state of alexa-remote like it is done in initDeviceState
-    // Here, we qre sync with alexa-remote but alexa-remote is maybe unsync with reality.
-    // It require to restart the server to refresh the list of devices.
-    for (var serial in alexa.serialNumbers)
+    for (var serial in devices)
     {
-      var device = alexa.serialNumbers[serial];
+      var device = devices[serial];
       toReturn.push({
         'serial': serial,
         'name': device.accountName,
         'type': device.deviceFamily,
         'online': device.online,
-        'capabilities' : device.capabilities
+        'capabilities' : device.capabilities,
+        'members': device.clusterMembers
       });
     }
     res.status(200).json(toReturn);
@@ -233,11 +273,30 @@ function startServer()
       process.exit(-1);
     }
 
-    // Start the server
-    server = app.listen(config.listeningPort, () =>
+    if (alexa.cookieData)
     {
-      config.logger && config.logger('Alexa-API: Server listening on port ' + server.address().port);
-    });
+      fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) =>
+      {
+        if (err)
+        {
+          config.logger && config.logger('Alexa-API - Error while saving the cookie to: ' + config.cookieLocation);
+          config.logger && config.logger('Alexa-API - ' + err);
+        }
+        config.logger && config.logger('Alexa-API - New cookie saved to:' + config.cookieLocation);
+
+        // Start the server
+        if (server)
+        {
+          config.logger && config.logger('Alexa-API: Server is already listening on port ' + server.address().port);
+          return;
+        }
+
+        server = app.listen(config.listeningPort, () =>
+        {
+          config.logger && config.logger('Alexa-API: Server listening on port ' + server.address().port);
+        });
+      });
+    }
   });
 }
 
@@ -246,7 +305,6 @@ function error(status, source, title, detail)
   let error =
   {
     'status': status,
-    'source': {pointer: source},
     'title': title,
     'detail': detail
   };
