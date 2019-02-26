@@ -40,14 +40,14 @@ foreach ($eqLogics as $eqLogic) {
 
     $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
 
-//Par sécurité, on Kill un éventuel précédent proessus initCookie.js
+//Par sÃ©curitÃ©, on Kill un Ã©ventuel prÃ©cÃ©dent proessus initCookie.js
 	$cmd = 'kill $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')';
     log::add('alexaapi', 'debug', '---- Kill initCookie.js: ' . $cmd);
     $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
 //    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexa-remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
     $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/initCookie.js '.config::byKey('internalAddr');
 
-    log::add('alexaapi', 'debug', '---- Lancement dÃ©mon Alexa-API-Cookie sur port 3457 : ' . $cmd);
+    log::add('alexaapi', 'debug', '---- Lancement dÃƒÂ©mon Alexa-API-Cookie sur port 3457 : ' . $cmd);
     
 	    $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
     
@@ -68,7 +68,7 @@ foreach ($eqLogics as $eqLogic) {
 
     $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
 
-//Par sécurité, on Kill un éventuel précédent proessus cookie.js
+//Par sÃ©curitÃ©, on Kill un Ã©ventuel prÃ©cÃ©dent proessus cookie.js
 	$cmd = 'kill $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')';
     log::add('alexaapi', 'debug', '---- Kill initCookie.js: ' . $cmd);
     $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
@@ -84,7 +84,10 @@ foreach ($eqLogics as $eqLogic) {
 		//throw new \Exception(__('Impossible', __FILE__));
 		ajax::success();
         break;
-
+	    	case 'reinstallNodeJS':
+		$ret=xiaomiTalk::reinstallNodeJS();
+		ajax::success($ret);
+	break;
     }
     throw new \Exception('Aucune methode correspondante');
 } catch (\Exception $e) {
