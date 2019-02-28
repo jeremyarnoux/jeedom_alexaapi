@@ -167,21 +167,21 @@ app.get('/reminder', (req, res) =>
   res.type('json');
 
   if ('device' in req.query === false)
-    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "device"'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Reminder', 'Missing parameter "device"'));
   config.logger && config.logger('Alexa-API: device: ' + req.query.device);
 
   if ('text' in req.query === false)
-    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "text"'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Reminder', 'Missing parameter "text"'));
   config.logger && config.logger('Alexa-API: text: ' + req.query.text);
 
   if ('when' in req.query === false)
-    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "when"'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Reminder', 'Missing parameter "when"'));
   config.logger && config.logger('Alexa-API: when: ' + req.query.when);
 
   // when: YYYY-MM-DD HH:MI:SS
   let dateValues = req.query.when.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
   if (dateValues === null)
-    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Reminder', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
   let when = new Date(dateValues[1], dateValues[2], dateValues[3], dateValues[4], dateValues[5], dateValues[6])
   config.logger && config.logger('Alexa-API: when: ' + when);
 

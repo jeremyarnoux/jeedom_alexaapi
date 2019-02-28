@@ -295,7 +295,6 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
 
     // mount `exampleProxy` in web server
     const app = express();
-
     app.use(myProxy);
     app.get('/cookie-success', function(req, res) {
         res.send('<b>Amazon Alexa Cookie successfully retrieved. You can close the browser.</b>');

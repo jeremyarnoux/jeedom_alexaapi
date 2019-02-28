@@ -58,6 +58,13 @@ try {
             alexaapi::scanAmazonAlexa();
             ajax::success();
         break;
+		case 'VerifiePresenceCookie':
+        $request = realpath(dirname(__FILE__) . '/../../resources/data/alexa-cookie.json');
+        if (file_exists($request))
+		ajax::success();
+		else
+ 		ajax::error();
+       break;
         case 'deamonCookieStart':
             log::add('alexaapi', 'info', 'Lancement Serveur pour Cookie - DEBUT deamonCookieStart');
             alexaapi::deamonCookie_start();

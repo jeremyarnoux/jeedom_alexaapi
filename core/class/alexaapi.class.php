@@ -166,6 +166,15 @@ class alexaapi extends eqLogic
         return $return;
     }
 
+ /*   public static function VerifiePresenceCookie()
+    {
+            //return true;
+        $return = array();
+        $request = realpath(dirname(__FILE__) . '/../../resources/node_modules');
+        $return['state'] = is_dir($request) ? 'ok' : 'nok';
+        return $return;
+    }
+*/
     public static function scanAmazonAlexa($_logical_id = null, $_exclusion = 0)
     {
         
@@ -382,13 +391,16 @@ class alexaapiCmd extends cmd
             case 'push':
                 $request = $this->buildPushRequest($_options);
                 break;
+            case 'reminder':
+                $request = $this->buildReminderRequest($_options);
+                break;
             default:
                 $request = '';
         }
         $request = scenarioExpression::setTags($request);
 
         if (trim($request) == '')
-            throw new Exception(__('La requête ne peut pas être vide : ', __FILE__) . print_r($this, true));
+            throw new Exception(__('Commande inconnue ou requête vide : ', __FILE__) . print_r($this, true));
 
         return 'http://' . config::byKey('internalAddr') . ':3456/' . $request . '&device=' . $this->getEqLogic()->getConfiguration('serial');
     }
@@ -399,6 +411,16 @@ class alexaapiCmd extends cmd
         $request = $this->getConfiguration('request');
         if (!isset($_options['slider']))
             throw new Exception(__('Le slider ne peut pas être vide', __FILE__));
+
+        return str_replace('#volume#', $_options['slider'], $request);
+    }
+
+    private function buildReminderRequest($_options = array())
+    {
+        log::add('alexaapi', 'debug', 'buildReminderRequest');
+        $request = $this->getConfiguration('request');
+        if (!isset($_options['message']) || $_options['message'] == '')
+            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
 
         return str_replace('#volume#', $_options['slider'], $request);
     }
