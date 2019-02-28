@@ -32,30 +32,12 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 
 <legend><i class="icon divers-triangular42"></i> {{Génération manuelle du cookie Amazon}}</legend>
 
-		<?php
-//On va tester si les d�pendances sont install�es
-		if (!(is_dir(realpath(dirname(__FILE__) . '/../resources/node_modules'))))
-		{
-		print "<B>Dépendances non présentes, génération manuelle du cookie Amazon impossible !!</B>";	
-		print "<br><small>Le dossier <I>".dirname(__FILE__) . "/../resources/node_modules</I> est introuvable</small>";	
-		}
-else
-		{
-		?>
 				<center><a class="btn btn-success btn-sm bt_startDeamonCookie"  >Identifiez-vous sur Amazon pour créer le cookie d'identification</a>
 				<a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fa fa-clock-o"></i> ... Attendez la génération du Cookie Amazon ... </a><a class="btn btn-default btn-sm bt_identificationCookie2bis"><i class="fa fa-clock-o"></i> ... Attendez la génération du Cookie Amazon ... </a><a class="btn btn-danger btn-sm bt_identificationCookie2echec"><i class="fa fa-times"></i> La génération du Cookie Amazon a échoué </a><a class="btn btn-success btn-sm bt_identificationCookie3"><i class="fa fa-check"></i> Bravo : Cookie d'identification Amazon chargé !</a><a class="btn btn-success btn-sm bt_identificationCookie"><i class="fa fa-clock-o"></i> Ouverture de la fenetre d'identification Amazon Alexa en cours ...</a></center>
 
-		<?php
-		}
-?>
 <script>
     var compteVerifCookie=0;
     var CookiePresent=0;
-
-	function VerifierSiCookieGenere() 
-	{
-VerifierSiCookieGenere1();
-	}
 	
 	function VerifierSiCookieGenere1() 
 		{
@@ -118,7 +100,7 @@ if(nouvellefenetre)
 		{
 		nouvellefenetre.window.close();
 		$('.bt_identificationCookie').hide();
-		VerifierSiCookieGenere();
+		VerifierSiCookieGenere1();
 		}
 	}
 }
@@ -134,7 +116,7 @@ if(nouvellefenetre)
   // On appuie sur Le lancement du serveur... on lance "deamonCookieStart" via action=deamonCookieStart dans alexaapi.ajax.php
   $('.bt_startDeamonCookie').on('click',function()
   {
-    clearTimeout(timeout_refreshDeamonInfo);
+	clearTimeout(timeout_refreshDeamonInfo);
     jeedom.plugin.deamonCookieStart(
     {
       id : plugin_id,

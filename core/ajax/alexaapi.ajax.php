@@ -66,6 +66,11 @@ try {
  		ajax::error();
        break;
         case 'deamonCookieStart':
+					//on va vérifier que les dépendances sont bien installées
+					$request = realpath(dirname(__FILE__) . '/../../resources/node_modules');
+					if (!(file_exists($request)))
+					ajax::error("DÃ©pendances non prÃ©sentes, gÃ©nÃ©ration manuelle du cookie Amazon impossible !!");
+
             log::add('alexaapi', 'info', 'Lancement Serveur pour Cookie - DEBUT deamonCookieStart');
             alexaapi::deamonCookie_start();
             log::add('alexaapi', 'info', 'Lancement Serveur pour Cookie - DEBUT deamon_info');
