@@ -161,7 +161,7 @@ window.setTimeout(lancer, 2000);
 }
 
 function lancer() {
-PopUpCentre('http://192.168.0.21:3457', 480, 640);
+PopUpCentre("http://<?php print config::byKey('internalAddr')?>:3457", 480, 640);
 }
 
   $('.bt_stopDeamonCookie').on('click',function()
