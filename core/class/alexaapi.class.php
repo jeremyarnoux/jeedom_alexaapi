@@ -280,6 +280,16 @@ class alexaapi extends eqLogic
       $cmd->setDisplay('title_disable', 1);
       $cmd->save();
 
+      // Reminder command
+      $cmd = new alexaapiCmd();
+      $cmd->setType('action');
+      $cmd->setSubType('message');
+      $cmd->setEqLogic_id($device->getId());
+      $cmd->setName('Reminder');
+	  $cmd->setIsVisible(false);
+      $cmd->setConfiguration('request', 'reminder?text=#message#&when=#when#');
+      $cmd->save();
+
       // Volume command
       $cmd = new alexaapiCmd();
       $cmd->setType('action');
@@ -290,6 +300,7 @@ class alexaapi extends eqLogic
       $cmd->setConfiguration('minValue', '0');
       $cmd->setConfiguration('maxValue', '100');
       $cmd->save();
+
     }
 
     public static function dependancy_install()
@@ -335,7 +346,7 @@ class alexaapiCmd extends cmd
         else
             $request_http = new com_http($request);
 
-        if ($this->getConfiguration('allowEmptyResponse') == 1)
+        //if ($this->getConfiguration('allowEmptyResponse') == 1)
             $request_http->setAllowEmptyReponse(true);
 
         if ($this->getConfiguration('noSslCheck') == 1)
@@ -350,10 +361,13 @@ class alexaapiCmd extends cmd
             $request_http->exec(0.1, 1);
             return;
         }
-
+        //log::add('alexaapi', 'info', 'Request : ' . $request_http);
         $result = $request_http->exec($this->getConfiguration('timeout', 2), $this->getConfiguration('maxHttpRetry', 3));
+        //$result = $request_http->exec();
         if (!result)
           throw new Exception(__('Serveur injoignable', __FILE__));
+
+        log::add('alexaapi', 'debug', 'Result : ' . $result);
 
         $jsonResult = json_decode($json, true);
         if (!empty($jsonResult))
@@ -415,16 +429,6 @@ class alexaapiCmd extends cmd
         return str_replace('#volume#', $_options['slider'], $request);
     }
 
-    private function buildReminderRequest($_options = array())
-    {
-        log::add('alexaapi', 'debug', 'buildReminderRequest');
-        $request = $this->getConfiguration('request');
-        if (!isset($_options['message']) || $_options['message'] == '')
-            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
-
-        return str_replace('#volume#', $_options['slider'], $request);
-    }
-
     private function buildSpeakRequest($_options = array())
     {
         log::add('alexaapi', 'debug', 'buildSpeakRequest');
@@ -439,6 +443,23 @@ class alexaapiCmd extends cmd
           ), array(
             urlencode($_options['message']),
             isset($_options['volume']) ? $_options['volume'] : $_options['slider']
+          ), $request);
+    }
+    private function buildReminderRequest($_options = array())
+    {
+        log::add('alexaapi', 'debug', 'buildReminderRequest');
+        $request = $this->getConfiguration('request');
+        if (!isset($_options['message']) || $_options['message'] == '')
+            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
+
+        return str_replace(
+          array(
+            '#when#',
+            '#message#'
+          ), array(
+//            str_replace(" ", "+", $_options['when']),
+            urlencode($_options['when']),
+            urlencode($_options['message'])
           ), $request);
     }
 
@@ -465,8 +486,11 @@ class alexaapiCmd extends cmd
         return parent::getWidgetTemplateCode($_version, $_noCustom);
 
       list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
+
       if ($command == 'speak' && strpos($arguments, '#volume#') !== false)
         return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
+      if ($command == 'reminder')
+        return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');
       return parent::getWidgetTemplateCode($_version, $_noCustom);
     }
 }

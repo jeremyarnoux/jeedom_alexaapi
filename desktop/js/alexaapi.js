@@ -20,6 +20,11 @@ $("#bt_addespeasyAction").on('click', function(event)
   var _cmd = {type: 'action'};
   addCmdToTable(_cmd);
 });
+ $('#bt_addEvent').on('click', function () {
+	$('#bt_calendartab').trigger('click');
+    $('#md_modal').dialog({title: "{{Ajouter évènement}}"});
+    $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=alarm&eqLogic_id=' + $('.eqLogicAttr[data-l1key=id]').value()).dialog('open');
+});
 
 $('#bt_sante').on('click', function ()
 {
@@ -154,10 +159,10 @@ function addCmdToTable(_cmd)
 
     if (is_numeric(_cmd.id))
     {
-      tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fa fa-cogs"></i></a> '
-          + '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
-    }
-
+      tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fa fa-cogs"></i></a> ';
+		   if (!(init(_cmd.name)=="Reminder")) //Masquer le bouton Tester
+			  tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
+	}
     tr += '<i class="fa fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>'
      + '  </td>'
      + '</tr>';

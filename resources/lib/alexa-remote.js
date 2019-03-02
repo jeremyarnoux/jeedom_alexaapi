@@ -617,10 +617,10 @@ class AlexaRemote extends EventEmitter {
         let dev = this.find(serialOrName);
         if (!dev) return null;
 
-        const now = new Date();
+        //const now = new Date(); **Modif Sigalou 2019.02.28
         const notification = {
-            'alarmTime': now.getTime(), // will be overwritten
-            'createdDate': now.getTime(),
+            'alarmTime': value.getTime(), // will be overwritten **Modif Sigalou 2019.02.28
+            'createdDate': value.getTime(),// **Modif Sigalou 2019.02.28
             'type': type, // Alarm ...
             'deviceSerialNumber': dev.serialNumber,
             'deviceType': dev.deviceType,
@@ -633,8 +633,8 @@ class AlexaRemote extends EventEmitter {
                 'providerId': 'ECHO',
                 'sampleUrl': 'https://s3.amazonaws.com/deeappservice.prod.notificationtones/system_alerts_repetitive_04.mp3'
             }*/
-            'originalDate': `${now.getFullYear()}-${_00(now.getMonth() + 1)}-${_00(now.getDate())}`,
-            'originalTime': `${_00(now.getHours())}:${_00(now.getMinutes())}:${_00(now.getSeconds())}.000`,
+            'originalDate': `${value.getFullYear()}-${_00(value.getMonth() + 1)}-${_00(value.getDate())}`,// **Modif Sigalou 2019.02.28
+            'originalTime': `${_00(value.getHours())}:${_00(value.getMinutes())}:${_00(value.getSeconds())}.000`,// **Modif Sigalou 2019.02.28
             'id': 'create' + type,
 
             'isRecurring' : false,
@@ -1371,7 +1371,8 @@ class AlexaRemote extends EventEmitter {
     }
 
     setReminder(serialOrName, timestamp, label, callback) {
-        const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(timestamp));
+        //const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(timestamp)); **Modif Sigalou 2019.02.28
+        const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(Number(timestamp)));
         this.createNotification(notification, callback);
     }
 

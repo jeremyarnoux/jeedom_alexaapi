@@ -273,6 +273,8 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
           </tbody>
         </table>
       </div>
+
+
     </div>
   </div>
 </div>
