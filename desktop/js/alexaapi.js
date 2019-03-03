@@ -160,7 +160,7 @@ function addCmdToTable(_cmd)
     if (is_numeric(_cmd.id))
     {
       tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fa fa-cogs"></i></a> ';
-		   if (!(init(_cmd.name)=="Reminder")) //Masquer le bouton Tester
+		   if (!((init(_cmd.name)=="Reminder")||(init(_cmd.name)=="Alarm"))) //Masquer le bouton Tester
 			  tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
 	}
     tr += '<i class="fa fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>'

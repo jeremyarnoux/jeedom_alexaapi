@@ -655,6 +655,62 @@ class AlexaRemote extends EventEmitter {
         return this.parseValue4Notification(notification, value);
     }
 
+    createNotificationAlarmObject(serialOrName, recurring, label, value, status, sound) { // type = Reminder, Alarm
+                 console.log('-->-->--recurring: ' + recurring + '-----------------');
+      const type="Alarm";
+
+		if (status && typeof status === 'object') {
+            sound = status;
+            status = 'ON';
+        }
+        if (value === null || value === undefined) {
+            value = new Date().getTime() + 5000;
+        }
+
+		var recurringtruefalse='true';
+        if (recurring === null || recurring === undefined || recurring === "") {
+            recurringtruefalse='false';
+        }
+
+        let dev = this.find(serialOrName);
+        if (!dev) return null;
+		const now = new Date();
+		const notification = {
+            'alarmTime': now.getTime(), // will be overwritten
+            'createdDate': now.getTime(),
+            'type': type, // Alarm ...
+            'deviceSerialNumber': dev.serialNumber,
+            'deviceType': dev.deviceType,
+            'reminderLabel': label || null,
+            'sound': sound || null,
+            /*{
+                'displayName': 'Countertop',
+                'folder': null,
+                'id': 'system_alerts_repetitive_04',
+                'providerId': 'ECHO',
+                'sampleUrl': 'https://s3.amazonaws.com/deeappservice.prod.notificationtones/system_alerts_repetitive_04.mp3'
+            }*/
+            'originalDate': `${now.getFullYear()}-${_00(now.getMonth() + 1)}-${_00(now.getDate())}`,
+            'originalTime': `${_00(now.getHours())}:${_00(now.getMinutes())}:${_00(now.getSeconds())}.000`,
+            'id': 'create' + type,
+
+            'isRecurring' : recurringtruefalse,
+            'recurringPattern': recurring,
+
+            'timeZoneId': null,
+            'reminderIndex': null,
+
+            'isSaveInFlight': true,
+
+            'status': 'ON' // OFF
+        };
+        /*if (type === 'Timer') {
+            notification.originalDate = null;
+            notification.originalTime = null;
+            notification.alarmTime = 0;
+        }*/
+return this.parseValue4Notification(notification, value);    }
+
     parseValue4Notification(notification, value) {
       
                 console.log('--------Typeof: ' + (typeof value) + 'Value: ' + value + '-----------------');
@@ -1373,6 +1429,11 @@ class AlexaRemote extends EventEmitter {
     setReminder(serialOrName, timestamp, label, callback) {
         //const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(timestamp)); **Modif Sigalou 2019.02.28
         const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(Number(timestamp)));
+        this.createNotification(notification, callback);
+    }
+    setAlarm(serialOrName, timestamp, recurring, callback) {
+        //const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(timestamp)); **Modif Sigalou 2019.02.28
+        const notification = this.createNotificationAlarmObject(serialOrName, recurring, '', new Date(Number(timestamp)));
         this.createNotification(notification, callback);
     }
 

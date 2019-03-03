@@ -280,6 +280,17 @@ class alexaapi extends eqLogic
       $cmd->setDisplay('title_disable', 1);
       $cmd->save();
 
+      // alarm command
+      $cmd = new alexaapiCmd();
+      $cmd->setType('action');
+      $cmd->setSubType('message');
+      $cmd->setEqLogic_id($device->getId());
+      $cmd->setDisplay('title_disable', 1);
+      $cmd->setName('Alarm');
+	  $cmd->setIsVisible(false);
+      $cmd->setConfiguration('request', 'alarm?&when=#when#&recurring=#recurring#');
+      $cmd->save();
+
       // Reminder command
       $cmd = new alexaapiCmd();
       $cmd->setType('action');
@@ -408,6 +419,9 @@ class alexaapiCmd extends cmd
             case 'reminder':
                 $request = $this->buildReminderRequest($_options);
                 break;
+            case 'alarm':
+                $request = $this->buildAlarmRequest($_options);
+                break;
             default:
                 $request = '';
         }
@@ -463,6 +477,24 @@ class alexaapiCmd extends cmd
           ), $request);
     }
 
+    private function buildAlarmRequest($_options = array())
+    {
+        log::add('alexaapi', 'debug', 'buildalarmRequest');
+        $request = $this->getConfiguration('request');
+		        if (!isset($_options['message']) || $_options['message'] == '')
+            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
+
+        return str_replace(
+          array(
+            '#when#',
+            '#recurring#'
+          ), array(
+//            str_replace(" ", "+", $_options['when']),
+            urlencode($_options['message']),
+            urlencode($_options['select']),
+          ), $request);
+    }
+
     private function buildPushRequest($_options = array())
     {
         log::add('alexaapi', 'debug', 'buildPushRequest');
@@ -491,6 +523,8 @@ class alexaapiCmd extends cmd
         return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
       if ($command == 'reminder')
         return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');
+      if ($command == 'alarm')
+        return getTemplate('core', 'scenario', 'cmd.alarm', 'alexaapi');
       return parent::getWidgetTemplateCode($_version, $_noCustom);
     }
 }

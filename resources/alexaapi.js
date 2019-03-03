@@ -193,6 +193,48 @@ app.get('/reminder', (req, res) =>
   });
 });
 
+/***** Create a alarm *****
+  URL /alarm?device=?&text=?&when=?
+    device - String - name of the device
+    text - String - Content of the alarm
+    when - String - Date at which the alarm should occur. Date format: YYYY-MM-DD HH24:MI:SS
+
+  Return an empty object if the function succeed.
+  Otherwise, an error object is returned.
+*/
+app.get('/alarm', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Alexa.Alarm');
+  res.type('json');
+
+  if ('device' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Alarm', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
+  if ('when' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Alarm', 'Missing parameter "when"'));
+  config.logger && config.logger('Alexa-API: when: ' + req.query.when);
+
+  if ('recurring' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Alarm', 'Missing parameter "recurring"'));
+  config.logger && config.logger('Alexa-API: recurring: ' + req.query.recurring);
+
+
+  // when: YYYY-MM-DD HH:MI:SS
+  let dateValues = req.query.when.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+  if (dateValues === null)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Alarm', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
+  let when = new Date(dateValues[1], dateValues[2]-1, dateValues[3], dateValues[4], dateValues[5], dateValues[6])
+  config.logger && config.logger('Alexa-API: when: ' + when);
+
+ alexa.setAlarm(req.query.device, when.getTime(), req.query.recurring, function(err)
+  {
+    if (err)
+      return res.status(500).json(error(500, req.route.path, 'createReminder', err));
+    res.status(200).json({});
+  });
+});
+
 /***** Get devices *****
   URL: /devices
 
