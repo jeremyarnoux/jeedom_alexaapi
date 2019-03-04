@@ -67,7 +67,7 @@ class alexaapi extends eqLogic
         $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
 		}
 		*/
-        //    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexa-remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
+        //    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/Alexa-Remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
         $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ';
         log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
         $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
@@ -316,7 +316,7 @@ class alexaapi extends eqLogic
 
     public static function dependancy_install()
     {
-        log::add('alexaapi', 'info', 'Installation des dépéndances : alexa-remote-http');
+        log::add('alexaapi', 'info', 'Installation des dépéndances : Alexa-Remote-http');
         $resource_path = realpath(dirname(__FILE__) . '/../../resources');
         passthru('/bin/bash ' . $resource_path . '/nodejs.sh ' . $resource_path . ' alexaapi > ' . log::getPathToLog('alexaapi_dep') . ' 2>&1 &');
     }

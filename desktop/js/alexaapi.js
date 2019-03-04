@@ -32,6 +32,12 @@ $('#bt_sante').on('click', function ()
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=health').dialog('open');
 });
 
+$('#bt_reminders').on('click', function ()
+{
+  $('#md_modal').dialog({title: "{{Liste des Rappels/Alarmes}}"});
+  $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders').dialog('open');
+});
+
  $('#bt_scan').on('click', function () {
     scanAmazonAlexa();
 });

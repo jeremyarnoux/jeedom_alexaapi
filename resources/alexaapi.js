@@ -271,6 +271,62 @@ app.get('/devices', (req, res) =>
   });
 });
 
+/***** Reminders *****
+  URL: /reminders
+
+  Return the list of reminders
+  [{
+    serial - String - Serial number of the device (unique identifier)
+    name: String - name of the device. Use this name (or serial) to call as "device" parameter of others methods
+    type: String - Device family as defined by Amazon. Known type: TABLET (for tablet device), ECHO (for ECHO device), WHA (for group of devices), VOX (for smartphone? Webpage?)
+    online: Boolean - true when the device is connected, false otherwise,
+    capabilities: [String] - List of available capabilties of the device, few example: VOLUME_SETTING, REMINDERS, MICROPHONE, TUNE_IN, ...
+  }]
+
+*/
+
+function printObject(o) {
+  var out = '';
+  for (var p in o) {
+    out += p + ': ' + o[p] + '\n';
+  }
+  //alert(out);
+  config.logger && config.logger('Alexa-API: (reminders) boucle = '+ out );
+}
+
+
+
+app.get('/reminders', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Reminders');
+  res.type('json');
+
+config.logger && config.logger('Alexa-API: (reminders) Lancement' );
+
+  alexa.getNotifications2(function(notifications)
+  {
+config.logger && config.logger('Alexa-API: (reminders) function' );
+    var toReturn = [];
+
+    for (var serial in notifications)
+    {
+      var device = notifications[serial];
+      toReturn.push({
+        'serial': serial,
+        'deviceSerialNumber': device.deviceSerialNumber,
+        'type': device.type,
+        'originalTime': device.originalTime,
+        'originalDate': device.originalDate,
+        'status' : device.status,
+        'recurringPattern' : device.recurringPattern,
+        'reminderLabel': device.reminderLabel
+      });
+    }
+    res.status(200).json(toReturn);
+
+  });
+});
+
 /***** Stop the server *****/
 app.get('/stop', (req, res) =>
 {

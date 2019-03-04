@@ -216,29 +216,39 @@ class AlexaRemote extends EventEmitter {
     }
 
     initNotifications(callback) {
-        if (!this._options.notifications) return callback && callback();
+		                        this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: initNotifications');
+
+        //if (!this._options.notifications) return callback && callback();
         this.getNotifications((err, res) => {
+		                        this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: 0');
+
             if (err || !res || !res.notifications || !Array.isArray(res.notifications)) return callback && callback();
 
             for (var serialNumber in this.serialNumbers) {
+		                        this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: boucle serialNumbers');
                 if (this.serialNumbers.hasOwnProperty(serialNumber)) {
                     this.serialNumbers[serialNumber].notifications = [];
                 }
             }
+		                        this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: 1');
 
             res.notifications.forEach((noti) => {
                 let device = this.find(noti.deviceSerialNumber);
                 if (!device) {
                     //TODO: new stuff
-                    return;
+ 		                        this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: 2');
+                   return;
                 }
                 if (noti.alarmTime && !noti.originalTime && noti.originalDate && noti.type !== 'Timer') {
                     const now = new Date(noti.alarmTime);
+ 		                        this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: 3');
                     noti.originalTime = `${_00(now.getHours())}:${_00(now.getMinutes())}:${_00(now.getSeconds())}.000`;
                 }
-                noti.set = this.changeNotification.bind(this, noti);
+  		                        this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: 4');
+               noti.set = this.changeNotification.bind(this, noti);
                 device.notifications.push(noti);
             });
+  		                        this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: 5');
             callback && callback();
         });
     }
@@ -597,6 +607,7 @@ class AlexaRemote extends EventEmitter {
         return this.getNotifications(cached, callback);
     }
     getNotifications(cached, callback) {
+
         if (typeof cached === 'function') {
             callback = cached;
             cached = true;
@@ -604,6 +615,21 @@ class AlexaRemote extends EventEmitter {
         if (cached === undefined) cached = true;
         this.httpsGet (`/api/notifications?cached=${cached}&_=%t`, callback);
     }
+
+//**********************************************************************************************************************
+//**********************************************************************************************************************
+//**********************************************************************************************************************
+//**********************************************************************************************************************
+getNotifications2(callback) {
+
+    this.getNotifications((err, res) => {
+
+        if (err || !res || !res.notifications || !Array.isArray(res.notifications)) return callback && callback();
+
+		        callback && callback(res.notifications);
+
+    });
+}
 
     createNotificationObject(serialOrName, type, label, value, status, sound) { // type = Reminder, Alarm
         if (status && typeof status === 'object') {
