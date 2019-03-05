@@ -31,7 +31,7 @@ try {
         case 'createCookie':
             //log::add('alexaapi', 'info', 'Debut');
             $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
-            //Par sÈcuritÈ, on Kill un Èventuel prÈcÈdent proessus initCookie.js
+            //Par s√©curit√©, on Kill un √©ventuel pr√©c√©dent proessus initCookie.js
             $cmd = 'kill $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')';
             log::add('alexaapi', 'debug', '---- Kill initCookie.js: ' . $cmd);
             $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
@@ -47,7 +47,7 @@ try {
         break;
         case 'closeCookie':
             $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
-            //Par sÈcuritÈ, on Kill un Èventuel prÈcÈdent proessus cookie.js
+            //Par s√©curit√©, on Kill un √©ventuel pr√©c√©dent proessus cookie.js
             $cmd = 'kill $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')';
             log::add('alexaapi', 'debug', '---- Kill initCookie.js: ' . $cmd);
             $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
@@ -66,7 +66,7 @@ try {
  		ajax::error();
        break;
         case 'deamonCookieStart':
-					//on va vÈrifier que les dÈpendances sont bien installÈes
+					//on va v√©rifier que les d√©pendances sont bien install√©es
 					$request = realpath(dirname(__FILE__) . '/../../resources/node_modules');
 					if (!(file_exists($request)))
 					ajax::error("D√©pendances non pr√©sentes, g√©n√©ration manuelle du cookie Amazon impossible !!");
@@ -99,6 +99,10 @@ try {
             alexaapi::deamon_info();
             ajax::success();
         break;
+	case 'reinstallNodeJS':
+		$ret=alexaapi::reinstallNodeJS();
+		ajax::success($ret);
+	break;
     }
     throw new \Exception('Aucune methode correspondante');
 }
