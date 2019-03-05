@@ -183,5 +183,34 @@ PopUpCentre("http://<?php print config::byKey('internalAddr')?>:3457", 480, 640)
   $('.bt_identificationCookie').on('click',function()
   {
   });
+  
+  $('#bt_reinstallNodeJS').on('click', function() {
+		bootbox.confirm('{{Etes-vous sûr de vouloir supprimer et reinstaller NodeJS ?}}', function(result) {
+			if (result) {
+				$.ajax({
+					type : 'POST',
+					url : 'plugins/alexaapi/core/ajax/alexaapi.ajax.php',
+					data : {
+						action : 'reinstallNodeJS',
+					},
+					dataType : 'json',
+					global : false,
+					error : function(request, status, error) {
+						$('#div_alert').showAlert({
+							message : error.message,
+							level : 'danger'
+						});
+					},
+					success : function(data) {
+						$('li.li_plugin.active').click();
+						$('#div_alert').showAlert({
+							message : "{{Réinstallation NodeJS effectuée, merci de patienter jusqu'à la fin de l'installation des dépendances}}",
+							level : 'success'
+						});
+					}
+				});
+			}
+		});
+	});	
 
 </script>
