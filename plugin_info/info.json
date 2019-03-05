@@ -7,14 +7,12 @@
 	"require" : "3.0",
 	"version": "0.0.1",
 	"changelog" : "http://sigalou-domotique.fr/domotique/65-alexa-api-changelog",
-	"documentation" : "http://sigalou-domotique.fr/domotique/65-alexa-api-changelog",
+	"documentation" : "https://www.jeedom.com/forum/viewtopic.php?f=140&t=43750",
 	"category" : "communication",
   "hasDependency" : 1,
   "hasOwnDeamon" : 1,
 	"language" : ["fr_FR","en_US"],
 	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile"],
-	"maxDependancyInstallTime" : 0,
-	"changelog" : "",
-	"documentation" : ""
+	"maxDependancyInstallTime" : 0
 }
 
