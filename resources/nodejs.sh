@@ -1,6 +1,7 @@
 #!/bin/bash
 
 PROGRESS_FILE=/tmp/jeedom/${2}/dependance
+mkdir /tmp/jeedom/${2}
 installVer='8' 	#NodeJS major version to be installed
 minVer='8'	#min NodeJS major version to be accepted
 
