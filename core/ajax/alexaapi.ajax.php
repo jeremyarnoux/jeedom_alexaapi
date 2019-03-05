@@ -100,7 +100,7 @@ try {
             ajax::success();
         break;
 	case 'reinstallNodeJS':
-		$ret=xiaomiTalk::reinstallNodeJS();
+		$ret=alexaapi::reinstallNodeJS();
 		ajax::success($ret);
 	break;
     }
