@@ -1,6 +1,7 @@
 # jeedom_alexaapi
 
 Le plugin est intégré depuis le 05/03/2019 au Market de Jeedom sous le nom Alexa-API
+
 Installez le depuis le market, cela est plus simple et permet de bénéficier des mises à jour automatiques.
 
 Ce dépôt reste le lieu de développement.
