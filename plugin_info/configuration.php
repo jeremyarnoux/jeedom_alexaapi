@@ -185,7 +185,7 @@ PopUpCentre("http://<?php print config::byKey('internalAddr')?>:3457", 480, 640)
   });
   
   $('#bt_reinstallNodeJS').on('click', function() {
-		bootbox.confirm('{{Etes-vous sûr de vouloir supprimer et reinstaller NodeJS ?}}', function(result) {
+		bootbox.confirm('{{Etes-vous sûr de vouloir supprimer et reinstaller NodeJS ? <br /> Merci de patienter 10-20 secondes quand vous aurez cliqué...}}', function(result) {
 			if (result) {
 				$.ajax({
 					type : 'POST',
