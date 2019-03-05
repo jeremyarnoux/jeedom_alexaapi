@@ -36,7 +36,7 @@ class alexaapi extends eqLogic
 		if (curl_errno($ch)) {
 			$curl_error = curl_error($ch);
 			curl_close($ch);
-			throw new Exception(__('Echec de la requÃªte http : ', __FILE__) . $url . ' Curl error : ' . $curl_error, 404);
+			throw new Exception(__('Echec de la requête http : ', __FILE__) . $url . ' Curl error : ' . $curl_error, 404);
 		}
 		curl_close($ch);
 		return (is_json($result)) ? json_decode($result, true) : $result;
@@ -73,9 +73,9 @@ class alexaapi extends eqLogic
         self::deamon_stop();
         $deamon_info = self::deamon_info();
         if ($deamon_info['launchable'] != 'ok')
-            throw new Exception(__('Veuillez vÃ©rifier la configuration', __FILE__));
+            throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
 
-        log::add('alexaapi', 'info', 'Lancement du dÃ©mon alexaapi');
+        log::add('alexaapi', 'info', 'Lancement du démon alexaapi');
         $url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/alexaapi/core/api/jeealexaapi.php?apikey=' . jeedom::getApiKey('alexaapi');
         $log = $_debug ? '1' : '0';
 
@@ -93,7 +93,7 @@ class alexaapi extends eqLogic
 		*/
         //    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/Alexa-Remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
         $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ';
-        log::add('alexaapi', 'debug', 'Lancement dÃ©mon alexaapi : ' . $cmd);
+        log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
         $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
         if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false)
         {
@@ -112,18 +112,18 @@ class alexaapi extends eqLogic
         }
         if ($i >= 30)
         {
-            log::add('alexaapi', 'error', 'Impossible de lancer le dÃ©mon alexaapi, vÃ©rifiez le port', 'unableStartDeamon');
+            log::add('alexaapi', 'error', 'Impossible de lancer le démon alexaapi, vérifiez le port', 'unableStartDeamon');
             return false;
         }
         message::removeAll('alexaapi', 'unableStartDeamon');
-        log::add('alexaapi', 'info', 'DÃ©mon alexaapi lancÃ©');
+        log::add('alexaapi', 'info', 'Démon alexaapi lancé');
         return true;
     }
 
     public static function deamon_stop()
     {
         exec('kill $(ps aux | grep "/alexaapi.js" | awk \'{print $2}\')');
-        log::add('alexaapi', 'info', 'ArrÃªt du service alexaapi');
+        log::add('alexaapi', 'info', 'Arrêt du service alexaapi');
         $deamon_info = self::deamon_info();
         if ($deamon_info['state'] == 'ok')
         {
@@ -157,7 +157,7 @@ class alexaapi extends eqLogic
         self::deamonCookie_stop();
         $deamon_info = self::deamon_info();
 
-        log::add('alexaapi_cookie', 'info', 'Lancement du dÃ©mon cookie');
+        log::add('alexaapi_cookie', 'info', 'Lancement du démon cookie');
         $log = $_debug ? '1' : '0';
 
         $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
@@ -165,7 +165,7 @@ class alexaapi extends eqLogic
         $cmd = "kill $(ps aux | grep 'initCookie.js' | awk '{print $2}')";
         log::add('alexaapi', 'debug', '---- Kill initCookie.js: ' . $cmd);
         $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/initCookie.js ' . config::byKey('internalAddr');
-        log::add('alexaapi', 'debug', '---- Lancement dÃ©mon Alexa-API-Cookie sur port 3457 : ' . $cmd);
+        log::add('alexaapi', 'debug', '---- Lancement démon Alexa-API-Cookie sur port 3457 : ' . $cmd);
         $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
         if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false)
         {
@@ -174,14 +174,14 @@ class alexaapi extends eqLogic
         }
 
         message::removeAll('alexaapi', 'unableStartDeamonCookie');
-        log::add('alexaapi_cookie', 'info', 'DÃ©mon cookie lancÃ©');
+        log::add('alexaapi_cookie', 'info', 'Démon cookie lancé');
         return true;
     }
 
     public static function deamonCookie_stop()
     {
         exec('kill $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')');
-        log::add('alexaapi', 'info', 'ArrÃªt du service cookie');
+        log::add('alexaapi', 'info', 'Arrêt du service cookie');
         $deamon_info = self::deamon_info();
         if ($deamon_info['stateCookie'] == 'ok')
         {
@@ -193,7 +193,7 @@ class alexaapi extends eqLogic
     //************Dépendances ***********
     public static function dependancy_info()
     {
-        log::add('alexaapi','info','Controle dependances');
+        log::add('alexaapi','info','Controle dépendances');
         $return = array();
         $return['log'] = 'alexaapi_dep';
         $request = realpath(dirname(__FILE__) . '/../../resources/node_modules');
@@ -254,7 +254,7 @@ class alexaapi extends eqLogic
         event::add('jeedom::alert', array(
           'level' => 'success',
           'page' => 'alexaapi',
-          'message' => __('Scan terminÃ©. ' . $numDevices . ' Ã©quipements mis a jour dont ' . $numNewDevices . ' ajoutÃ©(s)', __FILE__)
+          'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . ' ajouté(s)', __FILE__)
         ));
     }
 
@@ -352,7 +352,7 @@ class alexaapi extends eqLogic
 
     public static function dependancy_install()
     {
-        log::add('alexaapi', 'info', 'Installation des dÃ©pÃ©ndances : Alexa-Remote-http');
+        log::add('alexaapi', 'info', 'Installation des dépéndances : Alexa-Remote-http');
         $resource_path = realpath(dirname(__FILE__) . '/../../resources');
         passthru('/bin/bash ' . $resource_path . '/nodejs.sh ' . $resource_path . ' alexaapi > ' . log::getPathToLog('alexaapi_dep') . ' 2>&1 &');
     }
@@ -418,7 +418,7 @@ class alexaapiCmd extends cmd
 
         $jsonResult = json_decode($json, true);
         if (!empty($jsonResult))
-            throw new Exception(__('Echec de l\'execution: ', __FILE__) . '(' . $jsonResult['title'] . ') ' . $jsonResult['detail']);
+            throw new Exception(__('Echec de l\'exécution: ', __FILE__) . '(' . $jsonResult['title'] . ') ' . $jsonResult['detail']);
 
         // Update info
         if ($this->getType() == 'action')
@@ -464,7 +464,7 @@ class alexaapiCmd extends cmd
         $request = scenarioExpression::setTags($request);
 
         if (trim($request) == '')
-            throw new Exception(__('Commande inconnue ou requÃªte vide : ', __FILE__) . print_r($this, true));
+            throw new Exception(__('Commande inconnue ou requête vide : ', __FILE__) . print_r($this, true));
 
         return 'http://' . config::byKey('internalAddr') . ':3456/' . $request . '&device=' . $this->getEqLogic()->getConfiguration('serial');
     }
@@ -474,7 +474,7 @@ class alexaapiCmd extends cmd
         log::add('alexaapi', 'debug', 'buildVolumeRequest');
         $request = $this->getConfiguration('request');
         if (!isset($_options['slider']))
-            throw new Exception(__('Le slider ne peut pas Ãªtre vide', __FILE__));
+            throw new Exception(__('Le slider ne peut pas être vide', __FILE__));
 
         return str_replace('#volume#', $_options['slider'], $request);
     }
@@ -484,7 +484,7 @@ class alexaapiCmd extends cmd
         log::add('alexaapi', 'debug', 'buildSpeakRequest');
         $request = $this->getConfiguration('request');
         if (!isset($_options['message']) || $_options['message'] == '')
-            throw new Exception(__('Le message ne peut pas Ãªtre vide', __FILE__));
+            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
 
         return str_replace(
           array(
@@ -500,7 +500,7 @@ class alexaapiCmd extends cmd
         log::add('alexaapi', 'debug', 'buildReminderRequest');
         $request = $this->getConfiguration('request');
         if (!isset($_options['message']) || $_options['message'] == '')
-            throw new Exception(__('Le message ne peut pas Ãªtre vide', __FILE__));
+            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
 
         return str_replace(
           array(
@@ -518,7 +518,7 @@ class alexaapiCmd extends cmd
         log::add('alexaapi', 'debug', 'buildalarmRequest');
         $request = $this->getConfiguration('request');
 		        if (!isset($_options['message']) || $_options['message'] == '')
-            throw new Exception(__('Le message ne peut pas Ãªtre vide', __FILE__));
+            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
 
         return str_replace(
           array(
@@ -536,7 +536,7 @@ class alexaapiCmd extends cmd
         log::add('alexaapi', 'debug', 'buildPushRequest');
         $request = $this->getConfiguration('request');
         if (!isset($_options['message']) || $_options['message'] == '')
-            throw new Exception(__('Le message ne peut pas Ãªtre vide', __FILE__));
+            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
 
         return str_replace(
           array(
