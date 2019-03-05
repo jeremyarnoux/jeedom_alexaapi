@@ -32,17 +32,17 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 
 	<legend><i class="icon divers-triangular42"></i> {{Génération manuelle du cookie Amazon}}</legend>
 	<center>
-		<a class="btn btn-success btn-sm bt_startDeamonCookie"  >Identifiez-vous sur Amazon pour créer le cookie d'identification</a>
-		<a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fa fa-clock-o"></i> ... Attendez la génération du Cookie Amazon ... </a>
-		<a class="btn btn-default btn-sm bt_identificationCookie2bis"><i class="fa fa-clock-o"></i> ... Attendez la génération du Cookie Amazon ... </a>
-		<a class="btn btn-danger btn-sm bt_identificationCookie2echec"><i class="fa fa-times"></i> La génération du Cookie Amazon a échoué </a>
-		<a class="btn btn-success btn-sm bt_identificationCookie3"><i class="fa fa-check"></i> Bravo : Cookie d'identification Amazon chargé !</a>
-		<a class="btn btn-success btn-sm bt_identificationCookie"><i class="fa fa-clock-o"></i> Ouverture de la fenetre d'identification Amazon Alexa en cours ...</a>
+		<a class="btn btn-success btn-sm bt_startDeamonCookie"> {{Identifiez-vous sur Amazon pour créer le cookie d'identification}} </a>
+		<a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fa fa-clock-o"></i> {{... Attendez la génération du Cookie Amazon ...}} </a>
+		<a class="btn btn-default btn-sm bt_identificationCookie2bis"><i class="fa fa-clock-o"></i> {{... Attendez la génération du Cookie Amazon ...}} </a>
+		<a class="btn btn-danger btn-sm bt_identificationCookie2echec"><i class="fa fa-times"></i> {{La génération du Cookie Amazon a échoué}} </a>
+		<a class="btn btn-success btn-sm bt_identificationCookie3"><i class="fa fa-check"></i> {{Bravo : Cookie d'identification Amazon chargé !}} </a>
+		<a class="btn btn-success btn-sm bt_identificationCookie"><i class="fa fa-clock-o"></i> {{Ouverture de la fenetre d'identification Amazon Alexa en cours ...}} </a>
 	</center>
 	<br />
 	<legend><i class="fa fa-wrench"></i> {{Réparations}}</legend>
 	<center>
-		<a class="btn btn-danger btn-sm" id="bt_reinstallNodeJS"><i class="fa fa-recycle"></i> {{Réparation de NodeJS}}</a>
+		<a class="btn btn-danger btn-sm" id="bt_reinstallNodeJS"><i class="fa fa-recycle"></i> {{Réparation de NodeJS}} </a>
 	</center>
 
 <script>
