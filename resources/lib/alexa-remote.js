@@ -825,6 +825,9 @@ return this.parseValue4Notification(notification, value);    }
         );
     }
 
+
+
+
     deleteNotification(notification, callback) {
         let flags = {
             data: JSON.stringify (notification),
@@ -837,6 +840,32 @@ return this.parseValue4Notification(notification, value);    }
             flags
         );
     }
+
+
+test(callback)
+	{
+
+
+        const notification = {
+ /*           'alarmTime': '1551798300000', 
+            'createdDate': '1551744071809',
+            'type': 'Alarm', 
+            'deviceSerialNumber': 'G070RQ13812407G6',
+            'originalDate': '2019-03-05',
+            'originalTime': '15:05:00.000',*/
+            'id': 'A3S5BH2HU6VAYF-G090LF118173117U-fc56efd2-d9b7-46ab-800a-52f70c8433d9'
+//			'notificationIndex':'03907eaa-bc3b-4afe-be90-62b52ef626bf'
+/*            'isRecurring' : false,
+            'recurringPattern': null,
+            'timeZoneId': null,
+            'reminderIndex': null,
+            'isSaveInFlight': true,
+            'status': 'OFF' // OFF*/
+        };
+
+this.deleteNotification(notification, callback);
+
+	}
 
     getDoNotDisturb(callback) {
         return this.getDeviceStatusList(callback);

@@ -18,7 +18,31 @@
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 class alexaapi extends eqLogic
 {
-    //*********** Demon ***************
+	/*     * ***********************Methode static*************************** */
+
+	public static function callProxyAlexaapi($_url) {
+		//if (strpos($_url, '?') !== false) {
+			$url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('openzwave');
+		//} else {
+		//	$url = 'http://127.0.0.1:' . config::byKey('port_server', 'openzwave', 8083) . '/' . trim($_url, '/') . '?apikey=' . jeedom::getApiKey('openzwave');
+		//}
+		$ch = curl_init();
+		curl_setopt_array($ch, array(
+			CURLOPT_URL => $url,
+			CURLOPT_HEADER => false,
+			CURLOPT_RETURNTRANSFER => true,
+		));
+		$result = curl_exec($ch);
+		if (curl_errno($ch)) {
+			$curl_error = curl_error($ch);
+			curl_close($ch);
+			throw new Exception(__('Echec de la requête http : ', __FILE__) . $url . ' Curl error : ' . $curl_error, 404);
+		}
+		curl_close($ch);
+		return (is_json($result)) ? json_decode($result, true) : $result;
+	}
+
+	//*********** Demon ***************
     public static function deamon_info()
     {
         $return = array();

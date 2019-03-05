@@ -285,17 +285,6 @@ app.get('/devices', (req, res) =>
 
 */
 
-function printObject(o) {
-  var out = '';
-  for (var p in o) {
-    out += p + ': ' + o[p] + '\n';
-  }
-  //alert(out);
-  config.logger && config.logger('Alexa-API: (reminders) boucle = '+ out );
-}
-
-
-
 app.get('/reminders', (req, res) =>
 {
   config.logger && config.logger('Alexa-API: Reminders');
@@ -319,13 +308,49 @@ config.logger && config.logger('Alexa-API: (reminders) function' );
         'originalDate': device.originalDate,
         'status' : device.status,
         'recurringPattern' : device.recurringPattern,
-        'reminderLabel': device.reminderLabel
+        'reminderLabel': device.reminderLabel,
+        'id': device.id
       });
     }
     res.status(200).json(toReturn);
 
   });
 });
+
+
+/***** DeleteReminder *****
+  URL: /deletereminder
+
+  Return the list of reminders
+  [{
+    id - String - id of the reminder (unique identifier)
+  }]
+
+*/
+
+app.get('/deletereminder', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Reminders');
+  res.type('json');
+
+  if ('id' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.DeleteReminder', 'Missing parameter "id"'));
+
+        const notification = {
+            'id': req.query.id
+        };
+
+  alexa.deleteNotification(notification, function(err)
+  {
+    if (err)
+      return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.DeleteReminder', err));
+    res.status(200).json({});
+  });
+});
+
+
+
+
 
 /***** Stop the server *****/
 app.get('/stop', (req, res) =>

@@ -34,7 +34,7 @@ $('#bt_sante').on('click', function ()
 
 $('#bt_reminders').on('click', function ()
 {
-  $('#md_modal').dialog({title: "{{Liste des Rappels/Alarmes}}"});
+  $('#md_modal').dialog({title: "{{Rappels/Alarmes}}"});
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders').dialog('open');
 });
 
@@ -279,4 +279,26 @@ jeedom.plugin.VerifiePresenceCookie = function(_params)
     $.ajax(paramsAJAX);
 };
 
+ /*************************Node************************************************/
+
+ jeedom.plugin.node = function() {
+ };
+
+ jeedom.plugin.node.action = function (_params) {
+ 	var paramsRequired = ['action','node_id'];
+ 	var paramsSpecifics = {};
+ 	try {
+ 		jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+ 	} catch (e) {
+ 		(_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+ 		return;
+ 	}
+ 	var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
+ 	var paramsAJAX = jeedom.private.getParamsAJAX(params);
+ 	paramsAJAX.url = 'plugins/alexaapi/desktop/php/alexaapiProxy.php';
+ 	paramsAJAX.data = {
+ 		request: 'deletereminder?id='+_params.node_id+'&type=action&action='+_params.action,
+ 	};
+ 	$.ajax(paramsAJAX);
+ }
 
