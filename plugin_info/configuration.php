@@ -30,10 +30,20 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 
 ?>
 
-<legend><i class="icon divers-triangular42"></i> {{GÃ©nÃ©ration manuelle du cookie Amazon}}</legend>
-
-				<center><a class="btn btn-success btn-sm bt_startDeamonCookie"  >Identifiez-vous sur Amazon pour crÃ©er le cookie d'identification</a>
-				<a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fa fa-clock-o"></i> ... Attendez la gÃ©nÃ©ration du Cookie Amazon ... </a><a class="btn btn-default btn-sm bt_identificationCookie2bis"><i class="fa fa-clock-o"></i> ... Attendez la gÃ©nÃ©ration du Cookie Amazon ... </a><a class="btn btn-danger btn-sm bt_identificationCookie2echec"><i class="fa fa-times"></i> La gÃ©nÃ©ration du Cookie Amazon a Ã©chouÃ© </a><a class="btn btn-success btn-sm bt_identificationCookie3"><i class="fa fa-check"></i> Bravo : Cookie d'identification Amazon chargÃ© !</a><a class="btn btn-success btn-sm bt_identificationCookie"><i class="fa fa-clock-o"></i> Ouverture de la fenetre d'identification Amazon Alexa en cours ...</a></center>
+	<legend><i class="icon divers-triangular42"></i> {{Génération manuelle du cookie Amazon}}</legend>
+	<center>
+		<a class="btn btn-success btn-sm bt_startDeamonCookie"  >Identifiez-vous sur Amazon pour créer le cookie d'identification</a>
+		<a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fa fa-clock-o"></i> ... Attendez la génération du Cookie Amazon ... </a>
+		<a class="btn btn-default btn-sm bt_identificationCookie2bis"><i class="fa fa-clock-o"></i> ... Attendez la génération du Cookie Amazon ... </a>
+		<a class="btn btn-danger btn-sm bt_identificationCookie2echec"><i class="fa fa-times"></i> La génération du Cookie Amazon a échoué </a>
+		<a class="btn btn-success btn-sm bt_identificationCookie3"><i class="fa fa-check"></i> Bravo : Cookie d'identification Amazon chargé !</a>
+		<a class="btn btn-success btn-sm bt_identificationCookie"><i class="fa fa-clock-o"></i> Ouverture de la fenetre d'identification Amazon Alexa en cours ...</a>
+	</center>
+	<br />
+	<legend><i class="fa fa-wrench"></i> {{Réparations}}</legend>
+	<center>
+		<a class="btn btn-danger btn-sm" id="bt_reinstallNodeJS"><i class="fa fa-recycle"></i> {{Réparation de NodeJS}}</a>
+	</center>
 
 <script>
     var compteVerifCookie=0;
@@ -173,34 +183,5 @@ PopUpCentre("http://<?php print config::byKey('internalAddr')?>:3457", 480, 640)
   $('.bt_identificationCookie').on('click',function()
   {
   });
-
-  	$('#bt_reinstallNodeJS').on('click', function() {
-		bootbox.confirm('{{Etes-vous sûr de vouloir supprimer et reinstaller NodeJS ?}}', function(result) {
-			if (result) {
-				$.ajax({
-					type : 'POST',
-					url : 'plugins/alexaapi/core/ajax/alexaapi.ajax.php',
-					data : {
-						action : 'reinstallNodeJS',
-					},
-					dataType : 'json',
-					global : false,
-					error : function(request, status, error) {
-						$('#div_alert').showAlert({
-							message : error.message,
-							level : 'danger'
-						});
-					},
-					success : function(data) {
-						$('li.li_plugin.active').click();
-						$('#div_alert').showAlert({
-							message : "{{Réinstallation NodeJS effectuée, merci de patienter jusqu'à la fin de l'installation des dépendances}}",
-							level : 'success'
-						});
-					}
-				});
-			}
-		});
-	});	
 
 </script>
