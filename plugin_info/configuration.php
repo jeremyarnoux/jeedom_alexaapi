@@ -187,6 +187,7 @@ PopUpCentre("http://<?php print config::byKey('internalAddr')?>:3457", 480, 640)
   $('#bt_reinstallNodeJS').on('click', function() {
 		bootbox.confirm('{{Etes-vous sûr de vouloir supprimer et reinstaller NodeJS ? <br /> Merci de patienter 10-20 secondes quand vous aurez cliqué...}}', function(result) {
 			if (result) {
+				$.showLoading();
 				$.ajax({
 					type : 'POST',
 					url : 'plugins/alexaapi/core/ajax/alexaapi.ajax.php',
@@ -196,12 +197,14 @@ PopUpCentre("http://<?php print config::byKey('internalAddr')?>:3457", 480, 640)
 					dataType : 'json',
 					global : false,
 					error : function(request, status, error) {
+						$.hideLoading();
 						$('#div_alert').showAlert({
 							message : error.message,
 							level : 'danger'
 						});
 					},
 					success : function(data) {
+						$.hideLoading();
 						$('li.li_plugin.active').click();
 						$('#div_alert').showAlert({
 							message : "{{Réinstallation NodeJS effectuée, merci de patienter jusqu'à la fin de l'installation des dépendances}}",
