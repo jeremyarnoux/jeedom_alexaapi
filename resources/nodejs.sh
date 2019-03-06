@@ -66,7 +66,7 @@ fi
 
 echo 20 > ${PROGRESS_FILE}
 echo "--20%"
-
+sudo apt-get update
 
 echo 30 > ${PROGRESS_FILE}
 echo "--30%"
