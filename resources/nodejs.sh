@@ -134,7 +134,7 @@ sudo rm -rf node_modules
 echo 60 > ${PROGRESS_FILE}
 echo "--60%"
 echo "Installation..."
-sudo npm install
+sudo npm install --verbose
 sudo chown -R www-data node_modules
 
 echo 95 > ${PROGRESS_FILE}
