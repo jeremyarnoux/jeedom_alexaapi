@@ -66,7 +66,7 @@ fi
 
 echo 20 > ${PROGRESS_FILE}
 echo "--20%"
-sudo apt-get update
+
 
 echo 30 > ${PROGRESS_FILE}
 echo "--30%"
@@ -134,7 +134,7 @@ sudo rm -rf node_modules
 echo 60 > ${PROGRESS_FILE}
 echo "--60%"
 echo "Installation..."
-sudo npm install --verbose
+sudo npm install
 sudo chown -R www-data node_modules
 
 echo 95 > ${PROGRESS_FILE}

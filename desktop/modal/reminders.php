@@ -82,6 +82,7 @@ foreach($json as $item)
 			<th>{{Date}}</th>
 			<th>{{Activé}}</th>
 			<th>{{Répétition}}</th>
+			<th>{{ID}}</th>
 			<th>{{Supprimer}}</th>
 		</tr>
 	</thead>
@@ -157,7 +158,7 @@ $repetition="";
 	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' .substr($item['originalDate'],8,2). substr($item['originalDate'],4,4). substr($item['originalDate'],0,4) . '</span></td>';
 	echo '<td>' . $present . '</td>';
 	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $repetition . '</span></td>';
-	//echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $item['id'] . '</span></td>';
+	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $item['id'] . '</span></td>';
 	echo '<td><a class="btn btn-danger deleteReminder" data-id="'. $item['id'] .'"><i class="fa fa-times-circle"></i></a></td>';
 			//$present = '<span class="label label-default" style="font-size : 1em;" title="{{Inactif}}"><i class="fa fa-times-circle"></i></span>';
 

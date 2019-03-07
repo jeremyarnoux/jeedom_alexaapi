@@ -90,17 +90,18 @@ function addCmdToTable(_cmd)
      +   '<td>'
      +     '<input class="cmdAttr form-control input-sm" data-l1key="name" style="width : 140px;" placeholder="{{Nom du capteur}}"></td>'
      +   '<td>'
-     +     '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
+//     +     '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
+     +     '<input class="cmdAttr form-control type input-sm" data-l1key="type" value="info" disabled style="margin-bottom : 5px;" />'
      +     '<span class="subType" subType="' + init(_cmd.subType) + '"></span>'
      +   '</td>'
      +   '<td>'
-     +     '<span class="cmdAttr"  data-l1key="configuration" data-l2key="cmd"></span> (Task <span class="cmdAttr"  data-l1key="configuration" data-l2key="taskid"></span>)'
+     +     '<small><span class="cmdAttr"  data-l1key="configuration" data-l2key="cmd"></span> Résultat de la commande <span class="cmdAttr"  data-l1key="configuration" data-l2key="taskname"></span> (<span class="cmdAttr"  data-l1key="configuration" data-l2key="taskid"></span>)</small>'
      +   '</td>'
      +   '<td>'
      +     '<span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span>'
      +   '</td>'
      +   '<td>'
-     +     '<input class="cmdAttr form-control input-sm" data-l1key="unite" style="width : 90px;" placeholder="{{Unite}}">'
+  //   +     '<input class="cmdAttr form-control input-sm" data-l1key="unite" style="width : 90px;" placeholder="{{Unite}}">'
      +   '</td>'
      +   '<td>'
      +     '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></span> '
@@ -144,15 +145,25 @@ function addCmdToTable(_cmd)
      +     '</select>'
      +   '</td>'
      +   '<td>'
-     +     '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
+//     +     '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
+     +     '<input class="cmdAttr form-control type input-sm" data-l1key="type" value="action" disabled style="margin-bottom : 5px;" />'
      +     '<span class="subType" subType="' + init(_cmd.subType) + '"></span>'
+	 +     '<input class="cmdAttr" data-l1key="configuration" data-l2key="virtualAction" value="1" style="display:none;" />'
      +   '</td>'
      +   '<td>'
      +     '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="request">'
      +   '</td>'
      +   '<td>'
-     +     '<span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span>'
-     +   '</td>'
+     //+     '<small><small><span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span></small></small><br><br>';
+ 
+  if (init(_cmd.subType) == 'other')
+  {
+    tr +=
+	     '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="infoName" placeholder="{{Nom de la Commande Info}}" style="width : 250px;" />';
+  }
+
+    tr +=
+        '</td>'
      +   '<td>'
      +     '<input class="cmdAttr form-control input-sm" data-l1key="unite"  style="width : 100px;" placeholder="{{Unité}}" title="{{Unité}}" >'
      +     '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}} style="margin-top : 3px;"> '
@@ -178,7 +189,7 @@ function addCmdToTable(_cmd)
     jeedom.eqLogic.builSelectCmd(
     {
       id: $(".li_eqLogic.active").attr('data-eqLogic_id'),
-      filter: {type: 'info'},
+      filter: {type: 'i'},
       error: function (error)
       {
         $('#div_alert').showAlert({message: error.message, level: 'danger'});

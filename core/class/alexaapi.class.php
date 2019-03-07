@@ -138,19 +138,7 @@ class alexaapi extends eqLogic
             exec('sudo kill -9 $(ps aux | grep "/alexaapi.js" | awk \'{print $2}\')');
         }
     }
-    // Reinstall NODEJS from scratch (to use if there is errors in dependancy install
-    public static function reinstallNodeJS() {
-	$pluginalexaapi = plugin::byId('alexaapi');
-	log::add('alexaapi', 'info', 'Suppression du Code NodeJS');
-	$cmd = system::getCmdSudo() . 'rm -rf '.dirname(__FILE__) . '/../../resources/node_modules &>/dev/null';
-	log::add('alexaapi', 'info', 'Suppression de NodeJS');
-	$cmd = system::getCmdSudo() . 'apt-get -y --purge autoremove nodejs npm';
-	exec($cmd);
-	log::add('alexaapi', 'info', 'Réinstallation des dependances');
-	$pluginalexaapi->dependancy_install();
-		
-	return true;
-    }		
+
     //*********** Demon Cookie***************
     public static function deamonCookie_start($_debug = false)
     {
@@ -193,7 +181,7 @@ class alexaapi extends eqLogic
     //************Dépendances ***********
     public static function dependancy_info()
     {
-        log::add('alexaapi','info','Controle dépendances');
+        log::add('alexaapi','info','Controle dependances');
         $return = array();
         $return['log'] = 'alexaapi_dep';
         $request = realpath(dirname(__FILE__) . '/../../resources/node_modules');
@@ -324,7 +312,7 @@ class alexaapi extends eqLogic
       $cmd->setDisplay('title_disable', 1);
       $cmd->setName('Alarm');
 	  $cmd->setIsVisible(false);
-      $cmd->setConfiguration('request', 'alarm?&when=#when#&recurring=#recurring#');
+      $cmd->setConfiguration('request', 'alarm?when=#when#&recurring=#recurring#');
       $cmd->save();
 
       // Reminder command
@@ -352,7 +340,7 @@ class alexaapi extends eqLogic
 
     public static function dependancy_install()
     {
-        log::add('alexaapi', 'info', 'Installation des dépéndances : Alexa-Remote-http');
+        log::add('alexaapi', 'info', 'Installation des dépendances : Alexa-Remote-http');
         $resource_path = realpath(dirname(__FILE__) . '/../../resources');
         passthru('/bin/bash ' . $resource_path . '/nodejs.sh ' . $resource_path . ' alexaapi > ' . log::getPathToLog('alexaapi_dep') . ' 2>&1 &');
     }
@@ -368,10 +356,55 @@ class alexaapiCmd extends cmd
 {
     public function preSave()
     {
-        if ($this->getType() == 'action')
+		if ($this->getType() == 'action')
         {
             $eqLogic = $this->getEqLogic();
             $this->setConfiguration('value', 'http://' . config::byKey('internalAddr') . ':3456/' . $this->getConfiguration('request') . "&device=" . $eqLogic->getConfiguration('serial'));
+        }
+		
+		
+			$actionInfo = virtualCmd::byEqLogicIdCmdName($this->getEqLogic_id(), $this->getName());
+			if (is_object($actionInfo)) {
+				$this->setId($actionInfo->getId());
+        log::add('alexaapi', 'info', 'preSave : ' . '******************************************************************************');
+        log::add('alexaapi', 'info', 'TROUVE ' );
+			}        
+        log::add('alexaapi', 'info', 'preSave : ' . '$this->getConfiguration(virtualAction)='.$this->getConfiguration('virtualAction'));
+			
+        log::add('alexaapi', 'info', 'preSave : ' . '$this->getConfiguration(infoName)='.$this->getConfiguration('infoName'));
+        log::add('alexaapi', 'info', 'preSave : ' . 'id='.$this->getID());
+			
+			
+		if (($this->getType() == 'action') && ($this->getConfiguration('infoName') != '')) 
+			//Si c'est une action et que Commande info est renseigné
+        {
+			
+            //$eqLogic = $this->getEqLogic();
+
+        log::add('alexaapi', 'info', 'preSave : ' . '$this->getConfiguration(infoName)='.$this->getConfiguration('infoName'));
+        log::add('alexaapi', 'info', 'preSave : ' . '$this->getEqLogic_id()='.$this->getEqLogic_id());
+        log::add('alexaapi', 'info', 'preSave : ' . '$this->getName='.$this->getName());
+			//On regarde s'il existe déja une commande avec ce nom
+			//$cmd = cmd::byId(str_replace('#', '', $this->getConfiguration('infoName')));
+		$actionInfo = alexaapiCmd::byEqLogicIdCmdName($this->getEqLogic_id(), $this->getConfiguration('infoName'));
+				if (!is_object($actionInfo)) 
+					//C'est une commande qui n'existe pas
+				{
+		        log::add('alexaapi', 'info', 'preSave : ' . '!is_object($actionInfo) OUI //'. $this->getConfiguration('infoName')." // ".$this->getEqLogic_id());
+					$actionInfo = new alexaapiCmd();
+					$actionInfo->setType('info');
+					$actionInfo->setSubType('string');
+					$actionInfo->setConfiguration('taskid', $this->getID());
+					$actionInfo->setConfiguration('taskname', $this->getName());
+					
+				}
+				$actionInfo->setName($this->getConfiguration('infoName'));
+				$actionInfo->setEqLogic_id($this->getEqLogic_id());
+				$actionInfo->save();
+				$this->setConfiguration('infoId', $actionInfo->getId());
+		        log::add('alexaapi', 'info', 'preSave : ' . 'Fin');
+		
+
         }
     }
 
@@ -418,7 +451,7 @@ class alexaapiCmd extends cmd
 
         $jsonResult = json_decode($json, true);
         if (!empty($jsonResult))
-            throw new Exception(__('Echec de l\'exécution: ', __FILE__) . '(' . $jsonResult['title'] . ') ' . $jsonResult['detail']);
+            throw new Exception(__('Echec de l\'execution: ', __FILE__) . '(' . $jsonResult['title'] . ') ' . $jsonResult['detail']);
 
         // Update info
         if ($this->getType() == 'action')

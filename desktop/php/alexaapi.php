@@ -8,7 +8,7 @@ if (!isConnect('admin'))
 $plugin = plugin::byId('alexaapi');
 // Charger le javascript
 sendVarToJS('eqType', $plugin->getId());
-// AccÈder aux donnÈes du plugin
+// Acc√©der aux donn√©es du plugin
 $eqLogics = eqLogic::byType($plugin->getId());
 
 
@@ -54,11 +54,11 @@ function printEqLogic(data)
 
 <!-- Container global (Ligne bootstrap) -->
 <div class="row row-overflow">
-  <!-- Container bootstrap du menu latÈral -->
+  <!-- Container bootstrap du menu lat√©ral -->
   <div class="col-lg-2 col-md-3 col-sm-4">
-    <!-- Container du menu latÈral -->
+    <!-- Container du menu lat√©ral -->
     <div class="bs-sidebar">
-    <!-- Menu latÈral -->
+    <!-- Menu lat√©ral -->
       <ul id="ul_eqLogic" class="nav nav-list bs-sidenav">
         <!-- Filtre des objets -->
         <li class="filter" style="margin-bottom: 5px; width: 100%"><input class="filter form-control input-sm" placeholder="{{Rechercher}}"/></li>
@@ -79,7 +79,7 @@ function printEqLogic(data)
     });
   </script>
 
-  <!-- Container des listes de commandes / ÈlÈments -->
+  <!-- Container des listes de commandes / √©l√©ments -->
   <div class="col-lg-10 col-md-9 col-sm-8 eqLogicThumbnailDisplay">
     <legend><i class="fa fa-cog"></i> {{Gestion}}</legend>
     <div class="eqLogicThumbnailContainer">
@@ -102,7 +102,7 @@ function printEqLogic(data)
         </center>
         <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Rappels/Alarmes}}</center></span>
       </div>
-      <!-- Bouton d accËs ‡ la configuration -->
+      <!-- Bouton d acc√®s √† la configuration -->
       <div class="cursor eqLogicAction" data-action="gotoPluginConf" style="background-color : #ffffff; height : 140px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
         <center>
           <i class="fa fa-wrench" style="font-size : 6em;color:#767676;"></i>
@@ -111,7 +111,7 @@ function printEqLogic(data)
       </div>
     </div>
 
-    <!-- DÈbut de la liste des objets -->
+    <!-- D√©but de la liste des objets -->
     <legend><i class="fa fa-table"></i> {{Mes Amazon Echo}}</legend>
     <!-- Container de la liste -->
     <div class="eqLogicThumbnailContainer">
@@ -137,13 +137,13 @@ foreach ($eqLogics as $eqLogic)
 ?>
     </div>
   </div>
-  <!-- Container du panneau de contrÙle -->
+  <!-- Container du panneau de contr√¥le -->
   <div class="col-lg-10 col-md-9 col-sm-8 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
     <!-- Bouton sauvegarder -->
     <a class="btn btn-success eqLogicAction pull-right" data-action="save"><i class="fa fa-check-circle"></i> {{Sauvegarder}}</a>
     <!-- Bouton Supprimer -->
     <a class="btn btn-danger eqLogicAction pull-right" data-action="remove"><i class="fa fa-minus-circle"></i> {{Supprimer}}</a>
-    <!-- Bouton configuration avancÈe -->
+    <!-- Bouton configuration avanc√©e -->
     <a class="btn btn-default eqLogicAction pull-right" data-action="configure"><i class="fa fa-cogs"></i> {{Configuration avanc√©e}}</a>
     <!-- Liste des onglets -->
     <ul class="nav nav-tabs" role="tablist">
@@ -189,7 +189,7 @@ foreach (object::all() as $object)
                     </select>
                   </div>
                 </div>
-                <!-- CatÈgorie" -->
+                <!-- Cat√©gorie" -->
                 <div class="form-group">
                   <label class="col-sm-4 control-label">{{Cat√©gorie}}</label>
                   <div class="col-sm-8">
@@ -265,10 +265,10 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
           <thead>
             <tr>
               <th style="width: 50px;">#</th>
-              <th style="width: 150px;">{{Nom}}</th>
+              <th style="width: 300px;">{{Nom}}</th>
               <th style="width: 150px;">{{Type}}</th>
-              <th style="width: 250px;">{{Commande & Variable}}</th>
-              <th>{{Commande envoy√©e}}</th>
+              <th style="width: 300px;">{{Commande & Variable}}</th>
+              <th style="width: 300px;">{{R√©sultat dans}}</th>
               <th style="width: 100px;">{{Min/Max}}</th>
               <th style="width: 150px;">{{Param√®tres}}</th>
               <th style="width: 100px;"></th>
