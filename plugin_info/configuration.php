@@ -37,7 +37,7 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 		<a class="btn btn-default btn-sm bt_identificationCookie2bis"><i class="fa fa-clock-o"></i> {{... Attendez la génération du Cookie Amazon ...}} </a>
 		<a class="btn btn-danger btn-sm bt_identificationCookie2echec"><i class="fa fa-times"></i> {{La génération du Cookie Amazon a échoué}} </a>
 		<a class="btn btn-success btn-sm bt_identificationCookie3"><i class="fa fa-check"></i> {{Bravo : Cookie d'identification Amazon chargé !}} </a>
-		<a class="btn btn-success btn-sm bt_identificationCookie"><i class="fa fa-clock-o"></i> {{Ouverture de la fenetre d'identification Amazon Alexa en cours ...}} </a>
+		<a class="btn btn-primary btn-sm bt_identificationCookie"><i class="fa fa-spinner fa-spin"></i> {{Ouverture de la fenetre d'identification Amazon Alexa en cours ...}} </a>
 	</center>
 	<br />
 	<legend><i class="fa fa-wrench"></i> {{Réparations}}</legend>
@@ -59,7 +59,7 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 		$('.bt_identificationCookie2echec').show();
 			return;
 			}
-		if ((compteVerifCookie>3) && (CookiePresent=1))
+		if ((compteVerifCookie>4) && (CookiePresent=1))
 			{
 		$('.bt_identificationCookie2').hide();
 		$('.bt_identificationCookie2bis').hide();
@@ -149,7 +149,7 @@ if(nouvellefenetre)
 
 
 function attendre() {
-window.setTimeout(lancer, 2000);
+window.setTimeout(lancer, 1500);
 }
 
 function lancer() {
