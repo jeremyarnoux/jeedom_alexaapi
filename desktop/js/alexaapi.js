@@ -98,7 +98,7 @@ function addCmdToTable(_cmd)
      +     '<small><span class="cmdAttr"  data-l1key="configuration" data-l2key="cmd"></span> Résultat de la commande <span class="cmdAttr"  data-l1key="configuration" data-l2key="taskname"></span> (<span class="cmdAttr"  data-l1key="configuration" data-l2key="taskid"></span>)</small>'
      +   '</td>'
      +   '<td>'
-     +     '<span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span>'
+ //    +     '<span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span>'
      +   '</td>'
      +   '<td>'
   //   +     '<input class="cmdAttr form-control input-sm" data-l1key="unite" style="width : 90px;" placeholder="{{Unite}}">'

@@ -322,7 +322,7 @@ class alexaapi extends eqLogic
       $cmd->setEqLogic_id($device->getId());
       $cmd->setName('Next Alarm');
 	  $cmd->setIsVisible(false);
-      $cmd->setConfiguration('request', 'whennextalarm?position=1&format=FULL');
+      $cmd->setConfiguration('request', 'whennextalarm?position=0');
       $cmd->save();
 
       // Reminder command
@@ -376,13 +376,13 @@ class alexaapiCmd extends cmd
 			$actionInfo = virtualCmd::byEqLogicIdCmdName($this->getEqLogic_id(), $this->getName());
 			if (is_object($actionInfo)) {
 				$this->setId($actionInfo->getId());
-        //log::add('alexaapi', 'info', 'preSave : ' . '******************************************************************************');
-        //log::add('alexaapi', 'info', 'TROUVE ' );
+        log::add('alexaapi', 'info', 'preSave : ' . '******************************************************************************');
+        log::add('alexaapi', 'info', 'TROUVE ' );
 			}        
-        //log::add('alexaapi', 'info', 'preSave : ' . '$this->getConfiguration(virtualAction)='.$this->getConfiguration('virtualAction'));
+        log::add('alexaapi', 'info', 'preSave : ' . '$this->getConfiguration(virtualAction)='.$this->getConfiguration('virtualAction'));
 			
-        //log::add('alexaapi', 'info', 'preSave : ' . '$this->getConfiguration(infoName)='.$this->getConfiguration('infoName'));
-        //log::add('alexaapi', 'info', 'preSave : ' . 'id='.$this->getID());
+        log::add('alexaapi', 'info', 'preSave : ' . '$this->getConfiguration(infoName)='.$this->getConfiguration('infoName'));
+        log::add('alexaapi', 'info', 'preSave : ' . 'id='.$this->getID());
 			
 			
 		if (($this->getType() == 'action') && ($this->getConfiguration('infoName') != '')) 
@@ -391,16 +391,16 @@ class alexaapiCmd extends cmd
 			
             //$eqLogic = $this->getEqLogic();
 
-        //log::add('alexaapi', 'info', 'preSave : ' . '$this->getConfiguration(infoName)='.$this->getConfiguration('infoName'));
-        //log::add('alexaapi', 'info', 'preSave : ' . '$this->getEqLogic_id()='.$this->getEqLogic_id());
-        //log::add('alexaapi', 'info', 'preSave : ' . '$this->getName='.$this->getName());
+        log::add('alexaapi', 'info', 'preSave : ' . '$this->getConfiguration(infoName)='.$this->getConfiguration('infoName'));
+        log::add('alexaapi', 'info', 'preSave : ' . '$this->getEqLogic_id()='.$this->getEqLogic_id());
+        log::add('alexaapi', 'info', 'preSave : ' . '$this->getName='.$this->getName());
 			//On regarde s'il existe déja une commande avec ce nom
 			//$cmd = cmd::byId(str_replace('#', '', $this->getConfiguration('infoName')));
 		$actionInfo = alexaapiCmd::byEqLogicIdCmdName($this->getEqLogic_id(), $this->getConfiguration('infoName'));
 				if (!is_object($actionInfo)) 
 					//C'est une commande qui n'existe pas
 				{
-		        //log::add('alexaapi', 'info', 'preSave : ' . '!is_object($actionInfo) OUI //'. $this->getConfiguration('infoName')." // ".$this->getEqLogic_id());
+		        log::add('alexaapi', 'info', 'preSave : ' . '!is_object($actionInfo) OUI //'. $this->getConfiguration('infoName')." // ".$this->getEqLogic_id());
 					$actionInfo = new alexaapiCmd();
 					$actionInfo->setType('info');
 					$actionInfo->setSubType('string');
@@ -412,7 +412,7 @@ class alexaapiCmd extends cmd
 				$actionInfo->setEqLogic_id($this->getEqLogic_id());
 				$actionInfo->save();
 				$this->setConfiguration('infoId', $actionInfo->getId());
-		        //log::add('alexaapi', 'info', 'preSave : ' . 'Fin');
+		        log::add('alexaapi', 'info', 'preSave : ' . 'Fin');
 		
 
         }
@@ -426,7 +426,6 @@ class alexaapiCmd extends cmd
             return;
         }
           
-		log::add('alexaapi', 'debug', 'execute : Début');
 
         $request = $this->buildRequest($_options);
         log::add('alexaapi', 'info', 'Request : ' . $request);
@@ -457,38 +456,21 @@ class alexaapiCmd extends cmd
         //$result = $request_http->exec();
         if (!result)
           throw new Exception(__('Serveur injoignable', __FILE__));
-	  
-	  
-		// json doit etre un retour d'erreur (probablement)
+
+        log::add('alexaapi', 'debug', 'Result : ' . $result);
+
         $jsonResult = json_decode($json, true);
-         if (!empty($jsonResult))
+        if (!empty($jsonResult))
             throw new Exception(__('Echec de l\'execution: ', __FILE__) . '(' . $jsonResult['title'] . ') ' . $jsonResult['detail']);
-		// On traite la valeur de resultat (dans le cas de whennextalarm par exemple)
-        $resultjson = json_decode($result, true);
-		$value=$resultjson['value'];
-		log::add('alexaapi', 'debug', 'Résultat value=' . $value);
 
-
-        if (($this->getType() == 'action') && ($this->getConfiguration('infoName')!= ''))
+        // Update info
+        if ($this->getType() == 'action')
         {
-		// On enregistre la valeur de retour dans le champ info 
-           foreach ($this->getEqLogic()->getCmd('info') as $cmd)
+            foreach ($this->getEqLogic()->getCmd('info') as $cmd)
             {
-        //log::add('alexaapi', 'debug', 'getName : ' . $cmd->getName());
-		
-		if ($cmd->getName() == $this->getConfiguration('infoName'))
-		{
-		$cmd->setConfiguration('value',$value);
-		$cmd->event($value);
-		$cmd->save();
-		}
-
-			
-		/*
                 $value = $cmd->execute();
                 if ($cmd->execCmd(null, 2) != $cmd->formatValue($value))
                     $cmd->event($value);
-				*/
             }
         }
 
@@ -498,16 +480,9 @@ class alexaapiCmd extends cmd
 
     private function buildRequest($_options = array())
     {
-		//log::add('alexaapi', 'debug', 'buildRequest : Début');
-		
-		//log::add('alexaapi', 'debug', 'buildRequest : $this->getType()='.$this->getType());
-		//log::add('alexaapi', 'debug', 'buildRequest : $this->getConfiguration(request)='.$this->getConfiguration('request'));
-		
-       if ($this->getType() != 'action')
+        if ($this->getType() != 'action')
           return $this->getConfiguration('request');
-	  
-		//log::add('alexaapi', 'debug', 'buildRequest : suite');
-         
+
         list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
         switch ($command)
         {
