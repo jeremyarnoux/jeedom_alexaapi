@@ -315,7 +315,18 @@ class alexaapi extends eqLogic
       $cmd->setConfiguration('request', 'alarm?when=#when#&recurring=#recurring#');
       $cmd->save();
 	  
-      // alarm command
+      // delete all alarms command
+      $cmd = new alexaapiCmd();
+      $cmd->setType('action');
+      $cmd->setSubType('message');
+      $cmd->setEqLogic_id($device->getId());
+      $cmd->setDisplay('title_disable', 1);
+      $cmd->setName('Delete All Alarms');
+	  $cmd->setIsVisible(false);
+      $cmd->setConfiguration('request', 'deleteallalarms');
+      $cmd->save();
+	  
+      // whennextalarm command
       $cmd = new alexaapiCmd();
       $cmd->setType('action');
       $cmd->setSubType('other');
@@ -324,7 +335,17 @@ class alexaapi extends eqLogic
 	  $cmd->setIsVisible(false);
       $cmd->setConfiguration('request', 'whennextalarm?position=1&format=FULL');
       $cmd->save();
-
+	  
+      // whennextreminder command
+      $cmd = new alexaapiCmd();
+      $cmd->setType('action');
+      $cmd->setSubType('other');
+      $cmd->setEqLogic_id($device->getId());
+      $cmd->setName('Next Reminder');
+	  $cmd->setIsVisible(false);
+      $cmd->setConfiguration('request', 'whennextreminder?position=1');
+      $cmd->save();
+	  
       // Reminder command
       $cmd = new alexaapiCmd();
       $cmd->setType('action');
@@ -529,6 +550,12 @@ class alexaapiCmd extends cmd
             case 'whennextalarm':
                 $request = $this->buildNextAlarmRequest($_options);
                 break;
+            case 'whennextreminder':
+                $request = $this->buildNextReminderRequest($_options);
+                break;
+            case 'deleteallalarms':
+                $request = $this->buildDeleteAllAlarmsRequest($_options);
+                break;
             default:
                 $request = '';
         }
@@ -628,7 +655,31 @@ class alexaapiCmd extends cmd
             $_options['position']
           ), $request);
     }
+	
+    private function buildDeleteAllAlarmsRequest($_options = array())
+    {
+        log::add('alexaapi', 'debug', 'buildDeleteAllAlarmsRequest');
+        $request = $this->getConfiguration('request');
 
+        return str_replace( //faudra corriger ici ************************position inutile
+          array(
+            '#position#'
+          ), array(
+            $_options['position']
+          ), $request);
+    }	
+    private function buildNextReminderRequest($_options = array())
+    {
+        log::add('alexaapi', 'debug', 'buildNextReminderRequest');
+        $request = $this->getConfiguration('request');
+
+        return str_replace(
+          array(
+            '#position#'
+          ), array(
+            $_options['position']
+          ), $request);
+    }
     /***********************Methode d'instance************************* */
     public function getWidgetTemplateCode($_version = 'dashboard', $_noCustom = false)
     {
