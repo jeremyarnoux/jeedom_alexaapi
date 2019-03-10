@@ -394,7 +394,7 @@ class alexaapiCmd extends cmd
         }
 		
 		
-			$actionInfo = virtualCmd::byEqLogicIdCmdName($this->getEqLogic_id(), $this->getName());
+			$actionInfo = alexaapiCmd::byEqLogicIdCmdName($this->getEqLogic_id(), $this->getName());
 			if (is_object($actionInfo)) {
 				$this->setId($actionInfo->getId());
         //log::add('alexaapi', 'info', 'preSave : ' . '******************************************************************************');
