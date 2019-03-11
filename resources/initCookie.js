@@ -4,13 +4,17 @@ let alexa = new Alexa();
 let cookieLocation = __dirname + '/data/alexa-cookie.json';
 var fs = require('fs');
 
+const amazonserver = process.argv[3];
+const alexaserver = process.argv[4];
+
+
 alexa.init({
   proxyOnly: true,
   proxyOwnIp: process.argv[2],
   proxyPort: 3457,
   proxyLogLevel: 'info',
   logger: console.log,
-  alexaServiceHost: 'alexa.amazon.fr'
+  alexaServiceHost: alexaserver
 },
 function (err)
 {
@@ -19,11 +23,15 @@ function (err)
     console.log('initCookie - ' + err);
     return; // Wait next call
   }
+  
+ console.log('Alexa-Config (initCookie.js): amazonserver=' + amazonserver );
+ console.log('Alexa-Config (initCookie.js): alexaserver=' + alexaserver );
 
   if (!alexa.cookieData)
     return; // Wait next call
 
-  console.log ('initCookie - Cookie successfully retrieved from Amazon');
+ 
+ console.log ('initCookie - Cookie successfully retrieved from Amazon');
   fs.writeFile(cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) =>
   {
     if (err)

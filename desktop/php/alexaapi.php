@@ -8,6 +8,8 @@ if (!isConnect('admin'))
 $plugin = plugin::byId('alexaapi');
 // Charger le javascript
 sendVarToJS('eqType', $plugin->getId());
+//sendVarToJS('serveurtest', 'lionel dans alexaapi.php');
+
 // Accéder aux données du plugin
 $eqLogics = eqLogic::byType($plugin->getId());
 

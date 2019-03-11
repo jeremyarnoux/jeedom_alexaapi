@@ -12,6 +12,9 @@ const extend = require('extend');
 
 const EventEmitter = require('events');
 
+const amazonserver = process.argv[2];
+const alexaserver = process.argv[3];
+
 function _00(val) {
     let s = val.toString();
     while (s.length < 2) s = '0' + s;
@@ -32,7 +35,7 @@ class AlexaRemote extends EventEmitter {
         this.csrf = null;
         this.cookieData = null;
 
-        this.baseUrl = 'alexa.amazon.fr';
+        this.baseUrl = alexaserver;
     }
 
     setCookie(_cookie)
@@ -87,6 +90,8 @@ class AlexaRemote extends EventEmitter {
 
             cookie = this._options.cookie;
         }
+        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): amazonserver=' + amazonserver);
+        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): alexaserver=' + alexaserver);
         this._options.logger && this._options.logger('Alexa-Remote: Use as User-Agent: ' + this._options.userAgent);
         this._options.logger && this._options.logger('Alexa-Remote: Use as Login-Amazon-URL: ' + this._options.amazonPage);
         if (this._options.alexaServiceHost)

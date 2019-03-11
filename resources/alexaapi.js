@@ -3,15 +3,31 @@ const fs = require('fs');
 const Alexa = require('./lib/alexa-remote.js');
 let alexa = new Alexa();
 
+const amazonserver = process.argv[2];
+const alexaserver = process.argv[3];
+
+
 /* Configuration */
 const config =
 {
   cookieLocation: __dirname + '/data/alexa-cookie.json',
   cookieRefreshInterval: 7*24*60*1000,
   logger: console.log,
-  alexaServiceHost: 'alexa.amazon.fr',
+  alexaServiceHost: alexaserver,
   listeningPort: 3456
 };
+
+// Par sécurité pour détecter un éventuel souci :
+if (!amazonserver) config.logger && config.logger('Alexa-Config: *********************amazonserver NON DEFINI*********************');
+if (!alexaserver) config.logger && config.logger('Alexa-Config: *********************alexaserver NON DEFINI*********************');
+
+//var l1key = $(this).attr('data-l1key');
+//config.logger && config.logger('Alexa-API: 33333333333333333333333333333333333333' + serveurtest + '333333333333333333333333333333333333333333333333');
+config.logger && config.logger('Alexa-Config (alexaapi.js): amazonserver='+amazonserver);
+config.logger && config.logger('Alexa-Config (alexaapi.js): alexaserver='+alexaserver);
+//config.logger && config.logger($('.attr[data-l1key=alexaserver]').value());
+//config.logger && config.logger($('.cmdAttr[data-l1key=alexaserver]').value(''));
+//config.logger && config.logger('Alexa-API: 33333333333333333333333333333333333333333333333333333333333333333333333333333333333333');
 
 /* Routing */
 const app = express();
