@@ -27,6 +27,7 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 include_file('core', 'authentification', 'php');
 include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 
+        log::add('alexaapi', 'debug', 'Test de config::byKey dans config: ' . config::byKey('amazonserver','alexaapi'));
 
 ?>
 
@@ -44,6 +45,27 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 	<center>
 		<a class="btn btn-danger btn-sm" id="bt_reinstallNodeJS"><i class="fa fa-recycle"></i> {{Réparation de NodeJS}} </a>
 	</center>
+
+<form class="form-horizontal">
+    <fieldset>
+    <legend><i class="icon nature-planet5"></i> {{Options internationales}}</legend>
+       <div class="form-group">
+        <label class="col-sm-4 control-label">{{Adresse du serveur Amazon}}</label>
+    <div class="col-lg-2">
+        <input class="configKey form-control" data-l1key="amazonserver" placeholder="{{amazon.fr}}" />
+    </div>
+   </div>
+
+   <div class="form-group">
+    <label class="col-lg-4 control-label">{{Adresse du serveur Alexa (ou Pitangui ou Layla ...)}}</label>
+    <div class="col-lg-2">
+        <input class="configKey form-control" data-l1key="alexaserver" placeholder="{{alexa.amazon.fr}}" />
+    </div>
+</div>
+</fieldset>
+</form>
+
+
 
 <script>
     var compteVerifCookie=0;

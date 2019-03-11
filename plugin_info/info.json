@@ -6,7 +6,7 @@
 	"author" : "Sigalou",
 	"require" : "3.0",
 	"version": "0.0.1",
-	"changelog" : "http://sigalou-domotique.fr/domotique/65-alexa-api-changelog",
+	"changelog" : "http://sigalou-domotique.fr/plugin-jeedom-alexa-api",
 	"documentation" : "https://www.jeedom.com/forum/viewtopic.php?f=140&t=43750",
 	"category" : "communication",
   "hasDependency" : 1,

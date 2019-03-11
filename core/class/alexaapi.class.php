@@ -16,6 +16,8 @@
 */
 /* * ***************************Includes********************************* */
 require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
+
+
 class alexaapi extends eqLogic
 {
 	/*     * ***********************Methode static*************************** */
@@ -78,7 +80,7 @@ class alexaapi extends eqLogic
         log::add('alexaapi', 'info', 'Lancement du démon alexaapi');
         $url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/alexaapi/core/api/jeealexaapi.php?apikey=' . jeedom::getApiKey('alexaapi');
         $log = $_debug ? '1' : '0';
-
+		
         $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
 
         
@@ -92,7 +94,7 @@ class alexaapi extends eqLogic
 		}
 		*/
         //    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/Alexa-Remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
-        $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ';
+        $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js '.config::byKey('amazonserver','alexaapi', 'amazon.fr').' '.config::byKey('alexaserver','alexaapi', 'alexa.amazon.fr');
         log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
         $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
         if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false)
@@ -138,19 +140,7 @@ class alexaapi extends eqLogic
             exec('sudo kill -9 $(ps aux | grep "/alexaapi.js" | awk \'{print $2}\')');
         }
     }
-    // Reinstall NODEJS from scratch (to use if there is errors in dependancy install
-    public static function reinstallNodeJS() {
-	$pluginalexaapi = plugin::byId('alexaapi');
-	log::add('alexaapi', 'info', 'Suppression du Code NodeJS');
-	$cmd = system::getCmdSudo() . 'rm -rf '.dirname(__FILE__) . '/../../resources/node_modules &>/dev/null';
-	log::add('alexaapi', 'info', 'Suppression de NodeJS');
-	$cmd = system::getCmdSudo() . 'apt-get -y --purge autoremove nodejs npm';
-	exec($cmd);
-	log::add('alexaapi', 'info', 'Réinstallation des dependances');
-	$pluginalexaapi->dependancy_install();
-		
-	return true;
-    }		
+
     //*********** Demon Cookie***************
     public static function deamonCookie_start($_debug = false)
     {
@@ -164,7 +154,7 @@ class alexaapi extends eqLogic
         //Par sécurité, on Kill un éventuel précédent proessus initCookie.js
         $cmd = "kill $(ps aux | grep 'initCookie.js' | awk '{print $2}')";
         log::add('alexaapi', 'debug', '---- Kill initCookie.js: ' . $cmd);
-        $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/initCookie.js ' . config::byKey('internalAddr');
+        $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/initCookie.js ' . config::byKey('internalAddr'). ' '.config::byKey('amazonserver','alexaapi', 'amazon.fr').' '.config::byKey('alexaserver','alexaapi', 'alexa.amazon.fr');
         log::add('alexaapi', 'debug', '---- Lancement démon Alexa-API-Cookie sur port 3457 : ' . $cmd);
         $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
         if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false)
