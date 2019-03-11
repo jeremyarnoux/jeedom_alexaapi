@@ -3,8 +3,8 @@ const fs = require('fs');
 const Alexa = require('./lib/alexa-remote.js');
 let alexa = new Alexa();
 
-const amazonserver = process.argv[2];
-const alexaserver = process.argv[3];
+const amazonserver = process.argv[3];
+const alexaserver = process.argv[4];
 
 
 /* Configuration */
