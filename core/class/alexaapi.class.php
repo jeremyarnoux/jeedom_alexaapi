@@ -138,7 +138,19 @@ class alexaapi extends eqLogic
             exec('sudo kill -9 $(ps aux | grep "/alexaapi.js" | awk \'{print $2}\')');
         }
     }
-
+    // Reinstall NODEJS from scratch (to use if there is errors in dependancy install
+    public static function reinstallNodeJS() {
+	$pluginalexaapi = plugin::byId('alexaapi');
+	log::add('alexaapi', 'info', 'Suppression du Code NodeJS');
+	$cmd = system::getCmdSudo() . 'rm -rf '.dirname(__FILE__) . '/../../resources/node_modules &>/dev/null';
+	log::add('alexaapi', 'info', 'Suppression de NodeJS');
+	$cmd = system::getCmdSudo() . 'apt-get -y --purge autoremove nodejs npm';
+	exec($cmd);
+	log::add('alexaapi', 'info', 'Réinstallation des dependances');
+	$pluginalexaapi->dependancy_install();
+		
+	return true;
+    }		
     //*********** Demon Cookie***************
     public static function deamonCookie_start($_debug = false)
     {
