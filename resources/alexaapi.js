@@ -672,7 +672,9 @@ function startServer()
         // Start the server
         if (server)
         {
-          config.logger && config.logger('Alexa-API: Server is already listening on port ' + server.address().port);
+          config.logger && config.logger('Alexa-API: *******************************************');
+          config.logger && config.logger('Alexa-API: *Server is already listening on port ' + server.address().port +' *');
+          config.logger && config.logger('Alexa-API: *******************************************');
           return;
         }
 
