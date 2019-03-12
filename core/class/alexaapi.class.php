@@ -239,7 +239,6 @@ class alexaapi extends eqLogic
             if (!$device)
             {
                 $device = self::createNewDevice($item['name'], $item['serial']);
-                self::importDefaultCommandTo($device);
                 $numNewDevices++;
             }
 
@@ -275,111 +274,151 @@ class alexaapi extends eqLogic
       return $newDevice;
     }
 
-    private static function importDefaultCommandTo($device)
+    private function postSave()
     {
 
 
-     /*       if ($device->getName() == 'Tous les appareils')
+     /*       if ($this->getName() == 'Tous les appareils')
         {
             return;
 		}*/
-	if (strstr($device->getName(), "Alexa Apps"))
-        {
-      // Push command
-      $cmd = new alexaapiCmd();
-      $cmd->setType('action');
-      $cmd->setSubType('message');
-      $cmd->setEqLogic_id($device->getId());
-      $cmd->setName('Push');
-      $cmd->setConfiguration('request', 'push?text=#message#');
-      $cmd->setDisplay('title_disable', 1);
-      $cmd->save();
-            return;
+		
+		if (strstr($this->getName(), "Alexa Apps"))
+		{
+			// Push command
+			$cmd = $this->getCmd(null, 'push');
+			if (!is_object($cmd)) {
+				$cmd = new alexaapiCmd();
+				$cmd->setType('action');
+				$cmd->setLogicalId('push');
+				$cmd->setSubType('message');
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setName('Push');
+			}
+			$cmd->setIsVisible(true);
+			$cmd->setConfiguration('request', 'push?text=#message#');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->save();
+			return;
 		}
 
-      // Speak command
-      $cmd = new alexaapiCmd();
-      $cmd->setType('action');
-      $cmd->setSubType('message');
-      $cmd->setEqLogic_id($device->getId());
-      $cmd->setName('Speak');
-      $cmd->setConfiguration('request', 'speak?text=#message#');
-      $cmd->setDisplay('title_disable', 1);
-      $cmd->save();
+		// Speak command
+		$cmd = $this->getCmd(null, 'speak');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('speak');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Speak');
+		}
+		$cmd->setIsVisible(true);
+		$cmd->setConfiguration('request', 'speak?text=#message#');
+		$cmd->setDisplay('title_disable', 1);
+		$cmd->save();
 
-      // Speak + Volume command
-      $cmd = new alexaapiCmd();
-      $cmd->setType('action');
-      $cmd->setSubType('message');
-      $cmd->setEqLogic_id($device->getId());
-      $cmd->setName('Speak+Volume');
-      $cmd->setConfiguration('request', 'speak?text=#message#&volume=#volume#');
-      $cmd->setIsVisible(false);
-      $cmd->setDisplay('title_disable', 1);
-      $cmd->save();
+		// Speak + Volume command
+		$cmd = $this->getCmd(null, 'speak-volume');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('speak-volume');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Speak+Volume');
+		}
+		$cmd->setIsVisible(false);
+		$cmd->setConfiguration('request', 'speak?text=#message#&volume=#volume#');
+		$cmd->setDisplay('title_disable', 1);
+		$cmd->save();
 
-      // alarm command
-      $cmd = new alexaapiCmd();
-      $cmd->setType('action');
-      $cmd->setSubType('message');
-      $cmd->setEqLogic_id($device->getId());
-      $cmd->setDisplay('title_disable', 1);
-      $cmd->setName('Alarm');
-	  $cmd->setIsVisible(false);
-      $cmd->setConfiguration('request', 'alarm?when=#when#&recurring=#recurring#');
-      $cmd->save();
+		// alarm command
+		$cmd = $this->getCmd(null, 'alarm');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('alarm');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Alarm');
+		}
+		$cmd->setIsVisible(false);
+		$cmd->setConfiguration('request', 'alarm?when=#when#&recurring=#recurring#');
+		$cmd->setDisplay('title_disable', 1);
+		$cmd->save();
 	  
-      // delete all alarms command
-      $cmd = new alexaapiCmd();
-      $cmd->setType('action');
-      $cmd->setSubType('message');
-      $cmd->setEqLogic_id($device->getId());
-      $cmd->setDisplay('title_disable', 1);
-      $cmd->setName('Delete All Alarms');
-	  $cmd->setIsVisible(false);
-      $cmd->setConfiguration('request', 'deleteallalarms');
-      $cmd->save();
+		// delete all alarms command
+		$cmd = $this->getCmd(null, 'deleteallalarms');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('deleteallalarms');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Delete All Alarms');
+		}
+		$cmd->setIsVisible(false);
+		$cmd->setConfiguration('request', 'deleteallalarms');
+		$cmd->setDisplay('title_disable', 1);
+		$cmd->save();
 	  
-      // whennextalarm command
-      $cmd = new alexaapiCmd();
-      $cmd->setType('action');
-      $cmd->setSubType('other');
-      $cmd->setEqLogic_id($device->getId());
-      $cmd->setName('Next Alarm');
-	  $cmd->setIsVisible(false);
-      $cmd->setConfiguration('request', 'whennextalarm?position=1&format=FULL');
-      $cmd->save();
+		// whennextalarm command
+		$cmd = $this->getCmd(null, 'whennextalarm');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('whennextalarm');
+			$cmd->setSubType('other');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Next Alarm');
+		}
+		$cmd->setIsVisible(false);
+		$cmd->setConfiguration('request', 'whennextalarm?position=1&format=FULL');
+		$cmd->save();
 	  
-      // whennextreminder command
-      $cmd = new alexaapiCmd();
-      $cmd->setType('action');
-      $cmd->setSubType('other');
-      $cmd->setEqLogic_id($device->getId());
-      $cmd->setName('Next Reminder');
-	  $cmd->setIsVisible(false);
-      $cmd->setConfiguration('request', 'whennextreminder?position=1');
-      $cmd->save();
+		// whennextreminder command
+		$cmd = $this->getCmd(null, 'whennextreminder');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('whennextreminder');
+			$cmd->setSubType('other');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Next Reminder');
+		}
+		$cmd->setIsVisible(false);
+		$cmd->setConfiguration('request', 'whennextreminder?position=1');
+		$cmd->save();
 	  
-      // Reminder command
-      $cmd = new alexaapiCmd();
-      $cmd->setType('action');
-      $cmd->setSubType('message');
-      $cmd->setEqLogic_id($device->getId());
-      $cmd->setName('Reminder');
-	  $cmd->setIsVisible(false);
-      $cmd->setConfiguration('request', 'reminder?text=#message#&when=#when#');
-      $cmd->save();
+		// Reminder command
+		$cmd = $this->getCmd(null, 'reminder');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('reminder');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Reminder');
+		}
+		$cmd->setIsVisible(false);
+		$cmd->setConfiguration('request', 'reminder?text=#message#&when=#when#');
+		$cmd->save();
 
-      // Volume command
-      $cmd = new alexaapiCmd();
-      $cmd->setType('action');
-      $cmd->setSubType('slider');
-      $cmd->setEqLogic_id($device->getId());
-      $cmd->setName('Volume');
-      $cmd->setConfiguration('request', 'volume?value=#volume#');
-      $cmd->setConfiguration('minValue', '0');
-      $cmd->setConfiguration('maxValue', '100');
-      $cmd->save();
+		// Volume command
+		$cmd = $this->getCmd(null, 'volume');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('volume');
+			$cmd->setSubType('slider');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Volume');
+		}
+		$cmd->setIsVisible(true);
+		$cmd->setConfiguration('request', 'volume?value=#volume#');
+		$cmd->setConfiguration('minValue', '0');
+		$cmd->setConfiguration('maxValue', '100');
+		$cmd->save();
 
     }
 
@@ -393,8 +432,6 @@ class alexaapi extends eqLogic
     }
 
     public function preUpdate() {}
-
-    public function postSave() {}
 
     public function preSave() {}
 }
