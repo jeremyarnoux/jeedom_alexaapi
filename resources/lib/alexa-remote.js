@@ -35,8 +35,8 @@ class AlexaRemote extends EventEmitter {
         this.csrf = null;
         this.cookieData = null;
 
-        this.baseUrl = alexaserver;
-    }
+        this.baseUrl = alexaserver; //alexa.amazon.fr
+   }
 
     setCookie(_cookie)
     {
@@ -85,8 +85,10 @@ class AlexaRemote extends EventEmitter {
                 else 
                     this._options.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
             }
-            this._options.amazonPage = this._options.amazonPage || 'amazon.fr';
-            this.baseUrl = 'alexa.' + this._options.amazonPage;
+        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): this._options.amazonPage=' + this._options.amazonPage);
+            this._options.amazonPage = this._options.amazonPage || amazonserver;
+            //this.baseUrl = 'alexa.' + this._options.amazonPage;
+            this.baseUrl = alexaserver;
 
             cookie = this._options.cookie;
         }
@@ -442,8 +444,8 @@ class AlexaRemote extends EventEmitter {
             headers: {
                 'User-Agent' : this._options.userAgent,
                 'Content-Type': 'application/json; charset=UTF-8',
-                'Referer': `https://alexa.${this._options.amazonPage}/spa/index.html`,
-                'Origin': `https://alexa.${this._options.amazonPage}`,
+                'Referer': `https://${this.baseUrl}/spa/index.html`,
+                'Origin': `https://${this.baseUrl}`,
                 'Content-Type': 'application/json',
                 //'Connection': 'keep-alive', // new
                 'csrf' : this.csrf,
@@ -1491,8 +1493,8 @@ this.deleteNotification(notification, callback);
         const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(Number(timestamp)));
         this.createNotification(notification, callback);
     }
-    setAlarm(serialOrName, timestamp, recurring, callback) {
-        //const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(timestamp)); **Modif Sigalou 2019.02.28
+    setAlarm(serialOrName, timestamp, recurring, callback) {        // **Modif Sigalou 2019.02.28
+
         const notification = this.createNotificationAlarmObject(serialOrName, recurring, '', new Date(Number(timestamp)));
         this.createNotification(notification, callback);
     }
@@ -1502,11 +1504,11 @@ this.deleteNotification(notification, callback);
     }
 
     getDevicePreferences(callback) {
-        this.httpsGet ('https://alexa.amazon.fr/api/device-preferences?cached=true&_=%t', callback);
+        this.httpsGet ('https://${this.baseUrl}/api/device-preferences?cached=true&_=%t', callback);
     }
 
     getSmarthomeDevices(callback) {
-        this.httpsGet ('https://alexa.amazon.fr/api/phoenix?_=%t', function (err, res) {
+        this.httpsGet ('https://${this.baseUrl}/api/phoenix?_=%t', function (err, res) {
             if (err || !res || !res.networkDetail) return callback(err, res);
             try {
                 res = JSON.parse(res.networkDetail);
@@ -1519,7 +1521,7 @@ this.deleteNotification(notification, callback);
     }
 
     getSmarthomeGroups(callback) {
-        this.httpsGet ('https://alexa.amazon.fr/api/phoenix/group?_=%t', callback);
+        this.httpsGet ('https://${this.baseUrl}/api/phoenix/group?_=%t', callback);
     }
 
     getSmarthomeEntities(callback) {
@@ -1556,7 +1558,7 @@ this.deleteNotification(notification, callback);
             deviceType: dev.deviceType,
             //deviceOwnerCustomerId: oo.deviceOwnerCustomerId
         };
-        this.httpsGet (`https://alexa.amazon.fr/api/devices-v2/device/${dev.serialNumber}`,
+        this.httpsGet (`https://${this.baseUrl}/api/devices-v2/device/${dev.serialNumber}`,
             callback,
             {
                 method: 'PUT',
@@ -1570,7 +1572,7 @@ this.deleteNotification(notification, callback);
             method: 'DELETE'
             //data: JSON.stringify (o),
         };
-        this.httpsGet (`https://alexa.amazon.fr/api/phoenix/appliance/${smarthomeDevice}`, callback, flags);
+        this.httpsGet (`https://${this.baseUrl}/api/phoenix/appliance/${smarthomeDevice}`, callback, flags);
     }
 
     deleteSmarthomeGroup(smarthomeGroup, callback) {
@@ -1578,7 +1580,7 @@ this.deleteNotification(notification, callback);
             method: 'DELETE'
             //data: JSON.stringify (o),
         };
-        this.httpsGet (`https://alexa.amazon.fr/api/phoenix/group/${smarthomeGroup}`, callback, flags);
+        this.httpsGet (`https://${this.baseUrl}/api/phoenix/group/${smarthomeGroup}`, callback, flags);
     }
 
     deleteAllSmarthomeDevices(callback) {
@@ -1705,7 +1707,7 @@ this.deleteNotification(notification, callback);
                 bluetoothDeviceClass: 'OTHER'
             })
         };
-        this.httpsGet (`https://alexa.amazon.fr/api/bluetooth/unpair-sink/${dev.deviceType}/${dev.serialNumber}`, callback, flags);
+        this.httpsGet (`https://${this.baseUrl}/api/bluetooth/unpair-sink/${dev.deviceType}/${dev.serialNumber}`, callback, flags);
     }
 
     deleteDevice(serialOrName, callback) {
@@ -1718,7 +1720,7 @@ this.deleteNotification(notification, callback);
                 deviceType: dev.deviceType
             })
         };
-        this.httpsGet (`https://alexa.amazon.fr/api/devices/device/${dev.serialNumber}?deviceType=${dev.deviceType}`, callback, flags);
+        this.httpsGet (`https://${this.baseUrl}/api/devices/device/${dev.serialNumber}?deviceType=${dev.deviceType}`, callback, flags);
     }
 }
 
