@@ -149,7 +149,7 @@ class alexaapi extends eqLogic
 	$cmd = system::getCmdSudo() . 'apt-get -y --purge autoremove nodejs npm';
 	exec($cmd);
 	log::add('alexaapi', 'info', 'Réinstallation des dependances');
-	$pluginalexaapi->dependancy_install();
+	$pluginalexaapi->dependancy_install(true);
 		
 	return true;
     }		
@@ -383,11 +383,13 @@ class alexaapi extends eqLogic
 
     }
 
-    public static function dependancy_install()
+    public static function dependancy_install($verbose="false")
     {
+		$_debug=0;
+		if(log::getLogLevel('alexaapi')==100 || $verbose==="true" || $verbose===true) $_debug=1;
         log::add('alexaapi', 'info', 'Installation des dépendances : Alexa-Remote-http');
         $resource_path = realpath(dirname(__FILE__) . '/../../resources');
-        passthru('/bin/bash ' . $resource_path . '/nodejs.sh ' . $resource_path . ' alexaapi > ' . log::getPathToLog('alexaapi_dep') . ' 2>&1 &');
+        passthru('/bin/bash ' . $resource_path . '/nodejs.sh ' . $resource_path . ' alexaapi '. $_debug .' > ' . log::getPathToLog('alexaapi_dep') . ' 2>&1 &');
     }
 
     public function preUpdate() {}
