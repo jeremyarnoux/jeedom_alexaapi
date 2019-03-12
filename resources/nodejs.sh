@@ -7,6 +7,9 @@ minVer='8'	#min NodeJS major version to be accepted
 touch ${PROGRESS_FILE}
 echo 0 > ${PROGRESS_FILE}
 echo "--0%"
+if [ "$3" = "1" ]; then
+  date +'--[%Y/%m/%d %H:%M:%S]-Mode Debug--'
+fi
 BASEDIR=$1
 DIRECTORY="/var/www"
 if [ ! -d "$DIRECTORY" ]; then
@@ -134,7 +137,11 @@ sudo rm -rf node_modules
 echo 60 > ${PROGRESS_FILE}
 echo "--60%"
 echo "Installation..."
-sudo npm install --verbose
+if [ "$3" = "1" ]; then
+  sudo npm install --verbose
+else
+  sudo npm install
+fi
 sudo chown -R www-data node_modules
 
 echo 95 > ${PROGRESS_FILE}
@@ -151,4 +158,7 @@ fi
 echo 100 > ${PROGRESS_FILE}
 echo "--100%"
 echo "Installation des dépendances ${2} terminée, vérifiez qu'il n'y a pas d'erreur"
+if [ "$3" = "1" ]; then
+  date +'--[%Y/%m/%d %H:%M:%S]--'
+fi
 rm -f ${PROGRESS_FILE}
