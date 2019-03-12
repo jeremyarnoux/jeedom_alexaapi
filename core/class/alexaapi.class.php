@@ -274,7 +274,7 @@ class alexaapi extends eqLogic
       return $newDevice;
     }
 
-    private function postSave()
+    public function postSave()
     {
 
 
