@@ -171,11 +171,11 @@ if(nouvellefenetre)
 
 
 function attendre() {
-window.setTimeout(lancer, 1500);
+window.setTimeout(lancer, 3000);
 }
 
 function lancer() {
-PopUpCentre("http://<?php print config::byKey('internalAddr')?>:3457", 480, 640);
+PopUpCentre("http://<?php print config::byKey('internalAddr')?>:3457", 480, 700);
 }
 
   $('.bt_stopDeamonCookie').on('click',function()

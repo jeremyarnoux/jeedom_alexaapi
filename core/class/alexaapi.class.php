@@ -94,7 +94,7 @@ class alexaapi extends eqLogic
 		}
 		*/
         //    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/Alexa-Remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
-        $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js '.config::byKey('amazonserver','alexaapi', 'amazon.fr').' '.config::byKey('alexaserver','alexaapi', 'alexa.amazon.fr');
+        $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ' . config::byKey('internalAddr'). ' '.config::byKey('amazonserver','alexaapi', 'amazon.fr').' '.config::byKey('alexaserver','alexaapi', 'alexa.amazon.fr');
         log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
         $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
         if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false)

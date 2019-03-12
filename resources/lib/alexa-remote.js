@@ -12,8 +12,8 @@ const extend = require('extend');
 
 const EventEmitter = require('events');
 
-const amazonserver = process.argv[2];
-const alexaserver = process.argv[3];
+const amazonserver = process.argv[3];
+const alexaserver = process.argv[4];
 
 function _00(val) {
     let s = val.toString();

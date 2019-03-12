@@ -3,8 +3,8 @@ const fs = require('fs');
 const Alexa = require('./lib/alexa-remote.js');
 let alexa = new Alexa();
 
-const amazonserver = process.argv[2];
-const alexaserver = process.argv[3];
+const amazonserver = process.argv[3];
+const alexaserver = process.argv[4];
 
 
 /* Configuration */
@@ -672,7 +672,9 @@ function startServer()
         // Start the server
         if (server)
         {
-          config.logger && config.logger('Alexa-API: Server is already listening on port ' + server.address().port);
+          config.logger && config.logger('Alexa-API: *******************************************');
+          config.logger && config.logger('Alexa-API: *Server is already listening on port ' + server.address().port +' *');
+          config.logger && config.logger('Alexa-API: *******************************************');
           return;
         }
 

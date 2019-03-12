@@ -19,8 +19,8 @@ const os = require('os');
 const cookieTools = require('cookie');
 const amazonProxy = require('./proxy.js');
 
-const amazonserver = process.argv[2];
-const alexaserver = process.argv[3];
+const amazonserver = process.argv[3];
+const alexaserver = process.argv[4];
 
 //const defaultAmazonPage = 'amazon.fr';
 const defaultAmazonPage = amazonserver;
