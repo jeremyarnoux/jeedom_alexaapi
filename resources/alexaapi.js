@@ -21,13 +21,8 @@ const config =
 if (!amazonserver) config.logger && config.logger('Alexa-Config: *********************amazonserver NON DEFINI*********************');
 if (!alexaserver) config.logger && config.logger('Alexa-Config: *********************alexaserver NON DEFINI*********************');
 
-//var l1key = $(this).attr('data-l1key');
-//config.logger && config.logger('Alexa-API: 33333333333333333333333333333333333333' + serveurtest + '333333333333333333333333333333333333333333333333');
 config.logger && config.logger('Alexa-Config (alexaapi.js): amazonserver='+amazonserver);
 config.logger && config.logger('Alexa-Config (alexaapi.js): alexaserver='+alexaserver);
-//config.logger && config.logger($('.attr[data-l1key=alexaserver]').value());
-//config.logger && config.logger($('.cmdAttr[data-l1key=alexaserver]').value(''));
-//config.logger && config.logger('Alexa-API: 33333333333333333333333333333333333333333333333333333333333333333333333333333333333333');
 
 /* Routing */
 const app = express();
@@ -132,12 +127,44 @@ app.get('/volume', (req, res) =>
   var err = forEachDevices(req.query.device, (serial) =>
   {
     alexa.sendSequenceCommand(serial, 'volume', req.query.value, (err) => {return err;});
-  });
-
-  if (err.length != 0)
+ 
+ if (err)
     return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
-  res.status(200).json({});
+  res.status(200).json({});  });
+
+
 });
+
+/***** Alexa.DeviceControls.Command *****
+  URL: /command?device=?&command=?
+    device - String - name of the device
+    command - String - command : pause|play|next|prev|fwd|rwd|shuffle|repeat
+
+*/
+app.get('/command', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Alexa.DeviceControls.Command');
+  res.type('json');
+
+  if ('device' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Command', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
+  if ('command' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Command', 'Missing parameter "command"'));
+  config.logger && config.logger('Alexa-API: command: ' + req.query.command);
+
+  var err = forEachDevices(req.query.device, (serial) =>
+	  {	
+		alexa.sendCommand(serial, req.query.command, (err) => {return err;});
+
+	  if (err)
+		return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Command', err));
+	  res.status(200).json({});
+	  });
+});
+
+
 
 /***** Alexa.Notifications.SendMobilePush *****
   URL /push?device=?&text=?

@@ -419,6 +419,21 @@ class alexaapi extends eqLogic
 		$cmd->setConfiguration('minValue', '0');
 		$cmd->setConfiguration('maxValue', '100');
 		$cmd->save();
+		
+		// Command command
+		$cmd = $this->getCmd(null, 'command');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('command');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Command');
+		}
+		$cmd->setIsVisible(false);
+		$cmd->setDisplay('title_disable', 1);
+		$cmd->setConfiguration('request', 'command?command=#command#');
+		$cmd->save();
 
     }
 
@@ -597,6 +612,9 @@ class alexaapiCmd extends cmd
             case 'reminder':
                 $request = $this->buildReminderRequest($_options);
                 break;
+            case 'command':
+                $request = $this->buildCommandRequest($_options);
+                break;
             case 'alarm':
                 $request = $this->buildAlarmRequest($_options);
                 break;
@@ -721,6 +739,18 @@ class alexaapiCmd extends cmd
             $_options['position']
           ), $request);
     }	
+    private function buildCommandRequest($_options = array())
+    {
+        log::add('alexaapi', 'debug', 'buildCommandRequest');
+        $request = $this->getConfiguration('request');
+
+        return str_replace( //faudra corriger ici ************************position inutile
+          array(
+            '#command#'
+          ), array(
+            $_options['command']
+          ), $request);
+    }	
     private function buildNextReminderRequest($_options = array())
     {
         log::add('alexaapi', 'debug', 'buildNextReminderRequest');
@@ -746,6 +776,8 @@ class alexaapiCmd extends cmd
         return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
       if ($command == 'reminder')
         return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');
+      if ($command == 'command')
+        return getTemplate('core', 'scenario', 'cmd.command', 'alexaapi');
       if ($command == 'alarm')
         return getTemplate('core', 'scenario', 'cmd.alarm', 'alexaapi');
       return parent::getWidgetTemplateCode($_version, $_noCustom);
