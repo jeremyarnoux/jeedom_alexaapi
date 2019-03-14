@@ -102,6 +102,69 @@ app.get('/speak', (req, res) =>
     res.status(200).json({});
 });
 
+/**** Alexa.Radio *****
+  URL: /radio?device=?&text=?
+    device - String - name of the device
+    text - String - Text to speech
+    volume - Integer - Determine the volume level between 0 to 100 (0 is mute and 100 is max).
+                       This parameter is optional. If not specified, the volume level will not be altered.
+
+  Return an empty object if the function succeed.
+  Otherwise, an error object is returned.
+  FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
+*/
+app.get('/radio', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Alexa.Speak');
+  res.type('json');
+
+  if ('device' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
+  if ('station' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "station"'));
+  config.logger && config.logger('Alexa-API: station: ' + req.query.station);
+
+  if ('volume' in req.query)
+  {
+    config.logger && config.logger('Alexa-API: volume: ' + req.query.volume);
+    var hasError = false;
+    forEachDevices(req.query.device, (serial) =>
+    {
+      alexa.sendSequenceCommand(serial, 'volume', req.query.volume, (err) =>
+      {
+        if (err)
+          hasError = true;
+      });
+    });
+    if (hasError)
+      return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err.message));
+  }
+
+  var hasError = false;
+  var errorMessage = '';
+  forEachDevices(req.query.device, (serial) =>
+  {
+	  //     setTunein(serialOrName, guideId, contentType, callback) {
+
+    alexa.setTunein(serial, req.query.station, (err) =>
+    {
+      if (err)
+      {
+        errorMessage = err.message;
+        hasError = true;
+      }
+    });
+  });
+
+  if (hasError)
+    res.status(500).json(error(500, req.route.path, 'Alexa.Speak', errorMessage));
+  else
+    res.status(200).json({});
+});
+
+
 /***** Alexa.DeviceControls.Volume *****
   URL: /volume?device=?&value=?
     device - String - name of the device
