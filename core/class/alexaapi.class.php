@@ -295,7 +295,7 @@ class alexaapi extends eqLogic
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setName('Push');
 			}
-			$cmd->setIsVisible(true);
+			$cmd->setIsVisible(1);
 			$cmd->setConfiguration('request', 'push?text=#message#');
 			$cmd->setDisplay('title_disable', 1);
 			$cmd->save();
@@ -312,7 +312,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Speak');
 		}
-		$cmd->setIsVisible(true);
+		$cmd->setIsVisible(1);
 		$cmd->setConfiguration('request', 'speak?text=#message#');
 		$cmd->setDisplay('title_disable', 1);
 		$cmd->save();
@@ -327,7 +327,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Radio');
 		}
-		$cmd->setIsVisible(true);
+		$cmd->setIsVisible(1);
 		$cmd->setConfiguration('request', 'radio?station=#station#');
 		$cmd->setDisplay('title_disable', 1);
 		$cmd->save();
@@ -342,7 +342,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Speak+Volume');
 		}
-		$cmd->setIsVisible(false);
+		$cmd->setIsVisible(0);
 		$cmd->setConfiguration('request', 'speak?text=#message#&volume=#volume#');
 		$cmd->setDisplay('title_disable', 1);
 		$cmd->save();
@@ -357,7 +357,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Radio+Volume');
 		}
-		$cmd->setIsVisible(false);
+		$cmd->setIsVisible(0);
 		$cmd->setConfiguration('request', 'radio?station=#station#&volume=#volume#');
 		$cmd->setDisplay('title_disable', 1);
 		$cmd->save();
@@ -372,7 +372,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Alarm');
 		}
-		$cmd->setIsVisible(false);
+		$cmd->setIsVisible(0);
 		$cmd->setConfiguration('request', 'alarm?when=#when#&recurring=#recurring#');
 		$cmd->setDisplay('title_disable', 1);
 		$cmd->save();
@@ -387,7 +387,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Delete All Alarms');
 		}
-		$cmd->setIsVisible(false);
+		$cmd->setIsVisible(0);
 		$cmd->setConfiguration('request', 'deleteallalarms');
 		$cmd->setDisplay('title_disable', 1);
 		$cmd->save();
@@ -402,7 +402,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Next Alarm');
 		}
-		$cmd->setIsVisible(false);
+		$cmd->setIsVisible(0);
 		$cmd->setConfiguration('request', 'whennextalarm?position=1&format=FULL');
 		$cmd->save();
 	  
@@ -416,7 +416,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Next Reminder');
 		}
-		$cmd->setIsVisible(false);
+		$cmd->setIsVisible(0);
 		$cmd->setConfiguration('request', 'whennextreminder?position=1');
 		$cmd->save();
 	  
@@ -430,7 +430,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Reminder');
 		}
-		$cmd->setIsVisible(false);
+		$cmd->setIsVisible(0);
 		$cmd->setConfiguration('request', 'reminder?text=#message#&when=#when#');
 		$cmd->save();
 
@@ -444,7 +444,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Volume');
 		}
-		$cmd->setIsVisible(true);
+		$cmd->setIsVisible(1);
 		$cmd->setConfiguration('request', 'volume?value=#volume#');
 		$cmd->setConfiguration('minValue', '0');
 		$cmd->setConfiguration('maxValue', '100');
@@ -460,7 +460,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Command');
 		}
-		$cmd->setIsVisible(false);
+		$cmd->setIsVisible(0);
 		$cmd->setDisplay('title_disable', 1);
 		$cmd->setConfiguration('request', 'command?command=#command#');
 		$cmd->save();
