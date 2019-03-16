@@ -820,10 +820,13 @@ class alexaapiCmd extends cmd
         return parent::getWidgetTemplateCode($_version, $_noCustom);
 
       list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
+ 
+
+ log::add('alexaapi', 'debug', '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'.$arguments);
 
       if ($command == 'speak' && strpos($arguments, '#volume#') !== false)
         return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
-      if ($command == 'radio' && strpos($arguments, '#volume#') !== false)
+      if ($command == 'radio' && (strpos($arguments, '#volume#') || strpos($arguments, 'volume')) !== false)
         return getTemplate('core', 'scenario', 'cmd.radio.volume', 'alexaapi');
       if ($command == 'radio' && (!strpos($arguments, '#volume#')))
         return getTemplate('core', 'scenario', 'cmd.radio', 'alexaapi');
