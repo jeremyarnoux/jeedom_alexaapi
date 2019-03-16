@@ -412,6 +412,7 @@ config.logger && config.logger('Alexa-API: (reminders) function' );
         'deviceSerialNumber': device.deviceSerialNumber,
         'type': device.type,
         'originalTime': device.originalTime,
+        'musicEntity': device.musicEntity,
         'originalDate': device.originalDate,
         'remainingTime': device.remainingTime,
         'status' : device.status,

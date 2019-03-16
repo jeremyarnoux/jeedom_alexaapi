@@ -77,7 +77,7 @@ foreach($json as $item)
 		<tr>
 			<th>{{Alexa}}</th>
 			<th>{{Type}}</th>
-			<th>{{Nom}}</th>
+			<th>{{Nom ou Musique}}</th>
 			<th>{{Heure}}</th>
 			<th>{{Date}}</th>
 			<th>{{Activé}}</th>
@@ -95,6 +95,9 @@ switch ($item['type']) {
     case "Alarm":
 		$couleur="primary";
         break;
+    case "MusicAlarm":
+		$couleur="warning";
+        break;
     case "Reminder":
 		$couleur="info";
         break;
@@ -102,7 +105,7 @@ switch ($item['type']) {
 		$couleur="success";
         break;
     default:
-		$couleur="warning";
+		$couleur="danger";
         break;
 }
 	
@@ -119,7 +122,10 @@ switch ($item['type']) {
     case "Alarm":
 		$type = '<span class="label label-'.$couleur.'" style="font-size : 1em;" title="{{Alarme}}"><i class="fa fa-bell"></i> Alarme</span>';
         break;
-    case "Reminder":
+     case "MusicAlarm":
+		$type = '<span class="label label-'.$couleur.'" style="font-size : 1em;" title="{{Alarme Musicale}}"><i class="fa loisir-musical7"></i> Alarme musicale</span>';
+        break;
+   case "Reminder":
 		$type = '<span class="label label-'.$couleur.'" style="font-size : 1em;" title="{{Rappel}}"><i class="fa divers-circular114"></i> Rappel</span>';
         break;
     case "Timer":
@@ -176,7 +182,7 @@ $repetition="";
 
 
 	echo '<td>' . $type . '</td>';
-	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $item['reminderLabel'] . '</span></td>';
+	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $item['musicEntity']. $item['reminderLabel'] . '</span></td>';
 
             if ($item['type'] =="Timer")
 			{
