@@ -602,10 +602,21 @@ app.get('/whennextalarm', (req, res) =>
 
 
 						//C'est bon, on est sur la bonne position, on renvoie le résultat
-						if ((req.query.format=="hour") || (req.query.format=="hour")) // Utilisation du format HH:MM
-							stringarenvoyer=device.originalTime.substring(0, 5);	
-							else
-							stringarenvoyer=device.originalDate+" "+device.originalTime;
+						
+						
+						switch (req.query.format)   {
+													  case 'hour':
+													  case 'HOUR':
+															stringarenvoyer=device.originalTime.substring(0, 5);
+															break;
+													  case 'hhmm':
+													  case 'HHMM':
+															stringarenvoyer=device.originalTime.substring(0, 5).replace(':','');// Utilisation du format HH:MM
+															break;
+													  default: //ou FULL
+															stringarenvoyer=device.originalDate+" "+device.originalTime;
+													}
+						
 			  }
 	compteurdePosition++;
  
