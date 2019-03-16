@@ -91,10 +91,20 @@ foreach($json as $item)
 {
 
 
-	if ($item['type'] == 'Alarm')
+switch ($item['type']) {
+    case "Alarm":
 		$couleur="primary";
-	else 
+        break;
+    case "Reminder":
 		$couleur="info";
+        break;
+    case "Timer":
+		$couleur="success";
+        break;
+    default:
+		$couleur="warning";
+        break;
+}
 	
 
 	if ($item['status'] == 'ON'){
@@ -104,11 +114,22 @@ foreach($json as $item)
 		$couleur="default";
 	}
 
-	if ($item['type'] == 'Alarm')
+
+switch ($item['type']) {
+    case "Alarm":
 		$type = '<span class="label label-'.$couleur.'" style="font-size : 1em;" title="{{Alarme}}"><i class="fa fa-bell"></i> Alarme</span>';
-	 else 
+        break;
+    case "Reminder":
 		$type = '<span class="label label-'.$couleur.'" style="font-size : 1em;" title="{{Rappel}}"><i class="fa divers-circular114"></i> Rappel</span>';
-	
+        break;
+    case "Timer":
+		$type = '<span class="label label-'.$couleur.'" style="font-size : 1em;" title="{{Minuteur}}"><i class="fa divers-circular114"></i> Minuteur</span>';
+        break;
+    default:
+		$type = '<span class="label label-'.$couleur.'" style="font-size : 1em;" title="{{????}}"><i class="fa fa-bell"></i> ????</span>';
+        break;
+}	
+			
 	
 $repetition="";	
 	switch ($item['recurringPattern']) {
@@ -151,9 +172,28 @@ $repetition="";
 			else
 	echo '<tr><td><span class="label label-danger" style="font-size : 1em; cursor : default;">?????</span></td>';
 
+
+
+
 	echo '<td>' . $type . '</td>';
 	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $item['reminderLabel'] . '</span></td>';
-	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . substr($item['originalTime'],0,5) . '</span></td>';
+
+            if ($item['type'] =="Timer")
+			{
+			//$date = DateTime::createFromFormat('U',strval(intval(intval($item['remainingTime'])/1000)));
+			$remainingTime=intval($item['remainingTime']);
+			$heures=floor($remainingTime/1000/60/60);
+			$minutes=floor(($remainingTime-$heures*60)/1000/60);
+			$secondes=floor($remainingTime/1000-$minutes*60);
+			if ($heures<10) $heures='0'.$heures;
+			if ($minutes<10) $minutes='0'.$minutes;
+			if ($secondes<10) $secondes='0'.$secondes;
+			
+			echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;"> Dans ' .$heures.":".$minutes.":".$secondes.'</span></td>';
+			}
+		else
+			echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . substr($item['originalTime'],0,5). '</span></td>';
+
 	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' .substr($item['originalDate'],8,2). substr($item['originalDate'],4,4). substr($item['originalDate'],0,4) . '</span></td>';
 	echo '<td>' . $present . '</td>';
 	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $repetition . '</span></td>';
