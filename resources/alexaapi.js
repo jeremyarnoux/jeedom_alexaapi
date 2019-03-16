@@ -377,6 +377,7 @@ app.get('/devices', (req, res) =>
   });
 });
 
+
 /***** Reminders *****
   URL: /reminders
 

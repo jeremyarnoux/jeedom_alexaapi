@@ -825,6 +825,8 @@ class alexaapiCmd extends cmd
         return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
       if ($command == 'radio' && strpos($arguments, '#volume#') !== false)
         return getTemplate('core', 'scenario', 'cmd.radio.volume', 'alexaapi');
+      if ($command == 'radio' && (!strpos($arguments, '#volume#')))
+        return getTemplate('core', 'scenario', 'cmd.radio', 'alexaapi');
       if ($command == 'reminder')
         return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');
       if ($command == 'command')
