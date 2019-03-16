@@ -327,7 +327,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Radio');
 		}
-		$cmd->setIsVisible(1);
+		$cmd->setIsVisible(0);
 		$cmd->setConfiguration('request', 'radio?station=#station#');
 		$cmd->setDisplay('title_disable', 1);
 		$cmd->save();
