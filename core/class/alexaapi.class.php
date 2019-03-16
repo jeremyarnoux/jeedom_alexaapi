@@ -685,8 +685,8 @@ class alexaapiCmd extends cmd
     {
         log::add('alexaapi', 'debug', 'buildRadioRequest');
         $request = $this->getConfiguration('request');
-        if (!isset($_options['station']))
-            throw new Exception(__('La station ne peut pas être vide', __FILE__));
+        //if (!isset($_options['station']))
+         //   throw new Exception(__('La station ne peut pas être vide', __FILE__));
 
         return str_replace(
           array(
