@@ -21,13 +21,8 @@ const config =
 if (!amazonserver) config.logger && config.logger('Alexa-Config: *********************amazonserver NON DEFINI*********************');
 if (!alexaserver) config.logger && config.logger('Alexa-Config: *********************alexaserver NON DEFINI*********************');
 
-//var l1key = $(this).attr('data-l1key');
-//config.logger && config.logger('Alexa-API: 33333333333333333333333333333333333333' + serveurtest + '333333333333333333333333333333333333333333333333');
 config.logger && config.logger('Alexa-Config (alexaapi.js): amazonserver='+amazonserver);
 config.logger && config.logger('Alexa-Config (alexaapi.js): alexaserver='+alexaserver);
-//config.logger && config.logger($('.attr[data-l1key=alexaserver]').value());
-//config.logger && config.logger($('.cmdAttr[data-l1key=alexaserver]').value(''));
-//config.logger && config.logger('Alexa-API: 33333333333333333333333333333333333333333333333333333333333333333333333333333333333333');
 
 /* Routing */
 const app = express();
@@ -107,6 +102,69 @@ app.get('/speak', (req, res) =>
     res.status(200).json({});
 });
 
+/**** Alexa.Radio *****
+  URL: /radio?device=?&text=?
+    device - String - name of the device
+    text - String - Text to speech
+    volume - Integer - Determine the volume level between 0 to 100 (0 is mute and 100 is max).
+                       This parameter is optional. If not specified, the volume level will not be altered.
+
+  Return an empty object if the function succeed.
+  Otherwise, an error object is returned.
+  FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
+*/
+app.get('/radio', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Alexa.Speak');
+  res.type('json');
+
+  if ('device' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
+  if ('station' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "station"'));
+  config.logger && config.logger('Alexa-API: station: ' + req.query.station);
+
+  if ('volume' in req.query)
+  {
+    config.logger && config.logger('Alexa-API: volume: ' + req.query.volume);
+    var hasError = false;
+    forEachDevices(req.query.device, (serial) =>
+    {
+      alexa.sendSequenceCommand(serial, 'volume', req.query.volume, (err) =>
+      {
+        if (err)
+          hasError = true;
+      });
+    });
+    if (hasError)
+      return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err.message));
+  }
+
+  var hasError = false;
+  var errorMessage = '';
+  forEachDevices(req.query.device, (serial) =>
+  {
+	  //     setTunein(serialOrName, guideId, contentType, callback) {
+
+    alexa.setTunein(serial, req.query.station, (err) =>
+    {
+      if (err)
+      {
+        errorMessage = err.message;
+        hasError = true;
+      }
+    });
+  });
+
+  if (hasError)
+    res.status(500).json(error(500, req.route.path, 'Alexa.Speak', errorMessage));
+  else
+    res.status(200).json({});
+});
+
+
 /***** Alexa.DeviceControls.Volume *****
   URL: /volume?device=?&value=?
     device - String - name of the device
@@ -132,12 +190,44 @@ app.get('/volume', (req, res) =>
   var err = forEachDevices(req.query.device, (serial) =>
   {
     alexa.sendSequenceCommand(serial, 'volume', req.query.value, (err) => {return err;});
-  });
-
-  if (err.length != 0)
+ 
+ if (err)
     return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
-  res.status(200).json({});
+  res.status(200).json({});  });
+
+
 });
+
+/***** Alexa.DeviceControls.Command *****
+  URL: /command?device=?&command=?
+    device - String - name of the device
+    command - String - command : pause|play|next|prev|fwd|rwd|shuffle|repeat
+
+*/
+app.get('/command', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Alexa.DeviceControls.Command');
+  res.type('json');
+
+  if ('device' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Command', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
+  if ('command' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Command', 'Missing parameter "command"'));
+  config.logger && config.logger('Alexa-API: command: ' + req.query.command);
+
+  var err = forEachDevices(req.query.device, (serial) =>
+	  {	
+		alexa.sendCommand(serial, req.query.command, (err) => {return err;});
+
+	  if (err)
+		return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Command', err));
+	  res.status(200).json({});
+	  });
+});
+
+
 
 /***** Alexa.Notifications.SendMobilePush *****
   URL /push?device=?&text=?
@@ -287,6 +377,7 @@ app.get('/devices', (req, res) =>
   });
 });
 
+
 /***** Reminders *****
   URL: /reminders
 
@@ -321,7 +412,9 @@ config.logger && config.logger('Alexa-API: (reminders) function' );
         'deviceSerialNumber': device.deviceSerialNumber,
         'type': device.type,
         'originalTime': device.originalTime,
+        'musicEntity': device.musicEntity,
         'originalDate': device.originalDate,
+        'remainingTime': device.remainingTime,
         'status' : device.status,
         'recurringPattern' : device.recurringPattern,
         'reminderLabel': device.reminderLabel,
@@ -510,10 +603,21 @@ app.get('/whennextalarm', (req, res) =>
 
 
 						//C'est bon, on est sur la bonne position, on renvoie le résultat
-						if ((req.query.format=="hour") || (req.query.format=="hour")) // Utilisation du format HH:MM
-							stringarenvoyer=device.originalTime.substring(0, 5);	
-							else
-							stringarenvoyer=device.originalDate+" "+device.originalTime;
+						
+						
+						switch (req.query.format)   {
+													  case 'hour':
+													  case 'HOUR':
+															stringarenvoyer=device.originalTime.substring(0, 5);
+															break;
+													  case 'hhmm':
+													  case 'HHMM':
+															stringarenvoyer=device.originalTime.substring(0, 5).replace(':','');// Utilisation du format HH:MM
+															break;
+													  default: //ou FULL
+															stringarenvoyer=device.originalDate+" "+device.originalTime;
+													}
+						
 			  }
 	compteurdePosition++;
  

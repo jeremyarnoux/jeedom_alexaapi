@@ -294,10 +294,10 @@ class alexaapi extends eqLogic
 				$cmd->setSubType('message');
 				$cmd->setEqLogic_id($this->getId());
 				$cmd->setName('Push');
+				$cmd->setConfiguration('request', 'push?text=#message#');
+				$cmd->setDisplay('title_disable', 1);
 			}
-			$cmd->setIsVisible(true);
-			$cmd->setConfiguration('request', 'push?text=#message#');
-			$cmd->setDisplay('title_disable', 1);
+			$cmd->setIsVisible(1);
 			$cmd->save();
 			return;
 		}
@@ -311,10 +311,25 @@ class alexaapi extends eqLogic
 			$cmd->setSubType('message');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Speak');
+			$cmd->setConfiguration('request', 'speak?text=#message#');
+			$cmd->setDisplay('title_disable', 1);
 		}
-		$cmd->setIsVisible(true);
-		$cmd->setConfiguration('request', 'speak?text=#message#');
-		$cmd->setDisplay('title_disable', 1);
+		$cmd->setIsVisible(1);
+		$cmd->save();
+		
+		// Radio command
+		$cmd = $this->getCmd(null, 'radio');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('radio');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Radio');
+			$cmd->setConfiguration('request', 'radio?station=#station#');
+			$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->setIsVisible(0);
 		$cmd->save();
 
 		// Speak + Volume command
@@ -326,12 +341,27 @@ class alexaapi extends eqLogic
 			$cmd->setSubType('message');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Speak+Volume');
+			$cmd->setConfiguration('request', 'speak?text=#message#&volume=#volume#');
+			$cmd->setDisplay('title_disable', 1);
 		}
-		$cmd->setIsVisible(false);
-		$cmd->setConfiguration('request', 'speak?text=#message#&volume=#volume#');
-		$cmd->setDisplay('title_disable', 1);
+		$cmd->setIsVisible(0);
 		$cmd->save();
-
+		
+		// Radio + Volume command
+		$cmd = $this->getCmd(null, 'radio-volume');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('radio-volume');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Radio+Volume');
+			$cmd->setConfiguration('request', 'radio?station=#station#&volume=#volume#');
+			$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->setIsVisible(0);
+		$cmd->save();
+		
 		// alarm command
 		$cmd = $this->getCmd(null, 'alarm');
 		if (!is_object($cmd)) {
@@ -341,10 +371,10 @@ class alexaapi extends eqLogic
 			$cmd->setSubType('message');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Alarm');
+			$cmd->setConfiguration('request', 'alarm?when=#when#&recurring=#recurring#');
+			$cmd->setDisplay('title_disable', 1);
 		}
-		$cmd->setIsVisible(false);
-		$cmd->setConfiguration('request', 'alarm?when=#when#&recurring=#recurring#');
-		$cmd->setDisplay('title_disable', 1);
+		$cmd->setIsVisible(0);
 		$cmd->save();
 	  
 		// delete all alarms command
@@ -356,10 +386,9 @@ class alexaapi extends eqLogic
 			$cmd->setSubType('message');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Delete All Alarms');
+		$cmd->setConfiguration('request', 'deleteallalarms?type=#type#&status=#status#');
 		}
-		$cmd->setIsVisible(false);
-		$cmd->setConfiguration('request', 'deleteallalarms');
-		$cmd->setDisplay('title_disable', 1);
+		$cmd->setIsVisible(0);
 		$cmd->save();
 	  
 		// whennextalarm command
@@ -371,9 +400,9 @@ class alexaapi extends eqLogic
 			$cmd->setSubType('other');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Next Alarm');
+			$cmd->setConfiguration('request', 'whennextalarm?position=1&format=FULL');
 		}
-		$cmd->setIsVisible(false);
-		$cmd->setConfiguration('request', 'whennextalarm?position=1&format=FULL');
+		$cmd->setIsVisible(0);
 		$cmd->save();
 	  
 		// whennextreminder command
@@ -385,9 +414,9 @@ class alexaapi extends eqLogic
 			$cmd->setSubType('other');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Next Reminder');
+			$cmd->setConfiguration('request', 'whennextreminder?position=1');
 		}
-		$cmd->setIsVisible(false);
-		$cmd->setConfiguration('request', 'whennextreminder?position=1');
+		$cmd->setIsVisible(0);
 		$cmd->save();
 	  
 		// Reminder command
@@ -399,9 +428,9 @@ class alexaapi extends eqLogic
 			$cmd->setSubType('message');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Reminder');
+			$cmd->setConfiguration('request', 'reminder?text=#message#&when=#when#');
 		}
-		$cmd->setIsVisible(false);
-		$cmd->setConfiguration('request', 'reminder?text=#message#&when=#when#');
+		$cmd->setIsVisible(0);
 		$cmd->save();
 
 		// Volume command
@@ -413,11 +442,26 @@ class alexaapi extends eqLogic
 			$cmd->setSubType('slider');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Volume');
+			$cmd->setConfiguration('request', 'volume?value=#volume#');
+			$cmd->setConfiguration('minValue', '0');
+			$cmd->setConfiguration('maxValue', '100');
 		}
-		$cmd->setIsVisible(true);
-		$cmd->setConfiguration('request', 'volume?value=#volume#');
-		$cmd->setConfiguration('minValue', '0');
-		$cmd->setConfiguration('maxValue', '100');
+		$cmd->setIsVisible(1);
+		$cmd->save();
+		
+		// Command command
+		$cmd = $this->getCmd(null, 'command');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('command');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Command');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setConfiguration('request', 'command?command=#command#');
+		}
+		$cmd->setIsVisible(0);
 		$cmd->save();
 
     }
@@ -597,6 +641,12 @@ class alexaapiCmd extends cmd
             case 'reminder':
                 $request = $this->buildReminderRequest($_options);
                 break;
+            case 'radio':
+                $request = $this->buildRadioRequest($_options);
+                break;
+            case 'command':
+                $request = $this->buildCommandRequest($_options);
+                break;
             case 'alarm':
                 $request = $this->buildAlarmRequest($_options);
                 break;
@@ -629,6 +679,22 @@ class alexaapiCmd extends cmd
 
         return str_replace('#volume#', $_options['slider'], $request);
     }
+	
+    private function buildRadioRequest($_options = array())
+    {
+        log::add('alexaapi', 'debug', 'buildRadioRequest');
+        $request = $this->getConfiguration('request');
+        //if (!isset($_options['station']))
+         //   throw new Exception(__('La station ne peut pas être vide', __FILE__));
+
+        return str_replace(
+          array(
+            '#station#',
+            '#volume#'
+          ), array(
+            urlencode($_options['station']),
+            isset($_options['volume']) ? $_options['volume'] : $_options['slider']
+          ), $request);    }
 
     private function buildSpeakRequest($_options = array())
     {
@@ -721,6 +787,18 @@ class alexaapiCmd extends cmd
             $_options['position']
           ), $request);
     }	
+    private function buildCommandRequest($_options = array())
+    {
+        log::add('alexaapi', 'debug', 'buildCommandRequest');
+        $request = $this->getConfiguration('request');
+
+        return str_replace( //faudra corriger ici ************************position inutile
+          array(
+            '#command#'
+          ), array(
+            $_options['command']
+          ), $request);
+    }	
     private function buildNextReminderRequest($_options = array())
     {
         log::add('alexaapi', 'debug', 'buildNextReminderRequest');
@@ -741,11 +819,20 @@ class alexaapiCmd extends cmd
         return parent::getWidgetTemplateCode($_version, $_noCustom);
 
       list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
+ 
+
+ log::add('alexaapi', 'debug', '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'.$arguments);
 
       if ($command == 'speak' && strpos($arguments, '#volume#') !== false)
         return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
+      if ($command == 'radio' && (strpos($arguments, '#volume#') || strpos($arguments, 'volume')) !== false)
+        return getTemplate('core', 'scenario', 'cmd.radio.volume', 'alexaapi');
+      if ($command == 'radio' && (!strpos($arguments, '#volume#')))
+        return getTemplate('core', 'scenario', 'cmd.radio', 'alexaapi');
       if ($command == 'reminder')
         return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');
+      if ($command == 'command')
+        return getTemplate('core', 'scenario', 'cmd.command', 'alexaapi');
       if ($command == 'alarm')
         return getTemplate('core', 'scenario', 'cmd.alarm', 'alexaapi');
       return parent::getWidgetTemplateCode($_version, $_noCustom);
