@@ -692,7 +692,7 @@ class alexaapiCmd extends cmd
             '#station#',
             '#volume#'
           ), array(
-            urlencode($_options['station']),
+            isset($_options['select']) ? urlencode($_options['select']) : urlencode($_options['station']),
             isset($_options['volume']) ? $_options['volume'] : $_options['slider']
           ), $request);    }
 
