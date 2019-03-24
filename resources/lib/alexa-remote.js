@@ -203,9 +203,11 @@ class AlexaRemote extends EventEmitter {
 
     prepare(callback) {
         this.getAccount((err, result) => {
+			//this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: getAccount');
             if (!err && result && Array.isArray(result)) {
                 result.forEach ((account) => {
                     if (!this.commsId) this.commsId = account.commsId;
+					//this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: getAccount:'+account.commsId);
                     //if (!this.directedId) this.directedId = account.directedId;
                 });
             }
@@ -1369,8 +1371,17 @@ this.deleteNotification(notification, callback);
             }
         );
     }
-
-    getAutomationRoutines(limit, callback) {
+	    
+		
+		
+		getRoutines(limit, callback) 
+		{
+		return this.getAutomationRoutines(callback);
+		}
+	
+	
+	
+    getAutomationRoutines(limit, callback) { //equivalent de getNotifications
         if (typeof limit === 'function') {
             callback = limit;
             limit = 0;
@@ -1378,6 +1389,14 @@ this.deleteNotification(notification, callback);
         limit = limit || 2000;
         this.httpsGet (`/api/behaviors/automations?limit=${limit}`, callback);
     }
+
+getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
+
+    this.getAutomationRoutines((err, res) => {
+					//this._options.logger && this._options.logger('Alexa-Remote: >>>>>>>>>>>>>>>>>>>>>>>: ' + JSON.stringify(res));
+		        callback && callback(res);
+    });
+}
 
     executeAutomationRoutine(serialOrName, routine, callback) {
         return this.sendSequenceCommand(serialOrName, routine, callback);

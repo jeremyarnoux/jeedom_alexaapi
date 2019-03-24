@@ -38,6 +38,14 @@ $('#bt_reminders').on('click', function ()
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders').dialog('open');
 });
 
+
+$('#bt_routines').on('click', function ()
+{
+  $('#md_modal').dialog({title: "{{Routines}}"});
+  $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=routines').dialog('open');
+});
+
+
  $('#bt_scan').on('click', function () {
     scanAmazonAlexa();
 });

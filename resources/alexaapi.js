@@ -227,7 +227,32 @@ app.get('/command', (req, res) =>
 	  });
 });
 
+/***** Alexa.Routine *****
+  URL /routine?device=?&name=?
+    device - String - name of the device
+    name - String - name of routine
 
+*/
+app.get('/routine', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: Alexa.Routine');
+  res.type('json');
+
+  if ('device' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Routine', 'Missing parameter "device"'));
+  config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+
+  if ('name' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.Routine', 'Missing parameter "name"'));
+  config.logger && config.logger('Alexa-API: name: ' + req.query.name);
+
+  alexa.executeAutomationRoutine(req.query.device, req.query.name, function(err)
+  {
+    if (err)
+      return res.status(500).json(error(500, req.route.path, 'Alexa.Routine', err));
+    res.status(200).json({});
+  });
+});
 
 /***** Alexa.Notifications.SendMobilePush *****
   URL /push?device=?&text=?
@@ -378,15 +403,107 @@ app.get('/devices', (req, res) =>
 });
 
 
-/***** Reminders *****
-  URL: /reminders
+/***** Get devices *****
+  URL: /devices
 
-  Return the list of reminders
+  Return the list of Alexa devices
   [{
     serial - String - Serial number of the device (unique identifier)
     name: String - name of the device. Use this name (or serial) to call as "device" parameter of others methods
     type: String - Device family as defined by Amazon. Known type: TABLET (for tablet device), ECHO (for ECHO device), WHA (for group of devices), VOX (for smartphone? Webpage?)
     online: Boolean - true when the device is connected, false otherwise,
+    capabilities: [String] - List of available capabilties of the device, few example: VOLUME_SETTING, REMINDERS, MICROPHONE, TUNE_IN, ...
+  }]
+*/
+app.get('/routines', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: routines');
+  res.type('json');
+
+//config.logger && config.logger('Alexa-API: type of devices : '+typeof devices);
+
+
+  alexa.getAutomationRoutines2(function(niveau0)
+ // alexa.getDevices(function(devices)
+  {
+	  //devices='{"notifications":'+devices+'}';
+	  
+	    //config.logger && config.logger('Alexa-API: routines2');
+		//  config.logger && config.logger(JSON.stringify(devices));
+		//  config.logger && config.logger(devices);
+
+//config.logger && config.logger('Alexa-API: type of devices : '+typeof devices);
+
+//config.logger && config.logger('Alexa-API: routines3b2');
+    var toReturn = [];
+    for (var serial in niveau0)
+    {
+		  config.logger && config.logger('************************************************');
+
+      var routine = niveau0[serial];
+	  
+		  config.logger && config.logger('(general)----- '+routine.status);
+		  config.logger && config.logger('(general)----- '+routine.creationTimeEpochMillis);
+	  
+		for (var serial2 in routine.triggers)
+		{
+		      
+			  var niveau2 = routine.triggers[serial2];
+				
+
+          
+          
+          
+					for (var triggers in niveau2.payload) //Partie PAYLOAD
+					{
+
+			  var niveau3 = niveau2.payload[triggers];
+			  			config.logger && config.logger('(triggers1)----- '+triggers.locale);
+			  config.logger && config.logger('(triggers2)----- '+niveau3.locale);	
+                      config.logger && config.logger('(triggers3)----- '+triggers+' : '+niveau3);
+                      
+                      if (triggers=='utterance') 
+                        resultatutterance =niveau3; 
+                      if (triggers=='locale') 
+                        resultatlocale =niveau3;        					}
+		}
+/*
+		for (Var serial2 in routine.sequence) //partie SEQUENCE non utilisé à ce stade
+		{
+			  var niveau2 = routine[serial2];
+				
+				config.logger && config.logger('(sequence)----- '+serial2+' : '+niveau2);
+
+
+		}
+*/
+	
+	  
+	  
+	  
+      toReturn.push({
+        'status': routine.status,
+        'locale': resultatlocale,
+        'utterance': resultatutterance ,
+
+       'creationTimeEpochMillis': routine.creationTimeEpochMillis,
+        'lastUpdatedTimeEpochMillis' : routine.lastUpdatedTimeEpochMillis
+       // 'members': device.clusterMembers
+      });
+    }
+    res.status(200).json(toReturn);
+  });
+});
+
+/***** Reminders *****
+  URL: /reminders
+
+  Return the list of reminders
+  [{
+    serial - String - Serial nu=mber of the device (unique identifier)
+    name: String - name of the device. Use this name (or serial) to call as "device" parameter of others methods
+    type: String - Device family as defined by Amazon. Known type: TABLET (for tablet device), ECHO (for ECHO device), WHA (for group of devices), VOX (for smartphone? Webpage?)
+    online: Boolean - true when the device is connected, false oe,
     capabilities: [String] - List of available capabilties of the device, few example: VOLUME_SETTING, REMINDERS, MICROPHONE, TUNE_IN, ...
   }]
 
