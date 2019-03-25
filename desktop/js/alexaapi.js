@@ -303,7 +303,7 @@ jeedom.plugin.VerifiePresenceCookie = function(_params)
  jeedom.plugin.node = function() {
  };
 
- jeedom.plugin.node.action = function (_params) {
+ jeedom.plugin.node.action = function (_params) { //Delete reminder
  	var paramsRequired = ['action','node_id'];
  	var paramsSpecifics = {};
  	try {
@@ -317,6 +317,24 @@ jeedom.plugin.VerifiePresenceCookie = function(_params)
  	paramsAJAX.url = 'plugins/alexaapi/desktop/php/alexaapiProxy.php';
  	paramsAJAX.data = {
  		request: 'deletereminder?id='+_params.node_id+'&type=action&action='+_params.action,
+ 	};
+ 	$.ajax(paramsAJAX);
+ }
+
+ jeedom.plugin.node.action2 = function (_params) {  //Lancement d'une routine
+ 	var paramsRequired = ['action','node_id','node_id2'];
+ 	var paramsSpecifics = {};
+ 	try {
+ 		jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+ 	} catch (e) {
+ 		(_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+ 		return;
+ 	}
+ 	var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
+ 	var paramsAJAX = jeedom.private.getParamsAJAX(params);
+ 	paramsAJAX.url = 'plugins/alexaapi/desktop/php/alexaapiProxy.php';
+ 	paramsAJAX.data = {
+ 		request: 'routine?device='+_params.node_id2+'&routine='+_params.node_id,
  	};
  	$.ajax(paramsAJAX);
  }

@@ -1333,24 +1333,42 @@ this.deleteNotification(notification, callback);
 
     sendSequenceCommand(serialOrName, command, value, callback)
     {
-        let dev = this.find(serialOrName);
+       
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 1 '+command);
+
+	   let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 2');
 
         if (typeof value === 'function') {
+			this._options.logger && this._options.logger('Alexa-sendSequenceCommand: function');
+
             callback = value;
             value = null;
         }
 
         let seqCommandObj;
         if (typeof command === 'object') {
+			this._options.logger && this._options.logger('Alexa-sendSequenceCommand: object');
+
             seqCommandObj = command.sequence || command;
         }
         else {
+				this._options.logger && this._options.logger('Alexa-sendSequenceCommand: else');
             seqCommandObj = {
                 '@type': 'com.amazon.alexa.behaviors.model.Sequence',
                 'startNode': this.createSequenceNode(command, value)
             };
         }
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 3');
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: deviceType '+dev.deviceType);
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: serialNumber '+dev.serialNumber);
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: deviceOwnerCustomerId '+dev.deviceOwnerCustomerId);
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: seqCommandObj.sequenceId '+seqCommandObj.sequenceId);
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: command.automationId '+command.automationId);
+
+//this._options.logger && this._options.logger('1'+JSON.stringify(seqCommandObj));
+//this._options.logger && this._options.logger('2'+seqCommandObj);
 
         const reqObj = {
             'behaviorId': seqCommandObj.sequenceId ? command.automationId : 'PREVIEW',
@@ -1362,6 +1380,8 @@ this.deleteNotification(notification, callback);
         reqObj.sequenceJson = reqObj.sequenceJson.replace(/"deviceSerialNumber":"ALEXA_CURRENT_DSN"/g, `"deviceSerialNumber":"${dev.serialNumber}"`);
         reqObj.sequenceJson = reqObj.sequenceJson.replace(/"customerId":"ALEXA_CUSTOMER_ID"/g, `"customerId":"${dev.deviceOwnerCustomerId}"`);
         reqObj.sequenceJson = reqObj.sequenceJson.replace(/"locale":"ALEXA_CURRENT_LOCALE"/g, `"locale":"fr-FR"`);
+
+//this._options.logger && this._options.logger(reqObj.sequenceJson);
 
         this.httpsGet (`/api/behaviors/preview`,
             callback,

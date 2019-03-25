@@ -18,6 +18,14 @@
 if (!isConnect('admin')) {
 	throw new Exception('401 Unauthorized');
 }
+								// On va aller cherche le N° de DEVICE de l'équipement "Tous les appareils"
+								$eqLogics = alexaapi::byType('alexaapi');
+								$EquipementTouslesAppareils='';
+								foreach ($eqLogics as $eqLogic) {
+
+									if ($eqLogic->getConfiguration('type') === 'WHA') 
+										$EquipementTouslesAppareils = $eqLogic->getConfiguration('serial');
+								}
 
 $json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
 //echo $json;
@@ -39,13 +47,15 @@ function sortBy($field, &$array, $direction = 'asc')
 
     return true;
 }
-sortBy('status', $json, 'desc');
+sortBy('lastUpdatedTimeEpochMillis', $json, 'desc');
+
  ?>
 <table class="table table-condensed tablesorter" id="table_healthNetwork">
 	<thead>
 		<tr>
 			<th>{{Routine}}</th>
-			<th>{{Locale}}</th>
+			<th>{{Locale, Time zone}}</th>
+			<th>{{Répétition}}</th>
 			<th>{{Création}}</th>
 			<th>{{Mise à jour}}</th>
 			
@@ -57,12 +67,6 @@ sortBy('status', $json, 'desc');
 	 <?php
 foreach($json as $item)
 {
-
-
-		
-        
-	
-
 	if ($item['status'] == 'ENABLED'){
       $couleur="success";
       $present = '<span class="label label-success" style="font-size : 1em;" title="{{Actif}}"><i class="fa fa-check-circle"></i></span>';
@@ -71,15 +75,62 @@ foreach($json as $item)
 		$couleur="default";
 	}
 
-		$type = '<span class="label label-'.$couleur.'" style="font-size : 1em;">'. $item['locale']. '</span>';
-        
-	echo '<tr><td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'. $item['utterance']. '</span></td>';
-
-
-
-
-	echo '<td>' . $type . '</td>';
+ 	$resultattriggerTime="";
+	$resultattimeZoneId=$item['locale'];
 	
+     
+	$repetition="";	
+	switch ($item['recurrence']) {
+    case "P1D":
+        $repetition="Tous les jours";
+        break;
+    case "XXXX-WD":
+        $repetition="En semaine";
+        break;
+    case "XXXX-WE":
+        $repetition="Week-ends";
+        break;
+    case "XXXX-WXX-1":
+        $repetition="Chaque lundi";
+        break;
+    case "XXXX-WXX-2":
+        $repetition="Chaque mardi";
+        break;
+    case "XXXX-WXX-3":
+        $repetition="Chaque mercredi";
+        break;
+    case "XXXX-WXX-4":
+        $repetition="Chaque jeudi";
+        break;
+    case "XXXX-WXX-5":
+        $repetition="Chaque vendredi";
+        break;
+    case "XXXX-WXX-6":
+        $repetition="Chaque samedi";
+        break;
+    case "XXXX-WXX-7":
+        $repetition="Chaque dimanche";
+        break;
+} 
+	 
+	 
+	//	'timeZoneId': resultattimeZoneId ,
+	//	'recurrence': resultatrecurrence ,
+	
+	if ($item['triggerTime'] != '')
+	{
+ 	$resultattriggerTime=substr($item['triggerTime'],0,2).":".substr($item['triggerTime'],2,2);
+	$resultattimeZoneId=$item['timeZoneId'];
+	
+	}
+	
+		$type = '<span class="label label-'.$couleur.'" style="font-size : 1em;">'. $resultattimeZoneId. '</span>';
+		
+	echo '<tr><td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'. $resultattriggerTime.$item['utterance']. '</span></td>';
+
+	echo '<td>' .$type . '</td>';
+	
+	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'. $repetition. '</span></td>';
 
   
     
@@ -97,8 +148,8 @@ foreach($json as $item)
 		
 	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' .$datemaj. '</span></td>';
 	echo '<td>' . $present . '</td>';
-	
-	echo '<td><a style="position:relative;top:-5px;" class="btn btn-success deletexxxReminder" data-id="'. $item['id'] .'"><i class="fas fa-play"></i></a></td>';
+	$routineencodee=urlencode($item['utterance']);
+	echo '<td><a style="position:relative;top:-5px;" class="btn btn-success RunRoutine" data-id="'. $routineencodee .'" data-device="'. $EquipementTouslesAppareils .'"><i class="fas fa-play"></i></a></td>';
 			//$present = '<span class="label label-default" style="font-size : 1em;" title="{{Inactif}}"><i class="fa fa-times-circle"></i></span>';
 
 	echo '</tr>';
@@ -113,31 +164,32 @@ foreach($json as $item)
 <script>
 
 
-$('.deleteReminder').on('click',function(){
-    jeedom.plugin.node.action({
+$('.RunRoutine').on('click',function(){
+    jeedom.plugin.node.action2({
         action : 'testNode',
         node_id: $(this).attr('data-id'),
+        node_id2: $(this).attr('data-device'),
         error: function (error) {
 	//$('#div_alert').showAlert({message: error.message, level: 'danger'});
 	$('#md_modal').dialog('close');
-	$('#md_modal').dialog({title: "{{Rappels / Alarmes}}"});
-	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+	$('#md_modal').dialog({title: "{{Routines}}"});
+	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=routines&id=alexaapi').dialog('open');
 
        },
        success: function (data) {
         // $('#div_alert').showAlert({message: '{{Action réalisée avec succès}}', level: 'success'});
 	$('#md_modal').dialog('close');
-	$('#md_modal').dialog({title: "{{Rappels / Alarmes}}"});
-	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+	$('#md_modal').dialog({title: "{{Routines}}"});
+	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=routines&id=alexaapi').dialog('open');
      }
  });
 });
 
 
-$('.deleteReminder2').on('click',function(){
+$('.RunRoutine2').on('click',function(){
 	$('#md_modal').dialog('close');
-	$('#md_modal').dialog({title: "{{Rappels / Alarmes}}"});
-	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+	$('#md_modal').dialog({title: "{{Routines}}"});
+	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=routines&id=alexaapi').dialog('open');
 });
 
 $('.refreshAction[data-action=refresh]').on('click',function(){

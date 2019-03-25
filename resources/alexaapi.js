@@ -230,27 +230,77 @@ app.get('/command', (req, res) =>
 /***** Alexa.Routine *****
   URL /routine?device=?&name=?
     device - String - name of the device
-    name - String - name of routine
+    routine - String - name of routine
 
 */
 app.get('/routine', (req, res) =>
 {
-  config.logger && config.logger('Alexa-API: Alexa.Routine');
+  config.logger && config.logger('Alexa-API: /routine :');
   res.type('json');
 
   if ('device' in req.query === false)
-    return res.status(500).json(error(500, req.route.path, 'Alexa.Routine', 'Missing parameter "device"'));
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Command', 'Missing parameter "device"'));
   config.logger && config.logger('Alexa-API: device: ' + req.query.device);
+  
+  if ('routine' in req.query === false)
+    return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Command', 'Missing parameter "routine"'));
+  config.logger && config.logger('Alexa-API: routine: ' + req.query.routine);
 
-  if ('name' in req.query === false)
-    return res.status(500).json(error(500, req.route.path, 'Alexa.Routine', 'Missing parameter "name"'));
-  config.logger && config.logger('Alexa-API: name: ' + req.query.name);
 
-  alexa.executeAutomationRoutine(req.query.device, req.query.name, function(err)
+  alexa.getAutomationRoutines2(function(niveau0)
   {
-    if (err)
-      return res.status(500).json(error(500, req.route.path, 'Alexa.Routine', err));
-    res.status(200).json({});
+    var toReturn = [];
+    var routineaexecuter = "";
+	
+    for (var serial in niveau0)
+    {
+
+      var routine = niveau0[serial];
+	    
+		for (var serial2 in routine.triggers)
+		{
+		      
+			  var niveau2 = routine.triggers[serial2];
+					for (var triggers in niveau2.payload) //Partie PAYLOAD
+					{
+			  var niveau3 = niveau2.payload[triggers];
+						switch (triggers) 
+							{
+								
+								case 'utterance':
+							if (niveau3 === req.query.routine)
+								{
+								routineaexecuter=routine;
+								}
+									break;
+									
+								case 'schedule':
+									for (var schedule in niveau3) //Partie schedule
+									{
+									var niveau4 = niveau3[schedule];
+											switch (schedule) 
+												{
+													
+													case 'triggerTime':
+														if (niveau4 === req.query.routine)
+															routineaexecuter=routine;
+														break;
+											}
+									}
+									break;
+							}					   					
+					}
+		}
+    }
+							if (routineaexecuter != '')
+							{
+								alexa.executeAutomationRoutine(req.query.device, routineaexecuter, function(err)
+								{config.logger && config.logger('Alexa-API: routine - OK - Lancement routine: '+req.query.routine);});		
+							}
+							else
+							config.logger && config.logger('Alexa-API: routine - ECHEC (introuvable) - Lancement routine: '+req.query.routine);	
+
+    res.status(200).json(toReturn);
   });
 });
 
@@ -436,6 +486,7 @@ app.get('/routines', (req, res) =>
 
 //config.logger && config.logger('Alexa-API: routines3b2');
     var toReturn = [];
+		  config.logger && config.logger('************DEBUG DE ROUTINES*******************');
     for (var serial in niveau0)
     {
 		  config.logger && config.logger('************************************************');
@@ -444,6 +495,21 @@ app.get('/routines', (req, res) =>
 	  
 		  config.logger && config.logger('(general)----- '+routine.status);
 		  config.logger && config.logger('(general)----- '+routine.creationTimeEpochMillis);
+		  
+	if (routine.status === 'ENABLED')
+	{
+		
+		  config.logger && config.logger('(SUPPRESSION)----- '+routine.creationTimeEpochMillis);
+  alexa.executeAutomationRoutine("", routine, function(err)
+  {
+		  config.logger && config.logger('(SUPPRESSION DEDANS)----- '+routine.creationTimeEpochMillis);
+//executeAutomationRoutine(serialOrName, routine, callback)
+    //res.status(200).json({});
+  });		
+		  config.logger && config.logger('(SUPPRESSION)----- '+routine.creationTimeEpochMillis);
+	}		
+		  
+		  
 	  
 		for (var serial2 in routine.triggers)
 		{
@@ -451,21 +517,63 @@ app.get('/routines', (req, res) =>
 			  var niveau2 = routine.triggers[serial2];
 				
 
-          
-          
+                        resultatutterance =""; 
+                        resultatlocale ="";          
+          				resultattriggerTime =""; 			
+						resultattimeZoneId ="";
+						resultatrecurrence ="";
           
 					for (var triggers in niveau2.payload) //Partie PAYLOAD
 					{
 
 			  var niveau3 = niveau2.payload[triggers];
-			  			config.logger && config.logger('(triggers1)----- '+triggers.locale);
-			  config.logger && config.logger('(triggers2)----- '+niveau3.locale);	
+			  			//config.logger && config.logger('(triggers1)----- '+triggers.locale);
+			 // config.logger && config.logger('(triggers2)----- '+niveau3.locale);	
                       config.logger && config.logger('(triggers3)----- '+triggers+' : '+niveau3);
                       
-                      if (triggers=='utterance') 
-                        resultatutterance =niveau3; 
-                      if (triggers=='locale') 
-                        resultatlocale =niveau3;        					}
+						switch (triggers) 
+							{
+								
+								case 'utterance':
+									resultatutterance =niveau3; 			
+									break;
+								
+								case 'locale':
+									resultatlocale =niveau3;
+									break;
+									
+								case 'schedule':
+									for (var schedule in niveau3) //Partie schedule
+									{
+									var niveau4 = niveau3[schedule];
+									config.logger && config.logger('(schedule)----- '+schedule+' : '+niveau4);
+									
+											switch (schedule) 
+												{
+													
+													case 'triggerTime':
+														resultattriggerTime =niveau4; 			
+														break;
+													
+													case 'timeZoneId':
+														resultattimeZoneId =niveau4;
+														break;
+													case 'recurrence':
+														resultatrecurrence =niveau4;
+														break;												}
+									}
+									break;
+										
+
+							}					
+
+
+
+
+
+
+   					
+					}
 		}
 /*
 		for (Var serial2 in routine.sequence) //partie SEQUENCE non utilisé à ce stade
@@ -476,6 +584,9 @@ app.get('/routines', (req, res) =>
 
 
 		}
+		
+		
+		
 */
 	
 	  
@@ -485,6 +596,9 @@ app.get('/routines', (req, res) =>
         'status': routine.status,
         'locale': resultatlocale,
         'utterance': resultatutterance ,
+		'triggerTime': resultattriggerTime ,
+		'timeZoneId': resultattimeZoneId ,
+		'recurrence': resultatrecurrence ,
 
        'creationTimeEpochMillis': routine.creationTimeEpochMillis,
         'lastUpdatedTimeEpochMillis' : routine.lastUpdatedTimeEpochMillis
