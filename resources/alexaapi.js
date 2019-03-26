@@ -256,41 +256,13 @@ app.get('/routine', (req, res) =>
     {
 
       var routine = niveau0[serial];
-	    
-		for (var serial2 in routine.triggers)
-		{
-		      
-			  var niveau2 = routine.triggers[serial2];
-					for (var triggers in niveau2.payload) //Partie PAYLOAD
-					{
-			  var niveau3 = niveau2.payload[triggers];
-						switch (triggers) 
-							{
-								
-								case 'utterance':
-							if (niveau3 === req.query.routine)
-								{
-								routineaexecuter=routine;
-								}
-									break;
-									
-								case 'schedule':
-									for (var schedule in niveau3) //Partie schedule
-									{
-									var niveau4 = niveau3[schedule];
-											switch (schedule) 
-												{
-													
-													case 'triggerTime':
-														if (niveau4 === req.query.routine)
-															routineaexecuter=routine;
-														break;
-											}
-									}
-									break;
-							}					   					
-					}
-		}
+	  
+	   config.logger && config.logger('(Test creationTimeEpochMillis )-----> '+routine.creationTimeEpochMillis+'/'+req.query.routine);
+	   
+			if (routine.creationTimeEpochMillis == req.query.routine)
+				routineaexecuter=routine;
+			
+
     }
 							if (routineaexecuter != '')
 							{

@@ -164,12 +164,8 @@ foreach($json as $item)
 	echo '<td>' . $present . '</td>';
 	$routineencodee=urlencode($item['utterance']);
 	
-		if ($item['utterance'] != '')
-	echo '<td><a style="position:relative;top:-5px;" class="btn btn-success RunRoutine" data-id="'. $routineencodee .'" data-device="'. $EquipementTouslesAppareils .'"><i class="fas fa-play"></i></a></td>
-<td>'.$item['utterance'].'</td>';
-		else
-	echo '<td><a style="position:relative;top:-5px;" class="btn btn-success RunRoutine" data-id="'. $item['triggerTime'] .'" data-device="'. $EquipementTouslesAppareils .'"><i class="fas fa-play"></i></a></td>
-<td>'.$item['triggerTime'].'</td>';
+	echo '<td><a style="position:relative;top:-5px;" class="btn btn-success RunRoutine" data-id="'. $item['creationTimeEpochMillis'] .'" data-device="'. $EquipementTouslesAppareils .'"><i class="fas fa-play"></i></a></td>
+<td>'.$item['creationTimeEpochMillis'].'</td>';
 			//$present = '<span class="label label-default" style="font-size : 1em;" title="{{Inactif}}"><i class="fa fa-times-circle"></i></span>';
 
 	echo '</tr>';
