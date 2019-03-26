@@ -317,6 +317,21 @@ class alexaapi extends eqLogic
 		$cmd->setIsVisible(1);
 		$cmd->save();
 		
+		// Routine command
+		$cmd = $this->getCmd(null, 'routine');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('routine');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Routine');
+			$cmd->setConfiguration('request', 'routine?routine=#message#');
+			$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->setIsVisible(0);
+		$cmd->save();
+		
 		// Radio command
 		$cmd = $this->getCmd(null, 'radio');
 		if (!is_object($cmd)) {
@@ -635,6 +650,9 @@ class alexaapiCmd extends cmd
             case 'speak':
                 $request = $this->buildSpeakRequest($_options);
                 break;
+            case 'routine':
+                $request = $this->buildRoutineRequest($_options);
+                break;
             case 'push':
                 $request = $this->buildPushRequest($_options);
                 break;
@@ -757,6 +775,20 @@ class alexaapiCmd extends cmd
 
         return str_replace(
           array(
+            '#messagge#'
+          ), array(
+            urlencode($_options['messagge'])
+          ), $request);
+    }
+    private function buildRoutineRequest($_options = array())
+    {
+        log::add('alexaapi', 'debug', 'buildRoutineRequest');
+        $request = $this->getConfiguration('request');
+        //if (!isset($_options['routine']) || $_options['routine'] == '')
+       //     throw new Exception(__('La routine ne peut pas être vide', __FILE__));
+
+        return str_replace(
+          array(
             '#message#'
           ), array(
             urlencode($_options['message'])
@@ -831,6 +863,8 @@ class alexaapiCmd extends cmd
         return getTemplate('core', 'scenario', 'cmd.radio', 'alexaapi');
       if ($command == 'reminder')
         return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');
+      if ($command == 'routine')
+        return getTemplate('core', 'scenario', 'cmd.routine', 'alexaapi');
       if ($command == 'command')
         return getTemplate('core', 'scenario', 'cmd.command', 'alexaapi');
       if ($command == 'alarm')

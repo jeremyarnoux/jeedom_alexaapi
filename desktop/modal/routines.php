@@ -47,12 +47,13 @@ function sortBy($field, &$array, $direction = 'asc')
 
     return true;
 }
-sortBy('lastUpdatedTimeEpochMillis', $json, 'desc');
+sortBy('utterance', $json, 'asc');
 
  ?>
 <table class="table table-condensed tablesorter" id="table_healthNetwork">
 	<thead>
 		<tr>
+			<th></th>
 			<th>{{Routine}}</th>
 			<th>{{Locale, Time zone}}</th>
 			<th>{{Répétition}}</th>
@@ -61,12 +62,22 @@ sortBy('lastUpdatedTimeEpochMillis', $json, 'desc');
 			
 			<th>{{Activé}}</th>
           		<th>{{Lancer}}</th>			
+          		<th>{{ID Routine}}</th>			
 		</tr>
 	</thead>
 	<tbody>
 	 <?php
 foreach($json as $item)
 {
+	
+	
+	if ($item['utterance'] === '')
+      $typeroutine="divers-circular114";
+	 else 
+      $typeroutine="jeedomapp-audiospeak";
+  
+    
+	
 	if ($item['status'] == 'ENABLED'){
       $couleur="success";
       $present = '<span class="label label-success" style="font-size : 1em;" title="{{Actif}}"><i class="fa fa-check-circle"></i></span>';
@@ -126,7 +137,10 @@ foreach($json as $item)
 	
 		$type = '<span class="label label-'.$couleur.'" style="font-size : 1em;">'. $resultattimeZoneId. '</span>';
 		
-	echo '<tr><td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'. $resultattriggerTime.$item['utterance']. '</span></td>';
+
+	echo '<tr><td><span class="label label-'.$couleur.'" style="font-size : 1em;" title="{{Actif}}"><i class="fa '.$typeroutine.'"></i></span></td>';
+	
+	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'. $resultattriggerTime.$item['utterance']. '</span></td>';
 
 	echo '<td>' .$type . '</td>';
 	
@@ -149,7 +163,13 @@ foreach($json as $item)
 	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' .$datemaj. '</span></td>';
 	echo '<td>' . $present . '</td>';
 	$routineencodee=urlencode($item['utterance']);
-	echo '<td><a style="position:relative;top:-5px;" class="btn btn-success RunRoutine" data-id="'. $routineencodee .'" data-device="'. $EquipementTouslesAppareils .'"><i class="fas fa-play"></i></a></td>';
+	
+		if ($item['utterance'] != '')
+	echo '<td><a style="position:relative;top:-5px;" class="btn btn-success RunRoutine" data-id="'. $routineencodee .'" data-device="'. $EquipementTouslesAppareils .'"><i class="fas fa-play"></i></a></td>
+<td>'.$item['utterance'].'</td>';
+		else
+	echo '<td><a style="position:relative;top:-5px;" class="btn btn-success RunRoutine" data-id="'. $item['triggerTime'] .'" data-device="'. $EquipementTouslesAppareils .'"><i class="fas fa-play"></i></a></td>
+<td>'.$item['triggerTime'].'</td>';
 			//$present = '<span class="label label-default" style="font-size : 1em;" title="{{Inactif}}"><i class="fa fa-times-circle"></i></span>';
 
 	echo '</tr>';
@@ -186,11 +206,6 @@ $('.RunRoutine').on('click',function(){
 });
 
 
-$('.RunRoutine2').on('click',function(){
-	$('#md_modal').dialog('close');
-	$('#md_modal').dialog({title: "{{Routines}}"});
-	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=routines&id=alexaapi').dialog('open');
-});
 
 $('.refreshAction[data-action=refresh]').on('click',function(){
 	$('#md_modal').dialog('close');
