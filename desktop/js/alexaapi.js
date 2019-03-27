@@ -88,6 +88,10 @@ function addCmdToTable(_cmd)
   if (!isset(_cmd))
     var _cmd = {configuration: {}};
 
+					var DefinitionDivPourCommandesPredefinies='style="visibility:hidden;"';
+					if (init(_cmd.logicalId)=="")
+					DefinitionDivPourCommandesPredefinies="";
+
   if (init(_cmd.type) == 'info')
   {
     var tr =
@@ -144,22 +148,34 @@ function addCmdToTable(_cmd)
      +         '<a class="cmdAction btn btn-default btn-sm" data-l1key="chooseIcon"><i class="fa fa-flag"></i> Icone</a>'
      +         '<span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>'
      +       '</div>'
-     +       '<div class="col-lg-6">'
-     +         '<input class="cmdAttr form-control input-sm" data-l1key="name">'
-     +       '</div>'
-     +     '</div>'
-     +     '<select class="cmdAttr form-control tooltips input-sm" data-l1key="value" style="display : none;margin-top : 5px;" title="{{La valeur de la commande vaut par défaut la commande}}">'
-     +       '<option value="">Aucune</option>'
-     +     '</select>'
-     +   '</td>'
-     +   '<td>'
+    +       '<div class="col-lg-6">'
+    +         '<input class="cmdAttr form-control input-sm" data-l1key="name">'
+    +       '</div>'
+     +     '</div>';
+ if (init(_cmd.logicalId)=="")
+ {
+ 
+  tr  +=    '<select class="cmdAttr form-control tooltips input-sm" data-l1key="value" style="display : none;margin-top : 5px;" title="{{La valeur de la commande vaut par défaut la commande}}">'
+      +       '<option value="">Aucune</option>'
+      +     '</select>';
+ }
+    tr  +=   '</td>'
+     +   '<td><div '+DefinitionDivPourCommandesPredefinies+'>'
 //     +     '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
-     +     '<input class="cmdAttr form-control type input-sm" data-l1key="type" value="action" disabled style="margin-bottom : 5px;" />'
+     +     '<input ';
+ if (init(_cmd.logicalId)!="")
+ tr  +='type="hidden"';
+
+	 tr  +=' class="cmdAttr form-control type input-sm" data-l1key="type" value="action" disabled style="margin-bottom : 5px;" />'
      +     '<span class="subType" subType="' + init(_cmd.subType) + '"></span>'
 	 +     '<input class="cmdAttr" data-l1key="configuration" data-l2key="virtualAction" value="1" style="display:none;" />'
-     +   '</td>'
+     +   '</div></td>'
      +   '<td>'
-     +     '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="request">'
+     +     '<input class="cmdAttr form-control input-sm"';
+ if (init(_cmd.logicalId)!="")
+ tr  +='readonly';
+	 
+tr+= ' data-l1key="configuration" data-l2key="request">'
      +   '</td>'
      +   '<td>'
      //+     '<small><small><span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span></small></small><br><br>';
