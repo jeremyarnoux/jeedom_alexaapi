@@ -100,6 +100,7 @@ else
 
   echo 45 > ${PROGRESS_FILE}
   echo "--45%"
+  arch=`arch`
   if [[ $arch == "armv6l" ]]
   then
     echo "Raspberry 1, 2 ou zéro détecté, utilisation du paquet v${installVer} pour ${arch}"
