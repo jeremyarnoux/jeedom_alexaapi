@@ -18,14 +18,55 @@
 if (!isConnect('admin')) {
 	throw new Exception('401 Unauthorized');
 }
+//*******************************************************************************************************************************
 								// On va aller cherche le N° de DEVICE de l'équipement "Tous les appareils"
 								$eqLogics = alexaapi::byType('alexaapi');
-								$EquipementTouslesAppareils='';
+								$EquipementQuiTesteRoutine='';
 								foreach ($eqLogics as $eqLogic) {
 
 									if ($eqLogic->getConfiguration('type') === 'WHA') 
-										$EquipementTouslesAppareils = $eqLogic->getConfiguration('serial');
+										$EquipementQuiTesteRoutine = $eqLogic->getConfiguration('serial');
 								}
+//***************************************SERA A SUPPRIMER****************************************************************************************
+//*******************************************************************************************************************************
+?>
+
+<script>
+function change_valeur() {
+var selectElmt = document.getElementById("ListeDevices");
+var valeurselectionnee = selectElmt.options[selectElmt.selectedIndex].value;
+var textselectionne = selectElmt.options[selectElmt.selectedIndex].text;
+document.getElementById("IDDevice").innerHTML = valeurselectionnee;
+}
+
+var selectElmt = document.getElementById("ListeDevices");
+var valeurselectionnee = selectElmt.options[selectElmt.selectedIndex].value;
+var textselectionne = selectElmt.options[selectElmt.selectedIndex].text;
+document.getElementById("IDDevice").innerHTML = valeurselectionnee;
+
+
+</script>
+
+<div class="input-group input-group-sm" style="width: 100%">
+	<select id="ListeDevices" onchange="change_valeur();" class="form-control input-sm expressionAttr" style="float: right;width: 200px">
+<?php
+ foreach ($eqLogics as $eqLogic)
+{  
+echo '<option value="'.$eqLogic->getConfiguration('serial').'">'.$eqLogic->getName().'</option>';
+}
+?>         
+            </select>
+	<span class="input-group-addon" id="basic-addon1" style="float: right;width: 180px">Executer le lancement sur</span>
+</div>
+
+
+<h1><span id="IDDevice"></span></h1>
+
+
+<?php
+//*******************************************************************************************************************************
+// IL FAUDRAIT REMPLIR $EquipementQuiTesteRoutine PAR LA VALEUR Javascript de IDDevice
+//*******************************************************************************************************************************
 
 $json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
 //echo $json;
@@ -164,7 +205,7 @@ foreach($json as $item)
 	echo '<td>' . $present . '</td>';
 	$routineencodee=urlencode($item['utterance']);
 	
-	echo '<td><a style="position:relative;top:-5px;" class="btn btn-success RunRoutine" data-id="'. $item['creationTimeEpochMillis'] .'" data-device="'. $EquipementTouslesAppareils .'"><i class="fas fa-play"></i></a></td>
+	echo '<td><a style="position:relative;top:-5px;" class="btn btn-success RunRoutine" data-id="'. $item['creationTimeEpochMillis'] .'" data-device="'. $EquipementQuiTesteRoutine .'"><i class="fas fa-play"></i></a></td>
 <td>'.$item['creationTimeEpochMillis'].'</td>';
 			//$present = '<span class="label label-default" style="font-size : 1em;" title="{{Inactif}}"><i class="fa fa-times-circle"></i></span>';
 

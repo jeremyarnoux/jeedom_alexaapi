@@ -260,14 +260,7 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
       </div>
 
       <div role="tabpanel" class="tab-pane" id="commandtab">
-        <form class="form-horizontal">
-          <fieldset>
-            <div class="form-actions">
-              <a class="btn btn-success btn-sm cmdAction" id="bt_addespeasyAction"><i class="fa fa-plus-circle"></i> {{Ajouter une commande action}}</a>
-            </div>
-          </fieldset>
-        </form>
-        <br />
+        
 
         <table id="table_cmd" class="table table-bordered table-condensed">
           <thead>
@@ -286,6 +279,17 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
 
           </tbody>
         </table>
+		
+    
+		
+		<form class="form-horizontal">
+          <fieldset>
+            <div class="form-actions">
+              <a class="btn btn-success btn-sm cmdAction" id="bt_addespeasyAction"><i class="fa fa-plus-circle"></i> {{Ajouter une commande action}}</a>
+            </div>
+          </fieldset>
+        </form>
+		
       </div>
 
 
