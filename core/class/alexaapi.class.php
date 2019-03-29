@@ -451,7 +451,7 @@ class alexaapi extends eqLogic
 			$cmd->setSubType('other');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Next Alarm');
-			$cmd->setConfiguration('request', 'whennextalarm?position=1&format=FULL');
+			$cmd->setConfiguration('request', 'whennextalarm?position=1');
 		}
 		$cmd->setIsVisible(0);
 		$cmd->save();

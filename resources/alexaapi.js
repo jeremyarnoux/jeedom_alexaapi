@@ -834,12 +834,12 @@ app.get('/whennextalarm', (req, res) =>
 													  case 'HOUR':
 															stringarenvoyer=device.originalTime.substring(0, 5);
 															break;
-													  case 'hhmm':
-													  case 'HHMM':
-															stringarenvoyer=device.originalTime.substring(0, 5).replace(':','');// Utilisation du format HH:MM
-															break;
-													  default: //ou FULL
+													  case 'full':
+													  case 'FULL':
 															stringarenvoyer=device.originalDate+" "+device.originalTime;
+															break;
+													  default: //ou HHMM
+															stringarenvoyer=device.originalTime.substring(0, 5).replace(':','');// Utilisation du format HH:MM
 													}
 						
 			  }
