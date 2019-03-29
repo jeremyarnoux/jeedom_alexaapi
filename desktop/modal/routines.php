@@ -146,7 +146,7 @@ sortBy('utterance', $json, 'asc');
 		echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' .$datecreation.'</span></td>';
 		echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' .$datemaj. '</span></td>';
 		echo '<td>'.$present.'</td>';
-		echo '<td><a style="position:relative;top:-5px;" class="btn btn-'.$couleur.' RunRoutine" data-id="'. $item['creationTimeEpochMillis'] .'"><i class="fas fa-play"></i></a></td>';
+		echo '<td><a style="position:relative;top:-5px;" class="btn btn-success RunRoutine" data-id="'. $item['creationTimeEpochMillis'] .'"><i class="fas fa-play"></i></a></td>';
 		echo '<td>'.$item['creationTimeEpochMillis'].'</td>';
 		echo '</tr>';
 	}
@@ -158,7 +158,7 @@ sortBy('utterance', $json, 'asc');
 
 <script>
 $('.RunRoutine').on('click',function(){
-	if($(this).hasClass('btn-default')) return false;
+	//if($(this).hasClass('btn-default')) return false;
 	var selectElmt = document.getElementById("ListeDevices");
 	console.log(selectElmt);
 	var selectedDevice = selectElmt.options[selectElmt.selectedIndex].value;	
