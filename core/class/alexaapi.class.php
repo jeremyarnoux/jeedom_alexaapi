@@ -199,7 +199,7 @@ class alexaapi extends eqLogic
         $return = array();
         $return['log'] = 'alexaapi_dep';
         $request = realpath(dirname(__FILE__) . '/../../resources/node_modules');
-        $return['progress_file'] = '/tmp/alexaapi_dep';
+        $return['progress_file'] = jeedom::getTmpFolder('alexaapi') . '/dependance';
         $return['state'] = is_dir($request) ? 'ok' : 'nok';
         return $return;
     }
@@ -519,11 +519,12 @@ class alexaapi extends eqLogic
 
     public static function dependancy_install($verbose="false")
     {
-		$_debug=0;
-		if(log::getLogLevel('alexaapi')==100 || $verbose==="true" || $verbose===true) $_debug=1;
+	$_debug=0;
+	if(log::getLogLevel('alexaapi')==100 || $verbose==="true" || $verbose===true) $_debug=1;
         log::add('alexaapi', 'info', 'Installation des dépendances : Alexa-Remote-http');
         $resource_path = realpath(dirname(__FILE__) . '/../../resources');
-        passthru('/bin/bash ' . $resource_path . '/nodejs.sh ' . $resource_path . ' alexaapi '. $_debug .' > ' . log::getPathToLog('alexaapi_dep') . ' 2>&1 &');
+	return array('script' => $resource_path . '/nodejs.sh '.$resource_path.' alexaapi '.$_debug,
+					 'log' => log::getPathToLog('alexaapi_dep'));    
     }
 
     public function preUpdate() {}
