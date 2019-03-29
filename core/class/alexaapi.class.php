@@ -519,6 +519,10 @@ class alexaapi extends eqLogic
 
     public static function dependancy_install($verbose="false")
     {
+	if (file_exists(jeedom::getTmpFolder('alexaapi') . '/dependance')) {
+	    return;
+	}
+	log::remove('alexaapi_dep');
 	$_debug=0;
 	if(log::getLogLevel('alexaapi')==100 || $verbose==="true" || $verbose===true) $_debug=1;
         log::add('alexaapi', 'info', 'Installation des dépendances : Alexa-Remote-http');
