@@ -173,11 +173,11 @@ $('.RunRoutine').on('click',function(){
 	var selectElmt = document.getElementById("ListeDevices");
 	console.log(selectElmt);
 	var selectedDevice = selectElmt.options[selectElmt.selectedIndex].value;	
-    jeedom.plugin.node.action2({
-        action : 'testNode',
-        node_id: $(this).attr('data-id'),
-        node_id2: selectedDevice,
-        error: function (error) {
+	jeedom.plugin.node.action2({
+		action : 'testNode',
+		node_id: $(this).attr('data-id'),
+		node_id2: selectedDevice,
+		error: function (error) {
 			//$('#div_alert').showAlert({message: error.message, level: 'danger'});
 			$('#md_modal').dialog('close');
 			$('#md_modal').dialog({title: "{{Routines}}"});
