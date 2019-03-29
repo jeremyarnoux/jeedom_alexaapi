@@ -28,8 +28,8 @@ if (!isConnect('admin')) {
 		{  
 			echo '<option value="'.$eqLogic->getConfiguration('serial').'">'.$eqLogic->getName().'</option>';
 		}
-	?>         
-    </select>
+	?>
+	</select>
 	<span class="input-group-addon" id="basic-addon1" style="float: right;width: 180px">Executer le lancement sur</span>
 </div>
 
