@@ -38,13 +38,7 @@ var valeurselectionnee = selectElmt.options[selectElmt.selectedIndex].value;
 var textselectionne = selectElmt.options[selectElmt.selectedIndex].text;
 document.getElementById("IDDevice").innerHTML = valeurselectionnee;
 }
-
-var selectElmt = document.getElementById("ListeDevices");
-var valeurselectionnee = selectElmt.options[selectElmt.selectedIndex].value;
-var textselectionne = selectElmt.options[selectElmt.selectedIndex].text;
-document.getElementById("IDDevice").innerHTML = valeurselectionnee;
-
-
+change_valeur();
 </script>
 
 <div class="input-group input-group-sm" style="width: 100%">
@@ -60,7 +54,7 @@ echo '<option value="'.$eqLogic->getConfiguration('serial').'">'.$eqLogic->getNa
 </div>
 
 
-<h1><span id="IDDevice"></span></h1>
+<span id="IDDevice" class="hidden"></span>
 
 
 <?php
@@ -222,10 +216,11 @@ foreach($json as $item)
 
 
 $('.RunRoutine').on('click',function(){
+	var selectedDevice=$('#IDDevice')[0].innerText;
     jeedom.plugin.node.action2({
         action : 'testNode',
         node_id: $(this).attr('data-id'),
-        node_id2: $(this).attr('data-device'),
+        node_id2: selectedDevice,
         error: function (error) {
 	//$('#div_alert').showAlert({message: error.message, level: 'danger'});
 	$('#md_modal').dialog('close');
