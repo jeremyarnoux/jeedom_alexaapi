@@ -33,13 +33,10 @@ if (!isConnect('admin')) {
 	<span class="input-group-addon" id="basic-addon1" style="float: right;width: 180px">Executer le lancement sur</span>
 </div>
 
-
 <?php
-
 $json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
 //echo $json;
 $json = json_decode($json,true);
-
 
 function sortBy($field, &$array, $direction = 'asc')
 {
@@ -57,8 +54,8 @@ function sortBy($field, &$array, $direction = 'asc')
     return true;
 }
 sortBy('utterance', $json, 'asc');
-
 ?>
+
 <table class="table table-condensed tablesorter" id="table_healthNetwork">
 	<thead>
 		<tr>
@@ -69,25 +66,19 @@ sortBy('utterance', $json, 'asc');
 			<th>{{Création}}</th>
 			<th>{{Mise à jour}}</th>
 			<th>{{Activé}}</th>
-          	<th>{{Lancer}}</th>			
-          	<th>{{ID Routine}}</th>			
+			<th>{{Lancer}}</th>			
+			<th>{{ID Routine}}</th>			
 		</tr>
 	</thead>
 	<tbody>
 	<?php
 	foreach($json as $item)
 	{
-		
-		
 		if ($item['utterance'] === '')
 			$typeroutine="divers-circular114";
 		else 
 			$typeroutine="jeedomapp-audiospeak";
 	  
-		
-		
-
-
 		$resultattriggerTime="";
 		$resultattimeZoneId=$item['locale'];
 		 
@@ -124,7 +115,6 @@ sortBy('utterance', $json, 'asc');
 				$repetition="Chaque dimanche";
 				break;
 		} 
-	 
 		 
 		if ($item['triggerTime'] != '')
 		{
@@ -163,10 +153,9 @@ sortBy('utterance', $json, 'asc');
 	?>
 	</tbody>
 </table>  
-  
-  
+
 <a class="btn btn-default pull-right refreshAction" data-action="refresh"><i class="fa fa-refresh"></i>  {{Rafraichir}}</a>
-    
+
 <script>
 $('.RunRoutine').on('click',function(){
 	if($(this).hasClass('btn-default')) return false;
@@ -192,8 +181,6 @@ $('.RunRoutine').on('click',function(){
 	});
 });
 
-
-
 $('.refreshAction[data-action=refresh]').on('click',function(){
 	$('#md_modal').dialog('close');
 	$('#md_modal').dialog({title: "{{Routines}}"});
@@ -201,4 +188,4 @@ $('.refreshAction[data-action=refresh]').on('click',function(){
 });
 </script>
 
-<?php include_file('desktop', 'alexaapi', 'js', 'alexaapi');?>
+<?php include_file('desktop', 'alexaapi', 'js', 'alexaapi');
