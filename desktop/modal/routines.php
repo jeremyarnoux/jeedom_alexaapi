@@ -20,8 +20,9 @@ if (!isConnect('admin')) {
 }
 ?>
 
-<div class="input-group input-group-sm" style="width: 100%">
-	<select id="ListeDevices" class="form-control input-sm expressionAttr" style="float: right;width: 200px">
+<div class="input-group " style="float:right">
+	<span class="input-group-addon" id="basic-addon1" style="width: 180px">Executer le lancement sur</span>
+	<select id="ListeDevices" class="form-control input-sm expressionAttr" style="width: 200px">
 	<?php
 		$eqLogics = alexaapi::byType('alexaapi');
 		foreach ($eqLogics as $eqLogic)
@@ -30,7 +31,6 @@ if (!isConnect('admin')) {
 		}
 	?>
 	</select>
-	<span class="input-group-addon" id="basic-addon1" style="float: right;width: 180px">Executer le lancement sur</span>
 </div>
 
 <?php
