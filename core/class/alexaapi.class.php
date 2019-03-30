@@ -399,7 +399,7 @@ class alexaapi extends eqLogic
 				$refresh = new virtualCmd();
 				$refresh->setLogicalId('refresh');
 				$refresh->setIsVisible(1);
-				$refresh->setName(__('Rafraichir', __FILE__));
+				$refresh->setName(__('Refresh', __FILE__));
 			}
 			$refresh->setType('action');
 			$refresh->setSubType('other');
