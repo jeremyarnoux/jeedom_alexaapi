@@ -225,13 +225,13 @@ class alexaapi extends eqLogic
 
 				switch($authenticated) {
 					case 'OK':
-						log::add('alexaapi','debug','Etat authentification : ' . $authenticated);
+						log::add('alexaapi','debug','Etat authentification Amazon : ' . $authenticated);
 					break;
 					case 'KO':
-						log::add('alexaapi','error','Etat authentification : ' . $authenticated);
+						log::add('alexaapi','error','Etat authentification Amazon : ' . $authenticated);
 					break;
 					default:
-						log::add('alexaapi','info','Etat authentification : ' . $authenticated);
+						log::add('alexaapi','info','Etat authentification Amazon : ' . $authenticated);
 					break;
 				}
 			}
