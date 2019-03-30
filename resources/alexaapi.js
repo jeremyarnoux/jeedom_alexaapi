@@ -42,6 +42,25 @@ function forEachDevices(nameOrSerial, callback)
     callback(device.clusterMembers[i]);
 }
 
+/***** checkAuth *****
+  URL: /checkAuth
+  Return the status of the Auth
+  [{
+    auth - binary - authentified or not
+  }]
+*/
+
+app.get('/checkAuth', (req, res) =>
+{
+	config.logger && config.logger('Alexa-API: checkAuth');
+	res.type('json');
+
+	alexa.checkAuthentication(function(auth)
+	{
+		res.status(200).json({authenticated: auth});
+	});
+});
+
 /**** Alexa.Speak *****
   URL: /speak?device=?&text=?
     device - String - name of the device
