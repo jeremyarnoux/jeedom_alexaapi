@@ -213,6 +213,40 @@ class alexaapi extends eqLogic
         return $return;
     }
 */
+    public static function cron($_eqlogic_id = null) {
+	$autorefresh = '*/15 * * * *';
+	$deamon_info = self::deamon_info();
+	if ($deamon_info['state'] == 'ok') {
+		try {
+			$c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
+			if ($c->isDue()) {
+				$authenticated=self::checkAuth();
+				switch($authenticated) {
+					case 'OK':
+						log::add('alexaapi','debug','Etat authentification Amazon : ' . $authenticated);
+					break;
+					case 'KO':
+						log::add('alexaapi','error','Etat authentification Amazon : ' . $authenticated);
+					break;
+					default:
+						log::add('alexaapi','info','Etat authentification Amazon : ' . $authenticated);
+					break;
+				}
+			}
+		} catch (Exception $exc) {
+			log::add('alexaapi', 'error', __('Expression cron non valide', __FILE__) . ' : ' . $autorefresh);
+		}
+	}
+    }
+    public static function checkAuth() {
+	$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/checkAuth");
+	if($json === false) $authenticated="Démon pas prêt";
+	else {
+		$json = json_decode($json, true);
+		$authenticated=(($json['authenticated'])?'OK':'KO');
+	}
+	return $authenticated;
+    }	
     public static function scanAmazonAlexa($_logical_id = null, $_exclusion = 0)
     {
         
