@@ -310,8 +310,107 @@ class alexaapi extends eqLogic
       return $newDevice;
     }
 
+	public function sortBy($field, &$array, $direction = 'asc')
+{
+    usort($array, create_function('$a, $b', '
+        $a = $a["' . $field . '"];
+        $b = $b["' . $field . '"];
+
+        if ($a == $b) return 0;
+
+        $direction = strtolower(trim($direction));
+
+        return ($a ' . ($direction == 'desc' ? '>' : '<') .' $b) ? -1 : 1;
+    '));
+
+    return true;
+}
+
+
+	/*     * *********************Methode d'instance************************* */
+	public function refresh() {
+		
+				log::add('alexaapi', 'debug', 'execute : refresh');
+				
+					// Met à jour la liste des routines des commandes action "routine"	
+					$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
+					$json = json_decode($json,true);				
+					self::sortBy('utterance', $json, 'asc');
+
+					$ListeDesRoutines="";
+					$PremierTourpourlePointVirgule=true;
+					
+					foreach($json as $item)
+					{
+						if (!$PremierTourpourlePointVirgule)
+						$ListeDesRoutines.=";";
+						$PremierTourpourlePointVirgule=false;
+						
+						if ($item['triggerTime'] != '')
+						$resultattriggerTime=substr($item['triggerTime'],0,2).":".substr($item['triggerTime'],2,2);
+						
+						if ($item['utterance'] != '')
+						$ListeDesRoutines.=$item['creationTimeEpochMillis'].'|'.$item['utterance'];
+						else 
+						$ListeDesRoutines.=$item['creationTimeEpochMillis'].'|'.$resultattriggerTime;
+					}				
+					$cmd = $this->getCmd(null, 'routine');
+					if (is_object($cmd)) {
+						//routine existe on  met à jour la liste des routines
+						$cmd->setConfiguration('listValue', $ListeDesRoutines);
+						$cmd->save();		
+					}
+					// Fin mise à jour de la liste des routines
+
+		try {
+			foreach ($this->getCmd('action') as $cmd) {
+				//log::add('alexaapi', 'debug', 'Refresh: Test '.$cmd->getName()."/".$cmd->getConfiguration('RunWhenRefresh', 0));
+				if ($cmd->getConfiguration('RunWhenRefresh', 0) != '1') {
+					continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
+				}
+				log::add('alexaapi', 'debug', 'Refresh: Execute '.$cmd->getName());
+				$value = $cmd->execute();
+				//if ($cmd->execCmd() != $cmd->formatValue($value)) { ???????
+				//	$cmd->event($value);
+				//}
+			}
+		} catch (Exception $exc) {
+			log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $exc->getMessage());
+		}
+						log::add('alexaapi', 'debug', 'execute (fini) : refresh');
+
+	}
+	
+
+
     public function postSave()
     {
+
+		$createRefreshCmd = true;
+		$refresh = $this->getCmd(null, 'refresh');
+		if (!is_object($refresh)) {
+			$refresh = cmd::byEqLogicIdCmdName($this->getId(), __('Rafraichir', __FILE__));
+			if (is_object($refresh)) {
+				$createRefreshCmd = false;
+			}
+		}
+		if ($createRefreshCmd) {
+			if (!is_object($refresh)) {
+				$refresh = new virtualCmd();
+				$refresh->setLogicalId('refresh');
+				$refresh->setIsVisible(1);
+				$refresh->setName(__('Rafraichir', __FILE__));
+			}
+			$refresh->setType('action');
+			$refresh->setSubType('other');
+			$refresh->setEqLogic_id($this->getId());
+			$refresh->save();
+		}
+
+
+
+
+
 
 
      /*       if ($this->getName() == 'Tous les appareils')
@@ -352,21 +451,24 @@ class alexaapi extends eqLogic
 		}
 		$cmd->setIsVisible(1);
 		$cmd->save();
-		
+
+
 		// Routine command
 		$cmd = $this->getCmd(null, 'routine');
 		if (!is_object($cmd)) {
 			$cmd = new alexaapiCmd();
 			$cmd->setType('action');
 			$cmd->setLogicalId('routine');
-			$cmd->setSubType('message');
+			$cmd->setSubType('select');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Routine');
-			$cmd->setConfiguration('request', 'routine?routine=#message#');
-			$cmd->setDisplay('title_disable', 1);
+			$cmd->setConfiguration('request', 'routine?routine=#select#');
+			$cmd->setConfiguration('listValue', 'Lancer Refresh|Lancer Refresh');
+			//$cmd->setDisplay('title_disable', 1);
 		}
 		$cmd->setIsVisible(0);
 		$cmd->save();
+
 		
 		// Radio command
 		$cmd = $this->getCmd(null, 'radio');
@@ -449,13 +551,15 @@ class alexaapi extends eqLogic
 			$cmd->setType('action');
 			$cmd->setLogicalId('whennextalarm');
 			$cmd->setSubType('other');
+			$cmd->setConfiguration('infoName', 'Next Alarm Hour');
 			$cmd->setEqLogic_id($this->getId());
-			$cmd->setName('Next Alarm');
+			$cmd->setName('Next Alarm When');
+			$cmd->setConfiguration('RunWhenRefresh', 1);
 			$cmd->setConfiguration('request', 'whennextalarm?position=1');
 		}
 		$cmd->setIsVisible(0);
 		$cmd->save();
-	  
+		
 		// whennextreminder command
 		$cmd = $this->getCmd(null, 'whennextreminder');
 		if (!is_object($cmd)) {
@@ -463,8 +567,10 @@ class alexaapi extends eqLogic
 			$cmd->setType('action');
 			$cmd->setLogicalId('whennextreminder');
 			$cmd->setSubType('other');
+			$cmd->setConfiguration('infoName', 'Next Reminder Hour');
 			$cmd->setEqLogic_id($this->getId());
-			$cmd->setName('Next Reminder');
+			$cmd->setName('Next Reminder When');
+			$cmd->setConfiguration('RunWhenRefresh', 1);
 			$cmd->setConfiguration('request', 'whennextreminder?position=1');
 		}
 		$cmd->setIsVisible(0);
@@ -479,7 +585,7 @@ class alexaapi extends eqLogic
 			$cmd->setSubType('message');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Reminder');
-			$cmd->setConfiguration('request', 'reminder?text=#message#&when=#when#');
+			$cmd->setConfiguration('request', 'reminder?text=#text#&when=#when#');
 		}
 		$cmd->setIsVisible(0);
 		$cmd->save();
@@ -538,8 +644,25 @@ class alexaapi extends eqLogic
 
 class alexaapiCmd extends cmd
 {
+	
+	
+		public function dontRemoveCmd() {
+		if ($this->getLogicalId() == 'refresh') {
+			return true;
+		}
+		return false;
+	}
+	
+	
+	
+	
     public function preSave()
     {
+	if ($this->getLogicalId() == 'refresh') {
+			return;
+		}
+		
+		
 		if ($this->getType() == 'action')
         {
             $eqLogic = $this->getEqLogic();
@@ -580,7 +703,8 @@ class alexaapiCmd extends cmd
 					$actionInfo->setSubType('string');
 					$actionInfo->setConfiguration('taskid', $this->getID());
 					$actionInfo->setConfiguration('taskname', $this->getName());
-					
+					//$actionInfo->setConfiguration('virtualAction', 1);
+
 				}
 				$actionInfo->setName($this->getConfiguration('infoName'));
 				$actionInfo->setEqLogic_id($this->getEqLogic_id());
@@ -736,6 +860,9 @@ class alexaapiCmd extends cmd
         if (!isset($_options['slider']))
             throw new Exception(__('Le slider ne peut pas être vide', __FILE__));
 
+if ($_options['volume']=="" && $_options['slider']=="")
+	$_options['volume']="50";
+
         return str_replace('#volume#', $_options['slider'], $request);
     }
 	
@@ -745,6 +872,12 @@ class alexaapiCmd extends cmd
         $request = $this->getConfiguration('request');
         //if (!isset($_options['station']))
          //   throw new Exception(__('La station ne peut pas être vide', __FILE__));
+
+if ($_options['station']=="")
+	$_options['station']="s2960";
+
+if ($_options['volume']=="" && $_options['slider']=="")
+	$_options['volume']="50";
 
         return str_replace(
           array(
@@ -762,6 +895,7 @@ class alexaapiCmd extends cmd
         if (!isset($_options['message']) || $_options['message'] == '')
             throw new Exception(__('Le message ne peut pas être vide', __FILE__));
 
+
         return str_replace(
           array(
             '#message#',
@@ -775,17 +909,20 @@ class alexaapiCmd extends cmd
     {
         log::add('alexaapi', 'debug', 'buildReminderRequest');
         $request = $this->getConfiguration('request');
-        if (!isset($_options['message']) || $_options['message'] == '')
-            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
+        //if (!isset($_options['text']) || $_options['text'] == '')
+           // throw new Exception(__('Le titre ne peut pas être vide', __FILE__));
+
+if ($_options['when']=="")
+	$_options['when']="2023-01-01 10:00:00";
 
         return str_replace(
           array(
             '#when#',
-            '#message#'
+            '#text#'
           ), array(
 //            str_replace(" ", "+", $_options['when']),
             urlencode($_options['when']),
-            urlencode($_options['message'])
+            urlencode($_options['text'])
           ), $request);
     }
 
@@ -793,8 +930,11 @@ class alexaapiCmd extends cmd
     {
         log::add('alexaapi', 'debug', 'buildalarmRequest');
         $request = $this->getConfiguration('request');
-		        if (!isset($_options['message']) || $_options['message'] == '')
-            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
+//		        if (!isset($_options['message']) || $_options['message'] == '')
+//            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
+
+if ($_options['when']=="")
+	$_options['when']="2023-01-01 10:00:00";
 
         return str_replace(
           array(
@@ -802,7 +942,7 @@ class alexaapiCmd extends cmd
             '#recurring#'
           ), array(
 //            str_replace(" ", "+", $_options['when']),
-            urlencode($_options['message']),
+            urlencode($_options['when']),
             urlencode($_options['select']),
           ), $request);
     }
@@ -830,9 +970,9 @@ class alexaapiCmd extends cmd
 
         return str_replace(
           array(
-            '#message#'
+            '#select#'
           ), array(
-            urlencode($_options['message'])
+            urlencode($_options['select'])
           ), $request);
     }
     private function buildNextAlarmRequest($_options = array())
@@ -853,17 +993,29 @@ class alexaapiCmd extends cmd
         log::add('alexaapi', 'debug', 'buildDeleteAllAlarmsRequest');
         $request = $this->getConfiguration('request');
 
-        return str_replace( //faudra corriger ici ************************position inutile
+if ($_options['type']=="")
+	$_options['type']="alarm";
+
+if ($_options['status']=="")
+	$_options['status']="ON";
+
+        return str_replace( 
           array(
-            '#position#'
+            '#type#',
+            '#status#'
           ), array(
-            $_options['position']
+            $_options['type'],
+            $_options['status']
           ), $request);
     }	
     private function buildCommandRequest($_options = array())
     {
         log::add('alexaapi', 'debug', 'buildCommandRequest');
         $request = $this->getConfiguration('request');
+		
+if ($_options['command']=="")
+	$_options['command']="pause";
+
 
         return str_replace( //faudra corriger ici ************************position inutile
           array(
@@ -904,8 +1056,8 @@ class alexaapiCmd extends cmd
         return getTemplate('core', 'scenario', 'cmd.radio', 'alexaapi');
       if ($command == 'reminder')
         return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');
-      if ($command == 'routine')
-        return getTemplate('core', 'scenario', 'cmd.routine', 'alexaapi');
+      if ($command == 'deleteallalarms')
+        return getTemplate('core', 'scenario', 'cmd.deleteallalarms', 'alexaapi');
       if ($command == 'command')
         return getTemplate('core', 'scenario', 'cmd.command', 'alexaapi');
       if ($command == 'alarm')

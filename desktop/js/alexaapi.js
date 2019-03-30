@@ -91,7 +91,11 @@ function addCmdToTable(_cmd)
 					var DefinitionDivPourCommandesPredefinies='style="visibility:hidden;"';
 					if (init(_cmd.logicalId)=="")
 					DefinitionDivPourCommandesPredefinies="";
-
+				
+  //if (init(_cmd.logicalId) == 'refresh') {
+ //   return;
+ // }
+  
   if (init(_cmd.type) == 'info')
   {
     var tr =
@@ -174,6 +178,10 @@ function addCmdToTable(_cmd)
      +     '<input class="cmdAttr form-control input-sm"';
  if (init(_cmd.logicalId)!="")
  tr  +='readonly';
+
+ if (init(_cmd.logicalId)=="refresh")
+ tr  +=' style="display:none;" ';
+
 	 
 tr+= ' data-l1key="configuration" data-l2key="request">'
      +   '</td>'
@@ -190,6 +198,7 @@ tr+= ' data-l1key="configuration" data-l2key="request">'
         '</td>'
      +   '<td>'
      +     '<input class="cmdAttr form-control input-sm" data-l1key="unite"  style="width : 100px;" placeholder="{{Unité}}" title="{{Unité}}" >'
+ //   + '<input class="tooltips cmdAttr form-control input-sm expertModeVisible" data-l1key="configuration" data-l2key="listValue" placeholder="{{Liste de valeur|texte séparé par ;}}" title="{{Liste}}" style="margin-top : 5px;">'
      +     '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}} style="margin-top : 3px;"> '
      +     '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">'
      +   '</td>'
@@ -201,7 +210,7 @@ tr+= ' data-l1key="configuration" data-l2key="request">'
     if (is_numeric(_cmd.id))
     {
       tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fa fa-cogs"></i></a> ';
-		   if (!((init(_cmd.name)=="Reminder")||(init(_cmd.name)=="Alarm"))) //Masquer le bouton Tester
+		   if (!((init(_cmd.name)=="Routine")||(init(_cmd.name)=="xxxxxxxx"))) //Masquer le bouton Tester
 			  tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>';
 	}
     tr += '<i class="fa fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>'
