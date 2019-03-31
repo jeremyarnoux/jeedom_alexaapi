@@ -399,6 +399,7 @@ class alexaapi extends eqLogic
 				$refresh = new virtualCmd();
 				$refresh->setLogicalId('refresh');
 				$refresh->setIsVisible(1);
+				$refresh->setDisplay('icon', '<i class="fa fa-refresh"></i>');
 				$refresh->setName(__('Refresh', __FILE__));
 			}
 			$refresh->setType('action');
@@ -448,6 +449,7 @@ class alexaapi extends eqLogic
 			$cmd->setName('Speak');
 			$cmd->setConfiguration('request', 'speak?text=#message#');
 			$cmd->setDisplay('title_disable', 1);
+			$cmd->setDisplay('icon', '<i class="fa jeedomapp-audiospeak"></i>');
 			$cmd->setIsVisible(1);
 		}
 		$cmd->save();
@@ -466,6 +468,8 @@ class alexaapi extends eqLogic
 			$cmd->setConfiguration('listValue', 'Lancer Refresh|Lancer Refresh');
 			//$cmd->setDisplay('title_disable', 1);
 			$cmd->setIsVisible(0);
+			$cmd->setDisplay('icon', '<i class="divers-viral"></i>');
+
 		}
 		$cmd->save();
 
@@ -482,6 +486,7 @@ class alexaapi extends eqLogic
 			$cmd->setConfiguration('request', 'radio?station=#station#');
 			$cmd->setDisplay('title_disable', 1);
 			$cmd->setIsVisible(0);
+			$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
 		}
 		$cmd->save();
 
@@ -496,6 +501,7 @@ class alexaapi extends eqLogic
 			$cmd->setName('Speak+Volume');
 			$cmd->setConfiguration('request', 'speak?text=#message#&volume=#volume#');
 			$cmd->setDisplay('title_disable', 1);
+			$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
 			$cmd->setIsVisible(0);
 		}
 		$cmd->save();
@@ -511,6 +517,7 @@ class alexaapi extends eqLogic
 			$cmd->setName('Radio+Volume');
 			$cmd->setConfiguration('request', 'radio?station=#station#&volume=#volume#');
 			$cmd->setDisplay('title_disable', 1);
+			$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
 			$cmd->setIsVisible(0);
 		}
 		$cmd->save();
@@ -526,6 +533,7 @@ class alexaapi extends eqLogic
 			$cmd->setName('Alarm');
 			$cmd->setConfiguration('request', 'alarm?when=#when#&recurring=#recurring#');
 			$cmd->setDisplay('title_disable', 1);
+			$cmd->setDisplay('icon', '<i class="fa fa-bell"></i>');
 			$cmd->setIsVisible(0);
 		}
 		$cmd->save();
@@ -541,6 +549,7 @@ class alexaapi extends eqLogic
 			$cmd->setName('Delete All Alarms');
 			$cmd->setConfiguration('request', 'deleteallalarms?type=#type#&status=#status#');
 			$cmd->setIsVisible(0);
+			$cmd->setDisplay('icon', '<i class="maison-poubelle"></i>');
 		}
 		$cmd->save();
 	  
@@ -555,6 +564,7 @@ class alexaapi extends eqLogic
 			$cmd->setConfiguration('infoName', 'Next Alarm Hour');
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Next Alarm When');
+			$cmd->setDisplay('icon', '<i class="fa fa-bell"></i>');
 			$cmd->setConfiguration('RunWhenRefresh', 1);
 			$cmd->setConfiguration('request', 'whennextalarm?position=1');
 		}
@@ -572,6 +582,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Next Reminder When');
 			$cmd->setConfiguration('RunWhenRefresh', 1);
+			$cmd->setDisplay('icon', '<i class="fa divers-circular114"></i>');
 			$cmd->setConfiguration('request', 'whennextreminder?position=1');
 		}
 		$cmd->save();
@@ -586,6 +597,7 @@ class alexaapi extends eqLogic
 			$cmd->setEqLogic_id($this->getId());
 			$cmd->setName('Reminder');
 			$cmd->setConfiguration('request', 'reminder?text=#text#&when=#when#');
+			$cmd->setDisplay('icon', '<i class="fa divers-circular114"></i>');
 			$cmd->setIsVisible(0);
 		}
 		$cmd->save();
@@ -603,6 +615,7 @@ class alexaapi extends eqLogic
 			$cmd->setConfiguration('minValue', '0');
 			$cmd->setConfiguration('maxValue', '100');
 			$cmd->setIsVisible(1);
+			$cmd->setDisplay('icon', '<i class="fa fa-volume-up"></i>');
 		}
 		$cmd->save();
 		
@@ -617,6 +630,7 @@ class alexaapi extends eqLogic
 			$cmd->setName('Command');
 			$cmd->setDisplay('title_disable', 1);
 			$cmd->setConfiguration('request', 'command?command=#command#');
+			$cmd->setDisplay('icon', '<i class="fa fa-play-circle"></i>');
 			$cmd->setIsVisible(0);
 		}
 		$cmd->save();
@@ -724,7 +738,7 @@ class alexaapiCmd extends cmd
             return;
         }
           
-		log::add('alexaapi', 'debug', 'execute : Début');
+		//log::add('alexaapi', 'debug', 'execute : Début');
 
         $request = $this->buildRequest($_options);
         log::add('alexaapi', 'info', 'Request : ' . $request);
@@ -764,7 +778,7 @@ class alexaapiCmd extends cmd
 		// On traite la valeur de resultat (dans le cas de whennextalarm par exemple)
         $resultjson = json_decode($result, true);
 		$value=$resultjson['value'];
-		log::add('alexaapi', 'debug', 'Résultat value=' . $value);
+		//log::add('alexaapi', 'debug', 'Résultat value=' . $value);
 
 
         if (($this->getType() == 'action') && ($this->getConfiguration('infoName')!= ''))

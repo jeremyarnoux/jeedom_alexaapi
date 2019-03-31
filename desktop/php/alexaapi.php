@@ -265,8 +265,7 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
         <table id="table_cmd" class="table table-bordered table-condensed">
           <thead>
             <tr>
-              <th style="width: 50px;">#</th>
-              <th style="width: 50px;"></th>
+              <th style="width: 40px;">#</th>
               <th style="width: 300px;">{{Nom}}</th>
               <th style="width: 150px;">{{Type}}</th>
               <th style="width: 300px;">{{Commande & Variable}}</th>
