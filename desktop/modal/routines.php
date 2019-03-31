@@ -139,7 +139,7 @@ sortBy('utterance', $json, 'asc');
 		}		
 
 		echo '<tr>';
-		echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em;" title="{{Actif}}"><i class="fa '.$typeroutine.'"></i></span></td>';
+		echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em;"><i class="fa '.$typeroutine.'"></i></span></td>';
 		echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'. $resultattriggerTime.$item['utterance']. '</span></td>';
 		echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em;">'. $resultattimeZoneId. '</span></td>';
 		echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'. $repetition. '</span></td>';

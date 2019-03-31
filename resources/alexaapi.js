@@ -12,7 +12,7 @@ const config =
 {
   cookieLocation: __dirname + '/data/alexa-cookie.json',
   cookieRefreshInterval: 7*24*60*1000,
-  logger: console.log,
+  logger: consoleSigalou,
   alexaServiceHost: alexaserver,
   listeningPort: 3456
 };
@@ -20,6 +20,12 @@ const config =
 // Par sécurité pour détecter un éventuel souci :
 if (!amazonserver) config.logger && config.logger('Alexa-Config: *********************amazonserver NON DEFINI*********************');
 if (!alexaserver) config.logger && config.logger('Alexa-Config: *********************alexaserver NON DEFINI*********************');
+
+		function consoleSigalou() 
+		{
+		var today=new Date();
+		console.log("["+today.toLocaleString()+"] "+arguments[0].concat(Array.prototype.slice.call(arguments, 1)));
+		};
 
 config.logger && config.logger('Alexa-Config (alexaapi.js): amazonserver='+amazonserver);
 config.logger && config.logger('Alexa-Config (alexaapi.js): alexaserver='+alexaserver);
