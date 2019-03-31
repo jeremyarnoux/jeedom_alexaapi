@@ -647,7 +647,8 @@ class alexaapi extends eqLogic
 			$cmd->setIsVisible(0);
 		}
 		$cmd->save();
-
+	    
+		$this->refresh();
     }
 
     public static function dependancy_install($verbose="false")
