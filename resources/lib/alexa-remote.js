@@ -203,9 +203,11 @@ class AlexaRemote extends EventEmitter {
 
     prepare(callback) {
         this.getAccount((err, result) => {
+			//this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: getAccount');
             if (!err && result && Array.isArray(result)) {
                 result.forEach ((account) => {
                     if (!this.commsId) this.commsId = account.commsId;
+					//this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: getAccount:'+account.commsId);
                     //if (!this.directedId) this.directedId = account.directedId;
                 });
             }
@@ -481,7 +483,7 @@ class AlexaRemote extends EventEmitter {
         delete logOptions.headers.Origin;
         this._options.logger && this._options.logger('Alexa-Remote: Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? 'and data=' + flags.data : ''));
         let req = https.request(options, (res) => {
-            let body  = '';
+            let body  = '';
 
             res.on('data', (chunk) => {
                 body += chunk;
@@ -502,9 +504,24 @@ class AlexaRemote extends EventEmitter {
                         ret = JSON.parse(body);
                     } catch(e)
                     {
-                        this._options.logger && this._options.logger('Alexa-Remote: Response: No/Invalid JSON');
+                        this._options.logger && this._options.logger('******************************************************');
+                        this._options.logger && this._options.logger('*********************DEBUG****************************');
+                        this._options.logger && this._options.logger('******************************************************');
+                        this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote: Response: No/Invalid JSON');
                         this._options.logger && this._options.logger(body);
-                        return callback && callback(new Error('no JSON'), body);
+                        this._options.logger && this._options.logger('**DEBUG**DEBUG* Message Exception :'+e.message);
+                        this._options.logger && this._options.logger('******************************************************');
+                        this._options.logger && this._options.logger('******************************************************');
+						var ValeurdelErreur='no JSON';
+						//if (body.includes("authenticated"))
+						if (body.includes("Connection: close"))
+                        {
+							this._options.logger && this._options.logger('******************************************************');
+							this._options.logger && this._options.logger('***************FIND**CONNEXION CLOSE *****************');
+							this._options.logger && this._options.logger('******************************************************');
+						ValeurdelErreur='Connexion Close';
+						}
+                       return callback && callback(new Error(ValeurdelErreur), body);
                     }
                     this._options.logger && this._options.logger('Alexa-Remote: Response: ' + JSON.stringify(ret));
                     return callback && callback (null, ret);
@@ -1331,24 +1348,42 @@ this.deleteNotification(notification, callback);
 
     sendSequenceCommand(serialOrName, command, value, callback)
     {
-        let dev = this.find(serialOrName);
+       
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 1 '+command);
+
+	   let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 2');
 
         if (typeof value === 'function') {
+			this._options.logger && this._options.logger('Alexa-sendSequenceCommand: function');
+
             callback = value;
             value = null;
         }
 
         let seqCommandObj;
         if (typeof command === 'object') {
+			this._options.logger && this._options.logger('Alexa-sendSequenceCommand: object');
+
             seqCommandObj = command.sequence || command;
         }
         else {
+				this._options.logger && this._options.logger('Alexa-sendSequenceCommand: else');
             seqCommandObj = {
                 '@type': 'com.amazon.alexa.behaviors.model.Sequence',
                 'startNode': this.createSequenceNode(command, value)
             };
         }
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 3');
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: deviceType '+dev.deviceType);
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: serialNumber '+dev.serialNumber);
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: deviceOwnerCustomerId '+dev.deviceOwnerCustomerId);
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: seqCommandObj.sequenceId '+seqCommandObj.sequenceId);
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: command.automationId '+command.automationId);
+
+//this._options.logger && this._options.logger('1'+JSON.stringify(seqCommandObj));
+//this._options.logger && this._options.logger('2'+seqCommandObj);
 
         const reqObj = {
             'behaviorId': seqCommandObj.sequenceId ? command.automationId : 'PREVIEW',
@@ -1361,6 +1396,8 @@ this.deleteNotification(notification, callback);
         reqObj.sequenceJson = reqObj.sequenceJson.replace(/"customerId":"ALEXA_CUSTOMER_ID"/g, `"customerId":"${dev.deviceOwnerCustomerId}"`);
         reqObj.sequenceJson = reqObj.sequenceJson.replace(/"locale":"ALEXA_CURRENT_LOCALE"/g, `"locale":"fr-FR"`);
 
+//this._options.logger && this._options.logger(reqObj.sequenceJson);
+
         this.httpsGet (`/api/behaviors/preview`,
             callback,
             {
@@ -1369,8 +1406,17 @@ this.deleteNotification(notification, callback);
             }
         );
     }
-
-    getAutomationRoutines(limit, callback) {
+	    
+		
+		
+		getRoutines(limit, callback) 
+		{
+		return this.getAutomationRoutines(callback);
+		}
+	
+	
+	
+    getAutomationRoutines(limit, callback) { //equivalent de getNotifications
         if (typeof limit === 'function') {
             callback = limit;
             limit = 0;
@@ -1378,6 +1424,14 @@ this.deleteNotification(notification, callback);
         limit = limit || 2000;
         this.httpsGet (`/api/behaviors/automations?limit=${limit}`, callback);
     }
+
+getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
+
+    this.getAutomationRoutines((err, res) => {
+					//this._options.logger && this._options.logger('Alexa-Remote: >>>>>>>>>>>>>>>>>>>>>>>: ' + JSON.stringify(res));
+		        callback && callback(res);
+    });
+}
 
     executeAutomationRoutine(serialOrName, routine, callback) {
         return this.sendSequenceCommand(serialOrName, routine, callback);
