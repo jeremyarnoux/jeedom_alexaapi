@@ -1017,9 +1017,9 @@ function startServer()
 
         server = app.listen(config.listeningPort, () =>
         {
-			config.logger && config.logger('Alexa-API: *********************************');
-			config.logger && config.logger('Alexa-API: * Server listening on port ' + server.address().port+' *');
-			config.logger && config.logger('Alexa-API: *********************************');
+			config.logger && config.logger('Alexa-API: ****************************************');
+			config.logger && config.logger('Alexa-API: *** Server OK listening on port ' + server.address().port+' ***');
+			config.logger && config.logger('Alexa-API: ****************************************');
         });
       });
     }

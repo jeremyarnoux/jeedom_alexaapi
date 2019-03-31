@@ -504,9 +504,24 @@ class AlexaRemote extends EventEmitter {
                         ret = JSON.parse(body);
                     } catch(e)
                     {
-                        this._options.logger && this._options.logger('Alexa-Remote: Response: No/Invalid JSON');
+                        this._options.logger && this._options.logger('******************************************************');
+                        this._options.logger && this._options.logger('*********************DEBUG****************************');
+                        this._options.logger && this._options.logger('******************************************************');
+                        this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote: Response: No/Invalid JSON');
                         this._options.logger && this._options.logger(body);
-                        return callback && callback(new Error('no JSON'), body);
+                        this._options.logger && this._options.logger('**DEBUG**DEBUG* Message Exception :'+e.message);
+                        this._options.logger && this._options.logger('******************************************************');
+                        this._options.logger && this._options.logger('******************************************************');
+						var ValeurdelErreur='no JSON';
+						//if (body.includes("authenticated"))
+						if (body.includes("Connection: close"))
+                        {
+							this._options.logger && this._options.logger('******************************************************');
+							this._options.logger && this._options.logger('***************FIND**CONNEXION CLOSE *****************');
+							this._options.logger && this._options.logger('******************************************************');
+						ValeurdelErreur='Connexion Close';
+						}
+                       return callback && callback(new Error(ValeurdelErreur), body);
                     }
                     this._options.logger && this._options.logger('Alexa-Remote: Response: ' + JSON.stringify(ret));
                     return callback && callback (null, ret);

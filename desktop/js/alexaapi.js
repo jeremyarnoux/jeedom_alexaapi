@@ -111,7 +111,7 @@ function addCmdToTable(_cmd)
  //    +         '<a class="cmdAction btn btn-default btn-sm" data-l1key="chooseIcon"><i class="fa fa-flag"></i> Icone</a>'
      +         '<span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>'
      +       '</div>'
-     +   '<div class="col-lg-6">'
+     +   '<div class="col-lg-8">'
      +     '<input class="cmdAttr form-control input-sm" data-l1key="name" placeholder="{{Nom du capteur}}"></td>'
      +   '<td>'
 //     +     '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
@@ -161,7 +161,7 @@ function addCmdToTable(_cmd)
  //    +         '<a class="cmdAction btn btn-default btn-sm" data-l1key="chooseIcon"><i class="fa fa-flag"></i> Icone</a>'
      +         '<span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>'
      +       '</div>'
-    +       '<div class="col-lg-6">'
+    +       '<div class="col-lg-8">'
     +         '<input class="cmdAttr form-control input-sm" data-l1key="name">'
     +       '</div>'
      +     '</div>';
