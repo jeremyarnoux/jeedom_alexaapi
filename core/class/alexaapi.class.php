@@ -238,6 +238,19 @@ class alexaapi extends eqLogic
 		} catch (Exception $exc) {
 			log::add('alexaapi', 'error', __('Expression cron non valide', __FILE__) . ' : ' . $autorefresh);
 		}
+		
+		$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
+		foreach ($eqLogics as $alexaapi) {
+			try {
+				$d = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
+				if ($d->isDue()) {
+					$alexaapi->refresh();
+				}
+			} catch (Exception $exc) {
+				log::add('piHole', 'error', __('Expression cron non valide pour ', __FILE__) . $piHole->getHumanName() . ' : ' . $autorefresh);
+			}
+		}		
+		
 	}
     }
     public static function checkAuth() {
