@@ -38,6 +38,11 @@ $('#bt_reminders').on('click', function ()
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders').dialog('open');
 });
 
+$('#bt_history').on('click', function ()
+{
+  $('#md_modal').dialog({title: "{{Historique}}"});
+  $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=history').dialog('open');
+});
 
 $('#bt_routines').on('click', function ()
 {
@@ -165,13 +170,13 @@ function addCmdToTable(_cmd)
     +         '<input class="cmdAttr form-control input-sm" data-l1key="name">'
     +       '</div>'
      +     '</div>';
- if (init(_cmd.logicalId)=="")
+ /*if (init(_cmd.logicalId)=="")
  {
  
   tr  +=    '<select class="cmdAttr form-control tooltips input-sm" data-l1key="value" style="display : none;margin-top : 5px;" title="{{La valeur de la commande vaut par défaut la commande}}">'
       +       '<option value="">Aucune</option>'
       +     '</select>';
- }
+ }*/
     tr  +=   '</td>';
 	
 	

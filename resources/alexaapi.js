@@ -24,7 +24,14 @@ if (!alexaserver) config.logger && config.logger('Alexa-Config: ****************
 		function consoleSigalou() 
 		{
 		var today=new Date();
+                    try 
+					{
 		console.log("["+today.toLocaleString()+"] "+arguments[0].concat(Array.prototype.slice.call(arguments, 1)));
+                    }
+                    catch (e)
+					{
+ 		console.log(arguments[0]);
+					}
 		};
 
 config.logger && config.logger('Alexa-Config (alexaapi.js): amazonserver='+amazonserver);
@@ -451,7 +458,6 @@ app.get('/devices', (req, res) =>
   });
 });
 
-
 /***** Get devices *****
   URL: /devices
 
@@ -463,6 +469,70 @@ app.get('/devices', (req, res) =>
     online: Boolean - true when the device is connected, false otherwise,
     capabilities: [String] - List of available capabilties of the device, few example: VOLUME_SETTING, REMINDERS, MICROPHONE, TUNE_IN, ...
   }]
+*/
+app.get('/wakewords', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: WakeWords');
+  res.type('json');
+
+  alexa.getWakeWords2(function(devices)
+  {
+    var toReturn = [];
+    for (var serial in devices)
+    {
+      var device = devices[serial];
+      toReturn.push({
+        'serial': serial,
+        'active': device.active,
+        'deviceSerialNumber': device.deviceSerialNumber,
+        'wakeWord': device.wakeWord
+      });
+    }
+    res.status(200).json(toReturn);
+  });
+});
+
+app.get('/history', (req, res) =>
+{
+  config.logger && config.logger('Alexa-API: History');
+  res.type('json');
+
+
+  if ('size' in req.query === false)
+    req.query.size=1;
+  if ('offset' in req.query === false)
+    req.query.offset=1;
+
+		const options =
+{
+  size: req.query.size,
+  offset: req.query.offset
+};
+
+  alexa.getHistory2(options, function(devices)
+  {
+    var toReturn = [];
+	 		
+			//console.log(devices);
+
+    for (var serial in devices)
+    {
+      var activities = devices[activities];
+      var device = devices[serial];
+      toReturn.push({
+        'serial': serial,
+        'activityStatus': device.activityStatus,
+        'deviceSerialNumber': device.deviceSerialNumber,
+        'creationTimestamp': device.creationTimestamp,
+        'summary': device.description.summary
+    });
+    }
+    res.status(200).json(toReturn);
+  });
+});
+/***** routines *****
+  URL: /routines
+
 */
 app.get('/routines', (req, res) =>
 {
@@ -485,27 +555,27 @@ app.get('/routines', (req, res) =>
 
 //config.logger && config.logger('Alexa-API: routines3b2');
     var toReturn = [];
-		  config.logger && config.logger('************DEBUG DE ROUTINES*******************');
+		  //config.logger && config.logger('************DEBUG DE ROUTINES*******************');
     for (var serial in niveau0)
     {
-		  config.logger && config.logger('************************************************');
+		  //config.logger && config.logger('************************************************');
 
       var routine = niveau0[serial];
 	  
-		  config.logger && config.logger('(general)----- '+routine.status);
-		  config.logger && config.logger('(general)----- '+routine.creationTimeEpochMillis);
+		  //config.logger && config.logger('(general)----- '+routine.status);
+		  //config.logger && config.logger('(general)----- '+routine.creationTimeEpochMillis);
 		  
 	if (routine.status === 'ENABLED')
 	{
 		
-		  config.logger && config.logger('(SUPPRESSION)----- '+routine.creationTimeEpochMillis);
+		  //config.logger && config.logger('(SUPPRESSION)----- '+routine.creationTimeEpochMillis);
   alexa.executeAutomationRoutine("", routine, function(err)
   {
-		  config.logger && config.logger('(SUPPRESSION DEDANS)----- '+routine.creationTimeEpochMillis);
+		  //config.logger && config.logger('(SUPPRESSION DEDANS)----- '+routine.creationTimeEpochMillis);
 //executeAutomationRoutine(serialOrName, routine, callback)
     //res.status(200).json({});
   });		
-		  config.logger && config.logger('(SUPPRESSION)----- '+routine.creationTimeEpochMillis);
+		  //config.logger && config.logger('(SUPPRESSION)----- '+routine.creationTimeEpochMillis);
 	}		
 		  
 		  
@@ -528,7 +598,7 @@ app.get('/routines', (req, res) =>
 			  var niveau3 = niveau2.payload[triggers];
 			  			//config.logger && config.logger('(triggers1)----- '+triggers.locale);
 			 // config.logger && config.logger('(triggers2)----- '+niveau3.locale);	
-                      config.logger && config.logger('(triggers3)----- '+triggers+' : '+niveau3);
+                      //config.logger && config.logger('(triggers3)----- '+triggers+' : '+niveau3);
                       
 						switch (triggers) 
 							{
@@ -545,7 +615,7 @@ app.get('/routines', (req, res) =>
 									for (var schedule in niveau3) //Partie schedule
 									{
 									var niveau4 = niveau3[schedule];
-									config.logger && config.logger('(schedule)----- '+schedule+' : '+niveau4);
+									//config.logger && config.logger('(schedule)----- '+schedule+' : '+niveau4);
 									
 											switch (schedule) 
 												{
