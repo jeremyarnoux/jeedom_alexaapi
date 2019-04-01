@@ -19,24 +19,11 @@ if (!isConnect('admin')) {
 	throw new Exception('401 Unauthorized');
 }
 
+//$data_path = realpath(dirname(__FILE__) . '/../../resources/data');
+//echo $data_path;
 $json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/history?size=15");
+//file_put_contents($data_path, $json);
 $json = json_decode($json,true);
-
-function sortBy($field, &$array, $direction = 'asc')
-{
-    usort($array, create_function('$a, $b', '
-        $a = $a["' . $field . '"];
-        $b = $b["' . $field . '"];
-
-        if ($a == $b) return 0;
-
-        $direction = strtolower(trim($direction));
-
-        return ($a ' . ($direction == 'desc' ? '>' : '<') .' $b) ? -1 : 1;
-    '));
-
-    return true;
-}
 
 ?>
 
@@ -45,7 +32,7 @@ function sortBy($field, &$array, $direction = 'asc')
 		<tr>
 			<th>{{Alexa}}</th>
 			<th>{{Texte}}</th>
-			<th>{{Nom ou Musique}}</th>
+			<th>{{Date Heure}}</th>
 			<th>{{Status}}</th>
 
 		</tr>
@@ -53,18 +40,30 @@ function sortBy($field, &$array, $direction = 'asc')
 	<tbody>
 	 <?php
 	
-	 
-	 
+	$TouslesDevices = array(); 
+	//$TouslesDevices["coucou"] = "sonnom";
+ 
 foreach($json as $item)
 {
 
 
 		$couleur="success";
-	
-            // Retireve the device (if already registered in Jeedom)
-            $device = alexaapi::byLogicalId($item['deviceSerialNumber'], 'alexaapi');
-          if ($device)
-	echo '<tr><td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'.$device->getName().'</span></td>';
+//Petit tableau pour garder les valeurs de devices			
+if (array_key_exists($item['deviceSerialNumber'], $TouslesDevices)) 
+$ledevice = $TouslesDevices[$item['deviceSerialNumber']];	
+else
+{
+    $device = alexaapi::byLogicalId($item['deviceSerialNumber'], 'alexaapi');
+	$ledevice=$device->getName();
+	//echo "va chercher";
+	$TouslesDevices[$item['deviceSerialNumber']] = $ledevice;
+}	
+//***************************************************
+
+
+			
+          if ($ledevice!="")
+	echo '<tr><td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'.$ledevice.'</span></td>';
 			else
 	echo '<tr><td><span class="label label-danger" style="font-size : 1em; cursor : default;">?????</span></td>';
 
@@ -80,6 +79,7 @@ foreach($json as $item)
 	
 
 	echo '</tr>';
+	
 }
 ?>
 	</tbody>

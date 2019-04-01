@@ -343,7 +343,7 @@ class alexaapi extends eqLogic
 	/*     * *********************Methode d'instance************************* */
 	public function refresh() {
 		
-				log::add('alexaapi', 'debug', 'execute : refresh');
+			//	log::add('alexaapi', 'debug', 'execute : refresh');
 				
 					// Met à jour la liste des routines des commandes action "routine"	
 					$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
@@ -381,7 +381,7 @@ class alexaapi extends eqLogic
 				if ($cmd->getConfiguration('RunWhenRefresh', 0) != '1') {
 					continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
 				}
-				log::add('alexaapi', 'debug', 'Refresh: Execute '.$cmd->getName());
+				//log::add('alexaapi', 'debug', 'Refresh: Execute '.$cmd->getName());
 				$value = $cmd->execute();
 				//if ($cmd->execCmd() != $cmd->formatValue($value)) { ???????
 				//	$cmd->event($value);
@@ -390,7 +390,7 @@ class alexaapi extends eqLogic
 		} catch (Exception $exc) {
 			log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $exc->getMessage());
 		}
-						log::add('alexaapi', 'debug', 'execute (fini) : refresh');
+						//log::add('alexaapi', 'debug', 'execute (fini) : refresh');
 
 	}
 	
