@@ -367,7 +367,7 @@ class alexaapi extends eqLogic {
 		}
 		if ($createRefreshCmd) {
 			if (!is_object($refresh)) {
-				$refresh = new virtualCmd();
+				$refresh = new alexaapiCmd();
 				$refresh->setLogicalId('refresh');
 				$refresh->setIsVisible(1);
 				$refresh->setDisplay('icon', '<i class="fa fa-refresh"></i>');
