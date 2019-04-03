@@ -1130,6 +1130,7 @@ config.logger && config.logger('Alexa-API: *************************************
 			if 	(err.message=="Connexion Close")
 				  {
 					config.logger && config.logger("Connexion Close détectée dans la détection d'erreur et donc relance de l'initialisation");
+					message::add('alexaapi', "Connexion Close détectée dans la détection d'erreur et donc relance de l'initialisation");
 					startServer();
 				  }	
       }		
