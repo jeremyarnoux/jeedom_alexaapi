@@ -106,11 +106,13 @@ app.get('/speak', (req, res) =>
     var hasError = false;
     forEachDevices(req.query.device, (serial) =>
     {
+    alexa.sendSequenceCommand(serial, 'volume', req.query.volume, GestionRetour);
+	/*
       alexa.sendSequenceCommand(serial, 'volume', req.query.volume, (err) =>
       {
         if (err)
           hasError = true;
-      });
+      });*/
     });
     if (hasError)
       return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err.message));
@@ -120,6 +122,9 @@ app.get('/speak', (req, res) =>
   var errorMessage = '';
   forEachDevices(req.query.device, (serial) =>
   {
+	  
+    alexa.sendSequenceCommand(serial, 'speak', req.query.text, GestionRetour);
+	  /*
     alexa.sendSequenceCommand(serial, 'speak', req.query.text, (err) =>
     {
       if (err)
@@ -127,7 +132,7 @@ app.get('/speak', (req, res) =>
         errorMessage = err.message;
         hasError = true;
       }
-    });
+    });*/
   });
 
   if (hasError)
@@ -1100,6 +1105,35 @@ function startServer()
       });
     }
   });
+}
+
+//alexa.sendSequenceCommand(serial, 'speak', req.query.text, GestionErreur);
+
+//Gestion des erreurs et surtout pour détecter les ConnexionClose
+
+function GestionRetour(err) {
+hasError = false;
+if (err)
+
+      {
+config.logger && config.logger('Alexa-API: ******************************************************************');
+config.logger && config.logger('Alexa-API: *****************************ERROR********************************');
+config.logger && config.logger('Alexa-API: ******************************************************************');
+config.logger && config.logger(err.message);
+config.logger && config.logger('Alexa-API: ******************************************************************');
+config.logger && config.logger(err);
+config.logger && config.logger('Alexa-API: ******************************************************************');
+config.logger && config.logger('Alexa-API: ******************************************************************');
+
+        errorMessage = err.message;
+        hasError = true;
+			if 	(err.message=="Connexion Close")
+				  {
+					config.logger && config.logger("Connexion Close détectée dans la détection d'erreur et donc relance de l'initialisation");
+					startServer();
+				  }	
+      }		
+
 }
 
 function error(status, source, title, detail)
