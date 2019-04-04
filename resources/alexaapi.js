@@ -17,6 +17,8 @@ const config = {
 	listeningPort: 3456
 };
 
+var FiledesCommandes = [];  //Utiliser pour surveiller que les commandes sont bien envoyées (pour le souci de Connexion Close)
+
 // Par sécurité pour détecter un éventuel souci :
 if (!amazonserver) config.logger('Alexa-Config: *********************amazonserver NON DEFINI*********************');
 if (!alexaserver) config.logger('Alexa-Config: *********************alexaserver NON DEFINI*********************');
@@ -54,6 +56,65 @@ function forEachDevices(nameOrSerial, callback) {
 	}
 }
 
+
+function LancementCommande(commande, req) 
+{
+config.logger && config.logger('Alexa-API: Lancement /'+commande);
+FiledesCommandes.push([commande, req]);
+config.logger && config.logger('Taille:'+FiledesCommandes.length);
+AllerVoirSilYaDesCommandesenFileAttente();
+}
+
+function FinCommandeBienExecutee() 
+{
+//FiledesCommandes.pop(); 
+}
+
+
+function AllerVoirSilYaDesCommandesenFileAttente()		
+{
+config.logger && config.logger("Il reste "+FiledesCommandes.length+" commande(s) en file d'attente");
+
+
+
+
+
+FiledesCommandes.forEach(function (element) {
+config.logger && config.logger('Alexa-API: RE-Lancement de la '+element[0]);
+//element[0]=commande (speak par exemple)
+//element[1]=req (req a relancer)
+//  	console.log(">>>"+element[0]+"//"+element[1]);
+})
+
+
+/*for (var arrayIndex in FiledesCommandes) {
+  console.log("*****************");
+  console.log(FiledesCommandes[arrayIndex]);
+}
+
+FiledesCommandes.forEach(function(item, index, array) 
+{
+  console.log(item, index);
+});
+
+FiledesCommandes.forEach(function(item, index, array) 
+{
+  console.log(item, index);
+});
+
+
+var person = [];
+person["id"] = 1;
+person["born"] = 2009;
+person["favourite_meal"] = "chicken"; 
+
+var fourth = '';
+for (var arrayIndex in person) {
+  fourth += ' ' + person[arrayIndex];
+}*/
+
+}
+
 /***** checkAuth *****
   URL: /checkAuth
 
@@ -86,9 +147,11 @@ app.get('/checkAuth', (req, res) => {
   Otherwise, an error object is returned.
   FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
 */
-app.get('/speak', (req, res) => {
-	var hasError = false;
-	var errorMessage = '';
+
+//appel ailleurs avec maFonctionSpeak(req,res);
+app.get('/speak', maFonctionSpeak);
+
+var maFonctionSpeak = function(req,res){
 	config.logger('Alexa-API: Alexa.Speak');
 	res.type('json');
 
@@ -100,43 +163,58 @@ app.get('/speak', (req, res) => {
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
 	config.logger('Alexa-API: text: ' + req.query.text);
 
-	if ('volume' in req.query) {
-		config.logger('Alexa-API: volume: ' + req.query.volume);
-		hasError = false;
-		forEachDevices(req.query.device, (serial) => {
-			alexa.sendSequenceCommand(serial, 'volume', req.query.volume, GestionRetour);
-			/*
-			alexa.sendSequenceCommand(serial, 'volume', req.query.volume, (err) =>
-			{
-			if (err)
-			  hasError = true;
-			});*/
+	if ('volume' in req.query)
+	{
+		LancementCommande("volume",req);
+		forEachDevices(req.query.device, (serial) =>
+		{
+		alexa.sendSequenceCommand(serial, 'volume', req.query.volume, GestionRetour);
 		});
-		if (hasError)
-			return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', res.message));
 	}
 
-	hasError = false;
-
-	forEachDevices(req.query.device, (serial) => {
-		alexa.sendSequenceCommand(serial, 'speak', req.query.text, GestionRetour);
-		/*
-		alexa.sendSequenceCommand(serial, 'speak', req.query.text, (err) =>
-		{
-		  if (err)
-		  {
-			errorMessage = err.message;
-			hasError = true;
-		  }
-		});*/
+	LancementCommande("speak",req);
+	forEachDevices(req.query.device, (serial) =>
+	{
+	alexa.sendSequenceCommand(serial, 'speak', req.query.text, GestionRetour);
 	});
 
-	if (hasError)
-		res.status(500).json(error(500, req.route.path, 'Alexa.Speak', errorMessage));
-	else
-		res.status(200).json({});
-});
+res.status(200).json({});	
+}
 
+
+
+/*
+app.get('/speak', (req, res) => {
+
+	config.logger('Alexa-API: Alexa.Speak');
+	res.type('json');
+
+	if ('device' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+
+	if ('text' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
+	config.logger('Alexa-API: text: ' + req.query.text);
+
+	if ('volume' in req.query)
+	{
+		LancementCommande("volume",req);
+		forEachDevices(req.query.device, (serial) =>
+		{
+		alexa.sendSequenceCommand(serial, 'volume', req.query.volume, GestionRetour);
+		});
+	}
+
+	LancementCommande("speak",req);
+	forEachDevices(req.query.device, (serial) =>
+	{
+	alexa.sendSequenceCommand(serial, 'speak', req.query.text, GestionRetour);
+	});
+
+res.status(200).json({});
+});
+*/
 /**** Alexa.Radio *****
   URL: /radio?device=?&text=?
     device - String - name of the device
