@@ -308,6 +308,8 @@ class alexaapi extends eqLogic {
 
 	/*     * *********************Methode d'instance************************* */
 	public function refresh() {
+		$deamon_info = alexaapi::deamon_info();
+		if ($deamon_info['state'] != 'ok') return false;
 
 		//	log::add('alexaapi', 'debug', 'execute : refresh');
 		// Met à jour la liste des routines des commandes action "routine"
