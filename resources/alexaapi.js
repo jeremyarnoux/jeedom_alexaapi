@@ -71,64 +71,28 @@ FiledesCommandes.pop();
 
 }
 
-
 function AllerVoirSilYaDesCommandesenFileAttente()		
 {
 config.logger && config.logger("Il reste "+FiledesCommandes.length+" commande(s) en file d'attente");
+	FiledesCommandes.forEach(function (element) {
+	config.logger && config.logger('Alexa-API: RE-Lancement de la '+element[0]);
 
 
+									switch (element[0]) {
 
-
-
-FiledesCommandes.forEach(function (element) {
-config.logger && config.logger('Alexa-API: RE-Lancement de la '+element[0]);
-
-
-								switch (element[0]) {
-
-									case 'speak':
-										maFonctionSpeak(element[1],app.response);
-										break;
-
-
-								}
-
-/**/
-
-
-
-//element[0]=commande (speak par exemple)
-//element[1]=req (req a relancer)
-//  	console.log(">>>"+element[0]+"//"+element[1]);
-})
-
-
-/*for (var arrayIndex in FiledesCommandes) {
-  console.log("*****************");
-  console.log(FiledesCommandes[arrayIndex]);
-}
-
-FiledesCommandes.forEach(function(item, index, array) 
-{
-  console.log(item, index);
-});
-
-FiledesCommandes.forEach(function(item, index, array) 
-{
-  console.log(item, index);
-});
-
-
-var person = [];
-person["id"] = 1;
-person["born"] = 2009;
-person["favourite_meal"] = "chicken"; 
-
-var fourth = '';
-for (var arrayIndex in person) {
-  fourth += ' ' + person[arrayIndex];
-}*/
-
+										case 'speak':
+											maFonctionSpeak(element[1],app.response);
+											break;
+										case 'radio':
+											maFonctionRadio(element[1],app.response);
+											break;
+										case 'volume':
+											maFonctionVolume(element[1],app.response);
+											break;
+										case 'commande':
+											maFonctionCommand(element[1],app.response);
+											break;									}
+	})
 }
 
 /***** checkAuth *****
@@ -199,38 +163,6 @@ res.status(200).json({});
 app.get('/speak', maFonctionSpeak);
 
 
-/*
-app.get('/speak', (req, res) => {
-
-	config.logger('Alexa-API: Alexa.Speak');
-	res.type('json');
-
-	if ('device' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
-	config.logger('Alexa-API: device: ' + req.query.device);
-
-	if ('text' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
-	config.logger('Alexa-API: text: ' + req.query.text);
-
-	if ('volume' in req.query)
-	{
-		LancementCommande("volume",req);
-		forEachDevices(req.query.device, (serial) =>
-		{
-		alexa.sendSequenceCommand(serial, 'volume', req.query.volume, GestionRetour);
-		});
-	}
-
-	LancementCommande("speak",req);
-	forEachDevices(req.query.device, (serial) =>
-	{
-	alexa.sendSequenceCommand(serial, 'speak', req.query.text, GestionRetour);
-	});
-
-res.status(200).json({});
-});
-*/
 /**** Alexa.Radio *****
   URL: /radio?device=?&text=?
     device - String - name of the device
@@ -242,10 +174,8 @@ res.status(200).json({});
   Otherwise, an error object is returned.
   FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
 */
-app.get('/radio', (req, res) => {
-	var hasError = false;
-	var errorMessage = '';
-	config.logger('Alexa-API: Alexa.Speak');
+var maFonctionRadio = function(req,res){
+	config.logger('Alexa-API: Alexa.Radio');
 	res.type('json');
 
 	if ('device' in req.query === false)
@@ -257,35 +187,21 @@ app.get('/radio', (req, res) => {
 	config.logger('Alexa-API: station: ' + req.query.station);
 
 	if ('volume' in req.query) {
-		config.logger('Alexa-API: volume: ' + req.query.volume);
-		hasError = false;
 		forEachDevices(req.query.device, (serial) => {
-			alexa.sendSequenceCommand(serial, 'volume', req.query.volume, (err) => {
-				if (err)
-					hasError = true;
-			});
+			LancementCommande("volume",req);
+			alexa.sendSequenceCommand(serial, 'volume', GestionRetour);
 		});
-		if (hasError)
-			return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', res.message));
 	}
 
-	hasError = false;
-	forEachDevices(req.query.device, (serial) => {
-		//     setTunein(serialOrName, guideId, contentType, callback) {
-		alexa.setTunein(serial, req.query.station, (err) => {
-			if (err) {
-				errorMessage = err.message;
-				hasError = true;
-			}
+		forEachDevices(req.query.device, (serial) => {
+			LancementCommande("radio",req);
+			alexa.setTunein(serial, req.query.station, GestionRetour);
 		});
-	});
 
-	if (hasError)
-		res.status(500).json(error(500, req.route.path, 'Alexa.Speak', errorMessage));
-	else
-		res.status(200).json({});
-});
+res.status(200).json({});
+}
 
+app.get('/radio', maFonctionRadio);
 
 /***** Alexa.DeviceControls.Volume *****
   URL: /volume?device=?&value=?
@@ -296,8 +212,8 @@ app.get('/radio', (req, res) => {
   Otherwise, an error object is returned.
   FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
 */
-app.get('/volume', (req, res) => {
-	config.logger('Alexa-API: Alexa.DeviceControls.Volume');
+var maFonctionVolume = function(req,res){
+	config.logger('Alexa-API: Alexa.Volume');
 	res.type('json');
 
 	if ('device' in req.query === false)
@@ -309,17 +225,14 @@ app.get('/volume', (req, res) => {
 	config.logger('Alexa-API: value: ' + req.query.value);
 
 	var err = forEachDevices(req.query.device, (serial) => {
-		alexa.sendSequenceCommand(serial, 'volume', req.query.value, (err) => {
-			return err;
-		});
-
-		if (err)
-			return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', err));
-		res.status(200).json({});
+			LancementCommande("volume",req);
+			alexa.sendSequenceCommand(serial, 'volume', req.query.value, GestionRetour);
 	});
 
+	res.status(200).json({});
 
-});
+}
+app.get('/volume', maFonctionVolume);
 
 /***** Alexa.DeviceControls.Command *****
   URL: /command?device=?&command=?
@@ -327,8 +240,9 @@ app.get('/volume', (req, res) => {
     command - String - command : pause|play|next|prev|fwd|rwd|shuffle|repeat
 
 */
-app.get('/command', (req, res) => {
-	config.logger('Alexa-API: Alexa.DeviceControls.Command');
+
+var maFonctionCommand = function(req,res){
+	config.logger('Alexa-API: Alexa.Command');
 	res.type('json');
 
 	if ('device' in req.query === false)
@@ -340,16 +254,13 @@ app.get('/command', (req, res) => {
 	config.logger('Alexa-API: command: ' + req.query.command);
 
 	var err = forEachDevices(req.query.device, (serial) => {
-		alexa.sendCommand(serial, req.query.command, (err) => {
-			return err;
-		});
-
-		if (err)
-			return res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Command', err));
-		res.status(200).json({});
+		LancementCommande("command",req);
+		alexa.sendCommand(serial, req.query.command, GestionRetour);
 	});
-});
+		res.status(200).json({});
+}
 
+app.get('/command', maFonctionCommand);
 /***** Alexa.Routine *****
   URL /routine?device=?&name=?
     device - String - name of the device
@@ -1150,7 +1061,7 @@ function startServer() {
 //Gestion des erreurs et surtout pour détecter les ConnexionClose
 
 function GestionRetour(err) {
-
+//message::add('alexaapi', 'Sigalou est le meilleur');
 	//var hasError = false;
 	if (err) {
 		config.logger('Alexa-API: ******************************************************************');
