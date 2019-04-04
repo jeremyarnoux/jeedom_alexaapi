@@ -297,7 +297,7 @@ app.get('/routine', (req, res) => {
 		} else
 			config.logger('Alexa-API: routine - ECHEC (introuvable) - Lancement routine: ' + req.query.routine);
 
-		res.status(200).json(toReturn);
+		//res.status(200).json(toReturn);
 	});
 });
 
