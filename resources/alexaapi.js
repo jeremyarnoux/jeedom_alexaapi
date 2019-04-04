@@ -283,7 +283,7 @@ app.get('/routine', (req, res) => {
 			if (niveau0.hasOwnProperty(serial)) {
 				var routine = niveau0[serial];
 
-				config.logger('(Test creationTimeEpochMillis )-----> ' + routine.creationTimeEpochMillis + '/' + req.query.routine);
+				//config.logger('(Test creationTimeEpochMillis )-----> ' + routine.creationTimeEpochMillis + '/' + req.query.routine);
 
 				if (routine.creationTimeEpochMillis == req.query.routine)
 					routineaexecuter = routine;
@@ -297,7 +297,7 @@ app.get('/routine', (req, res) => {
 		} else
 			config.logger('Alexa-API: routine - ECHEC (introuvable) - Lancement routine: ' + req.query.routine);
 
-		//res.status(200).json(toReturn);
+		res.status(200).json({});
 	});
 });
 
@@ -644,7 +644,7 @@ app.get('/routines', (req, res) => {
 					// 'members': device.clusterMembers
 				});
 
-				//res.status(200).json(toReturn);
+				res.status(200).json(toReturn);
 			}
 		}
 	});
