@@ -317,22 +317,21 @@ class alexaapi extends eqLogic {
 		$json = json_decode($json, true);
 		self::sortBy('utterance', $json, 'asc');
 
-		$ListeDesRoutines = "";
-		$PremierTourpourlePointVirgule = true;
+		$ListeDesRoutines = [];
 
 		foreach ($json as $item) {
-			if (!$PremierTourpourlePointVirgule) $ListeDesRoutines .= ";";
-			$PremierTourpourlePointVirgule = false;
-
-			if ($item['triggerTime'] != '') $resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
-
-			if ($item['utterance'] != '') $ListeDesRoutines .= $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
-			else $ListeDesRoutines .= $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
+			if ($item['utterance'] != '') {
+				$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
+			}
+			else {
+				if ($item['triggerTime'] != '') $resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
+				$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
+			}
 		}
 		$cmd = $this->getCmd(null, 'routine');
 		if (is_object($cmd)) {
 			//routine existe on  met à jour la liste des routines
-			$cmd->setConfiguration('listValue', $ListeDesRoutines);
+			$cmd->setConfiguration('listValue', join(';',$ListeDesRoutines));
 			$cmd->save();
 		}
 		// Fin mise à jour de la liste des routines
