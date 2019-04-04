@@ -496,7 +496,7 @@ class AlexaRemote extends EventEmitter {
                 {
                     if (!body)
                     {
-                        this._options.logger && this._options.logger('Alexa-Remote: Response: No body');
+                        this._options.logger && this._options.logger('Alexa-Remote: Response: No body = OK');
                         return callback && callback(null, null);
                     }
                     try
@@ -711,7 +711,7 @@ class AlexaRemote extends EventEmitter {
     }
 
     createNotificationAlarmObject(serialOrName, recurring, label, value, status, sound) { // type = Reminder, Alarm
-                 console.log('-->-->--recurring: ' + recurring + '-----------------');
+                 //console.log('-->-->--recurring: ' + recurring + '-----------------');
       const type="Alarm";
 
 		if (status && typeof status === 'object') {
@@ -768,7 +768,7 @@ return this.parseValue4Notification(notification, value);    }
 
     parseValue4Notification(notification, value) {
       
-                console.log('--------Typeof: ' + (typeof value) + 'Value: ' + value + '-----------------');
+                //console.log('--------Typeof: ' + (typeof value) + 'Value: ' + value + '-----------------');
         switch (typeof value) {
             case 'object':
                 if (value instanceof Date)
@@ -1386,7 +1386,7 @@ this.deleteNotification(notification, callback);
             seqCommandObj = command.sequence || command;
         }
         else {
-				this._options.logger && this._options.logger('Alexa-sendSequenceCommand: else');
+				//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: else');
             seqCommandObj = {
                 '@type': 'com.amazon.alexa.behaviors.model.Sequence',
                 'startNode': this.createSequenceNode(command, value)

@@ -59,15 +59,16 @@ function forEachDevices(nameOrSerial, callback) {
 
 function LancementCommande(commande, req) 
 {
-config.logger && config.logger('Alexa-API: Lancement /'+commande);
+//config.logger && config.logger('Alexa-API: Lancement /'+commande);
 FiledesCommandes.push([commande, req]);
-config.logger && config.logger('Taille:'+FiledesCommandes.length);
-AllerVoirSilYaDesCommandesenFileAttente();
+//config.logger && config.logger('Taille au lancement:'+FiledesCommandes.length);
 }
 
 function FinCommandeBienExecutee() 
 {
-//FiledesCommandes.pop(); 
+FiledesCommandes.pop(); 
+//config.logger && config.logger('Taille après lancement :'+FiledesCommandes.length);
+
 }
 
 
@@ -81,6 +82,21 @@ config.logger && config.logger("Il reste "+FiledesCommandes.length+" commande(s)
 
 FiledesCommandes.forEach(function (element) {
 config.logger && config.logger('Alexa-API: RE-Lancement de la '+element[0]);
+
+
+								switch (element[0]) {
+
+									case 'speak':
+										maFonctionSpeak(element[1],app.response);
+										break;
+
+
+								}
+
+/**/
+
+
+
 //element[0]=commande (speak par exemple)
 //element[1]=req (req a relancer)
 //  	console.log(">>>"+element[0]+"//"+element[1]);
@@ -149,7 +165,6 @@ app.get('/checkAuth', (req, res) => {
 */
 
 //appel ailleurs avec maFonctionSpeak(req,res);
-app.get('/speak', maFonctionSpeak);
 
 var maFonctionSpeak = function(req,res){
 	config.logger('Alexa-API: Alexa.Speak');
@@ -181,6 +196,7 @@ var maFonctionSpeak = function(req,res){
 res.status(200).json({});	
 }
 
+app.get('/speak', maFonctionSpeak);
 
 
 /*
@@ -1120,6 +1136,9 @@ function startServer() {
 						config.logger('Alexa-API: ****************************************');
 						config.logger('Alexa-API: *** Server OK listening on port ' + server.address().port + ' ***');
 						config.logger('Alexa-API: ****************************************');
+						
+						AllerVoirSilYaDesCommandesenFileAttente();
+						
 					});
 				});
 			}
@@ -1131,7 +1150,8 @@ function startServer() {
 //Gestion des erreurs et surtout pour détecter les ConnexionClose
 
 function GestionRetour(err) {
-	var hasError = false;
+
+	//var hasError = false;
 	if (err) {
 		config.logger('Alexa-API: ******************************************************************');
 		config.logger('Alexa-API: *****************************ERROR********************************');
@@ -1143,12 +1163,14 @@ function GestionRetour(err) {
 		config.logger('Alexa-API: ******************************************************************');
 
 		//var errorMessage = err.message;
-		hasError = true;
+		//hasError = true;
 		if (err.message == "Connexion Close") {
 			config.logger("Connexion Close détectée dans la détection d'erreur et donc relance de l'initialisation");
 			startServer();
 		}
 	}
+	else
+	FinCommandeBienExecutee();
 
 }
 
