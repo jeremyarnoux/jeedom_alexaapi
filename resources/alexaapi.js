@@ -644,9 +644,10 @@ app.get('/routines', (req, res) => {
 					// 'members': device.clusterMembers
 				});
 
-				res.status(200).json(toReturn);
+				
 			}
 		}
+	res.status(200).json(toReturn);
 	});
 });
 /***** Reminders *****
