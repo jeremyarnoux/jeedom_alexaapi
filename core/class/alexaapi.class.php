@@ -349,7 +349,7 @@ class alexaapi extends eqLogic {
 			}
 		}
 		catch(Exception $exc) {
-			log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $eqLogic->getHumanName() . ' : ' . $exc->getMessage());
+			log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());
 		}
 		//log::add('alexaapi', 'debug', 'execute (fini) : refresh');
 		
