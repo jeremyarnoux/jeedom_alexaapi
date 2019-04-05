@@ -1030,16 +1030,14 @@ function startServer() {
 						config.logger('Alexa-API: *******************************************');
 						config.logger('Alexa-API: *Server is already listening on port ' + server.address().port + ' *');
 						config.logger('Alexa-API: *******************************************');
-						return;
+					} else {
+						server = app.listen(config.listeningPort, () => {
+							config.logger('Alexa-API: ****************************************');
+							config.logger('Alexa-API: *** Server OK listening on port ' + server.address().port + ' ***');
+							config.logger('Alexa-API: ****************************************');
+						});
 					}
-
-					server = app.listen(config.listeningPort, () => {
-						config.logger('Alexa-API: ****************************************');
-						config.logger('Alexa-API: *** Server OK listening on port ' + server.address().port + ' ***');
-						config.logger('Alexa-API: ****************************************');
-						
-						AllerVoirSilYaDesCommandesenFileAttente();
-					});
+					AllerVoirSilYaDesCommandesenFileAttente();
 				});
 			}
 		});
