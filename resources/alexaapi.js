@@ -38,6 +38,8 @@ config.logger('Alexa-Config (alexaapi.js): alexaserver=' + alexaserver);
 /* Routing */
 const app = express();
 let server = null;
+/* Objet contenant les commandes pour appeler via chaine */
+var mesFonc = {};
 
 /* Apply callback on every cluster's membre (for multiroom device) */
 function forEachDevices(nameOrSerial, callback) {
@@ -59,41 +61,27 @@ function forEachDevices(nameOrSerial, callback) {
 
 function LancementCommande(commande, req) 
 {
-//config.logger && config.logger('Alexa-API: Lancement /'+commande);
-FiledesCommandes.push([commande, req]);
-//config.logger && config.logger('Taille au lancement:'+FiledesCommandes.length);
+	//config.logger && config.logger('Alexa-API: Lancement /'+commande);
+	FiledesCommandes.push([commande, req]);
+	//config.logger && config.logger('Taille au lancement:'+FiledesCommandes.length);
 }
 
 function FinCommandeBienExecutee() 
 {
-FiledesCommandes.pop(); 
-//config.logger && config.logger('Taille après lancement :'+FiledesCommandes.length);
-
+	FiledesCommandes.pop(); 
+	//config.logger && config.logger('Taille après lancement :'+FiledesCommandes.length);
 }
 
 function AllerVoirSilYaDesCommandesenFileAttente()		
 {
-config.logger && config.logger("Il reste "+FiledesCommandes.length+" commande(s) en file d'attente");
+	config.logger && config.logger("Il reste "+FiledesCommandes.length+" commande(s) en file d'attente");
 	FiledesCommandes.forEach(function (element) {
-	config.logger && config.logger('Alexa-API: RE-Lancement de la '+element[0]);
-
-
-									switch (element[0]) {
-
-										case 'speak':
-											maFonctionSpeak(element[1],app.response);
-											break;
-										case 'radio':
-											maFonctionRadio(element[1],app.response);
-											break;
-										case 'volume':
-											maFonctionVolume(element[1],app.response);
-											break;
-										case 'commande':
-											maFonctionCommand(element[1],app.response);
-											break;									}
+		config.logger && config.logger('Alexa-API: RE-Lancement de '+element[0]+'('+element[1]+')');
+		
+		mesFonc[element[0]](element[1],app.response);
 	})
 }
+
 
 /***** checkAuth *****
   URL: /checkAuth
@@ -104,7 +92,6 @@ config.logger && config.logger("Il reste "+FiledesCommandes.length+" commande(s)
   }]
 
 */
-
 app.get('/checkAuth', (req, res) => {
 	config.logger('Alexa-API: checkAuth');
 	res.type('json');
@@ -115,6 +102,7 @@ app.get('/checkAuth', (req, res) => {
 		});
 	});
 });
+
 
 /**** Alexa.Speak *****
   URL: /speak?device=?&text=?
@@ -127,10 +115,8 @@ app.get('/checkAuth', (req, res) => {
   Otherwise, an error object is returned.
   FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
 */
-
-//appel ailleurs avec maFonctionSpeak(req,res);
-
-var maFonctionSpeak = function(req,res){
+mesFonc.maFonctionSpeak = function(req,res){
+	LancementCommande("maFonctionSpeak",req);
 	config.logger('Alexa-API: Alexa.Speak');
 	res.type('json');
 
@@ -144,23 +130,20 @@ var maFonctionSpeak = function(req,res){
 
 	if ('volume' in req.query)
 	{
-		LancementCommande("volume",req);
 		forEachDevices(req.query.device, (serial) =>
 		{
-		alexa.sendSequenceCommand(serial, 'volume', req.query.volume, GestionRetour);
+			alexa.sendSequenceCommand(serial, 'volume', req.query.volume, GestionRetour);
 		});
 	}
 
-	LancementCommande("speak",req);
 	forEachDevices(req.query.device, (serial) =>
 	{
-	alexa.sendSequenceCommand(serial, 'speak', req.query.text, GestionRetour);
+		alexa.sendSequenceCommand(serial, 'speak', req.query.text, GestionRetour);
 	});
 
-res.status(200).json({});	
+	res.status(200).json({});	
 }
-
-app.get('/speak', maFonctionSpeak);
+app.get('/speak', mesFonc.maFonctionSpeak);
 
 
 /**** Alexa.Radio *****
@@ -174,7 +157,8 @@ app.get('/speak', maFonctionSpeak);
   Otherwise, an error object is returned.
   FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
 */
-var maFonctionRadio = function(req,res){
+mesFonc.maFonctionRadio = function(req,res){
+	LancementCommande("maFonctionRadio",req);
 	config.logger('Alexa-API: Alexa.Radio');
 	res.type('json');
 
@@ -188,20 +172,18 @@ var maFonctionRadio = function(req,res){
 
 	if ('volume' in req.query) {
 		forEachDevices(req.query.device, (serial) => {
-			LancementCommande("volume",req);
 			alexa.sendSequenceCommand(serial, 'volume', GestionRetour);
 		});
 	}
 
-		forEachDevices(req.query.device, (serial) => {
-			LancementCommande("radio",req);
-			alexa.setTunein(serial, req.query.station, GestionRetour);
-		});
+	forEachDevices(req.query.device, (serial) => {
+		alexa.setTunein(serial, req.query.station, GestionRetour);
+	});
 
-res.status(200).json({});
+	res.status(200).json({});
 }
+app.get('/radio', mesFonc.maFonctionRadio);
 
-app.get('/radio', maFonctionRadio);
 
 /***** Alexa.DeviceControls.Volume *****
   URL: /volume?device=?&value=?
@@ -212,7 +194,8 @@ app.get('/radio', maFonctionRadio);
   Otherwise, an error object is returned.
   FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
 */
-var maFonctionVolume = function(req,res){
+mesFonc.maFonctionVolume = function(req,res){
+	LancementCommande("maFonctionVolume",req);
 	config.logger('Alexa-API: Alexa.Volume');
 	res.type('json');
 
@@ -225,14 +208,13 @@ var maFonctionVolume = function(req,res){
 	config.logger('Alexa-API: value: ' + req.query.value);
 
 	var err = forEachDevices(req.query.device, (serial) => {
-			LancementCommande("volume",req);
-			alexa.sendSequenceCommand(serial, 'volume', req.query.value, GestionRetour);
+		alexa.sendSequenceCommand(serial, 'volume', req.query.value, GestionRetour);
 	});
 
 	res.status(200).json({});
-
 }
-app.get('/volume', maFonctionVolume);
+app.get('/volume', mesFonc.maFonctionVolume);
+
 
 /***** Alexa.DeviceControls.Command *****
   URL: /command?device=?&command=?
@@ -240,8 +222,8 @@ app.get('/volume', maFonctionVolume);
     command - String - command : pause|play|next|prev|fwd|rwd|shuffle|repeat
 
 */
-
-var maFonctionCommand = function(req,res){
+mesFonc.maFonctionCommand = function(req,res){
+	LancementCommande("maFonctionCommand",req);
 	config.logger('Alexa-API: Alexa.Command');
 	res.type('json');
 
@@ -254,13 +236,13 @@ var maFonctionCommand = function(req,res){
 	config.logger('Alexa-API: command: ' + req.query.command);
 
 	var err = forEachDevices(req.query.device, (serial) => {
-		LancementCommande("command",req);
 		alexa.sendCommand(serial, req.query.command, GestionRetour);
 	});
-		res.status(200).json({});
+	res.status(200).json({});
 }
+app.get('/command', mesFonc.maFonctionCommand);
 
-app.get('/command', maFonctionCommand);
+
 /***** Alexa.Routine *****
   URL /routine?device=?&name=?
     device - String - name of the device
@@ -306,6 +288,7 @@ app.get('/routine', (req, res) => {
 	});
 });
 
+
 /***** Alexa.Notifications.SendMobilePush *****
   URL /push?device=?&text=?
     device - String - name of the device
@@ -332,6 +315,7 @@ app.get('/push', (req, res) => {
 		res.status(200).json({});
 	});
 });
+
 
 /***** Create a reminder *****
   URL /reminder?device=?&text=?&when=?
@@ -371,6 +355,7 @@ app.get('/reminder', (req, res) => {
 		res.status(200).json({});
 	});
 });
+
 
 /***** Create a alarm *****
   URL /alarm?device=?&text=?&when=?
@@ -412,6 +397,7 @@ app.get('/alarm', (req, res) => {
 	});
 });
 
+
 /***** Get devices *****
   URL: /devices
 
@@ -447,6 +433,7 @@ app.get('/devices', (req, res) => {
 	});
 });
 
+
 /***** Get devices *****
   URL: /devices
 
@@ -479,6 +466,7 @@ app.get('/wakewords', (req, res) => {
 		res.status(200).json(toReturn);
 	});
 });
+
 
 app.get('/history', (req, res) => {
 	config.logger('Alexa-API: History');
@@ -516,6 +504,8 @@ app.get('/history', (req, res) => {
 		res.status(200).json(toReturn);
 	});
 });
+
+
 /***** routines *****
   URL: /routines
 
@@ -655,6 +645,8 @@ app.get('/routines', (req, res) => {
 	res.status(200).json(toReturn);
 	});
 });
+
+
 /***** Reminders *****
   URL: /reminders
 
@@ -668,7 +660,6 @@ app.get('/routines', (req, res) => {
   }]
 
 */
-
 app.get('/reminders', (req, res) => {
 	config.logger('Alexa-API: Reminders');
 	res.type('json');
@@ -711,7 +702,6 @@ app.get('/reminders', (req, res) => {
   }]
 
 */
-
 app.get('/deletereminder', (req, res) => {
 	config.logger('Alexa-API: DeleteReminder');
 	res.type('json');
@@ -730,6 +720,7 @@ app.get('/deletereminder', (req, res) => {
 	});
 });
 
+
 /***** DeleteAllAlarms *****
   URL: /deleteallalarms
 
@@ -739,7 +730,6 @@ app.get('/deletereminder', (req, res) => {
   }]
 
 */
-
 app.get('/deleteallalarms', (req, res) => {
 	config.logger('Alexa-API: DeleteAllAlarms');
 	res.type('json');
@@ -792,6 +782,7 @@ app.get('/deleteallalarms', (req, res) => {
 	});
 });
 
+
 /***** WhenNextAlarm *****
   URL: /whennextalarm
 
@@ -803,7 +794,6 @@ app.get('/deleteallalarms', (req, res) => {
   }]
 
 */
-
 app.get('/whennextalarm', (req, res) => {
 	config.logger('Alexa-API: WhenNextAlarm');
 	res.type('json');
@@ -910,7 +900,6 @@ app.get('/whennextalarm', (req, res) => {
   }]
 
 */
-
 app.get('/whennextreminder', (req, res) => {
 	config.logger('Alexa-API: WhenNextReminder');
 	res.type('json');
@@ -1000,6 +989,7 @@ app.get('/stop', (req, res) => {
 	});
 });
 
+
 /* Main */
 fs.readFile(config.cookieLocation, 'utf8', (err, data) => {
 	if (err) {
@@ -1049,7 +1039,6 @@ function startServer() {
 						config.logger('Alexa-API: ****************************************');
 						
 						AllerVoirSilYaDesCommandesenFileAttente();
-						
 					});
 				});
 			}
@@ -1082,7 +1071,6 @@ function GestionRetour(err) {
 	}
 	else
 	FinCommandeBienExecutee();
-
 }
 
 function error(status, source, title, detail) {
