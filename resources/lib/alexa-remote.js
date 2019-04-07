@@ -482,15 +482,23 @@ class AlexaRemote extends EventEmitter {
         delete logOptions.headers.Referer;
         delete logOptions.headers.Origin;
         this._options.logger && this._options.logger('Alexa-Remote: Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? 'and data=' + flags.data : ''));
-        let req = https.request(options, (res) => {
+		let req = https.request(options, (res) => {
+        //console.log(res+"FIN de RES");
             let body  = '';
+        //this._options.logger && this._options.logger('DEBUG1');
+			
+//SIMULER UN BUG !!!
+if (flags.data !=undefined) body="Connection: close";
+
 
             res.on('data', (chunk) => {
                 body += chunk;
             });
+        //this._options.logger && this._options.logger('DEBUG2');
 
             res.on('end', () =>
             {
+        //this._options.logger && this._options.logger('DEBUG3');
                 let ret;
                 if (typeof callback === 'function')
                 {
@@ -1366,14 +1374,14 @@ this.deleteNotification(notification, callback);
     sendSequenceCommand(serialOrName, command, value, callback)
     {
        
-//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 1 '+command);
+this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 1 '+command);
 
 	   let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
 //this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 2');
 
         if (typeof value === 'function') {
-			this._options.logger && this._options.logger('Alexa-sendSequenceCommand: function');
+			//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: function');
 
             callback = value;
             value = null;
@@ -1381,7 +1389,7 @@ this.deleteNotification(notification, callback);
 
         let seqCommandObj;
         if (typeof command === 'object') {
-			this._options.logger && this._options.logger('Alexa-sendSequenceCommand: object');
+			//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: object');
 
             seqCommandObj = command.sequence || command;
         }

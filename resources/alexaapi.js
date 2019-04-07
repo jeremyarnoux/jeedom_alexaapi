@@ -3,10 +3,15 @@ const express = require('express');
 const fs = require('fs');
 const Alexa = require('./lib/alexa-remote.js');
 let alexa = new Alexa();
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
 
+//const debug=1; //mettre 1 pour debug
+
+// Références :
+// https://openclassrooms.com/fr/courses/1173401-les-closures-en-javascript
 
 /* Configuration */
 const config = {
@@ -17,7 +22,10 @@ const config = {
 	listeningPort: 3456
 };
 
+
+
 var FiledesCommandes = [];  //Utiliser pour surveiller que les commandes sont bien envoyées (pour le souci de Connexion Close)
+var FiledesCommandes2 = [];  //Utiliser pour surveiller que les commandes sont bien envoyées (pour le souci de Connexion Close)
 
 // Par sécurité pour détecter un éventuel souci :
 if (!amazonserver) config.logger('Alexa-Config: *********************amazonserver NON DEFINI*********************');
@@ -32,17 +40,18 @@ function consoleSigalou() {
 	}
 }
 
-config.logger('Alexa-Config (alexaapi.js): amazonserver=' + amazonserver);
-config.logger('Alexa-Config (alexaapi.js): alexaserver=' + alexaserver);
+//config.logger('Alexa-Config (alexaapi.js): amazonserver=' + amazonserver);
+//config.logger('Alexa-Config (alexaapi.js): alexaserver=' + alexaserver);
 
 /* Routing */
 const app = express();
 let server = null;
 /* Objet contenant les commandes pour appeler via chaine */
-var mesFonc = {};
+var CommandAlexa = {};
 
 /* Apply callback on every cluster's membre (for multiroom device) */
 function forEachDevices(nameOrSerial, callback) {
+	
 	var device = alexa.find(nameOrSerial);
 	if (device === undefined)
 		return;
@@ -61,28 +70,84 @@ function forEachDevices(nameOrSerial, callback) {
 
 function LancementCommande(commande, req) 
 {
-	//config.logger && config.logger('Alexa-API: Lancement /'+commande);
-	FiledesCommandes.push([commande, req]);
-	//config.logger && config.logger('Taille au lancement:'+FiledesCommandes.length);
+	config.logger('Alexa-API: Lancement /'+commande);
+	config.logger('Alexa-API: Lancement /'+req.query.tagId);
+			//config.logger(req);
+/*
+	FiledesCommandes.push([commande, req, Date.now()]);
+	FiledesCommandes2.push([commande, req, Date.now()]);
+	config.logger && config.logger('Taille au lancement:'+FiledesCommandes.length);
+	config.logger && config.logger('Taille au lancement:'+FiledesCommandes.length);
+	config.logger && config.logger('heure:'+Date.now());*/
 }
-
+/*
 function FinCommandeBienExecutee() 
 {
-	FiledesCommandes.pop(); 
+	if (debug!=1) FiledesCommandes.pop(); 
 	//config.logger && config.logger('Taille après lancement :'+FiledesCommandes.length);
 }
 
 function AllerVoirSilYaDesCommandesenFileAttente()		
 {
-	config.logger && config.logger("Il reste "+FiledesCommandes.length+" commande(s) en file d'attente");
+	config.logger && config.logger("Alexa-API: Il reste "+FiledesCommandes.length+" commande(s) en file d'attente");
 	FiledesCommandes.forEach(function (element) {
 		config.logger && config.logger('Alexa-API: RE-Lancement de '+element[0]+'('+element[1]+')');
-		
-		mesFonc[element[0]](element[1],app.response);
+		config.logger && config.logger('Test Horodatage : Ancien lancement: '+element[2]+' et maintenant : '+Date.now()+ 'Difference :'+(Date.now()-element[2]));
+		//config.logger(element[1]);
+		//element[1].fresh="132";
+		//if (element[1].fresh) {
+  // The user-agent is asking for a more up-to-date version of the requested resource.
+  // Let's hit the database to get some stuff and send it back.
+  
+  
+	req=element[1];
+	
+		CommandAlexa[element[0]](req,app.response);//}
 	})
 }
 
 
+///pour debug, c'est pour attendre 4s
+function traitement()
+{
+//Traitement à effectuer sur la page
+setTimeout(suiteTraitement, 4000) //Attendez 10 secondes avant de continuer dans la fonction suivante
+}
+function suiteTraitement()
+{
+//Continuez le traitement après la pause dans cette fonction
+//AllerVoirSilYaDesCommandesenFileAttente();
+config.logger && config.logger('test 4s');
+/*var req = new XMLHttpRequest();
+req.open("POST", "http://192.168.0.21:3456/volume?value=50&device=G090LF118173117U");
+// Envoi de la requête en y incluant l'objet
+req.send(identite);
+
+// *****************************************
+
+
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var req = new XMLHttpRequest();
+req.open("POST", "http://192.168.0.21:3456/volume?value=50&device=G090LF118173117U");
+// Envoi de la requête en y incluant l'objet
+req.send();
+
+
+
+
+
+
+const req = new XMLHttpRequest();
+req.open('POST', 'http://192.168.0.21:3456/volume?value=50&device=G090LF118173117U', false);
+req.send(null);
+
+// if (req.status === 0) {}
+
+//console.log(req.responseText);
+
+
+}
+*/
 /***** checkAuth *****
   URL: /checkAuth
 
@@ -115,11 +180,9 @@ app.get('/checkAuth', (req, res) => {
   Otherwise, an error object is returned.
   FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
 */
-mesFonc.maFonctionSpeak = function(req,res){
-	LancementCommande("maFonctionSpeak",req);
-	config.logger('Alexa-API: Alexa.Speak');
+CommandAlexa.Speak = function(req,res){
+	LancementCommande("Speak",req);
 	res.type('json');
-
 	if ('device' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
 	config.logger('Alexa-API: device: ' + req.query.device);
@@ -128,14 +191,6 @@ mesFonc.maFonctionSpeak = function(req,res){
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
 	config.logger('Alexa-API: text: ' + req.query.text);
 
-	if ('volume' in req.query)
-	{
-		forEachDevices(req.query.device, (serial) =>
-		{
-			alexa.sendSequenceCommand(serial, 'volume', req.query.volume, GestionRetour);
-		});
-	}
-
 	forEachDevices(req.query.device, (serial) =>
 	{
 		alexa.sendSequenceCommand(serial, 'speak', req.query.text, GestionRetour);
@@ -143,8 +198,6 @@ mesFonc.maFonctionSpeak = function(req,res){
 
 	res.status(200).json({});	
 }
-app.get('/speak', mesFonc.maFonctionSpeak);
-
 
 /**** Alexa.Radio *****
   URL: /radio?device=?&text=?
@@ -157,24 +210,17 @@ app.get('/speak', mesFonc.maFonctionSpeak);
   Otherwise, an error object is returned.
   FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
 */
-mesFonc.maFonctionRadio = function(req,res){
-	LancementCommande("maFonctionRadio",req);
-	config.logger('Alexa-API: Alexa.Radio');
+CommandAlexa.Radio = function(req,res){
+	LancementCommande("Radio",req);
 	res.type('json');
 
 	if ('device' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Radio', 'Missing parameter "device"'));
 	config.logger('Alexa-API: device: ' + req.query.device);
 
 	if ('station' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "station"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Radio', 'Missing parameter "station"'));
 	config.logger('Alexa-API: station: ' + req.query.station);
-
-	if ('volume' in req.query) {
-		forEachDevices(req.query.device, (serial) => {
-			alexa.sendSequenceCommand(serial, 'volume', GestionRetour);
-		});
-	}
 
 	forEachDevices(req.query.device, (serial) => {
 		alexa.setTunein(serial, req.query.station, GestionRetour);
@@ -182,10 +228,9 @@ mesFonc.maFonctionRadio = function(req,res){
 
 	res.status(200).json({});
 }
-app.get('/radio', mesFonc.maFonctionRadio);
 
 
-/***** Alexa.DeviceControls.Volume *****
+/***** Alexa.Volume *****
   URL: /volume?device=?&value=?
     device - String - name of the device
     value - Integer - Determine the volume level between 0 to 100 (0 is mute and 100 is max)
@@ -194,45 +239,66 @@ app.get('/radio', mesFonc.maFonctionRadio);
   Otherwise, an error object is returned.
   FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
 */
-mesFonc.maFonctionVolume = function(req,res){
-	LancementCommande("maFonctionVolume",req);
-	config.logger('Alexa-API: Alexa.Volume');
+
+CommandAlexa.Volume = function(req,res){
+	
+	LancementCommande("Volume", req);
+	//req.fresh="";
+
+
+	// fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+	//config.logger('Alexa-API: Traitement de : '+fullUrl);
 	res.type('json');
 
+
+	//Quand Volume est lancé par une autre fonction, la valeur du volume n'est pas value mais volume
+	if ('volume' in req.query) 
+		req.query.value=req.query.volume
+
 	if ('device' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "device"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "device"'));
 	config.logger('Alexa-API: device: ' + req.query.device);
 
 	if ('value' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Volume', 'Missing parameter "value"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "value"'));
 	config.logger('Alexa-API: value: ' + req.query.value);
-
+	
+	
+	
 	var err = forEachDevices(req.query.device, (serial) => {
-		alexa.sendSequenceCommand(serial, 'volume', req.query.value, GestionRetour);
+		
+		alexa.sendSequenceCommand(serial, 'volume', req.query.value, 
+				
+			function(testErreur){
+				if (testErreur) {
+				traiteErreur(testErreur);		
+				res.status(500).json({value: testErreur.message});
+				} else {
+				   res.status(200).json({value: "OK"});
+				}
+			}
+		);
 	});
-
-	res.status(200).json({});
 }
-app.get('/volume', mesFonc.maFonctionVolume);
 
 
-/***** Alexa.DeviceControls.Command *****
+
+/***** Alexa.Command *****
   URL: /command?device=?&command=?
     device - String - name of the device
     command - String - command : pause|play|next|prev|fwd|rwd|shuffle|repeat
 
 */
-mesFonc.maFonctionCommand = function(req,res){
-	LancementCommande("maFonctionCommand",req);
-	config.logger('Alexa-API: Alexa.Command');
+CommandAlexa.Command = function(req,res){
+	LancementCommande("Command",req);
 	res.type('json');
 
 	if ('device' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Command', 'Missing parameter "device"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Command', 'Missing parameter "device"'));
 	config.logger('Alexa-API: device: ' + req.query.device);
 
 	if ('command' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Command', 'Missing parameter "command"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Command', 'Missing parameter "command"'));
 	config.logger('Alexa-API: command: ' + req.query.command);
 
 	var err = forEachDevices(req.query.device, (serial) => {
@@ -240,7 +306,10 @@ mesFonc.maFonctionCommand = function(req,res){
 	});
 	res.status(200).json({});
 }
-app.get('/command', mesFonc.maFonctionCommand);
+app.get('/command', CommandAlexa.Command);
+app.get('/volume', CommandAlexa.Volume);
+app.get('/speak', CommandAlexa.Speak);
+app.get('/radio', CommandAlexa.Radio);
 
 
 /***** Alexa.Routine *****
@@ -249,16 +318,18 @@ app.get('/command', mesFonc.maFonctionCommand);
     routine - String - name of routine
 
 */
-app.get('/routine', (req, res) => {
-	config.logger('Alexa-API: /routine :');
+//app.get('/routine', (req, res) => {
+
+CommandAlexa.Routine = function(req,res){
+	LancementCommande("Routine",req);
 	res.type('json');
 
 	if ('device' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Command', 'Missing parameter "device"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Routine', 'Missing parameter "device"'));
 	config.logger('Alexa-API: device: ' + req.query.device);
 
 	if ('routine' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Command', 'Missing parameter "routine"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Routine', 'Missing parameter "routine"'));
 	config.logger('Alexa-API: routine: ' + req.query.routine);
 
 
@@ -270,23 +341,19 @@ app.get('/routine', (req, res) => {
 			if (niveau0.hasOwnProperty(serial)) {
 				var routine = niveau0[serial];
 
-				//config.logger('(Test creationTimeEpochMillis )-----> ' + routine.creationTimeEpochMillis + '/' + req.query.routine);
-
 				if (routine.creationTimeEpochMillis == req.query.routine)
 					routineaexecuter = routine;
-
 			}
 		}
-		if (routineaexecuter != '') {
-			alexa.executeAutomationRoutine(req.query.device, routineaexecuter, function(err) {
-				config.logger('Alexa-API: routine - OK - Lancement routine: ' + req.query.routine);
-			});
-		} else
+		if (routineaexecuter != '') 
+			alexa.executeAutomationRoutine(req.query.device, routineaexecuter, GestionRetour);
+		else
 			config.logger('Alexa-API: routine - ECHEC (introuvable) - Lancement routine: ' + req.query.routine);
 
 		res.status(200).json({});
 	});
-});
+}
+app.get('/routine', CommandAlexa.Routine);
 
 
 /***** Alexa.Notifications.SendMobilePush *****
@@ -331,21 +398,21 @@ app.get('/reminder', (req, res) => {
 	res.type('json');
 
 	if ('device' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Reminder', 'Missing parameter "device"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Reminder', 'Missing parameter "device"'));
 	config.logger('Alexa-API: device: ' + req.query.device);
 
 	if ('text' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Reminder', 'Missing parameter "text"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Reminder', 'Missing parameter "text"'));
 	config.logger('Alexa-API: text: ' + req.query.text);
 
 	if ('when' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Reminder', 'Missing parameter "when"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Reminder', 'Missing parameter "when"'));
 	config.logger('Alexa-API: when: ' + req.query.when);
 
 	// when: YYYY-MM-DD HH:MI:SS
 	let dateValues = req.query.when.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
 	if (dateValues === null)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Reminder', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Reminder', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
 	let when = new Date(dateValues[1], dateValues[2] - 1, dateValues[3], dateValues[4], dateValues[5], dateValues[6]);
 	config.logger('Alexa-API: when: ' + when);
 
@@ -371,22 +438,22 @@ app.get('/alarm', (req, res) => {
 	res.type('json');
 
 	if ('device' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Alarm', 'Missing parameter "device"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Missing parameter "device"'));
 	config.logger('Alexa-API: device: ' + req.query.device);
 
 	if ('when' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Alarm', 'Missing parameter "when"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Missing parameter "when"'));
 	config.logger('Alexa-API: when: ' + req.query.when);
 
 	if ('recurring' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Alarm', 'Missing parameter "recurring"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Missing parameter "recurring"'));
 	config.logger('Alexa-API: recurring: ' + req.query.recurring);
 
 
 	// when: YYYY-MM-DD HH:MI:SS
 	let dateValues = req.query.when.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
 	if (dateValues === null)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.Alarm', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
 	let when = new Date(dateValues[1], dateValues[2] - 1, dateValues[3], dateValues[4], dateValues[5], dateValues[6]);
 	config.logger('Alexa-API: when: ' + when);
 
@@ -707,7 +774,7 @@ app.get('/deletereminder', (req, res) => {
 	res.type('json');
 
 	if ('id' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeviceControls.DeleteReminder', 'Missing parameter "id"'));
+		return res.status(500).json(error(500, req.route.path, 'Alexa.DeleteReminder', 'Missing parameter "id"'));
 
 	const notification = {
 		'id': req.query.id
@@ -1003,6 +1070,7 @@ fs.readFile(config.cookieLocation, 'utf8', (err, data) => {
 });
 
 function startServer() {
+	config.logger('Alexa-API: ******************** Lancement Serveur ***********************');
 	alexa.init({
 			cookie: config.cookie,
 			logger: config.logger,
@@ -1032,12 +1100,13 @@ function startServer() {
 						config.logger('Alexa-API: *******************************************');
 					} else {
 						server = app.listen(config.listeningPort, () => {
-							config.logger('Alexa-API: ****************************************');
-							config.logger('Alexa-API: *** Server OK listening on port ' + server.address().port + ' ***');
-							config.logger('Alexa-API: ****************************************');
+							config.logger('Alexa-API: **************************************************************');
+							config.logger('Alexa-API: ************** Server OK listening on port ' + server.address().port + ' **************');
+							config.logger('Alexa-API: **************************************************************');
+
 						});
 					}
-					AllerVoirSilYaDesCommandesenFileAttente();
+					//AllerVoirSilYaDesCommandesenFileAttente();
 				});
 			}
 		});
@@ -1048,6 +1117,8 @@ function startServer() {
 //Gestion des erreurs et surtout pour détecter les ConnexionClose
 
 function GestionRetour(err) {
+		
+	
 //message::add('alexaapi', 'Sigalou est le meilleur');
 	//var hasError = false;
 	if (err) {
@@ -1064,13 +1135,58 @@ function GestionRetour(err) {
 		//hasError = true;
 		if (err.message == "Connexion Close") {
 			config.logger("Connexion Close détectée dans la détection d'erreur et donc relance de l'initialisation");
+			
+			
+				//************ Faut arreter mieux le serveur et relancer
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			startServer();
+			
+			
+			//AllerVoirSilYaDesCommandesenFileAttente();
 		}
+		
+	hasError = true;
+	errorMessage = err.message;
 	}
-	else
-	FinCommandeBienExecutee();
+	//else
+	//FinCommandeBienExecutee();
+
+//if(typeof(next) == "function") next(); Le garder si un jour on enchaine les commandes, pour avoir la synthaxe.
+		config.logger('Alexa-API: 2222222EEEEEEEEERRRRRRREEEEEEEEEEUUUUUUUUUUUURRRRR : '+err);
+		
 }
 
+function traiteErreur(err) {
+		
+	
+//message::add('alexaapi', 'Sigalou est le meilleur');
+	//var hasError = false;
+
+		config.logger('Alexa-API: ******************************************************************');
+		config.logger('Alexa-API: *****************************ERROR********************************');
+		config.logger('Alexa-API: ******************************************************************');
+		config.logger(err.message);
+		config.logger('Alexa-API: ******************************************************************');
+		config.logger(err);
+		config.logger('Alexa-API: ******************************************************************');
+		config.logger('Alexa-API: ******************************************************************');
+
+		//var errorMessage = err.message;
+		//hasError = true;
+		if (err.message == "Connexion Close") {
+			config.logger("Connexion Close détectée dans la détection d'erreur et donc relance de l'initialisation");
+			startServer();
+			//AllerVoirSilYaDesCommandesenFileAttente();
+		}
+		
+	//hasError = true;
+	//errorMessage = err.message;
+
+
+//if(typeof(next) == "function") next(); Le garder si un jour on enchaine les commandes, pour avoir la synthaxe.
+		//config.logger('Alexa-API: 2222222EEEEEEEEERRRRRRREEEEEEEEEEUUUUUUUUUUUURRRRR : '+err);
+		
+}
 function error(status, source, title, detail) {
 	let error = {
 		'status': status,

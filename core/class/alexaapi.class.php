@@ -452,7 +452,7 @@ class alexaapi extends eqLogic {
 			$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
 		}
 		$cmd->save();
-
+/*
 		// Speak + Volume command
 		$cmd = $this->getCmd(null, 'speak-volume');
 		if (!is_object($cmd)) {
@@ -484,7 +484,7 @@ class alexaapi extends eqLogic {
 			$cmd->setIsVisible(0);
 		}
 		$cmd->save();
-
+*/
 		// alarm command
 		$cmd = $this->getCmd(null, 'alarm');
 		if (!is_object($cmd)) {
@@ -688,28 +688,31 @@ class alexaapiCmd extends cmd {
 		}
 
 		//log::add('alexaapi', 'debug', 'execute : Début');
+		//On construit la requete 
 		$request = $this->buildRequest($_options);
-		log::add('alexaapi', 'info', 'Request : ' . $request);
+		log::add('alexaapi', 'info', 'Request : ' . $request);//Request : http://192.168.0.21:3456/volume?value=50&device=G090LF118173117U
 
-		// Execute request
-		if ($this->getConfiguration('http_username') != '' && $this->getConfiguration('http_password') != '') $request_http = new com_http($request, $this->getConfiguration('http_username'), $this->getConfiguration('http_password'));
-		else $request_http = new com_http($request);
+		// On déclare la requete $request_http en tant que com_http 
+		// Archive version avec user/pass
+		//if ($this->getConfiguration('http_username') != '' && $this->getConfiguration('http_password') != '') $request_http = new com_http($request, $this->getConfiguration('http_username'), $this->getConfiguration('http_password'));
+		//else $request_http = new com_http($request);
+		$request_http = new com_http($request);
 
-		//if ($this->getConfiguration('allowEmptyResponse') == 1)
+		//Autorise les réponses vides
 		$request_http->setAllowEmptyReponse(true);
 
 		if ($this->getConfiguration('noSslCheck') == 1) $request_http->setNoSslCheck(true);
 
 		if ($this->getConfiguration('doNotReportHttpError') == 1) $request_http->setNoReportError(true);
 
+		// option non activée 
 		if (isset($_options['speedAndNoErrorReport']) && $_options['speedAndNoErrorReport'] == true) {
 			$request_http->setNoReportError(true);
 			$request_http->exec(0.1, 1);
 			return;
 		}
-		//log::add('alexaapi', 'info', 'Request : ' . $request_http);
+		//Lance la requete avec un time out à 2s et 3 essais
 		$result = $request_http->exec($this->getConfiguration('timeout', 2), $this->getConfiguration('maxHttpRetry', 3));
-		//$result = $request_http->exec();
 		if (!result) throw new Exception(__('Serveur injoignable', __FILE__));
 
 		// json doit etre un retour d'erreur (probablement)
@@ -718,7 +721,29 @@ class alexaapiCmd extends cmd {
 		// On traite la valeur de resultat (dans le cas de whennextalarm par exemple)
 		$resultjson = json_decode($result, true);
 		$value = $resultjson['value'];
-		//log::add('alexaapi', 'debug', 'Résultat value=' . $value);
+		//log::add('alexaapi', 'debug', '** Résultat value=' . $value);
+		
+		//*******************************************************************************
+		// Ici, on va traiter une commande qui n'a pas été executée correctement (erreur type "Connexion Close")
+		if ($value =="Connexion Close")
+		{
+		log::add('alexaapi', 'debug', '**On traite Connexion Close** dans la Class');
+		sleep(8);
+		log::add('alexaapi', 'debug', '**On relance '.$request);
+		//Lance la requete avec un time out à 2s et 3 essais
+		$result = $request_http->exec($this->getConfiguration('timeout', 2), $this->getConfiguration('maxHttpRetry', 3));
+		if (!result) throw new Exception(__('Serveur injoignable', __FILE__));
+
+		// json doit etre un retour d'erreur (probablement)
+		$jsonResult = json_decode($json, true);
+		if (!empty($jsonResult)) throw new Exception(__('Echec de l\'execution: ', __FILE__) . '(' . $jsonResult['title'] . ') ' . $jsonResult['detail']);
+		// On traite la valeur de resultat (dans le cas de whennextalarm par exemple)
+		$resultjson = json_decode($result, true);
+		$value = $resultjson['value'];
+		
+		}
+		
+		
 		
 
 		if (($this->getType() == 'action') && ($this->getConfiguration('infoName') != '')) {
