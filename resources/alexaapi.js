@@ -3,7 +3,7 @@ const express = require('express');
 const fs = require('fs');
 const Alexa = require('./lib/alexa-remote.js');
 let alexa;
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+//var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
