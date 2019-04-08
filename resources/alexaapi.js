@@ -2,7 +2,7 @@
 const express = require('express');
 const fs = require('fs');
 const Alexa = require('./lib/alexa-remote.js');
-let alexa = new Alexa();
+let alexa;
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const amazonserver = process.argv[3];
@@ -1070,6 +1070,8 @@ fs.readFile(config.cookieLocation, 'utf8', (err, data) => {
 });
 
 function startServer() {
+	alexa = null;
+	alexa = new Alexa();
 	config.logger('Alexa-API: ******************** Lancement Serveur ***********************');
 	alexa.init({
 			cookie: config.cookie,
