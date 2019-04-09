@@ -177,15 +177,17 @@ class alexaapi extends eqLogic {
 		
 		$packageJson=json_decode(file_get_contents($resources.'package.json'),true);
 		$state='ok';
-		log::add('alexaapi','debug','liste des dependances :'.json_encode($packageJson['dependencies']));
+		log::add('alexaapi','info','liste des dependances :'.$resources.'package.json');
+		log::add('alexaapi','info','liste des dependances :'.json_encode($packageJson));
+		log::add('alexaapi','info','liste des dependances :'.json_encode($packageJson['dependencies']));
 		foreach($packageJson["dependencies"] as $dep => $ver){
-			log::add('alexaapi','debug','dependance : '.$dep);
+			log::add('alexaapi','info','dependance : '.$dep);
 			if(!file_exists($resources.'node_modules/'.$dep.'/package.json')) {
 				$state='nok';
-				log::add('alexaapi','debug',"n'existe pas");
+				log::add('alexaapi','info',"n'existe pas");
 			}
 		}
-		log::add('alexaapi','debug',"state : ".$state);
+		log::add('alexaapi','info',"state : ".$state);
 		
 		$return['progress_file'] = jeedom::getTmpFolder('alexaapi') . '/dependance';
 		//$return['state'] = is_dir($resources.'node_modules') ? 'ok' : 'nok';
