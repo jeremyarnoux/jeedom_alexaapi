@@ -174,7 +174,6 @@ class alexaapi extends eqLogic {
 		$return = array();
 		$return['log'] = 'alexaapi_dep';
 		$resources = realpath(dirname(__FILE__) . '/../../resources/');
-		
 		$packageJson=json_decode(file_get_contents($resources.'/package.json'),true);
 		$state='ok';
 		log::add('alexaapi','info','liste des dependances :'.$resources.'/package.json');
