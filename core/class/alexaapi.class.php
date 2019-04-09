@@ -177,7 +177,7 @@ class alexaapi extends eqLogic {
 		
 		$packageJson=json_decode(file_get_contents($resources.'package.json'),true);
 		$state='ok';
-		log::add('alexaapi','debug','liste des dependances');
+		log::add('alexaapi','debug','liste des dependances :'.json_encode($packageJson['dependencies']));
 		foreach($packageJson["dependencies"] as $dep => $ver){
 			log::add('alexaapi','debug','dependance : '.$dep);
 			if(!file_exists($resources.'node_modules/'.$dep.'/package.json')) {
