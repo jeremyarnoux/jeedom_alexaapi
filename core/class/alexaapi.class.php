@@ -177,9 +177,15 @@ class alexaapi extends eqLogic {
 		
 		$packageJson=json_decode(file_get_contents($resources.'package.json'),true);
 		$state='ok';
+		log::add('alexaapi','debug','liste des dependances');
 		foreach($packageJson["dependencies"] as $dep => $ver){
-			if(!file_exists($resources.'node_modules/'.$dep.'/package.json')) $state='nok';
+			log::add('alexaapi','debug','dependance : '.$dep);
+			if(!file_exists($resources.'node_modules/'.$dep.'/package.json')) {
+				$state='nok';
+				log::add('alexaapi','debug',"n'existe pas");
+			}
 		}
+		log::add('alexaapi','debug',"state : ".$state);
 		
 		$return['progress_file'] = jeedom::getTmpFolder('alexaapi') . '/dependance';
 		//$return['state'] = is_dir($resources.'node_modules') ? 'ok' : 'nok';
