@@ -885,7 +885,7 @@ class alexaapiCmd extends cmd {
 		$request = $this->getConfiguration('request');
 		if (!isset($_options['message']) || $_options['message'] == '') throw new Exception(__('Le message ne peut pas être vide', __FILE__));
 
-		return str_replace(array('#messagge#'), array(urlencode($_options['messagge'])), $request);
+		return str_replace(array('#message#'), array(urlencode($_options['message'])), $request);
 	}
 	private function buildRoutineRequest($_options = array()) {
 		log::add('alexaapi', 'debug', 'buildRoutineRequest');

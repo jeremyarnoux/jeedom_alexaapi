@@ -318,6 +318,7 @@ CommandAlexa.Command = function(req,res){
 		alexa.sendCommand(serial, req.query.command, traiteErreur);
 	});
 	res.status(200).json({});
+	// On ne peut pas traiter le retour de command comme les autres car il n'y a pas de retour
 }
 app.get('/command', CommandAlexa.Command);
 app.get('/volume', CommandAlexa.Volume);
@@ -347,7 +348,6 @@ CommandAlexa.Routine = function(req,res){
 
 
 	alexa.getAutomationRoutines2(function(niveau0) {
-		var toReturn = [];
 		var routineaexecuter = "";
 
 		for (var serial in niveau0) {
@@ -594,41 +594,23 @@ app.get('/routines', (req, res) => {
 	config.logger('Alexa-API: routines');
 	res.type('json');
 
-	//config.logger('Alexa-API: type of devices : '+typeof devices);
 
 	alexa.getAutomationRoutines2(function(niveau0) {
-		//devices='{"notifications":'+devices+'}';
-
-		//config.logger('Alexa-API: routines2');
-		//  config.logger(JSON.stringify(devices));
-		//  config.logger(devices);
-
-		//config.logger('Alexa-API: type of devices : '+typeof devices);
 		var resultatutterance;
 		var resultatlocale;
 		var resultattriggerTime;
 		var resultattimeZoneId;
 		var resultatrecurrence;
-		//config.logger('Alexa-API: routines3b2');
 		var toReturn = [];
-		//config.logger('************DEBUG DE ROUTINES*******************');
 		for (var serial in niveau0) {
 			if (niveau0.hasOwnProperty(serial)) {
-				//config.logger('************************************************');
 
 				var routine = niveau0[serial];
 
-				//config.logger('(general)----- '+routine.status);
-				//config.logger('(general)----- '+routine.creationTimeEpochMillis);
 
 				if (routine.status === 'ENABLED') {
-					//config.logger('(SUPPRESSION)----- '+routine.creationTimeEpochMillis);
 					alexa.executeAutomationRoutine("", routine, function(err) {
-						//config.logger('(SUPPRESSION DEDANS)----- '+routine.creationTimeEpochMillis);
-						//executeAutomationRoutine(serialOrName, routine, callback)
-						//res.status(200).json({});
 					});
-					//config.logger('(SUPPRESSION)----- '+routine.creationTimeEpochMillis);
 				}
 
 
@@ -716,7 +698,6 @@ app.get('/routines', (req, res) => {
 
 					'creationTimeEpochMillis': routine.creationTimeEpochMillis,
 					'lastUpdatedTimeEpochMillis': routine.lastUpdatedTimeEpochMillis
-					// 'members': device.clusterMembers
 				});
 
 				
