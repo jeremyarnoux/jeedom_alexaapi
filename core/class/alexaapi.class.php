@@ -170,7 +170,6 @@ class alexaapi extends eqLogic {
 
 	//************Dépendances ***********
 	public static function dependancy_info() {
-		log::add('alexaapi', 'info', 'Controle dependances');
 		$return = array();
 		$return['log'] = 'alexaapi_dep';
 		$resources = realpath(dirname(__FILE__) . '/../../resources/');
@@ -179,10 +178,8 @@ class alexaapi extends eqLogic {
 		foreach($packageJson["dependencies"] as $dep => $ver){
 			if(!file_exists($resources.'/node_modules/'.$dep.'/package.json')) {
 				$state='nok';
-				log::add('alexaapi','warning',$dep." n'existe pas");
 			}
 		}
-		log::add('alexaapi','info',"state : ".$state);
 		
 		$return['progress_file'] = jeedom::getTmpFolder('alexaapi') . '/dependance';
 		//$return['state'] = is_dir($resources.'/node_modules') ? 'ok' : 'nok';
