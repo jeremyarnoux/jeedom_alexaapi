@@ -1374,7 +1374,7 @@ this.deleteNotification(notification, callback);
     sendSequenceCommand(serialOrName, command, value, callback)
     {
        
-this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 1 '+command);
+//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 1 '+command);
 
 	   let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
