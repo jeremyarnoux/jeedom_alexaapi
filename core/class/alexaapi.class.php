@@ -170,12 +170,20 @@ class alexaapi extends eqLogic {
 
 	//************Dépendances ***********
 	public static function dependancy_info() {
-		log::add('alexaapi', 'info', 'Controle dependances');
 		$return = array();
 		$return['log'] = 'alexaapi_dep';
-		$request = realpath(dirname(__FILE__) . '/../../resources/node_modules');
+		$resources = realpath(dirname(__FILE__) . '/../../resources/');
+		$packageJson=json_decode(file_get_contents($resources.'/package.json'),true);
+		$state='ok';
+		foreach($packageJson["dependencies"] as $dep => $ver){
+			if(!file_exists($resources.'/node_modules/'.$dep.'/package.json')) {
+				$state='nok';
+			}
+		}
+		
 		$return['progress_file'] = jeedom::getTmpFolder('alexaapi') . '/dependance';
-		$return['state'] = is_dir($request) ? 'ok' : 'nok';
+		//$return['state'] = is_dir($resources.'/node_modules') ? 'ok' : 'nok';
+		$return['state']=$state;
 		return $return;
 	}
 
@@ -259,7 +267,7 @@ class alexaapi extends eqLogic {
 
 			// Retireve the device (if already registered in Jeedom)
 			$device = alexaapi::byLogicalId($item['serial'], 'alexaapi');
-			if (!is_object($device)) {
+			if (!$device) {
 				$device = self::createNewDevice($item['name'], $item['serial']);
 				$numNewDevices++;
 			}
@@ -371,7 +379,7 @@ class alexaapi extends eqLogic {
 				$refresh = new alexaapiCmd();
 				$refresh->setLogicalId('refresh');
 				$refresh->setIsVisible(1);
-				$refresh->setDisplay('icon', '<i class="fa fa-sync"></i>');
+				//$refresh->setDisplay('icon', '<i class="fa fa-refresh"></i>');
 				$refresh->setName(__('Refresh', __FILE__));
 			}
 			$refresh->setType('action');
@@ -601,22 +609,16 @@ class alexaapi extends eqLogic {
 		$this->refresh();
 	}
 
-	public static function dependancy_info() {
-		$return = array();
-		$return['log'] = 'alexaapi_dep';
-		$resources = realpath(dirname(__FILE__) . '/../../resources/');
-		$packageJson=json_decode(file_get_contents($resources.'/package.json'),true);
-		$state='ok';
-		foreach($packageJson["dependencies"] as $dep => $ver){
-			if(!file_exists($resources.'/node_modules/'.$dep.'/package.json')) {
-				$state='nok';
-			}
+	public static function dependancy_install($verbose = "false") {
+		if (file_exists(jeedom::getTmpFolder('alexaapi') . '/dependance')) {
+			return;
 		}
-		
-		$return['progress_file'] = jeedom::getTmpFolder('alexaapi') . '/dependance';
-		//$return['state'] = is_dir($resources.'/node_modules') ? 'ok' : 'nok';
-		$return['state']=$state;
-		return $return;
+		log::remove('alexaapi_dep');
+		$_debug = 0;
+		if (log::getLogLevel('alexaapi') == 100 || $verbose === "true" || $verbose === true) $_debug = 1;
+		log::add('alexaapi', 'info', 'Installation des dépendances : ');
+		$resource_path = realpath(dirname(__FILE__) . '/../../resources');
+		return array('script' => $resource_path . '/nodejs.sh ' . $resource_path . ' alexaapi ' . $_debug, 'log' => log::getPathToLog('alexaapi_dep'));
 	}
 
 	public function preUpdate() {
