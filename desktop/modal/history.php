@@ -54,9 +54,12 @@ $ledevice = $TouslesDevices[$item['deviceSerialNumber']];
 else
 {
     $device = alexaapi::byLogicalId($item['deviceSerialNumber'], 'alexaapi');
-	$ledevice=$device->getName();
-	//echo "va chercher";
-	$TouslesDevices[$item['deviceSerialNumber']] = $ledevice;
+	if (is_object($device)) {
+		$ledevice=$device->getName();
+		$TouslesDevices[$item['deviceSerialNumber']] = $ledevice;
+	} else {
+		continue;
+	}
 }	
 //***************************************************
 
