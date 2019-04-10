@@ -1,16 +1,9 @@
 /*jshint esversion: 6,node: true,-W041: false */
 const express = require('express');
 const fs = require('fs');
-<<<<<<< HEAD
-//const Alexa = require('./lib/alexa-remote.js'); //essai
-var Alexa = require('./lib/alexa-remote.js');
-let alexa = new Alexa();
-//var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-=======
 const Alexa = require('./lib/alexa-remote.js');
 let alexa;
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
->>>>>>> 5f566eb7590b272ae91b9ff20f6fbacd743a0cab
+//var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
@@ -1077,16 +1070,10 @@ fs.readFile(config.cookieLocation, 'utf8', (err, data) => {
 });
 
 function startServer() {
-<<<<<<< HEAD
-	
-	alexa=null
-	alexa = new Alexa();
-	
-=======
 	alexa = null;
 	alexa = new Alexa();
->>>>>>> 5f566eb7590b272ae91b9ff20f6fbacd743a0cab
 	config.logger('Alexa-API: ******************** Lancement Serveur ***********************');
+	
 	alexa.init({
 			cookie: config.cookie,
 			logger: config.logger,
