@@ -126,6 +126,8 @@ function PopUpCentre(url, width, height) {
     + leftPosition + ",top=" + topPosition + ",screenX=" + leftPosition + ",screenY="
     + topPosition + ",toolbar=no,menubar=no,scrollbars=no,location=no,directories=no");
 		
+		
+		
 if(nouvellefenetre)
 	{ //securité pour fermer la fenetre si le focus est perdu
 		window.onfocus=function()
@@ -134,6 +136,7 @@ if(nouvellefenetre)
 		$('.bt_identificationCookie').hide();
 		VerifierSiCookieGenere1();
 		}
+	
 	}
 }
 
