@@ -68,7 +68,7 @@ else
 	echo '<tr><td><span class="label label-danger" style="font-size : 1em; cursor : default;">?????</span></td>';
 
 
-	echo '<td><span style="font-size : 1em; cursor : default;">' . $item['summary'] . '</span></td>';
+	echo '<td><span style="font-size : 1em; cursor : default;">' . str_replace("jacques dit", "(via Jeedom)", $item['summary']) . '</span></td>';
 			
 			$heures=date("d-m-Y H:i:s",intval($item['creationTimestamp']/1000));
 			
