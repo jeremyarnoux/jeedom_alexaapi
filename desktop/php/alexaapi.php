@@ -107,7 +107,7 @@ function printEqLogic(data)
       </div>
       <div class="cursor" id="bt_reminders" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
         <center>
-          <i class="fa fa-clock" style="font-size : 6em;color:#767676;"></i>
+          <i class="fa fa-clock-o" style="font-size : 6em;color:#767676;"></i>
         </center>
         <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Rappels/Alarmes}}</center></span>
       </div>      <!-- Bouton d accès à la configuration -->

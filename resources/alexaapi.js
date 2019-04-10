@@ -1,9 +1,16 @@
 /*jshint esversion: 6,node: true,-W041: false */
 const express = require('express');
 const fs = require('fs');
+<<<<<<< HEAD
+//const Alexa = require('./lib/alexa-remote.js'); //essai
+var Alexa = require('./lib/alexa-remote.js');
+let alexa = new Alexa();
+//var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+=======
 const Alexa = require('./lib/alexa-remote.js');
 let alexa;
-//var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+>>>>>>> 5f566eb7590b272ae91b9ff20f6fbacd743a0cab
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
@@ -71,7 +78,7 @@ function forEachDevices(nameOrSerial, callback) {
 function LancementCommande(commande, req) 
 {
 	config.logger('Alexa-API: Lancement /'+commande);
-	//config.logger('Alexa-API: (tagId) Lancement /'+req.query.tagId);
+	config.logger('Alexa-API: Lancement /'+req.query.tagId);
 			//config.logger(req);
 /*
 	FiledesCommandes.push([commande, req, Date.now()]);
@@ -193,18 +200,10 @@ CommandAlexa.Speak = function(req,res){
 
 	forEachDevices(req.query.device, (serial) =>
 	{
-		alexa.sendSequenceCommand(serial, 'speak', req.query.text, 
-				
-			function(testErreur){
-				if (testErreur) {
-				traiteErreur(testErreur);		
-				res.status(500).json({value: testErreur.message});
-				} else {
-				   res.status(200).json({value: "OK"});
-				}
-			}
-		);
-	});	
+		alexa.sendSequenceCommand(serial, 'speak', req.query.text, GestionRetour);
+	});
+
+	res.status(200).json({});	
 }
 
 /**** Alexa.Radio *****
@@ -231,18 +230,10 @@ CommandAlexa.Radio = function(req,res){
 	config.logger('Alexa-API: station: ' + req.query.station);
 
 	forEachDevices(req.query.device, (serial) => {
-		alexa.setTunein(serial, req.query.station, 
-				
-			function(testErreur){
-				if (testErreur) {
-				traiteErreur(testErreur);		
-				res.status(500).json({value: testErreur.message});
-				} else {
-				   res.status(200).json({value: "OK"});
-				}
-			}
-		);
+		alexa.setTunein(serial, req.query.station, GestionRetour);
 	});
+
+	res.status(200).json({});
 }
 
 
@@ -259,6 +250,9 @@ CommandAlexa.Radio = function(req,res){
 CommandAlexa.Volume = function(req,res){
 	
 	LancementCommande("Volume", req);
+	//req.fresh="";
+
+
 	// fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
 	//config.logger('Alexa-API: Traitement de : '+fullUrl);
 	res.type('json');
@@ -315,10 +309,9 @@ CommandAlexa.Command = function(req,res){
 	config.logger('Alexa-API: command: ' + req.query.command);
 
 	var err = forEachDevices(req.query.device, (serial) => {
-		alexa.sendCommand(serial, req.query.command, traiteErreur);
+		alexa.sendCommand(serial, req.query.command, GestionRetour);
 	});
 	res.status(200).json({});
-	// On ne peut pas traiter le retour de command comme les autres car il n'y a pas de retour
 }
 app.get('/command', CommandAlexa.Command);
 app.get('/volume', CommandAlexa.Volume);
@@ -348,6 +341,7 @@ CommandAlexa.Routine = function(req,res){
 
 
 	alexa.getAutomationRoutines2(function(niveau0) {
+		var toReturn = [];
 		var routineaexecuter = "";
 
 		for (var serial in niveau0) {
@@ -359,7 +353,7 @@ CommandAlexa.Routine = function(req,res){
 			}
 		}
 		if (routineaexecuter != '') 
-			alexa.executeAutomationRoutine(req.query.device, routineaexecuter, traiteErreur);
+			alexa.executeAutomationRoutine(req.query.device, routineaexecuter, GestionRetour);
 		else
 			config.logger('Alexa-API: routine - ECHEC (introuvable) - Lancement routine: ' + req.query.routine);
 
@@ -594,23 +588,41 @@ app.get('/routines', (req, res) => {
 	config.logger('Alexa-API: routines');
 	res.type('json');
 
+	//config.logger('Alexa-API: type of devices : '+typeof devices);
 
 	alexa.getAutomationRoutines2(function(niveau0) {
+		//devices='{"notifications":'+devices+'}';
+
+		//config.logger('Alexa-API: routines2');
+		//  config.logger(JSON.stringify(devices));
+		//  config.logger(devices);
+
+		//config.logger('Alexa-API: type of devices : '+typeof devices);
 		var resultatutterance;
 		var resultatlocale;
 		var resultattriggerTime;
 		var resultattimeZoneId;
 		var resultatrecurrence;
+		//config.logger('Alexa-API: routines3b2');
 		var toReturn = [];
+		//config.logger('************DEBUG DE ROUTINES*******************');
 		for (var serial in niveau0) {
 			if (niveau0.hasOwnProperty(serial)) {
+				//config.logger('************************************************');
 
 				var routine = niveau0[serial];
 
+				//config.logger('(general)----- '+routine.status);
+				//config.logger('(general)----- '+routine.creationTimeEpochMillis);
 
 				if (routine.status === 'ENABLED') {
+					//config.logger('(SUPPRESSION)----- '+routine.creationTimeEpochMillis);
 					alexa.executeAutomationRoutine("", routine, function(err) {
+						//config.logger('(SUPPRESSION DEDANS)----- '+routine.creationTimeEpochMillis);
+						//executeAutomationRoutine(serialOrName, routine, callback)
+						//res.status(200).json({});
 					});
+					//config.logger('(SUPPRESSION)----- '+routine.creationTimeEpochMillis);
 				}
 
 
@@ -698,6 +710,7 @@ app.get('/routines', (req, res) => {
 
 					'creationTimeEpochMillis': routine.creationTimeEpochMillis,
 					'lastUpdatedTimeEpochMillis': routine.lastUpdatedTimeEpochMillis
+					// 'members': device.clusterMembers
 				});
 
 				
@@ -1064,8 +1077,15 @@ fs.readFile(config.cookieLocation, 'utf8', (err, data) => {
 });
 
 function startServer() {
+<<<<<<< HEAD
+	
+	alexa=null
+	alexa = new Alexa();
+	
+=======
 	alexa = null;
 	alexa = new Alexa();
+>>>>>>> 5f566eb7590b272ae91b9ff20f6fbacd743a0cab
 	config.logger('Alexa-API: ******************** Lancement Serveur ***********************');
 	alexa.init({
 			cookie: config.cookie,
@@ -1112,6 +1132,46 @@ function startServer() {
 
 //Gestion des erreurs et surtout pour détecter les ConnexionClose
 
+function GestionRetour(err) {
+		
+	
+//message::add('alexaapi', 'Sigalou est le meilleur');
+	//var hasError = false;
+	if (err) {
+		config.logger('Alexa-API: ******************************************************************');
+		config.logger('Alexa-API: *****************************ERROR********************************');
+		config.logger('Alexa-API: ******************************************************************');
+		config.logger(err.message);
+		config.logger('Alexa-API: ******************************************************************');
+		config.logger(err);
+		config.logger('Alexa-API: ******************************************************************');
+		config.logger('Alexa-API: ******************************************************************');
+
+		//var errorMessage = err.message;
+		//hasError = true;
+		if (err.message == "Connexion Close") {
+			config.logger("Connexion Close détectée dans la détection d'erreur et donc relance de l'initialisation");
+			
+			
+				//************ Faut arreter mieux le serveur et relancer
+				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			startServer();
+			
+			
+			//AllerVoirSilYaDesCommandesenFileAttente();
+		}
+		
+	hasError = true;
+	errorMessage = err.message;
+	}
+	//else
+	//FinCommandeBienExecutee();
+
+//if(typeof(next) == "function") next(); Le garder si un jour on enchaine les commandes, pour avoir la synthaxe.
+		config.logger('Alexa-API: 2222222EEEEEEEEERRRRRRREEEEEEEEEEUUUUUUUUUUUURRRRR : '+err);
+		
+}
+
 function traiteErreur(err) {
 		
 	
@@ -1132,7 +1192,15 @@ function traiteErreur(err) {
 		if (err.message == "Connexion Close") {
 			config.logger("Connexion Close détectée dans la détection d'erreur et donc relance de l'initialisation");
 			startServer();
+			//AllerVoirSilYaDesCommandesenFileAttente();
 		}
+		
+	//hasError = true;
+	//errorMessage = err.message;
+
+
+//if(typeof(next) == "function") next(); Le garder si un jour on enchaine les commandes, pour avoir la synthaxe.
+		//config.logger('Alexa-API: 2222222EEEEEEEEERRRRRRREEEEEEEEEEUUUUUUUUUUUURRRRR : '+err);
 		
 }
 function error(status, source, title, detail) {

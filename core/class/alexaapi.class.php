@@ -170,20 +170,12 @@ class alexaapi extends eqLogic {
 
 	//************Dépendances ***********
 	public static function dependancy_info() {
+		log::add('alexaapi', 'info', 'Controle dependances');
 		$return = array();
 		$return['log'] = 'alexaapi_dep';
-		$resources = realpath(dirname(__FILE__) . '/../../resources/');
-		$packageJson=json_decode(file_get_contents($resources.'/package.json'),true);
-		$state='ok';
-		foreach($packageJson["dependencies"] as $dep => $ver){
-			if(!file_exists($resources.'/node_modules/'.$dep.'/package.json')) {
-				$state='nok';
-			}
-		}
-		
+		$request = realpath(dirname(__FILE__) . '/../../resources/node_modules');
 		$return['progress_file'] = jeedom::getTmpFolder('alexaapi') . '/dependance';
-		//$return['state'] = is_dir($resources.'/node_modules') ? 'ok' : 'nok';
-		$return['state']=$state;
+		$return['state'] = is_dir($request) ? 'ok' : 'nok';
 		return $return;
 	}
 
@@ -616,7 +608,7 @@ class alexaapi extends eqLogic {
 		log::remove('alexaapi_dep');
 		$_debug = 0;
 		if (log::getLogLevel('alexaapi') == 100 || $verbose === "true" || $verbose === true) $_debug = 1;
-		log::add('alexaapi', 'info', 'Installation des dépendances : ');
+		log::add('alexaapi', 'info', 'Installation des dépendances : Alexa-Remote-http');
 		$resource_path = realpath(dirname(__FILE__) . '/../../resources');
 		return array('script' => $resource_path . '/nodejs.sh ' . $resource_path . ' alexaapi ' . $_debug, 'log' => log::getPathToLog('alexaapi_dep'));
 	}
@@ -885,7 +877,7 @@ class alexaapiCmd extends cmd {
 		$request = $this->getConfiguration('request');
 		if (!isset($_options['message']) || $_options['message'] == '') throw new Exception(__('Le message ne peut pas être vide', __FILE__));
 
-		return str_replace(array('#message#'), array(urlencode($_options['message'])), $request);
+		return str_replace(array('#messagge#'), array(urlencode($_options['messagge'])), $request);
 	}
 	private function buildRoutineRequest($_options = array()) {
 		log::add('alexaapi', 'debug', 'buildRoutineRequest');

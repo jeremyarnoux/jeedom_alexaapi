@@ -488,7 +488,7 @@ class AlexaRemote extends EventEmitter {
         //this._options.logger && this._options.logger('DEBUG1');
 			
 //SIMULER UN BUG !!!
-//if (flags.data !=undefined) body="Connection: close";
+if (flags.data !=undefined) body="Connection: close";
 
 
             res.on('data', (chunk) => {
@@ -1374,7 +1374,7 @@ this.deleteNotification(notification, callback);
     sendSequenceCommand(serialOrName, command, value, callback)
     {
        
-//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 1 '+command);
+this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 1 '+command);
 
 	   let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
