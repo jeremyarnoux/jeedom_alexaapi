@@ -259,7 +259,7 @@ class alexaapi extends eqLogic {
 
 			// Retireve the device (if already registered in Jeedom)
 			$device = alexaapi::byLogicalId($item['serial'], 'alexaapi');
-			if (!$device) {
+			if (!is_object($device)) {
 				$device = self::createNewDevice($item['name'], $item['serial']);
 				$numNewDevices++;
 			}
