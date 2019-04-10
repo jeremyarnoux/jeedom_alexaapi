@@ -186,21 +186,31 @@ CommandAlexa.Speak = function(req,res){
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
 	config.logger('Alexa-API: text: ' + req.query.text);
 
+	var hasError = false;
+	var errorMessage = '';
+	
+	
 	forEachDevices(req.query.device, (serial) =>
 	{
 		alexa.sendSequenceCommand(serial, 'speak', req.query.text, 
 				
 			function(testErreur){
 				if (testErreur) {
-				traiteErreur(testErreur);		
-				res.status(500).json({value: testErreur.message});
-				} else {
-				   res.status(200).json({value: "OK"});
+				traiteErreur(testErreur);
+				errorMessage = testErreur.message;
+				hasError = true;
 				}
 			}
 		);
 	});	
+	
+	if (hasError)
+    res.status(500).json({value: errorMessage});
+  else
+    res.status(200).json({value: "OK"});	
+	
 }
+
 
 /**** Alexa.Radio *****
   URL: /radio?device=?&text=?
@@ -224,20 +234,28 @@ CommandAlexa.Radio = function(req,res){
 	if ('station' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Radio', 'Missing parameter "station"'));
 	config.logger('Alexa-API: station: ' + req.query.station);
-
+	
+	var hasError = false;
+	var errorMessage = '';
+	
 	forEachDevices(req.query.device, (serial) => {
 		alexa.setTunein(serial, req.query.station, 
 				
 			function(testErreur){
 				if (testErreur) {
-				traiteErreur(testErreur);		
-				res.status(500).json({value: testErreur.message});
-				} else {
-				   res.status(200).json({value: "OK"});
+				traiteErreur(testErreur);
+				errorMessage = testErreur.message;
+				hasError = true;
 				}
 			}
 		);
 	});
+	
+	if (hasError)
+    res.status(500).json({value: errorMessage});
+  else
+    res.status(200).json({value: "OK"});	
+	
 }
 
 
@@ -275,21 +293,30 @@ CommandAlexa.Volume = function(req,res){
 	config.logger('Alexa-API: value: ' + req.query.value);
 	
 	
-	
-	var err = forEachDevices(req.query.device, (serial) => {
-		
+	var hasError = false;
+	var errorMessage = '';
+
+	forEachDevices(req.query.device, (serial) => {
+			
+		//config.logger('Alexa-API: *** DEBUG Lancement Volume sur ' + serial);
+
 		alexa.sendSequenceCommand(serial, 'volume', req.query.value, 
 				
 			function(testErreur){
 				if (testErreur) {
-				traiteErreur(testErreur);		
-				res.status(500).json({value: testErreur.message});
-				} else {
-				   res.status(200).json({value: "OK"});
+				traiteErreur(testErreur);
+				errorMessage = testErreur.message;
+				hasError = true;
 				}
 			}
 		);
 	});
+	
+  if (hasError)
+    res.status(500).json({value: errorMessage});
+  else
+    res.status(200).json({value: "OK"});	
+	
 }
 
 
@@ -312,7 +339,10 @@ CommandAlexa.Command = function(req,res){
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Command', 'Missing parameter "command"'));
 	config.logger('Alexa-API: command: ' + req.query.command);
 
-	var err = forEachDevices(req.query.device, (serial) => {
+	var hasError = false;
+	var errorMessage = '';
+	
+	forEachDevices(req.query.device, (serial) => {
 		alexa.sendCommand(serial, req.query.command, traiteErreur);
 	});
 	res.status(200).json({});
