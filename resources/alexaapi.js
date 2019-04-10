@@ -316,6 +316,7 @@ CommandAlexa.Command = function(req,res){
 		alexa.sendCommand(serial, req.query.command, traiteErreur);
 	});
 	res.status(200).json({});
+	// on ne fait pas le traitement d'erreur comme les autres puisque commande ne renvoie rien
 }
 app.get('/command', CommandAlexa.Command);
 app.get('/volume', CommandAlexa.Volume);
