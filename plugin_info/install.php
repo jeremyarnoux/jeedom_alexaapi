@@ -22,9 +22,6 @@ function alexaapi_update() {
 	foreach (eqLogic::byType('alexaapi') as $alexaapi) {
 		$alexaapi->save();
     }
-    alexaapi::deamon_stop();
-    $sensor_path = dirname(__FILE__) . '/../resources';
-    exec('cd ' . $sensor_path . '; rm -rf node_modules');
 }
 
 ?>
