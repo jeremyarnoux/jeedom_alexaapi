@@ -371,7 +371,7 @@ class alexaapi extends eqLogic {
 				$refresh = new alexaapiCmd();
 				$refresh->setLogicalId('refresh');
 				$refresh->setIsVisible(1);
-				//$refresh->setDisplay('icon', '<i class="fa fa-refresh"></i>');
+				$refresh->setDisplay('icon', '<i class="fa fa-sync"></i>');
 				$refresh->setName(__('Refresh', __FILE__));
 			}
 			$refresh->setType('action');
