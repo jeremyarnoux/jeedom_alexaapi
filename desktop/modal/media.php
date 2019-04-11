@@ -18,6 +18,7 @@
 if (!isConnect('admin')) {
 	throw new Exception('401 Unauthorized');
 }
+
 echo "<table width=100% border=0><tr><td>";
 echo  '<a class="btn btn-default pull-left refreshAction" data-action="refresh"><i class="fa fa-refresh"></i>  {{Rafraichir}}</a>';
 
@@ -105,12 +106,29 @@ foreach($myObject as $item):
 	$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/media?device=".$_GET['iddevice']);
 
 ?>
-
 <script>
 
 $('.refreshAction[data-action=refresh]').on('click',function(){
+	
+/*	const Url='http://192.168.0.21:3456/volume';
+	const data={
+		value:"50",
+		device:"G090LF118173117U"
+	};
+
+		$.post(Url, data, function(data, status){
+			$('#div_alert').showAlert({message: '55', level: 'danger'});
+		console.log('${data} and status is ${status}');
+	});
+	*/
+	
+	
 	$('#md_modal').dialog('close');
 	$('#md_modal').dialog({title: "{{Info Média}}"});
 	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=media&id=alexaapi&iddevice='+ $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
 });
+
 </script>
+
+
+<?php include_file('desktop', 'alexaapi', 'js', 'alexaapi'); ?>
