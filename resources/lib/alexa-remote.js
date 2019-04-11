@@ -602,7 +602,7 @@ class AlexaRemote extends EventEmitter {
 		this.getMedia(serialOrName,(err, res) => 
 		{
 		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2 dans boucle');
-			console.log(res);	
+			console.log(res.volume);	
 			if (err || !res || !res.volume || !Array.isArray(res.volume)) return callback && callback();
 			callback && callback(res.volume);
 		});

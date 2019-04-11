@@ -587,7 +587,7 @@ app.get('/media', (req, res) => {
 
 
 	alexa.getMedia2(req.query.device, function(devices) {
-			config.logger('Alexa-API: media-avant boucle');
+			config.logger('Alexa-API: media-avant boucle '+devices);
 		var toReturn = [];
 		for (var serial in devices) {
 			config.logger('Alexa-API: media-dans boucle');

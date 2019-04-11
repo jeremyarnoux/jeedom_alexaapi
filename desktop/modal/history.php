@@ -65,9 +65,9 @@ $json = json_decode($json,true);
 <table class="table table-condensed tablesorter" id="table_healthNetwork">
 	<thead>
 		<tr>
+			<th>{{Date Heure}}</th>
 			<th>{{Alexa}}</th>
 			<th>{{Texte}}</th>
-			<th>{{Date Heure}}</th>
 			<th>{{Status}}</th>
 
 		</tr>
