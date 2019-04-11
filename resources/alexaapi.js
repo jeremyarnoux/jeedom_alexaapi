@@ -595,7 +595,7 @@ app.get('/media', (req, res) => {
 				var device = devices[serial];
 				toReturn.push({
 					'serial': serial,
-					'active': device.active,
+					'volume': device.volume,
 					'deviceSerialNumber': device.deviceSerialNumber,
 					'wakeWord': device.wakeWord
 				});

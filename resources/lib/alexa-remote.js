@@ -584,9 +584,9 @@ class AlexaRemote extends EventEmitter {
     }
 
     getMedia(serialOrName, callback) {
- 		        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 avant boucle '+serialOrName);
+ 		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 avant boucle '+serialOrName);
        let dev = this.find(serialOrName);
- 		        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 avant boucle '+dev);
+ 		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 avant boucle '+dev);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
 		
 		        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 dans boucle');
@@ -597,13 +597,14 @@ class AlexaRemote extends EventEmitter {
 
 	getMedia2(serialOrName,callback) 
 	{
-		        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2');
+		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2');
 
 		this.getMedia(serialOrName,(err, res) => 
 		{
-		        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2 dans boucle');
-			if (err || !res || !res.wakeWords || !Array.isArray(res.wakeWords)) return callback && callback();
-			callback && callback(res.wakeWords);
+		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2 dans boucle');
+			console.log(res);	
+			if (err || !res || !res.volume || !Array.isArray(res.volume)) return callback && callback();
+			callback && callback(res.volume);
 		});
 	}
 
