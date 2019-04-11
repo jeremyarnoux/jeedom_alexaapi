@@ -605,26 +605,14 @@ app.get('/getvolume', (req, res) => {
 
 	if ('device' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.getVolume', 'Missing parameter "device"'));
-	config.logger('Alexa-API: device: ' + req.query.device);
 
+		var valeurvolume="";
 
 	alexa.getMedia2(req.query.device, function(devices) {
 		
-		var toReturn = [];
-		var valeurvolume="";
-		for (var serial in devices) {
 			config.logger('Alexa-API: trouve volume :'+devices["volume"]);
 			valeurvolume=devices["volume"];
-			if (devices.hasOwnProperty(serial)) {
-				toReturn.push({
-					'serial': serial,
-					'device': devices[serial]
-				});
-			}
-		}
-		
-			res.status(200).json({		value: valeurvolume	});
-
+		res.status(200).json({		value: valeurvolume	});
 });
 });
 
