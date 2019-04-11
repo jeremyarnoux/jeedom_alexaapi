@@ -52,6 +52,7 @@ function printEqLogic(data)
   $('#multiroom-members').parent().show();
   $('#multiroom-members').append(html);
 }
+
 </script>
 
 <!-- Container global (Ligne bootstrap) -->
@@ -228,6 +229,18 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
               </fieldset>
             </form>
           </div>
+		  
+		  
+		  				<div class="cursor" id="bt_media" data-l1key="logicalId" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+        
+		
+		<center>
+          <i class="fa loisir-musical7" style="font-size : 6em;color:#767676;"></i>
+        </center>
+        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Info Média}}</center></span>
+      </div>
+		  
+		  
           <div class="col-sm-5">
             <form class="form-horizontal">
               <fieldset>
@@ -252,6 +265,8 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
                   </div>
                 </div>
                 
+				
+				
                 <div class="form-group">
                   <label class="col-sm-2 control-label">{{Multiroom}}</label>
                   <div class="col-sm-8" id="multiroom-members">
@@ -297,6 +312,10 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
         </form>
 		
       </div>
+
+
+
+
 
 
     </div>

@@ -591,11 +591,22 @@ app.get('/media', (req, res) => {
 			//config.logger('Alexa-API: media-dans boucle');
 			if (devices.hasOwnProperty(serial)) {
 				toReturn.push({
-					'serial': serial,
-					'device': devices[serial]
+					'info': serial,
+					'value': devices[serial]
 				});
 			}
 		}
+		fichierjson = __dirname + '/data/media-'+req.query.device+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(toReturn, null, 2), err => {
+        if (err)
+          return res.sendStatus(500)
+
+        config.logger('*************** semble ok ');
+      });
+		
+		
+		
+		
 		res.status(200).json(toReturn);
 	});
 });
@@ -605,14 +616,17 @@ app.get('/getvolume', (req, res) => {
 
 	if ('device' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.getVolume', 'Missing parameter "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
 
-		var valeurvolume="";
+		//var valeurvolume="";
 
 	alexa.getMedia2(req.query.device, function(devices) {
 		
+		//var toReturn = [];
 			config.logger('Alexa-API: trouve volume :'+devices["volume"]);
-			valeurvolume=devices["volume"];
-		res.status(200).json({		value: valeurvolume	});
+			//valeurvolume=devices["volume"];
+			res.status(200).json({		value: devices["volume"]	});
+
 });
 });
 

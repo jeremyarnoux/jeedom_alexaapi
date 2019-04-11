@@ -589,7 +589,7 @@ class AlexaRemote extends EventEmitter {
  		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 avant boucle '+dev);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
 		
-		        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 dans boucle');
+		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 dans boucle');
 
         this.httpsGet (`/api/media/state?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
     }
@@ -602,7 +602,7 @@ class AlexaRemote extends EventEmitter {
 		this.getMedia(serialOrName,(err, res) => 
 		{
 		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2 dans boucle');
-			//console.log(res.volume);	
+			//console.log(res);	
 			//if (err || !res || !res.volume || !Array.isArray(res.volume)) return callback && callback();
 			if (err || !res ) return callback && callback();
 			callback && callback(res);
