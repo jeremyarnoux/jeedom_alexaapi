@@ -577,7 +577,6 @@ app.get('/wakewords', (req, res) => {
 });
 
 app.get('/media', (req, res) => {
-	config.logger('Alexa-API: media');
 	res.type('json');
 
 	if ('device' in req.query === false)
@@ -599,6 +598,34 @@ app.get('/media', (req, res) => {
 		}
 		res.status(200).json(toReturn);
 	});
+});
+
+app.get('/getvolume', (req, res) => {
+	res.type('json');
+
+	if ('device' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.getVolume', 'Missing parameter "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+
+
+	alexa.getMedia2(req.query.device, function(devices) {
+		
+		var toReturn = [];
+		var valeurvolume="";
+		for (var serial in devices) {
+			config.logger('Alexa-API: trouve volume :'+devices["volume"]);
+			valeurvolume=devices["volume"];
+			if (devices.hasOwnProperty(serial)) {
+				toReturn.push({
+					'serial': serial,
+					'device': devices[serial]
+				});
+			}
+		}
+		
+			res.status(200).json({		value: valeurvolume	});
+
+});
 });
 
 app.get('/history', (req, res) => {
