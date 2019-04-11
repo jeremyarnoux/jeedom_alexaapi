@@ -585,19 +585,15 @@ app.get('/media', (req, res) => {
 	config.logger('Alexa-API: device: ' + req.query.device);
 
 
-
 	alexa.getMedia2(req.query.device, function(devices) {
-			config.logger('Alexa-API: media-avant boucle '+devices);
+			//config.logger('Alexa-API: media-avant boucle '+devices);
 		var toReturn = [];
 		for (var serial in devices) {
-			config.logger('Alexa-API: media-dans boucle');
+			//config.logger('Alexa-API: media-dans boucle');
 			if (devices.hasOwnProperty(serial)) {
-				var device = devices[serial];
 				toReturn.push({
 					'serial': serial,
-					'volume': device.volume,
-					'deviceSerialNumber': device.deviceSerialNumber,
-					'wakeWord': device.wakeWord
+					'device': devices[serial]
 				});
 			}
 		}
