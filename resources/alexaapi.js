@@ -66,7 +66,7 @@ function forEachDevices(nameOrSerial, callback) {
 function LancementCommande(commande, req) 
 {
 	config.logger('Alexa-API: Lancement /'+commande);
-	config.logger('Alexa-API: Lancement /'+req.query.tagId);
+	//config.logger('Alexa-API: Lancement /'+req.query.tagId);
 			//config.logger(req);
 /*
 	FiledesCommandes.push([commande, req, Date.now()]);
@@ -576,6 +576,34 @@ app.get('/wakewords', (req, res) => {
 	});
 });
 
+app.get('/media', (req, res) => {
+	config.logger('Alexa-API: media');
+	res.type('json');
+
+	if ('device' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Missing parameter "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+
+
+
+	alexa.getMedia2(req.query.device, function(devices) {
+			config.logger('Alexa-API: media-avant boucle');
+		var toReturn = [];
+		for (var serial in devices) {
+			config.logger('Alexa-API: media-dans boucle');
+			if (devices.hasOwnProperty(serial)) {
+				var device = devices[serial];
+				toReturn.push({
+					'serial': serial,
+					'active': device.active,
+					'deviceSerialNumber': device.deviceSerialNumber,
+					'wakeWord': device.wakeWord
+				});
+			}
+		}
+		res.status(200).json(toReturn);
+	});
+});
 
 app.get('/history', (req, res) => {
 	config.logger('Alexa-API: History');
@@ -583,7 +611,7 @@ app.get('/history', (req, res) => {
 
 
 	if ('size' in req.query === false)
-		req.query.size = 1;
+		req.query.size = 5;
 	if ('offset' in req.query === false)
 		req.query.offset = 1;
 

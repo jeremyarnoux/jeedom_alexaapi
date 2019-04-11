@@ -5,6 +5,8 @@
 /* jslint esversion: 6 */
 'use strict';
 
+// Source : https://github.com/Apollon77/alexa-remote/blob/master/alexa-remote.js
+
 const https = require('https');
 const querystring = require('querystring');
 const os = require('os');
@@ -582,11 +584,32 @@ class AlexaRemote extends EventEmitter {
     }
 
     getMedia(serialOrName, callback) {
-        let dev = this.find(serialOrName);
+ 		        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 avant boucle '+serialOrName);
+       let dev = this.find(serialOrName);
+ 		        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 avant boucle '+dev);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+		
+		        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 dans boucle');
 
         this.httpsGet (`/api/media/state?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
     }
+
+
+	getMedia2(serialOrName,callback) 
+	{
+		        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2');
+
+		this.getMedia(serialOrName,(err, res) => 
+		{
+		        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2 dans boucle');
+			if (err || !res || !res.wakeWords || !Array.isArray(res.wakeWords)) return callback && callback();
+			callback && callback(res.wakeWords);
+		});
+	}
+
+
+
+
 
     getPlayerInfo(serialOrName, callback) {
         let dev = this.find(serialOrName);
