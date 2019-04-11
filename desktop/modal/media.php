@@ -18,61 +18,45 @@
 if (!isConnect('admin')) {
 	throw new Exception('401 Unauthorized');
 }
-/*
-	DEPLACE DANS 	public static function ScanAmazonAlexa($_logical_id = null, $_exclusion = 0) de core class alexaapi.class.php
+echo "<table width=100% border=0><tr><td>";
+echo  '<a class="btn btn-default pull-left refreshAction" data-action="refresh"><i class="fa fa-refresh"></i>  {{Rafraichir}}</a>';
 
-$json=file_get_contents("http://192.168.0.21:3456/devices");
-$json = json_decode($json,true);
+	$fichierMediaJson = realpath(dirname(__FILE__) . '/../../resources/data/media-'.$_GET['iddevice'].'.json');
 
-foreach($json as $item)
-	{
-
-
-
-						$device = $item['name'];
-						$serial = $item['serial'];
-						$type = $item['type'];
-						$online = $item['online'];
-
-
-		$alexaapi = alexaapi::byLogicalId($serial, 'alexaapi');
-		if (!is_object($alexaapi)) {
-			$alexaapi = new alexaapi();
-			$alexaapi->setName($device);
-			$alexaapi->setLogicalId($serial); 
-			$alexaapi->setEqType_name('alexaapi');
-			$alexaapi->setIsEnable(1);
-			$alexaapi->setIsVisible(1);
-		}
-		$alexaapi->setConfiguration('serial',$serial); 
-		$alexaapi->setConfiguration('device',$device);
-		$alexaapi->setConfiguration('type',$type);
-		$alexaapi->setStatus('online',$online);
-		$alexaapi->save();
- }
-*/
+echo "</td><td><center>";
+	echo "Dernière mise à jour : ".date ("d F Y H:i:s", filemtime($fichierMediaJson));
+echo "</center></td><td>";
 
 $eqLogics = alexaapi::byType('alexaapi');
-?>
 
-
-
-                  <!-- Onglet MEDIA -->
-
-        
-
- <?php
  //echo $_GET['iddevice'];
-	$fichierMediaJson = realpath(dirname(__FILE__) . '/../../resources/data/media-'.$_GET['iddevice'].'.json');
 	echo '<span class="eqLogicAttr" data-l1key="logicalId"></span>';
     $myData = file_get_contents($fichierMediaJson);
     $myObject = json_decode($myData);
-    //$myObjectMap = $myObject->MRData->RaceTable->Races;
-    $myObjectMap = $myObject;
-  ?>
-<table class="table table-condensed tablesorter" id="table">
+
+
+foreach($myObject as $item): 
+	 if ($item->info=='imageURL')
+		 echo '<p style="float:right"><img src="'.$item->value.'" alt="logo media" /></p>';
+ endforeach; 
+
+
+
+	
+ ?>
+</td></tr></table>
+
+
+<table class="table table-condensed tablesorter" id="table1">
+	<thead>
+		<tr>
+			<th>{{Info}}</th>
+			<th>{{Valeur}}</th>
+
+		</tr>
+	</thead>
     <tbody>
-      <?php foreach($myObjectMap as $key => $item): ?>
+      <?php foreach($myObject as $item): ?>
         <tr>
           <td><span class="label label-info" style="font-size : 1em; cursor : default;"><?PHP echo $item->info; ?></span></td>
           <td><?PHP echo $item->value; ?></td>
@@ -83,5 +67,50 @@ $eqLogics = alexaapi::byType('alexaapi');
   </table>
 
 	<?php
-	echo "Dernière mise à jour : ".date ("d F Y H:i:s", filemtime($fichierMediaJson));
+	
+foreach($myObject as $item): 
+	 if ($item->info=='queue')
+			{
+ ?>
+
+
+
+<table class="table table-condensed tablesorter" id="table2">
+	<thead>
+		<tr>
+			<th>{{File d'attente}}</th>
+			<th></th>
+
+		</tr>
+	</thead>
+	<tbody>
+
+      <?php foreach($item->value as $key => $serial): 
+				foreach($serial as $key => $suite): ?>
+        <tr>
+          <td><span class="label label-info" style="font-size : 1em; cursor : default;"><?PHP echo $key; ?></span></td>
+          <td><?PHP echo $suite; ?></td>
+
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+
+	<?php
+			endforeach; 
+			}
+ endforeach;	
+	
+	
+	$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/media?device=".$_GET['iddevice']);
+
 ?>
+
+<script>
+
+$('.refreshAction[data-action=refresh]').on('click',function(){
+	$('#md_modal').dialog('close');
+	$('#md_modal').dialog({title: "{{Info Média}}"});
+	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=media&id=alexaapi&iddevice='+ $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
+});
+</script>

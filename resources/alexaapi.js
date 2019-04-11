@@ -22,9 +22,42 @@ const config = {
 	listeningPort: 3456
 };
 
+
+
+
 // Par sécurité pour détecter un éventuel souci :
 if (!amazonserver) config.logger('Alexa-Config: *********************amazonserver NON DEFINI*********************');
 if (!alexaserver) config.logger('Alexa-Config: *********************alexaserver NON DEFINI*********************');
+
+
+// Speed up calls to hasOwnProperty - Pour le test function isEmpty(obj)
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+function isEmpty(obj) {
+
+    // null and undefined are "empty"
+    if (obj == null) return true;
+
+    // Assume if it has a length property with a non-zero value
+    // that that property is correct.
+    if (obj.length > 0)    return false;
+    if (obj.length === 0)  return true;
+
+    // If it isn't an object at this point
+    // it is empty, but it can't be anything *but* empty
+    // Is it empty?  Depends on your application.
+    if (typeof obj !== "object") return true;
+
+    // Otherwise, does it have any properties of its own?
+    // Note that this doesn't handle
+    // toString and valueOf enumeration bugs in IE < 9
+    for (var key in obj) {
+        if (hasOwnProperty.call(obj, key)) return false;
+    }
+
+    return true;
+}
+
+
 
 function consoleSigalou() {
 	var today = new Date();
@@ -964,6 +997,10 @@ app.get('/whennextalarm', (req, res) => {
 		//config.logger('Alexa-API: (WhenNextAlarm) function' );
 		//var toReturn = [];
 
+ if (isEmpty(notifications))
+		return res.status(500).json(error(500, req.route.path, 'Alexa.whennextalarm', 'Retour vide'));
+
+
 		// Filtre et ne garde que les enregistrements du device selctionné
 		const notificationsfiltrees = notifications.filter(tmp => tmp.deviceSerialNumber == req.query.device);
 		notifications = notificationsfiltrees;
@@ -1070,6 +1107,8 @@ app.get('/whennextreminder', (req, res) => {
 	alexa.getNotifications2(function(notifications) {
 		//config.logger('Alexa-API: (WhenNextAlarm) function' );
 		//var toReturn = [];
+ if (isEmpty(notifications))
+		return res.status(500).json(error(500, req.route.path, 'Alexa.whennextreminder', 'Retour vide'));
 
 		// Filtre et ne garde que les enregistrements du device selctionné
 		const notificationsfiltrees = notifications.filter(tmp => tmp.deviceSerialNumber == req.query.device);
