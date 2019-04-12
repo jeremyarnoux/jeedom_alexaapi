@@ -729,16 +729,22 @@ class alexaapiCmd extends cmd {
 		// On traite la valeur de resultat (dans le cas de whennextalarm par exemple)
 		$resultjson = json_decode($result, true);
 		$value = $resultjson['value'];
-		log::add('alexaapi', 'debug', '** Résultat retour via JSON value=' . $value);
+		//log::add('alexaapi', 'debug', '** Résultat retour via JSON value=' . $value);
 		
 		//*******************************************************************************
 		// Ici, on va traiter une commande qui n'a pas été executée correctement (erreur type "Connexion Close")
-		log::add('alexaapi', 'debug', '**TEST Connexion Close** dans la Class:'.$value);
+		//log::add('alexaapi', 'debug', '**TEST Connexion Close** dans la Class:'.$value);
 		if ($value =="Connexion Close")
 		{
+		message::add('alexaapi', 'Attention, Connexion close sur Alexa-API, Lien réinitialisé');
 		log::add('alexaapi', 'debug', '**On traite Connexion Close** dans la Class');
-		sleep(8);
+		sleep(6);
+			if (ob_get_length()) {
+			ob_end_flush();
+			flush();
+			}	
 		log::add('alexaapi', 'debug', '**On relance '.$request);
+		message::add('alexaapi', 'Connexion close détectée donc relance de la dernière commande :'.$request);
 		//Lance la requete avec un time out à 2s et 3 essais
 		$result = $request_http->exec($this->getConfiguration('timeout', 2), $this->getConfiguration('maxHttpRetry', 3));
 		if (!result) throw new Exception(__('Serveur injoignable', __FILE__));

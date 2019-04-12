@@ -23,7 +23,7 @@ const config = {
 };
 
 
-
+var dernierStartServeur=0;
 
 // Par sécurité pour détecter un éventuel souci :
 if (!amazonserver) config.logger('Alexa-Config: *********************amazonserver NON DEFINI*********************');
@@ -1173,49 +1173,58 @@ fs.readFile(config.cookieLocation, 'utf8', (err, data) => {
 });
 
 function startServer() {
-	alexa = null;
-	alexa = new Alexa();
-	config.logger('Alexa-API: ******************** Lancement Serveur ***********************');
-	
-	alexa.init({
-			cookie: config.cookie,
-			logger: config.logger,
-			alexaServiceHost: config.alexaServiceHost,
-			cookieRefreshInterval: config.cookieRefreshInterval
-		},
-		(err) => {
-			// Unable to init alexa
-			if (err) {
-				config.logger('Alexa-API: Error while initializing alexa');
-				config.logger('Alexa-API: ' + err);
-				process.exit(-1);
-			}
 
-			if (alexa.cookieData) {
-				fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) => {
-					if (err) {
-						config.logger('Alexa-API - Error while saving the cookie to: ' + config.cookieLocation);
-						config.logger('Alexa-API - ' + err);
-					}
-					config.logger('Alexa-API - New cookie saved to:' + config.cookieLocation);
+	if ((Date.now()-dernierStartServeur)>20000)
+	{
+		dernierStartServeur=Date.now();
+		alexa = null;
+		alexa = new Alexa();
+		config.logger('Alexa-API: ******************** Lancement Serveur ***********************');
+		
+		alexa.init({
+				cookie: config.cookie,
+				logger: config.logger,
+				alexaServiceHost: config.alexaServiceHost,
+				cookieRefreshInterval: config.cookieRefreshInterval
+			},
+			(err) => {
+				// Unable to init alexa
+				if (err) {
+					config.logger('Alexa-API: Error while initializing alexa');
+					config.logger('Alexa-API: ' + err);
+					process.exit(-1);
+				}
 
-					// Start the server
-					if (server) {
-						config.logger('Alexa-API: *******************************************');
-						config.logger('Alexa-API: *Server is already listening on port ' + server.address().port + ' *');
-						config.logger('Alexa-API: *******************************************');
-					} else {
-						server = app.listen(config.listeningPort, () => {
-							config.logger('Alexa-API: **************************************************************');
-							config.logger('Alexa-API: ************** Server OK listening on port ' + server.address().port + ' **************');
-							config.logger('Alexa-API: **************************************************************');
+				if (alexa.cookieData) {
+					fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) => {
+						if (err) {
+							config.logger('Alexa-API - Error while saving the cookie to: ' + config.cookieLocation);
+							config.logger('Alexa-API - ' + err);
+						}
+						config.logger('Alexa-API - New cookie saved to:' + config.cookieLocation);
 
-						});
-					}
-					//AllerVoirSilYaDesCommandesenFileAttente();
-				});
-			}
-		});
+						// Start the server
+						if (server) {
+							config.logger('Alexa-API: *******************************************');
+							config.logger('Alexa-API: *Server is already listening on port ' + server.address().port + ' *');
+							config.logger('Alexa-API: *******************************************');
+						} else {
+							server = app.listen(config.listeningPort, () => {
+								config.logger('Alexa-API: **************************************************************');
+								config.logger('Alexa-API: ************** Server OK listening on port ' + server.address().port + ' **************');
+								config.logger('Alexa-API: **************************************************************');
+
+							});
+						}
+						//AllerVoirSilYaDesCommandesenFileAttente();
+					});
+				}
+			});
+	}
+	else
+	{
+	config.logger('Alexa-API: ******************** Lancement Serveur annulé***********************');
+	}
 }
 
 //alexa.sendSequenceCommand(serial, 'speak', req.query.text, GestionErreur);
