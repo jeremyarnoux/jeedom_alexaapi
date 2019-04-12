@@ -490,7 +490,7 @@ class AlexaRemote extends EventEmitter {
         //this._options.logger && this._options.logger('DEBUG1');
 			
 //SIMULER UN BUG !!!
-//if (flags.data !=undefined) body="Connection: close";
+if (flags.data !=undefined) body="Connection: close";
 
 
             res.on('data', (chunk) => {

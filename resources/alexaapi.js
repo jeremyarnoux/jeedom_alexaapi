@@ -356,11 +356,45 @@ CommandAlexa.Command = function(req,res){
 	res.status(200).json({});
 	// on ne fait pas le traitement d'erreur comme les autres puisque commande ne renvoie rien
 }
+
+/***** Alexa.Notifications.SendMobilePush *****
+  URL /push?device=?&text=?
+    device - String - name of the device
+    text - String - Text to display in the push notification
+
+  Return an empty object if the function succeed.
+  Otherwise, an error object is returned.
+*/
+CommandAlexa.Push = function(req,res){
+	LancementCommande("Push",req);
+	res.type('json');
+
+	if ('device' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.SendMobilePush', 'Missing parameter "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+
+	if ('text' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.SendMobilePush', 'Missing parameter "text"'));
+	config.logger('Alexa-API: text: ' + req.query.text);
+
+	alexa.sendSequenceCommand(req.query.device, 'notification', req.query.text, 
+				function(testErreur){
+					if (testErreur) {
+					traiteErreur(testErreur);
+					res.status(500).json({value: testErreur.message});
+					}
+					else
+					res.status(200).json({value: "OK"});				
+				}
+			);
+	
+}
+
 app.get('/command', CommandAlexa.Command);
 app.get('/volume', CommandAlexa.Volume);
 app.get('/speak', CommandAlexa.Speak);
 app.get('/radio', CommandAlexa.Radio);
-
+app.get('/push', CommandAlexa.Push);
 
 /***** Alexa.Routine *****
   URL /routine?device=?&name=?
@@ -406,32 +440,7 @@ CommandAlexa.Routine = function(req,res){
 app.get('/routine', CommandAlexa.Routine);
 
 
-/***** Alexa.Notifications.SendMobilePush *****
-  URL /push?device=?&text=?
-    device - String - name of the device
-    text - String - Text to display in the push notification
 
-  Return an empty object if the function succeed.
-  Otherwise, an error object is returned.
-*/
-app.get('/push', (req, res) => {
-	config.logger('Alexa-API: Alexa.Notifications.SendMobilePush');
-	res.type('json');
-
-	if ('device' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.SendMobilePush', 'Missing parameter "device"'));
-	config.logger('Alexa-API: device: ' + req.query.device);
-
-	if ('text' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.SendMobilePush', 'Missing parameter "text"'));
-	config.logger('Alexa-API: text: ' + req.query.text);
-
-	alexa.sendSequenceCommand(req.query.device, 'notification', req.query.text, function(err) {
-		if (err)
-			return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.SendMobilePush', err));
-		res.status(200).json({});
-	});
-});
 
 
 /***** Create a reminder *****
