@@ -1258,7 +1258,8 @@ function traiteErreur(err) {
 	
 //message::add('alexaapi', 'Sigalou est le meilleur');
 	//var hasError = false;
-
+if (err)
+{
 		config.logger('Alexa-API: ******************************************************************');
 		config.logger('Alexa-API: *****************************ERROR********************************');
 		config.logger('Alexa-API: ******************************************************************');
@@ -1275,7 +1276,7 @@ function traiteErreur(err) {
 			startServer();
 			//AllerVoirSilYaDesCommandesenFileAttente();
 		}
-		
+}		
 	//hasError = true;
 	//errorMessage = err.message;
 
