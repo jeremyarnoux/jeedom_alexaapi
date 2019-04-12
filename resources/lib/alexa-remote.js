@@ -486,7 +486,7 @@ class AlexaRemote extends EventEmitter {
         this._options.logger && this._options.logger('Alexa-Remote: Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? 'and data=' + flags.data : ''));
 		let req = https.request(options, (res) => {
         //console.log(res+"FIN de RES");
-            let body  = '';
+            let body  = '';
         //this._options.logger && this._options.logger('DEBUG1');
 			
 //SIMULER UN BUG !!!
