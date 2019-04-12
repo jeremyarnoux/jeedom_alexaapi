@@ -5,6 +5,8 @@
 /* jslint esversion: 6 */
 'use strict';
 
+// Source : https://github.com/Apollon77/alexa-remote/blob/master/alexa-remote.js
+
 const https = require('https');
 const querystring = require('querystring');
 const os = require('os');
@@ -85,20 +87,20 @@ class AlexaRemote extends EventEmitter {
                 else 
                     this._options.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
             }
-        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): this._options.amazonPage=' + this._options.amazonPage);
+        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): this._options.amazonPage=' + this._options.amazonPage);
             this._options.amazonPage = this._options.amazonPage || amazonserver;
             //this.baseUrl = 'alexa.' + this._options.amazonPage;
             this.baseUrl = alexaserver;
 
             cookie = this._options.cookie;
         }
-        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): amazonserver=' + amazonserver);
-        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): alexaserver=' + alexaserver);
-        this._options.logger && this._options.logger('Alexa-Remote: Use as User-Agent: ' + this._options.userAgent);
-        this._options.logger && this._options.logger('Alexa-Remote: Use as Login-Amazon-URL: ' + this._options.amazonPage);
+//        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): amazonserver=' + amazonserver);
+//        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): alexaserver=' + alexaserver);
+//        this._options.logger && this._options.logger('Alexa-Remote: Use as User-Agent: ' + this._options.userAgent);
+//        this._options.logger && this._options.logger('Alexa-Remote: Use as Login-Amazon-URL: ' + this._options.amazonPage);
         if (this._options.alexaServiceHost)
             this.baseUrl = this._options.alexaServiceHost;
-        this._options.logger && this._options.logger('Alexa-Remote: Use as Base-URL: ' + this.baseUrl);
+//        this._options.logger && this._options.logger('Alexa-Remote: Use as Base-URL: ' + this.baseUrl);
         this._options.alexaServiceHost = this.baseUrl;
         if (this._options.refreshCookieInterval !== 0)
             this._options.refreshCookieInterval = this._options.refreshCookieInterval || 7*24*60*1000; // Auto Refresh after 7 days
@@ -482,21 +484,29 @@ class AlexaRemote extends EventEmitter {
         delete logOptions.headers.Referer;
         delete logOptions.headers.Origin;
         this._options.logger && this._options.logger('Alexa-Remote: Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? 'and data=' + flags.data : ''));
-        let req = https.request(options, (res) => {
+		let req = https.request(options, (res) => {
+        //console.log(res+"FIN de RES");
             let body  = '';
+        //this._options.logger && this._options.logger('DEBUG1');
+			
+//SIMULER UN BUG !!!
+//if (flags.data !=undefined) body="Connection: close";
+
 
             res.on('data', (chunk) => {
                 body += chunk;
             });
+        //this._options.logger && this._options.logger('DEBUG2');
 
             res.on('end', () =>
             {
+        //this._options.logger && this._options.logger('DEBUG3');
                 let ret;
                 if (typeof callback === 'function')
                 {
                     if (!body)
                     {
-                        this._options.logger && this._options.logger('Alexa-Remote: Response: No body');
+                        this._options.logger && this._options.logger('Alexa-Remote: Response: No body = OK');
                         return callback && callback(null, null);
                     }
                     try
@@ -574,11 +584,34 @@ class AlexaRemote extends EventEmitter {
     }
 
     getMedia(serialOrName, callback) {
-        let dev = this.find(serialOrName);
+ 		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 avant boucle '+serialOrName);
+       let dev = this.find(serialOrName);
+ 		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 avant boucle '+dev);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+		
+		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia1 dans boucle');
 
         this.httpsGet (`/api/media/state?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
     }
+
+
+	getMedia2(serialOrName,callback) 
+	{
+		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2');
+
+		this.getMedia(serialOrName,(err, res) => 
+		{
+		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2 dans boucle');
+			//console.log(res);	
+			//if (err || !res || !res.volume || !Array.isArray(res.volume)) return callback && callback();
+			if (err || !res ) return callback && callback();
+			callback && callback(res);
+		});
+	}
+
+
+
+
 
     getPlayerInfo(serialOrName, callback) {
         let dev = this.find(serialOrName);
@@ -623,9 +656,6 @@ class AlexaRemote extends EventEmitter {
         });
     }
 
-    getWakeWords(callback) {
-        this.httpsGet (`/api/wake-word?_=%t`, callback);
-    }
 
     getReminders(cached, callback) {
         return this.getNotifications(cached, callback);
@@ -640,20 +670,28 @@ class AlexaRemote extends EventEmitter {
         this.httpsGet (`/api/notifications?cached=${cached}&_=%t`, callback);
     }
 
-//**********************************************************************************************************************
-//**********************************************************************************************************************
-//**********************************************************************************************************************
-//**********************************************************************************************************************
-getNotifications2(callback) {
+	getNotifications2(callback) 
+	{
 
-    this.getNotifications((err, res) => {
+		this.getNotifications((err, res) => 
+		{
+			if (err || !res || !res.notifications || !Array.isArray(res.notifications)) return callback && callback();
+			callback && callback(res.notifications);
+		});
+	}
+	
+    getWakeWords(callback) {
+        this.httpsGet (`/api/wake-word?_=%t`, callback);
+    }
 
-        if (err || !res || !res.notifications || !Array.isArray(res.notifications)) return callback && callback();
-
-		        callback && callback(res.notifications);
-
-    });
-}
+	getWakeWords2(callback) 
+	{
+		this.getWakeWords((err, res) => 
+		{
+			if (err || !res || !res.wakeWords || !Array.isArray(res.wakeWords)) return callback && callback();
+			callback && callback(res.wakeWords);
+		});
+	}
 
     createNotificationObject(serialOrName, type, label, value, status, sound) { // type = Reminder, Alarm
         if (status && typeof status === 'object') {
@@ -706,7 +744,7 @@ getNotifications2(callback) {
     }
 
     createNotificationAlarmObject(serialOrName, recurring, label, value, status, sound) { // type = Reminder, Alarm
-                 console.log('-->-->--recurring: ' + recurring + '-----------------');
+                 //console.log('-->-->--recurring: ' + recurring + '-----------------');
       const type="Alarm";
 
 		if (status && typeof status === 'object') {
@@ -763,7 +801,7 @@ return this.parseValue4Notification(notification, value);    }
 
     parseValue4Notification(notification, value) {
       
-                console.log('--------Typeof: ' + (typeof value) + 'Value: ' + value + '-----------------');
+                //console.log('--------Typeof: ' + (typeof value) + 'Value: ' + value + '-----------------');
         switch (typeof value) {
             case 'object':
                 if (value instanceof Date)
@@ -946,6 +984,18 @@ this.deleteNotification(notification, callback);
     getHistory(options, callback) {
         return this.getActivities(options, callback);
     }
+	
+	getHistory2(options,callback) 
+	{
+		this.getHistory(options, (err, res) => 
+		{
+			        //this._options.logger && this._options.logger('coucou'+res);
+
+			if (err || !res || !res || !Array.isArray(res)) return callback && callback();
+			callback && callback(res);
+		});
+	}
+	
     getActivities(options, callback) {
         if (typeof options === 'function') {
             callback = options;
@@ -1356,7 +1406,7 @@ this.deleteNotification(notification, callback);
 //this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 2');
 
         if (typeof value === 'function') {
-			this._options.logger && this._options.logger('Alexa-sendSequenceCommand: function');
+			//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: function');
 
             callback = value;
             value = null;
@@ -1364,12 +1414,12 @@ this.deleteNotification(notification, callback);
 
         let seqCommandObj;
         if (typeof command === 'object') {
-			this._options.logger && this._options.logger('Alexa-sendSequenceCommand: object');
+			//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: object');
 
             seqCommandObj = command.sequence || command;
         }
         else {
-				this._options.logger && this._options.logger('Alexa-sendSequenceCommand: else');
+				//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: else');
             seqCommandObj = {
                 '@type': 'com.amazon.alexa.behaviors.model.Sequence',
                 'startNode': this.createSequenceNode(command, value)
