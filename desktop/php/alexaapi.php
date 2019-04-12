@@ -229,6 +229,7 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
               </fieldset>
             </form>
           </div>
+		  <!-- Castré par Nebz et HadesDT 
 		  
 		  				<div class="cursor" id="bt_media" data-l1key="logicalId" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
         
@@ -238,7 +239,6 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
         </center>
         <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Info Média}}</center></span>
       </div>
-		  <!-- Castré par Nebz et HadesDT 
 		  -->
 		  
           <div class="col-sm-5">
