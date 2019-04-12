@@ -958,3 +958,4 @@ class alexaapiCmd extends cmd {
 		return parent::getWidgetTemplateCode($_version, $_noCustom);
 	}
 }
+
