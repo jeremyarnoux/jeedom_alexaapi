@@ -1256,7 +1256,7 @@ function startServer() {
 function traiteErreur(err) {
 		
 	
-//message::add('alexaapi', 'Sigalou est le meilleur');
+//message::add('alexaapi', 'Connexion close détectée');
 	//var hasError = false;
 if (err)
 {
