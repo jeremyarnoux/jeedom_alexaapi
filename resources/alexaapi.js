@@ -219,29 +219,23 @@ CommandAlexa.Speak = function(req,res){
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
 	config.logger('Alexa-API: text: ' + req.query.text);
 
-	var hasError = false;
-	var errorMessage = '';
-	
-	
+	var BoucleEachOK=false;
 	forEachDevices(req.query.device, (serial) =>
 	{
+		BoucleEachOK=true;
 		alexa.sendSequenceCommand(serial, 'speak', req.query.text, 
-				
-			function(testErreur){
-				if (testErreur) {
-				traiteErreur(testErreur);
-				errorMessage = testErreur.message;
-				hasError = true;
+				function(testErreur){
+					
+					if (testErreur) {
+					traiteErreur(testErreur);
+					res.status(500).json({value: testErreur.message});
+					}
+					else
+					res.status(200).json({value: "OK"});				
 				}
-			}
-		);
-	});	
-	
-	if (hasError)
-    res.status(500).json({value: errorMessage});
-  else
-    res.status(200).json({value: "OK"});	
-	
+			);
+	});
+	if (!BoucleEachOK) res.status(500).json({value: 'Souci Device'}); //par sécurité
 }
 
 
@@ -268,27 +262,22 @@ CommandAlexa.Radio = function(req,res){
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Radio', 'Missing parameter "station"'));
 	config.logger('Alexa-API: station: ' + req.query.station);
 	
-	var hasError = false;
-	var errorMessage = '';
-	
+	var BoucleEachOK=false;
 	forEachDevices(req.query.device, (serial) => {
+		BoucleEachOK=true;
 		alexa.setTunein(serial, req.query.station, 
-				
-			function(testErreur){
-				if (testErreur) {
-				traiteErreur(testErreur);
-				errorMessage = testErreur.message;
-				hasError = true;
+				function(testErreur){
+					
+					if (testErreur) {
+					traiteErreur(testErreur);
+					res.status(500).json({value: testErreur.message});
+					}
+					else
+					res.status(200).json({value: "OK"});				
 				}
-			}
-		);
+			);
 	});
-	
-	if (hasError)
-    res.status(500).json({value: errorMessage});
-  else
-    res.status(200).json({value: "OK"});	
-	
+	if (!BoucleEachOK) res.status(500).json({value: 'Souci Device'}); //par sécurité
 }
 
 
@@ -325,34 +314,23 @@ CommandAlexa.Volume = function(req,res){
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "value"'));
 	config.logger('Alexa-API: value: ' + req.query.value);
 	
-	
-	var hasError = false;
-	var errorMessage = '';
-
+	var BoucleEachOK=false;
 	forEachDevices(req.query.device, (serial) => {
-			
-		//config.logger('Alexa-API: *** DEBUG Lancement Volume sur ' + serial);
-
-		alexa.sendSequenceCommand(serial, 'volume', req.query.value, 
-				
-			function(testErreur){
-				if (testErreur) {
-				traiteErreur(testErreur);
-				errorMessage = testErreur.message;
-				hasError = true;
+			BoucleEachOK=true;
+			alexa.sendSequenceCommand(serial, 'volume', req.query.value, 
+				function(testErreur){
+					
+					if (testErreur) {
+					traiteErreur(testErreur);
+					res.status(500).json({value: testErreur.message});
+					}
+					else
+					res.status(200).json({value: "OK"});				
 				}
-			}
-		);
+			);
 	});
-	
-  if (hasError)
-    res.status(500).json({value: errorMessage});
-  else
-    res.status(200).json({value: "OK"});	
-	
+	if (!BoucleEachOK) res.status(500).json({value: 'Souci Device'}); //par sécurité
 }
-
-
 
 /***** Alexa.Command *****
   URL: /command?device=?&command=?
@@ -372,9 +350,6 @@ CommandAlexa.Command = function(req,res){
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Command', 'Missing parameter "command"'));
 	config.logger('Alexa-API: command: ' + req.query.command);
 
-	var hasError = false;
-	var errorMessage = '';
-	
 	forEachDevices(req.query.device, (serial) => {
 		alexa.sendCommand(serial, req.query.command, traiteErreur);
 	});
@@ -997,8 +972,8 @@ app.get('/whennextalarm', (req, res) => {
 		//config.logger('Alexa-API: (WhenNextAlarm) function' );
 		//var toReturn = [];
 
- if (isEmpty(notifications))
-		return res.status(500).json(error(500, req.route.path, 'Alexa.whennextalarm', 'Retour vide'));
+		if (isEmpty(notifications))
+			return res.status(500).json(error(500, req.route.path, 'Alexa.whennextalarm', 'Retour vide'));
 
 
 		// Filtre et ne garde que les enregistrements du device selctionné
@@ -1037,7 +1012,7 @@ app.get('/whennextalarm', (req, res) => {
 		var compteurdePosition = 1;
 		var compteurdePositionaTrouver = 1;
 		var stringarenvoyer = 'none';
-		//config.logger('Alexa-API - WhenNextAlarm req.query.position: ' + req.query.position);
+
 		if (req.query.position > 1) {
 			compteurdePositionaTrouver = req.query.position;
 		}
@@ -1045,22 +1020,9 @@ app.get('/whennextalarm', (req, res) => {
 		for (var serial in notifications) {
 			if (notifications.hasOwnProperty(serial)) {
 				// On va parcourir les résultats en allant à la position demandée.
-				//config.logger('Alexa-API - Position à trouver : ' + compteurdePositionaTrouver);
-				//config.logger('Alexa-API - Position de la boucle : ' + compteurdePosition);
 
 				if (compteurdePositionaTrouver == compteurdePosition) {
 					var device = notifications[serial];
-
-					//config.logger('Alexa-API - WhenNextAlarm serial: ' + serial);
-					//config.logger('Alexa-API - WhenNextAlarm device.deviceSerialNumber: ' + device.deviceSerialNumber);//deviceSerialNumber
-					//config.logger('Alexa-API - WhenNextAlarm device.type: ' + device.type);
-					//config.logger('Alexa-API - WhenNextAlarm device.originalDate: ' + device.originalDate);
-					//config.logger('Alexa-API - WhenNextAlarm device.originalTime: ' + device.originalTime);
-					//config.logger('Alexa-API - WhenNextAlarm device.status: ' + device.status);
-
-
-					//C'est bon, on est sur la bonne position, on renvoie le résultat
-
 
 					switch (req.query.format) {
 						case 'hour':
@@ -1079,7 +1041,6 @@ app.get('/whennextalarm', (req, res) => {
 				compteurdePosition++;
 			}
 		}
-		//  res.status(200).json(toReturn);
 		res.status(200).json({
 			value: stringarenvoyer
 		});
@@ -1105,10 +1066,9 @@ app.get('/whennextreminder', (req, res) => {
 
 
 	alexa.getNotifications2(function(notifications) {
-		//config.logger('Alexa-API: (WhenNextAlarm) function' );
-		//var toReturn = [];
- if (isEmpty(notifications))
-		return res.status(500).json(error(500, req.route.path, 'Alexa.whennextreminder', 'Retour vide'));
+
+		if (isEmpty(notifications))
+			return res.status(500).json(error(500, req.route.path, 'Alexa.whennextreminder', 'Retour vide'));
 
 		// Filtre et ne garde que les enregistrements du device selctionné
 		const notificationsfiltrees = notifications.filter(tmp => tmp.deviceSerialNumber == req.query.device);

@@ -695,7 +695,7 @@ class alexaapiCmd extends cmd {
 			return;
 		}
 
-		//log::add('alexaapi', 'debug', 'execute : Début');
+		//log::add('alexaapi', 'debug', 'execute : Début555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555');
 		//On construit la requete 
 		$request = $this->buildRequest($_options);
 		log::add('alexaapi', 'info', 'Request : ' . $request);//Request : http://192.168.0.21:3456/volume?value=50&device=G090LF118173117U
@@ -729,10 +729,11 @@ class alexaapiCmd extends cmd {
 		// On traite la valeur de resultat (dans le cas de whennextalarm par exemple)
 		$resultjson = json_decode($result, true);
 		$value = $resultjson['value'];
-		//log::add('alexaapi', 'debug', '** Résultat value=' . $value);
+		log::add('alexaapi', 'debug', '** Résultat retour via JSON value=' . $value);
 		
 		//*******************************************************************************
 		// Ici, on va traiter une commande qui n'a pas été executée correctement (erreur type "Connexion Close")
+		log::add('alexaapi', 'debug', '**TEST Connexion Close** dans la Class:'.$value);
 		if ($value =="Connexion Close")
 		{
 		log::add('alexaapi', 'debug', '**On traite Connexion Close** dans la Class');
