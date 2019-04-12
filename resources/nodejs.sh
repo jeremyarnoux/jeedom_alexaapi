@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROGRESS_FILE=/tmp/${2}_dep
+PROGRESS_FILE=/tmp/jeedom/${2}/dependance
 installVer='8' 	#NodeJS major version to be installed
 minVer='8'	#min NodeJS major version to be accepted
 
@@ -110,6 +110,8 @@ else
     sudo cp -R * /usr/local/
     cd ..
     rm -fR node-*-linux-${arch}*
+    ln -s /usr/local/bin/node /usr/bin/node &>/dev/null
+    ln -s /usr/local/bin/node /usr/bin/nodejs &>/dev/null
     #upgrade to recent npm
     sudo npm install -g npm
   else

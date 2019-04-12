@@ -52,6 +52,7 @@ function printEqLogic(data)
   $('#multiroom-members').parent().show();
   $('#multiroom-members').append(html);
 }
+
 </script>
 
 <!-- Container global (Ligne bootstrap) -->
@@ -98,13 +99,25 @@ function printEqLogic(data)
         </center>
         <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Santé}}</center></span>
       </div>
+      <div class="cursor" id="bt_routines" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+        <center>
+          <i class="fa divers-viral" style="font-size : 6em;color:#767676;"></i>
+        </center>
+        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Routines}}</center></span>
+    
+      </div>
       <div class="cursor" id="bt_reminders" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
         <center>
-          <i class="fa fa-clock-o" style="font-size : 6em;color:#767676;"></i>
+          <i class="fa fa-clock" style="font-size : 6em;color:#767676;"></i>
         </center>
         <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Rappels/Alarmes}}</center></span>
-      </div>
-      <!-- Bouton d accès à la configuration -->
+      </div>      <!-- Bouton d accès à la configuration -->
+      <div class="cursor" id="bt_history" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+        <center>
+          <i class="fa fa-list-alt" style="font-size : 6em;color:#767676;"></i>
+        </center>
+        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Historique}}</center></span>
+      </div>      <!-- Bouton d accès à la configuration -->
       <div class="cursor eqLogicAction" data-action="gotoPluginConf" style="background-color : #ffffff; height : 140px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
         <center>
           <i class="fa fa-wrench" style="font-size : 6em;color:#767676;"></i>
@@ -216,6 +229,18 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
               </fieldset>
             </form>
           </div>
+		  <!-- Castré par Nebz et HadesDT 
+		  
+		  				<div class="cursor" id="bt_media" data-l1key="logicalId" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+        
+		
+		<center>
+          <i class="fa loisir-musical7" style="font-size : 6em;color:#767676;"></i>
+        </center>
+        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Info Média}}</center></span>
+      </div>
+		  -->
+		  
           <div class="col-sm-5">
             <form class="form-horizontal">
               <fieldset>
@@ -240,6 +265,8 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
                   </div>
                 </div>
                 
+				
+				
                 <div class="form-group">
                   <label class="col-sm-2 control-label">{{Multiroom}}</label>
                   <div class="col-sm-8" id="multiroom-members">
@@ -254,24 +281,17 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
       </div>
 
       <div role="tabpanel" class="tab-pane" id="commandtab">
-        <form class="form-horizontal">
-          <fieldset>
-            <div class="form-actions">
-              <a class="btn btn-success btn-sm cmdAction" id="bt_addespeasyAction"><i class="fa fa-plus-circle"></i> {{Ajouter une commande action}}</a>
-            </div>
-          </fieldset>
-        </form>
-        <br />
+        
 
         <table id="table_cmd" class="table table-bordered table-condensed">
           <thead>
             <tr>
-              <th style="width: 50px;">#</th>
-              <th style="width: 300px;">{{Nom}}</th>
+              <th style="width: 40px;">#</th>
+              <th style="width: 200px;">{{Nom}}</th>
               <th style="width: 150px;">{{Type}}</th>
               <th style="width: 300px;">{{Commande & Variable}}</th>
-              <th style="width: 300px;">{{Résultat dans}}</th>
-              <th style="width: 100px;">{{Min/Max}}</th>
+              <th style="width: 40px;">{{Min}}</th>
+              <th style="width: 40px;">{{Max}}</th>
               <th style="width: 150px;">{{Paramètres}}</th>
               <th style="width: 100px;"></th>
             </tr>
@@ -280,7 +300,22 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
 
           </tbody>
         </table>
+		
+    
+		
+		<form class="form-horizontal">
+          <fieldset>
+            <div class="form-actions">
+              <a class="btn btn-success btn-sm cmdAction" id="bt_addespeasyAction"><i class="fa fa-plus-circle"></i> {{Ajouter une commande action}}</a>
+            </div>
+          </fieldset>
+        </form>
+		
       </div>
+
+
+
+
 
 
     </div>

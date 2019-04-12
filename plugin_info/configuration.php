@@ -27,18 +27,19 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 include_file('core', 'authentification', 'php');
 include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 
-        log::add('alexaapi', 'debug', 'Test de config::byKey dans config: ' . config::byKey('amazonserver','alexaapi'));
+        //log::add('alexaapi', 'debug', 'Test de config::byKey dans config: ' . config::byKey('amazonserver','alexaapi'));
 
 ?>
 
 	<legend><i class="icon divers-triangular42"></i> {{Génération manuelle du cookie Amazon}}</legend>
 	<center>
 		<a class="btn btn-success btn-sm bt_startDeamonCookie"> {{Identifiez-vous sur Amazon pour créer le cookie d'identification}} </a>
-		<a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fa fa-clock-o"></i> {{... Attendez la génération du Cookie Amazon ...}} </a>
-		<a class="btn btn-default btn-sm bt_identificationCookie2bis"><i class="fa fa-clock-o"></i> {{... Attendez la génération du Cookie Amazon ...}} </a>
+		<a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fa fa-clock"></i> {{... Attendez la génération du Cookie Amazon ...}} </a>
+		<a class="btn btn-default btn-sm bt_identificationCookie2bis"><i class="fa fa-clock"></i> {{... Attendez la génération du Cookie Amazon ...}} </a>
 		<a class="btn btn-danger btn-sm bt_identificationCookie2echec"><i class="fa fa-times"></i> {{La génération du Cookie Amazon a échoué}} </a>
 		<a class="btn btn-success btn-sm bt_identificationCookie3"><i class="fa fa-check"></i> {{Bravo : Cookie d'identification Amazon chargé !}} </a>
 		<a class="btn btn-primary btn-sm bt_identificationCookie"><i class="fa fa-spinner fa-spin"></i> {{Ouverture de la fenetre d'identification Amazon Alexa en cours ...}} </a>
+		<a class="btn btn-default btn-sm bt_identificationCookie1"><i class="fa fa-spinner fa-spin"></i> {{Cliquez ici quand vous avez terminé l'identification}} </a>
 	</center>
 	<br />
 	<legend><i class="fa fa-wrench"></i> {{Réparations}}</legend>
@@ -83,11 +84,12 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 			}
 		if ((compteVerifCookie>4) && (CookiePresent=1))
 			{
-		$('.bt_identificationCookie2').hide();
+		$('.bt_identificationCookie2').hide();  
 		$('.bt_identificationCookie2bis').hide();
 		$('.bt_identificationCookie3').show();
 			return;
 			}		
+		$('.bt_identificationCookie1').hide();
 		$('.bt_identificationCookie2').show();
 		$('.bt_identificationCookie2bis').hide();
 		setTimeout(VerifierSiCookieGenere2, 1000);
@@ -126,14 +128,19 @@ function PopUpCentre(url, width, height) {
     + leftPosition + ",top=" + topPosition + ",screenX=" + leftPosition + ",screenY="
     + topPosition + ",toolbar=no,menubar=no,scrollbars=no,location=no,directories=no");
 		
+		
+		
 if(nouvellefenetre)
 	{ //securité pour fermer la fenetre si le focus est perdu
+		
 		window.onfocus=function()
 		{
 		nouvellefenetre.window.close();
 		$('.bt_identificationCookie').hide();
+		  $('.bt_identificationCookie1').hide();
 		VerifierSiCookieGenere1();
 		}
+	
 	}
 }
 
@@ -144,6 +151,7 @@ if(nouvellefenetre)
   $('.bt_identificationCookie2bis').hide();
   $('.bt_identificationCookie2echec').hide();
   $('.bt_identificationCookie3').hide();
+    $('.bt_identificationCookie1').hide();
 
   // On appuie sur Le lancement du serveur... on lance "deamonCookieStart" via action=deamonCookieStart dans alexaapi.ajax.php
   $('.bt_startDeamonCookie').on('click',function()
@@ -172,11 +180,22 @@ if(nouvellefenetre)
 
 function attendre() {
 window.setTimeout(lancer, 3000);
+window.setTimeout(lancer2, 5000);
 }
+
+
 
 function lancer() {
 PopUpCentre("http://<?php print config::byKey('internalAddr')?>:3457", 480, 700);
 }
+
+function lancer2() {
+
+  $('.bt_identificationCookie').hide();
+  $('.bt_identificationCookie1').show();
+
+}
+
 
   $('.bt_stopDeamonCookie').on('click',function()
   {
@@ -205,6 +224,10 @@ PopUpCentre("http://<?php print config::byKey('internalAddr')?>:3457", 480, 700)
   $('.bt_identificationCookie').on('click',function()
   {
   });
+  
+  $('.bt_identificationCookie1').on('click',function()
+  {VerifierSiCookieGenere1();
+  });  
   
   $('#bt_reinstallNodeJS').on('click', function() {
 		bootbox.confirm('{{Etes-vous sûr de vouloir supprimer et reinstaller NodeJS ? <br /> Merci de patienter 10-20 secondes quand vous aurez cliqué...}}', function(result) {

@@ -173,7 +173,7 @@ $repetition="";
 
             // Retireve the device (if already registered in Jeedom)
             $device = alexaapi::byLogicalId($item['deviceSerialNumber'], 'alexaapi');
-            if ($device)
+            if (is_object($device))
 	echo '<tr><td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'.$device->getName().'</span></td>';
 			else
 	echo '<tr><td><span class="label label-danger" style="font-size : 1em; cursor : default;">?????</span></td>';
