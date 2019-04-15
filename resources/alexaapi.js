@@ -715,6 +715,23 @@ app.get('/homegroup', (req, res) => {
 	});
 });
 
+app.get('/smarthomedevices', (req, res) => {
+	res.type('json');
+/*
+	if ('device' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.activities', 'Missing parameter "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+*/
+
+	alexa.getSmarthomeDevices2(function(smarthomedevices) {
+		fichierjson = __dirname + '/data/smarthomedevices.json';
+		fs.writeFile(fichierjson, JSON.stringify(smarthomedevices, null, 2), err => {
+        if (err)
+          return res.sendStatus(500)
+      });
+		res.status(200).json(smarthomedevices);
+	});
+});
 app.get('/getvolume', (req, res) => {
 	res.type('json');
 

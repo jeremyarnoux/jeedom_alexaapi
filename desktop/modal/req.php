@@ -33,6 +33,10 @@ if (empty($_GET['json']))
 							$commande="devicesfull";
 							$masquedevice=true;
 						break;
+						case 'smarthomedevices':
+							$commande="smarthomedevices";
+							$masquedevice=true;
+						break;
 						case 'devicepreferences':
 							$commande="devicepreferences";
 							$masquedevice=true;
@@ -79,6 +83,7 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 <option value="devicesfull" <?php if ($_GET['json']=="devicesfull") echo "selected"?>>Devices</option>
 <option value="devicepreferences" <?php if ($_GET['json']=="devicepreferences") echo "selected"?>>Préférences</option>
 <option value="homegroup" <?php if ($_GET['json']=="homegroup") echo "selected"?>>Home Group</option>
+<option value="smarthomedevices" <?php if ($_GET['json']=="smarthomedevices") echo "selected"?>>Smarthome Devices</option>
 <option value="media" <?php if ($_GET['json']=="media") echo "selected"?>>Media</option>
 <option value="playerinfo" <?php if ($_GET['json']=="playerinfo") echo "selected"?>>Player Info</option>
 	</select></div><div class="input-group" <?php if ($masquedevice) echo 'style="visibility:hidden;"'; ?> >

@@ -1650,7 +1650,8 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
 	}
 
     getSmarthomeDevices(callback) {
-        this.httpsGet ('https://${this.baseUrl}/api/phoenix?_=%t', function (err, res) {
+        //this.httpsGet ('https://${this.baseUrl}/api/phoenix?_=%t', function (err, res) {
+        this.httpsGet ('https://'+this.baseUrl+'/api/phoenix?_=%t', function (err, res) {
             if (err || !res || !res.networkDetail) return callback(err, res);
             try {
                 res = JSON.parse(res.networkDetail);
@@ -1661,9 +1662,18 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
             callback (err, res.locationDetails);
         });
     }
-
+	
+	getSmarthomeDevices2(callback) 
+	{
+		this.getSmarthomeDevices((err, res) => 
+		{
+			if (err) return callback && callback();
+			callback && callback(res);
+		});
+	}
     getSmarthomeGroups(callback) {
-        this.httpsGet ('https://${this.baseUrl}/api/phoenix/group?_=%t', callback);
+      //  this.httpsGet ('https://${this.baseUrl}/api/phoenix/group?_=%t', callback);
+        this.httpsGet ('https://'+this.baseUrl+'/api/phoenix/group?_=%t', callback);
     }
 
     getSmarthomeEntities(callback) {
