@@ -536,6 +536,24 @@ app.get('/alarm', (req, res) => {
     capabilities: [String] - List of available capabilties of the device, few example: VOLUME_SETTING, REMINDERS, MICROPHONE, TUNE_IN, ...
   }]
 */
+app.get('/devicesfull', (req, res) => {
+	config.logger('Alexa-API: Devices');
+	res.type('json');
+
+	alexa.getDevices(function(devices) {
+		fichierjson = __dirname + '/data/devicesfull.json';
+		fs.writeFile(fichierjson, JSON.stringify(devices, null, 2), err => {
+        if (err)
+			{
+			config.logger('*************** export json souci ');
+			return res.sendStatus(500)
+			}
+        config.logger('*************** export json semble ok ');
+		});
+		res.status(200).json(devices);
+	});
+});
+
 app.get('/devices', (req, res) => {
 	config.logger('Alexa-API: Devices');
 	res.type('json');
@@ -555,10 +573,19 @@ app.get('/devices', (req, res) => {
 				});
 			}
 		}
+		/*
+		fichierjson = __dirname + '/data/devices.json';
+		fs.writeFile(fichierjson, JSON.stringify(toReturn, null, 2), err => {
+        if (err)
+			{
+			config.logger('*************** export json souci ');
+			return res.sendStatus(500)
+			}
+        config.logger('*************** export json semble ok ');
+		});*/
 		res.status(200).json(toReturn);
 	});
 });
-
 
 /***** Get devices *****
   URL: /devices
@@ -576,20 +603,13 @@ app.get('/wakewords', (req, res) => {
 	config.logger('Alexa-API: WakeWords');
 	res.type('json');
 
-	alexa.getWakeWords2(function(devices) {
-		var toReturn = [];
-		for (var serial in devices) {
-			if (devices.hasOwnProperty(serial)) {
-				var device = devices[serial];
-				toReturn.push({
-					'serial': serial,
-					'active': device.active,
-					'deviceSerialNumber': device.deviceSerialNumber,
-					'wakeWord': device.wakeWord
-				});
-			}
-		}
-		res.status(200).json(toReturn);
+	alexa.getWakeWords2(function(wakewords) {
+		fichierjson = __dirname + '/data/wakewords.json';
+		fs.writeFile(fichierjson, JSON.stringify(wakewords, null, 2), err => {
+        if (err)
+          return res.sendStatus(500)
+		});
+		res.status(200).json(wakewords);
 	});
 });
 
@@ -601,7 +621,28 @@ app.get('/media', (req, res) => {
 	config.logger('Alexa-API: device: ' + req.query.device);
 
 
-	alexa.getMedia2(req.query.device, function(devices) {
+	alexa.getMedia2(req.query.device, function(media) {
+		fichierjson = __dirname + '/data/media-'+req.query.device+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(media, null, 2), err => {
+        if (err)
+          return res.sendStatus(500)
+      });
+		res.status(200).json(media);
+	});
+});
+
+
+// commandes en tests, non officielisées
+
+app.get('/playerinfo', (req, res) => {
+	res.type('json');
+
+	if ('device' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Missing parameter "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+
+
+	alexa.getPlayerInfo2(req.query.device, function(devices) {
 			//config.logger('Alexa-API: media-avant boucle '+devices);
 		var toReturn = [];
 		for (var serial in devices) {
@@ -613,18 +654,64 @@ app.get('/media', (req, res) => {
 				});
 			}
 		}
-		fichierjson = __dirname + '/data/media-'+req.query.device+'.json';
+		fichierjson = __dirname + '/data/playerinfo-'+req.query.device+'.json';
 		fs.writeFile(fichierjson, JSON.stringify(toReturn, null, 2), err => {
         if (err)
           return res.sendStatus(500)
 
         config.logger('*************** semble ok ');
       });
-		
-		
-		
-		
 		res.status(200).json(toReturn);
+	});
+});
+
+app.get('/activities', (req, res) => {
+	res.type('json');
+
+	if ('device' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.activities', 'Missing parameter "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+
+	alexa.getActivities2(req.query.device, function(activities) {
+		fichierjson = __dirname + '/data/activities-'+req.query.device+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(activities, null, 2), err => {
+        if (err)
+          return res.sendStatus(500)
+      });
+		res.status(200).json(activities);
+	});
+});
+
+app.get('/devicepreferences', (req, res) => {
+	res.type('json');
+
+
+	alexa.getDevicePreferences2(function(devices) {
+
+		fichierjson = __dirname + '/data/devicepreferences.json';
+		fs.writeFile(fichierjson, JSON.stringify(devices, null, 2), err => {
+        if (err)
+          return res.sendStatus(500)
+      });
+		res.status(200).json(devices);
+	});
+});
+
+app.get('/homegroup', (req, res) => {
+	res.type('json');
+/*
+	if ('device' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.activities', 'Missing parameter "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+*/
+
+	alexa.getHomeGroup2(function(homegroup) {
+		fichierjson = __dirname + '/data/homegroup.json';
+		fs.writeFile(fichierjson, JSON.stringify(homegroup, null, 2), err => {
+        if (err)
+          return res.sendStatus(500)
+      });
+		res.status(200).json(homegroup);
 	});
 });
 

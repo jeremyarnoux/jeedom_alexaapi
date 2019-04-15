@@ -32,6 +32,11 @@ $('#bt_media').on('click', function ()
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=media&iddevice='+ $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
 });
 
+$('#bt_req').on('click', function ()
+{
+  $('#md_modal').dialog({title: "{{Requêteur}}"});
+  $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=req&iddevice='+ $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
+});
 $('#bt_sante').on('click', function ()
 {
   $('#md_modal').dialog({title: "{{Liste Amazon Echo}}"});

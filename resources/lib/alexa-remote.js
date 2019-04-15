@@ -610,15 +610,25 @@ class AlexaRemote extends EventEmitter {
 	}
 
 
-
-
-
     getPlayerInfo(serialOrName, callback) {
         let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
 
         this.httpsGet (`/api/np/player?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
     }
+	getPlayerInfo2(serialOrName,callback) 
+	{
+		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2');
+
+		this.getPlayerInfo(serialOrName,(err, res) => 
+		{
+		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2 dans boucle');
+			//console.log(res);	
+			//if (err || !res || !res.volume || !Array.isArray(res.volume)) return callback && callback();
+			if (err || !res ) return callback && callback();
+			callback && callback(res);
+		});
+	}
 
     getList(serialOrName, listType, options, callback) {
         let dev = this.find(serialOrName);
@@ -995,6 +1005,17 @@ this.deleteNotification(notification, callback);
 			callback && callback(res);
 		});
 	}
+	
+	getActivities2(options,callback) 
+	{
+		this.getActivities(options, (err, res) => 
+		{
+			        //this._options.logger && this._options.logger('coucou'+res);
+
+			if (err || !res || !res || !Array.isArray(res)) return callback && callback();
+			callback && callback(res);
+		});
+	}	
 	
     getActivities(options, callback) {
         if (typeof options === 'function') {
@@ -1606,10 +1627,27 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
     getHomeGroup(callback) {
         this.httpsGet (`https://alexa-comms-mobile-service.amazon.com/users/${this.commsId}/identities?includeUserName=true`, callback);
     }
-
+	getHomeGroup2(callback) 
+	{
+		this.getHomeGroup((err, res) => 
+		{
+			if (err) return callback && callback();
+			callback && callback(res);
+		});
+	}
     getDevicePreferences(callback) {
-        this.httpsGet ('https://${this.baseUrl}/api/device-preferences?cached=true&_=%t', callback);
+//        this.httpsGet ('https://${this.baseUrl}/api/device-preferences?cached=true&_=%t', callback); //bug
+        this.httpsGet ('https://'+this.baseUrl+'/api/device-preferences?cached=true&_=%t', callback); //corrigé Sigalou 12042019
     }
+
+	getDevicePreferences2(callback) 
+	{
+		this.getDevicePreferences((err, res) => 
+		{
+			if (err) return callback && callback();
+			callback && callback(res);
+		});
+	}
 
     getSmarthomeDevices(callback) {
         this.httpsGet ('https://${this.baseUrl}/api/phoenix?_=%t', function (err, res) {

@@ -93,39 +93,54 @@ function printEqLogic(data)
         </center>
           <span style="font-size : 1.1em;position:relative; top : 23px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#94ca02"><center>{{Scan}}</center></span>
       </div>
-      <div class="cursor" id="bt_sante" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        <center>
-          <i class="fa fa-medkit" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Santé}}</center></span>
-      </div>
-      <div class="cursor" id="bt_routines" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        <center>
-          <i class="fa divers-viral" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Routines}}</center></span>
-    
-      </div>
-      <div class="cursor" id="bt_reminders" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        <center>
-          <i class="fa fa-clock" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Rappels/Alarmes}}</center></span>
-      </div>      <!-- Bouton d accès à la configuration -->
-      <div class="cursor" id="bt_history" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        <center>
-          <i class="fa fa-list-alt" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Historique}}</center></span>
-      </div>      <!-- Bouton d accès à la configuration -->
+	  
+	        <!-- Bouton d accès à la configuration -->
       <div class="cursor eqLogicAction" data-action="gotoPluginConf" style="background-color : #ffffff; height : 140px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
         <center>
           <i class="fa fa-wrench" style="font-size : 6em;color:#767676;"></i>
         </center>
         <span style="font-size : 1.1em;position:relative; top : 23px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Configuration}}</center></span>
       </div>
-    </div>
+	  
+      <div class="cursor" id="bt_sante" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+        <center>
+          <i class="fa fa-medkit" style="font-size : 6em;color:#767676;"></i>
+        </center>
+        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Santé}}</center></span>
+      </div>
+	  
+	  
+      <div class="cursor" id="bt_routines" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+        <center>
+          <i class="fa divers-viral" style="font-size : 6em;color:#767676;"></i>
+        </center>
+        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Routines}}</center></span>
+       </div>
+	  
+	  
+      <div class="cursor" id="bt_reminders" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+        <center>
+          <i class="fa fa-clock" style="font-size : 6em;color:#767676;"></i>
+        </center>
+        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Rappels/Alarmes}}</center></span>
+      </div>
 
+      <div class="cursor" id="bt_history" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+        <center>
+          <i class="fa fa-list-alt" style="font-size : 6em;color:#767676;"></i>
+        </center>
+        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Historique}}</center></span>
+      </div>
+
+      <div class="cursor" id="bt_req" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+        <center>
+          <i class="fa fa-key" style="font-size : 6em;color:#767676;"></i>
+        </center>
+        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Requêteur}}</center></span>
+      </div>
+	  
+	  
+    </div>
     <!-- Début de la liste des objets -->
     <legend><i class="fa fa-table"></i> {{Mes Amazon Echo}}</legend>
     <!-- Container de la liste -->
@@ -229,18 +244,24 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
               </fieldset>
             </form>
           </div>
-		  <!-- Castré par Nebz et HadesDT 
 		  
-		  				<div class="cursor" id="bt_media" data-l1key="logicalId" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        
-		
-		<center>
-          <i class="fa loisir-musical7" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Info Média}}</center></span>
-      </div>
-		  -->
-		  
+<!--		  
+<div class="cursor" id="bt_media" data-l1key="logicalId" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+	<center>
+	<i class="fa loisir-musical7" style="font-size : 6em;color:#767676;"></i>
+	</center>
+<span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Info Média}}</center></span>
+</div>
+	 	Castré par Nebz et HadesDT   
+<div class="cursor" id="bt_test" data-l1key="logicalId" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
+<center>
+<i class="fa loisir-musical7" style="font-size : 6em;color:#767676;"></i>
+</center>
+<span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Test}}</center></span>
+</div>
+-->
+
+	  
           <div class="col-sm-5">
             <form class="form-horizontal">
               <fieldset>
