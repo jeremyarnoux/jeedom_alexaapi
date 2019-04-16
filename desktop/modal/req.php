@@ -21,65 +21,32 @@ if (!isConnect('admin')) {
 }
 
 if (empty($_GET['json']))
-	$_GET['json']="wakewords";
+	$_GET['json']="wakeWords";
 
 					$partieFichier=$_GET['json'].".json";
+					$commande=$_GET['json'];
+					$masquedevice=true;
 					switch ($_GET['json']) {
-						case 'wakewords':
-							$commande="wakewords";
-							$masquedevice=true;
-						break;
-						case 'devicesfull':
-							$commande="devicesfull";
-							$masquedevice=true;
-						break;
-						case 'smarthomedevices':
-							$commande="smarthomedevices";
-							$masquedevice=true;
-						break;
-						case 'smarthomegroups':
-							$commande="smarthomegroups";
-							$masquedevice=true;
-						break;						
-						case 'smarthomebehaviouractiondefinitions':
-							$commande="smarthomebehaviouractiondefinitions";
-							$masquedevice=true;
-						break;						
-						case 'smarthomeentities':
-							$commande="smarthomeentities";
-							$masquedevice=true;
-						break;							
-						case 'devicepreferences':
-							$commande="devicepreferences";
-							$masquedevice=true;
-						break;
-						case 'homegroup':
-							$commande="homegroup";
-							$masquedevice=true;
-						break;						
 						case 'activities':
-							$commande="activities";
-							$masquedevice=false;
-							$partieFichier=$_GET['json']."-".$_GET['device'].".json";
-						break;
 						case 'media':
-							$commande="media";
-							$masquedevice=false;
-							$partieFichier=$_GET['json']."-".$_GET['device'].".json";
-						break;
-						case 'playerinfo':
-							$commande="playerinfo";
+						case 'playerInfo':
 							$masquedevice=false;
 							$partieFichier=$_GET['json']."-".$_GET['device'].".json";
 						break;					}
 
 $fichierJson = realpath(dirname(__FILE__)) . "/../../resources/data/".$partieFichier;
+//echo "Va chercher :" . $fichierJson;
+$texteaAfficher="Dernière mise à jour : ".date ("d F Y H:i:s", filemtime($fichierJson));
+
+
 
 if (date ("U", filemtime($fichierJson))=="0")
 	{
-	$regenerejson=@file_get_contents("http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device']);
+	$fichierJson="http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device'];
+	//$fichierJson=@file_get_contents("http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device']);
 //echo "génération de http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device']."<---";
-	}
+$texteaAfficher="Dernière mise à jour : à l'instant";
+}
 
 //echo "--->".date ("U", filemtime($fichierJson))."<---";
 
@@ -92,16 +59,16 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 	<span class="input-group-addon" id="basic-addon1" style="width: 180px">Informations à afficher :</span>
 	<select onchange="test();" id="ListeJSON" class="form-control input-sm expressionAttr" style="width: 200px">
 <option value="activities" <?php if ($_GET['json']=="activities") echo "selected"?>>Activities</option>
-<option value="wakewords" <?php if ($_GET['json']=="wakewords") echo "selected"?>>WakeWords</option>
+<option value="wakeWords" <?php if ($_GET['json']=="wakeWords") echo "selected"?>>WakeWords</option>
 <option value="devicesfull" <?php if ($_GET['json']=="devicesfull") echo "selected"?>>Devices</option>
-<option value="devicepreferences" <?php if ($_GET['json']=="devicepreferences") echo "selected"?>>Préférences</option>
-<option value="homegroup" <?php if ($_GET['json']=="homegroup") echo "selected"?>>Home Group</option>
+<option value="devicePreferences" <?php if ($_GET['json']=="devicePreferences") echo "selected"?>>Préférences</option>
+<option value="homeGroup" <?php if ($_GET['json']=="homeGroup") echo "selected"?>>Home Group</option>
 <option value="smarthomegroups" <?php if ($_GET['json']=="smarthomegroups") echo "selected"?>>Smarthome Groups</option>
-<option value="smarthomedevices" <?php if ($_GET['json']=="smarthomedevices") echo "selected"?>>Smarthome Devices</option>
+<option value="smarthomeDevices" <?php if ($_GET['json']=="smarthomeDevices") echo "selected"?>>Smarthome Devices</option>
 <option value="smarthomeentities" <?php if ($_GET['json']=="smarthomeentities") echo "selected"?>>Smarthome Entities</option>
 <option value="smarthomebehaviouractiondefinitions" <?php if ($_GET['json']=="smarthomebehaviouractiondefinitions") echo "selected"?>>Smarthome Behaviour Action Definitions Devices</option>
 <option value="media" <?php if ($_GET['json']=="media") echo "selected"?>>Media</option>
-<option value="playerinfo" <?php if ($_GET['json']=="playerinfo") echo "selected"?>>Player Info</option>
+<option value="playerInfo" <?php if ($_GET['json']=="playerInfo") echo "selected"?>>Player Info</option>
 	</select></div><div class="input-group" <?php if ($masquedevice) echo 'style="visibility:hidden;"'; ?> >
 	<span class="input-group-addon" id="basic-addon1" style="width: 180px">Utiliser :</span>
 	<select onchange="test();" id="ListeDevices" class="form-control input-sm expressionAttr" style="width: 200px">
@@ -120,7 +87,7 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 
 
 echo "</td><td><center>";
-echo "Dernière mise à jour : ".date ("d F Y H:i:s", filemtime($fichierJson));
+echo $texteaAfficher;
 echo "</center></td><td>";
 
 //echo  '<a class="btn btn-default pull-right refreshAction" data-action="refresh"><i class="fa fa-refresh"></i> Rafraichir</a>';
@@ -153,7 +120,7 @@ echo '<pre>';
 //$file = 'http://www.webpagetest.org/jsonResult.php?test=180605_G7_bed851a21eadf7995909b59fcac99212';
 			
             $json = @file_get_contents($fichierJson);
-            if (empty($json)) die("Json vide");
+            if (empty($json)) die("Réponse vide");
         echo json_viewer($json);
 echo '</pre>';
 
@@ -167,6 +134,7 @@ if (ob_get_length()) {
 			}
 */
 
+if ($texteaAfficher!="Dernière mise à jour : à l'instant")
 $regenerejson=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device']);
 //echo "http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device'];
 

@@ -595,21 +595,6 @@ class AlexaRemote extends EventEmitter {
     }
 
 
-	getMedia2(serialOrName,callback) 
-	{
-		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2');
-
-		this.getMedia(serialOrName,(err, res) => 
-		{
-		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2 dans boucle');
-			//console.log(res);	
-			//if (err || !res || !res.volume || !Array.isArray(res.volume)) return callback && callback();
-			if (err || !res ) return callback && callback();
-			callback && callback(res);
-		});
-	}
-
-
     getPlayerInfo(serialOrName, callback) {
         let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
@@ -694,7 +679,7 @@ class AlexaRemote extends EventEmitter {
         this.httpsGet (`/api/wake-word?_=%t`, callback);
     }
 
-	getWakeWords2(callback) 
+getWakeWords2(callback) 
 	{
 		this.getWakeWords((err, res) => 
 		{
