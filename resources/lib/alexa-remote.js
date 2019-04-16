@@ -1662,19 +1662,13 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
             callback (err, res.locationDetails);
         });
     }
-	
-	getSmarthomeDevices2(callback) 
-	{
-		this.getSmarthomeDevices((err, res) => 
-		{
-			if (err) return callback && callback();
-			callback && callback(res);
-		});
-	}
+	getSmarthomeDevices2(callback){this.getSmarthomeDevices((err, res)=>{if (err) return callback && callback();callback && callback(res);});}
+
     getSmarthomeGroups(callback) {
       //  this.httpsGet ('https://${this.baseUrl}/api/phoenix/group?_=%t', callback);
         this.httpsGet ('https://'+this.baseUrl+'/api/phoenix/group?_=%t', callback);
     }
+	getSmarthomeGroups2(callback){this.getSmarthomeGroups((err, res)=>{if (err) return callback && callback();callback && callback(res);});}
 
     getSmarthomeEntities(callback) {
         this.httpsGet ('/api/behaviors/entities?skillId=amzn1.ask.1p.smarthome',
@@ -1686,7 +1680,15 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
             }
         );
     }
-
+	
+	getSmarthomeEntities2(callback) 
+	{
+		this.getSmarthomeEntities((err, res) => 
+		{
+			if (err) return callback && callback();
+			callback && callback(res);
+		});
+	}
     getSmarthomeBehaviourActionDefinitions(callback) {
         this.httpsGet ('/api/behaviors/actionDefinitions?skillId=amzn1.ask.1p.smarthome',
             callback,
@@ -1698,7 +1700,15 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
         );
     }
 
-
+	getSmarthomeBehaviourActionDefinitions2(callback) 
+	{
+		this.getSmarthomeBehaviourActionDefinitions((err, res) => 
+		{
+			if (err) return callback && callback();
+			callback && callback(res);
+		});
+	}
+	
     renameDevice(serialOrName, newName, callback) {
         let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));

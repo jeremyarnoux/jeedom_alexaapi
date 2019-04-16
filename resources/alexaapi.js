@@ -717,11 +717,6 @@ app.get('/homegroup', (req, res) => {
 
 app.get('/smarthomedevices', (req, res) => {
 	res.type('json');
-/*
-	if ('device' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.activities', 'Missing parameter "device"'));
-	config.logger('Alexa-API: device: ' + req.query.device);
-*/
 
 	alexa.getSmarthomeDevices2(function(smarthomedevices) {
 		fichierjson = __dirname + '/data/smarthomedevices.json';
@@ -732,6 +727,44 @@ app.get('/smarthomedevices', (req, res) => {
 		res.status(200).json(smarthomedevices);
 	});
 });
+
+app.get('/smarthomebehaviouractiondefinitions', (req, res) => {
+	res.type('json');
+	alexa.getSmarthomeBehaviourActionDefinitions2(function(smarthomebehaviouractiondefinitions) {
+		fichierjson = __dirname + '/data/smarthomebehaviouractiondefinitions.json';
+		fs.writeFile(fichierjson, JSON.stringify(smarthomebehaviouractiondefinitions, null, 2), err => {
+        if (err)
+          return res.sendStatus(500)
+      });
+		res.status(200).json(smarthomebehaviouractiondefinitions);
+	});
+});
+
+app.get('/smarthomegroups', (req, res) => {
+	res.type('json');
+	alexa.getSmarthomeGroups2(function(smarthomegroups) {
+		fichierjson = __dirname + '/data/smarthomegroups.json';
+		fs.writeFile(fichierjson, JSON.stringify(smarthomegroups, null, 2), err => {
+        if (err)
+          return res.sendStatus(500)
+      });
+		res.status(200).json(smarthomegroups);
+	});
+});
+
+app.get('/smarthomeentities', (req, res) => {
+	res.type('json');
+
+	alexa.getSmarthomeEntities2(function(smarthomeentities) {
+		fichierjson = __dirname + '/data/smarthomeentities.json';
+		fs.writeFile(fichierjson, JSON.stringify(smarthomeentities, null, 2), err => {
+        if (err)
+          return res.sendStatus(500)
+      });
+		res.status(200).json(smarthomeentities);
+	});
+});
+
 app.get('/getvolume', (req, res) => {
 	res.type('json');
 

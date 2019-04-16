@@ -37,6 +37,18 @@ if (empty($_GET['json']))
 							$commande="smarthomedevices";
 							$masquedevice=true;
 						break;
+						case 'smarthomegroups':
+							$commande="smarthomegroups";
+							$masquedevice=true;
+						break;						
+						case 'smarthomebehaviouractiondefinitions':
+							$commande="smarthomebehaviouractiondefinitions";
+							$masquedevice=true;
+						break;						
+						case 'smarthomeentities':
+							$commande="smarthomeentities";
+							$masquedevice=true;
+						break;							
 						case 'devicepreferences':
 							$commande="devicepreferences";
 							$masquedevice=true;
@@ -44,7 +56,8 @@ if (empty($_GET['json']))
 						case 'homegroup':
 							$commande="homegroup";
 							$masquedevice=true;
-						break;						case 'activities':
+						break;						
+						case 'activities':
 							$commande="activities";
 							$masquedevice=false;
 							$partieFichier=$_GET['json']."-".$_GET['device'].".json";
@@ -83,7 +96,10 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 <option value="devicesfull" <?php if ($_GET['json']=="devicesfull") echo "selected"?>>Devices</option>
 <option value="devicepreferences" <?php if ($_GET['json']=="devicepreferences") echo "selected"?>>Préférences</option>
 <option value="homegroup" <?php if ($_GET['json']=="homegroup") echo "selected"?>>Home Group</option>
+<option value="smarthomegroups" <?php if ($_GET['json']=="smarthomegroups") echo "selected"?>>Smarthome Groups</option>
 <option value="smarthomedevices" <?php if ($_GET['json']=="smarthomedevices") echo "selected"?>>Smarthome Devices</option>
+<option value="smarthomeentities" <?php if ($_GET['json']=="smarthomeentities") echo "selected"?>>Smarthome Entities</option>
+<option value="smarthomebehaviouractiondefinitions" <?php if ($_GET['json']=="smarthomebehaviouractiondefinitions") echo "selected"?>>Smarthome Behaviour Action Definitions Devices</option>
 <option value="media" <?php if ($_GET['json']=="media") echo "selected"?>>Media</option>
 <option value="playerinfo" <?php if ($_GET['json']=="playerinfo") echo "selected"?>>Player Info</option>
 	</select></div><div class="input-group" <?php if ($masquedevice) echo 'style="visibility:hidden;"'; ?> >
