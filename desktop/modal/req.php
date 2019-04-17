@@ -30,6 +30,7 @@ if (empty($_GET['json']))
 						case 'activities':
 						case 'media':
 						case 'lists':
+						case 'deviceNotificationState':
 						case 'playerInfo':
 							$masquedevice=false;
 							$partieFichier=$_GET['json']."-".$_GET['device'].".json";
@@ -76,6 +77,8 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 <option value="lists" <?php if ($_GET['json']=="lists") echo "selected"?>>Lists</option>?>
 <option value="carts" <?php if ($_GET['json']=="carts") echo "selected"?>>Carts</option>?>
 <option value="alexa-cookie" <?php if ($_GET['json']=="alexa-cookie") echo "selected"?>>Cookie Amazon</option>?>
+<option value="deviceNotificationState" <?php if ($_GET['json']=="deviceNotificationState") echo "selected"?>>Device Notification State</option>?>
+<option value="deviceStatusList" <?php if ($_GET['json']=="deviceStatusList") echo "selected"?>>Device Status List</option>?>
 </select></div><div class="input-group" <?php if ($masquedevice) echo 'style="visibility:hidden;"'; ?> >
 	<span class="input-group-addon" id="basic-addon1" style="width: 180px">Utiliser :</span>
 	<select onchange="test();" id="ListeDevices" class="form-control input-sm expressionAttr" style="width: 200px">

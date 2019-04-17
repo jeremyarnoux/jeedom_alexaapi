@@ -601,19 +601,7 @@ class AlexaRemote extends EventEmitter {
 
         this.httpsGet (`/api/np/player?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
     }
-	getPlayerInfo2(serialOrName,callback) 
-	{
-		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2');
 
-		this.getPlayerInfo(serialOrName,(err, res) => 
-		{
-		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2 dans boucle');
-			//console.log(res);	
-			//if (err || !res || !res.volume || !Array.isArray(res.volume)) return callback && callback();
-			if (err || !res ) return callback && callback();
-			callback && callback(res);
-		});
-	}
 
     getList(serialOrName, listType, options, callback) {
         let dev = this.find(serialOrName);
@@ -679,14 +667,6 @@ class AlexaRemote extends EventEmitter {
         this.httpsGet (`/api/wake-word?_=%t`, callback);
     }
 
-getWakeWords2(callback) 
-	{
-		this.getWakeWords((err, res) => 
-		{
-			if (err || !res || !res.wakeWords || !Array.isArray(res.wakeWords)) return callback && callback();
-			callback && callback(res.wakeWords);
-		});
-	}
 
     createNotificationObject(serialOrName, type, label, value, status, sound) { // type = Reminder, Alarm
         if (status && typeof status === 'object') {

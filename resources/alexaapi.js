@@ -732,6 +732,30 @@ CommandAlexa.carts = function(req, res) {
 	});
 }
 
+CommandAlexa.deviceStatusList = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: /'+commandeEnvoyee);
+	res.type('json');
+	Appel_getDeviceStatusList(function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
+
+/*
+CommandAlexa.doNotDisturb = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: /'+commandeEnvoyee);
+	res.type('json');
+	Appel_getDoNotDisturb(function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}*/
 // ---- Toutes les commandes qui ont DEVICE comme paramètre
 
 CommandAlexa.media = function(req, res) {
@@ -797,6 +821,22 @@ CommandAlexa.lists = function(req, res) {
 		res.status(200).json(retourAmazon);
 	});
 }
+
+CommandAlexa.deviceNotificationState = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: /'+commandeEnvoyee);
+	res.type('json');
+
+	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+
+	Appel_getDeviceNotificationState(req.query.device, function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
 // ---- Functions d'appel des Commandes de la librairie
 
 function Appel_getWakeWords(callback) 
@@ -820,6 +860,12 @@ function Appel_getMusicProviders(callback)
 function Appel_getHistory(callback) 
 	{
 	alexa.getHistory((err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}
+	
+function Appel_getDeviceNotificationState(serialOrName,callback) 
+	{
+	alexa.getDeviceNotificationState(serialOrName,(err, res) => {if (err) return callback && callback();
 	callback && callback(res);});
 	}
 	
@@ -871,6 +917,17 @@ function Appel_getSmarthomeDevices(callback)
 	callback && callback(res);});
 	}
 	
+function Appel_getDeviceStatusList(callback) 
+	{
+	alexa.getDeviceStatusList((err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}
+	/*
+function Appel_getDoNotDisturb(callback) 
+	{
+	alexa.getDoNotDisturb((err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}	*/
 function Appel_getMedia(serialOrName,callback) 
 	{
 	alexa.getMedia(serialOrName,(err, res) => {if (err || !res ) return callback && callback();
@@ -913,6 +970,9 @@ app.get('/musicProviders', CommandAlexa.musicProviders);
 app.get('/remindersFull', CommandAlexa.remindersFull);
 app.get('/lists', CommandAlexa.lists);
 app.get('/carts', CommandAlexa.carts);
+app.get('/deviceNotificationState', CommandAlexa.deviceNotificationState);
+app.get('/deviceStatusList', CommandAlexa.deviceStatusList);
+//app.get('/doNotDisturb', CommandAlexa.doNotDisturb);
 
 
 app.get('/getvolume', (req, res) => {
