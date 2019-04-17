@@ -549,7 +549,8 @@ app.get('/devices', (req, res) => {
 				toReturn.push({
 					'serial': serial,
 					'name': device.accountName,
-					'type': device.deviceFamily,
+					'family': device.deviceFamily,
+					'type': device.deviceType,
 					'online': device.online,
 					'capabilities': device.capabilities,
 					'members': device.clusterMembers
@@ -580,7 +581,7 @@ CommandAlexa.wakeWords = function(req, res) {
 	commandeEnvoyee = req.path.replace("/", "");
 	config.logger('Alexa-API: /'+commandeEnvoyee);
 	res.type('json');
-	Appel_getDevices(function(retourAmazon) {
+	Appel_getWakeWords(function(retourAmazon) {
 		fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500)});
