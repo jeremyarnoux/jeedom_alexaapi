@@ -29,6 +29,7 @@ if (empty($_GET['json']))
 					switch ($_GET['json']) {
 						case 'activities':
 						case 'media':
+						case 'lists':
 						case 'playerInfo':
 							$masquedevice=false;
 							$partieFichier=$_GET['json']."-".$_GET['device'].".json";
@@ -60,7 +61,8 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 	<select onchange="test();" id="ListeJSON" class="form-control input-sm expressionAttr" style="width: 200px">
 <option value="activities" <?php if ($_GET['json']=="activities") echo "selected"?>>Activities</option>
 <option value="wakeWords" <?php if ($_GET['json']=="wakeWords") echo "selected"?>>WakeWords</option>
-<option value="devicesfull" <?php if ($_GET['json']=="devicesfull") echo "selected"?>>Devices</option>
+<option value="devicesFull" <?php if ($_GET['json']=="devicesFull") echo "selected"?>>Devices</option>
+<option value="historyFull" <?php if ($_GET['json']=="historyFull") echo "selected"?>>History</option>
 <option value="devicePreferences" <?php if ($_GET['json']=="devicePreferences") echo "selected"?>>Préférences</option>
 <option value="homeGroup" <?php if ($_GET['json']=="homeGroup") echo "selected"?>>Home Group</option>
 <option value="smarthomegroups" <?php if ($_GET['json']=="smarthomegroups") echo "selected"?>>Smarthome Groups</option>
@@ -68,8 +70,13 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 <option value="smarthomeentities" <?php if ($_GET['json']=="smarthomeentities") echo "selected"?>>Smarthome Entities</option>
 <option value="smarthomebehaviouractiondefinitions" <?php if ($_GET['json']=="smarthomebehaviouractiondefinitions") echo "selected"?>>Smarthome Behaviour Action Definitions Devices</option>
 <option value="media" <?php if ($_GET['json']=="media") echo "selected"?>>Media</option>
-<option value="playerInfo" <?php if ($_GET['json']=="playerInfo") echo "selected"?>>Player Info</option>
-	</select></div><div class="input-group" <?php if ($masquedevice) echo 'style="visibility:hidden;"'; ?> >
+<option value="musicProviders" <?php if ($_GET['json']=="musicProviders") echo "selected"?>>Music Providers</option>
+<option value="playerInfo" <?php if ($_GET['json']=="playerInfo") echo "selected"?>>Player Info</option>?>
+<option value="remindersFull" <?php if ($_GET['json']=="remindersFull") echo "selected"?>>Notifications</option>?>
+<option value="lists" <?php if ($_GET['json']=="lists") echo "selected"?>>Lists</option>?>
+<option value="carts" <?php if ($_GET['json']=="carts") echo "selected"?>>Carts</option>?>
+<option value="alexa-cookie" <?php if ($_GET['json']=="alexa-cookie") echo "selected"?>>Cookie Amazon</option>?>
+</select></div><div class="input-group" <?php if ($masquedevice) echo 'style="visibility:hidden;"'; ?> >
 	<span class="input-group-addon" id="basic-addon1" style="width: 180px">Utiliser :</span>
 	<select onchange="test();" id="ListeDevices" class="form-control input-sm expressionAttr" style="width: 200px">
 	<?php
@@ -152,7 +159,7 @@ function test()
 //window.alert(selectedDevice+"-"+selectedJSON);
 
 	$('#md_modal').dialog('close');
-	$('#md_modal').dialog({title: "{{Historique}}"});
+	$('#md_modal').dialog({title: "{{Requêteur}}"});
 	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=req&id=alexaapi&json='+selectedJSON+'&device='+selectedDevice).dialog('open');
 	
 }

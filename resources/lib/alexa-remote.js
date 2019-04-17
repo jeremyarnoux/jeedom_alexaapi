@@ -1612,27 +1612,12 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
     getHomeGroup(callback) {
         this.httpsGet (`https://alexa-comms-mobile-service.amazon.com/users/${this.commsId}/identities?includeUserName=true`, callback);
     }
-	getHomeGroup2(callback) 
-	{
-		this.getHomeGroup((err, res) => 
-		{
-			if (err) return callback && callback();
-			callback && callback(res);
-		});
-	}
+
     getDevicePreferences(callback) {
 //        this.httpsGet ('https://${this.baseUrl}/api/device-preferences?cached=true&_=%t', callback); //bug
         this.httpsGet ('https://'+this.baseUrl+'/api/device-preferences?cached=true&_=%t', callback); //corrigé Sigalou 12042019
     }
 
-	getDevicePreferences2(callback) 
-	{
-		this.getDevicePreferences((err, res) => 
-		{
-			if (err) return callback && callback();
-			callback && callback(res);
-		});
-	}
 
     getSmarthomeDevices(callback) {
         //this.httpsGet ('https://${this.baseUrl}/api/phoenix?_=%t', function (err, res) {
@@ -1647,7 +1632,6 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
             callback (err, res.locationDetails);
         });
     }
-	getSmarthomeDevices2(callback){this.getSmarthomeDevices((err, res)=>{if (err) return callback && callback();callback && callback(res);});}
 
     getSmarthomeGroups(callback) {
       //  this.httpsGet ('https://${this.baseUrl}/api/phoenix/group?_=%t', callback);
@@ -1666,14 +1650,7 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
         );
     }
 	
-	getSmarthomeEntities2(callback) 
-	{
-		this.getSmarthomeEntities((err, res) => 
-		{
-			if (err) return callback && callback();
-			callback && callback(res);
-		});
-	}
+
     getSmarthomeBehaviourActionDefinitions(callback) {
         this.httpsGet ('/api/behaviors/actionDefinitions?skillId=amzn1.ask.1p.smarthome',
             callback,
@@ -1685,15 +1662,7 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
         );
     }
 
-	getSmarthomeBehaviourActionDefinitions2(callback) 
-	{
-		this.getSmarthomeBehaviourActionDefinitions((err, res) => 
-		{
-			if (err) return callback && callback();
-			callback && callback(res);
-		});
-	}
-	
+
     renameDevice(serialOrName, newName, callback) {
         let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));

@@ -536,23 +536,6 @@ app.get('/alarm', (req, res) => {
     capabilities: [String] - List of available capabilties of the device, few example: VOLUME_SETTING, REMINDERS, MICROPHONE, TUNE_IN, ...
   }]
 */
-app.get('/devicesfull', (req, res) => {
-	config.logger('Alexa-API: Devices');
-	res.type('json');
-
-	alexa.getDevices(function(devices) {
-		fichierjson = __dirname + '/data/devicesfull.json';
-		fs.writeFile(fichierjson, JSON.stringify(devices, null, 2), err => {
-        if (err)
-			{
-			config.logger('*************** export json souci ');
-			return res.sendStatus(500)
-			}
-        config.logger('*************** export json semble ok ');
-		});
-		res.status(200).json(devices);
-	});
-});
 
 app.get('/devices', (req, res) => {
 	config.logger('Alexa-API: Devices');
@@ -573,16 +556,6 @@ app.get('/devices', (req, res) => {
 				});
 			}
 		}
-		/*
-		fichierjson = __dirname + '/data/devices.json';
-		fs.writeFile(fichierjson, JSON.stringify(toReturn, null, 2), err => {
-        if (err)
-			{
-			config.logger('*************** export json souci ');
-			return res.sendStatus(500)
-			}
-        config.logger('*************** export json semble ok ');
-		});*/
 		res.status(200).json(toReturn);
 	});
 });
@@ -607,7 +580,55 @@ CommandAlexa.wakeWords = function(req, res) {
 	commandeEnvoyee = req.path.replace("/", "");
 	config.logger('Alexa-API: /'+commandeEnvoyee);
 	res.type('json');
-	Appel_getWakeWords(function(retourAmazon) {
+	Appel_getDevices(function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
+
+CommandAlexa.musicProviders = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: /'+commandeEnvoyee);
+	res.type('json');
+	Appel_getMusicProviders(function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
+
+CommandAlexa.discoverSmarthomeDevice = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: /'+commandeEnvoyee);
+	res.type('json');
+	Appel_discoverSmarthomeDevice(function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
+
+CommandAlexa.historyFull = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: /'+commandeEnvoyee);
+	res.type('json');
+	Appel_getHistory(function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
+
+CommandAlexa.devicesFull = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: /'+commandeEnvoyee);
+	res.type('json');
+	alexa.getDevices(function(retourAmazon) {
 		fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500)});
@@ -686,6 +707,31 @@ CommandAlexa.smarthomeDevices = function(req, res) {
 		res.status(200).json(retourAmazon);
 	});
 }
+
+CommandAlexa.remindersFull = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: /'+commandeEnvoyee);
+	res.type('json');
+	Appel_getNotifications(function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
+
+CommandAlexa.carts = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: /'+commandeEnvoyee);
+	res.type('json');
+	Appel_getCards(function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
+
 // ---- Toutes les commandes qui ont DEVICE comme paramètre
 
 CommandAlexa.media = function(req, res) {
@@ -736,6 +782,21 @@ CommandAlexa.activities = function(req, res) {
 	});
 }
 
+CommandAlexa.lists = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: /'+commandeEnvoyee);
+	res.type('json');
+
+	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+
+	Appel_getLists(req.query.device, function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
 // ---- Functions d'appel des Commandes de la librairie
 
 function Appel_getWakeWords(callback) 
@@ -750,9 +811,33 @@ function Appel_getDevicePreferences(callback)
 	callback && callback(res);});
 	}
 	
+function Appel_getMusicProviders(callback) 
+	{
+	alexa.getMusicProviders((err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}
+	
+function Appel_getHistory(callback) 
+	{
+	alexa.getHistory((err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}
+	
+function Appel_getNotifications(callback) 
+	{
+	alexa.getNotifications((err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}	
+	
 function Appel_getSmarthomeBehaviourActionDefinitions(callback) 
 	{
 	alexa.getSmarthomeBehaviourActionDefinitions((err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}
+	
+function Appel_getCards(callback) 
+	{
+	alexa.getCards((err, res) => {if (err) return callback && callback();
 	callback && callback(res);});
 	}
 	
@@ -767,10 +852,16 @@ function Appel_getSmarthomeEntities(callback)
 	alexa.getSmarthomeEntities((err, res) => {if (err) return callback && callback();
 	callback && callback(res);});
 	}
-	
+		
 function Appel_getHomeGroup(callback) 
 	{
 	alexa.getHomeGroup((err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}
+	
+function Appel_discoverSmarthomeDevice(callback) 
+	{
+	alexa.discoverSmarthomeDevice((err, res) => {if (err) return callback && callback();
 	callback && callback(res);});
 	}
 	
@@ -798,6 +889,11 @@ function Appel_getActivities(serialOrName,callback)
 	callback && callback(res);});
 	}
 	
+function Appel_getLists(serialOrName,callback) 
+	{
+	alexa.getLists(serialOrName,(err, res) => {if (err || !res ) return callback && callback();
+	callback && callback(res);});
+	}	
 	// Tous les appels GET
 
 app.get('/wakeWords', CommandAlexa.wakeWords);
@@ -810,6 +906,13 @@ app.get('/smarthomeDevices', CommandAlexa.smarthomeDevices);
 app.get('/smarthomeBehaviourActionDefinitions', CommandAlexa.smarthomeBehaviourActionDefinitions);
 app.get('/smarthomeGroups', CommandAlexa.smarthomeGroups);
 app.get('/smarthomeEntities', CommandAlexa.smarthomeEntities);
+app.get('/devicesFull', CommandAlexa.devicesFull);
+app.get('/historyFull', CommandAlexa.historyFull);
+app.get('/discoverSmarthomeDevice', CommandAlexa.discoverSmarthomeDevice);
+app.get('/musicProviders', CommandAlexa.musicProviders);
+app.get('/remindersFull', CommandAlexa.remindersFull);
+app.get('/lists', CommandAlexa.lists);
+app.get('/carts', CommandAlexa.carts);
 
 
 app.get('/getvolume', (req, res) => {
@@ -1425,11 +1528,6 @@ if (err)
 		config.logger('Alexa-API: ******************************************************************');
 		config.logger('Alexa-API: *****************************ERROR********************************');
 		config.logger('Alexa-API: ******************************************************************');
-		config.logger(err.message);
-		config.logger('Alexa-API: ******************************************************************');
-		config.logger(err);
-		config.logger('Alexa-API: ******************************************************************');
-		config.logger('Alexa-API: ******************************************************************');
 
 		//var errorMessage = err.message;
 		//hasError = true;
@@ -1438,6 +1536,17 @@ if (err)
 			startServer();
 			//AllerVoirSilYaDesCommandesenFileAttente();
 		}
+		else
+		{
+		config.logger(err.message);
+		config.logger('Alexa-API: ******************************************************************');
+		config.logger(err);
+		config.logger('Alexa-API: ******************************************************************');
+		config.logger('Alexa-API: ******************************************************************');
+		}
+		
+		
+		
 }		
 	//hasError = true;
 	//errorMessage = err.message;
