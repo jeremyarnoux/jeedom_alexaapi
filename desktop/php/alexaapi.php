@@ -324,7 +324,12 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
                       <span class="eqLogicAttr" data-l1key="configuration" data-l2key="type"></span>
                   </div>
                 </div>
-                <!-- Onglet "Image" -->
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">{{Famille}}</label>
+                  <div class="col-sm-8">
+                      <span class="eqLogicAttr" data-l1key="configuration" data-l2key="family"></span>
+                  </div>
+                </div>                <!-- Onglet "Image" -->
                 <div class="form-group">
                   <div class="col-sm-10">
                     <center>
