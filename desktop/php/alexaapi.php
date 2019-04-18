@@ -16,47 +16,49 @@ $eqLogics = eqLogic::byType($plugin->getId());
 //---------------------------------------------------------------------------------------
 // récupéré de https://github.com/Apollon77/ioBroker.alexa2/blob/master/main.js
 $knownDeviceType = array(
-    'A10A33FOX2NUBK' => array('Echo Spot', 'commandSupport' => 'true', 'icon' => 'icons/spot.png'),
-    'A12GXV8XMS007S' => array('FireTV', 'commandSupport' => 'false', 'icon' => 'icons/firetv.png'), 
-    'A15ERDAKK5HQQG' => array('Sonos', 'commandSupport' => 'false', 'icon' => 'icons/sonos.png'),
-    'A17LGWINFBUTZZ' => array('Anker Roav Viva Alexa', 'commandSupport' => 'false', 'icon' => 'icons/other.png'),
-    'A18O6U1UQFJ0XK' => array('Echo Plus 2.Gen', 'commandSupport' => 'true', 'icon' => 'icons/echo_plus2.png'), 
-    'A1DL2DVDQVK3Q' => array('Apps', 'commandSupport' => 'false', 'icon' => 'icons/other.png'), 
-    'A1H0CMF1XM0ZP4' => array('Echo Dot/Bose', 'commandSupport' => 'false', 'icon' => 'icons/other.png'), 
-    'A1J16TEDOYCZTN' => array('Fire tab', 'commandSupport' => 'true', 'icon' => 'icons/firetab.png'),
-    'A1NL4BVLQ4L3N3' => array('Echo Show', 'commandSupport' => 'true', 'icon' => 'icons/echo_show.png'), 
-    'A1RTAM01W29CUP' => array('Windows App', 'commandSupport' => 'false', 'icon' => 'icons/other.png'), 
-    'A1X7HJX9QL16M5' => array('Bespoken.io', 'commandSupport' => 'false', 'icon' => 'icons/other.png'),
-    'A21Z3CGI8UIP0F' => array('Apps', 'commandSupport' => 'false', 'icon' => 'icons/other.png'), 
-    'A2825NDLA7WDZV' => array('Apps', 'commandSupport' => 'false', 'icon' => 'icons/other.png'), 
-    'A2E0SNTXJVT7WK' => array('Fire TV V1', 'commandSupport' => 'false', 'icon' => 'icons/firetv.png'),
-    'A2GFL5ZMWNE0PX' => array('Fire TV', 'commandSupport' => 'true', 'icon' => 'icons/firetv.png'), 
-    'A2IVLV5VM2W81' => array('Apps', 'commandSupport' => 'false', 'icon' => 'icons/other.png'), 
-    'A2L8KG0CT86ADW' => array('RaspPi', 'commandSupport' => 'false', 'icon' => 'icons/other.png'), 
-    'A2LWARUGJLBYEW' => array('Fire TV Stick V2', 'commandSupport' => 'false', 'icon' => 'icons/firetv.png'), 
-    'A2M35JJZWCQOMZ' => array('Echo Plus', 'commandSupport' => 'true', 'icon' => 'icons/echo.png'), 
-    'A2M4YX06LWP8WI' => array('Fire Tab', 'commandSupport' => 'false', 'icon' => 'icons/firetab.png'), 
-    'A2OSP3UA4VC85F' => array('Sonos', 'commandSupport' => 'true', 'icon' => 'icons/sonos.png'), 
-    'A2T0P32DY3F7VB' => array('echosim.io', 'commandSupport' => 'false', 'icon' => 'icons/other.png'),
-    'A2TF17PFR55MTB' => array('Apps', 'commandSupport' => 'false', 'icon' => 'icons/other.png'), 
-    'A32DOYMUN6DTXA' => array('Echo Dot 3.Gen', 'commandSupport' => 'true', 'icon' => '/icons/echo_dot3.png'),
-    'A37SHHQ3NUL7B5' => array('Bose Homespeaker', 'commandSupport' => 'false', 'icon' => 'icons/other.png'), 
-    'A38BPK7OW001EX' => array('Raspberry Alexa', 'commandSupport' => 'false', 'icon' => 'icons/raspi.png'), 
-    'A38EHHIB10L47V' => array('Echo Dot', 'commandSupport' => 'true', 'icon' => '/icons/echo_dot.png'), 
-    'A3C9PE6TNYLTCH' => array('Multiroom', 'commandSupport' => 'true', 'icon' => '/icons/multiroom.png'), 
-    'A3H674413M2EKB' => array('echosim.io', 'commandSupport' => 'false', 'icon' => 'icons/other.png'),
-    'A3HF4YRA2L7XGC' => array('Fire TV Cube', 'commandSupport' => 'true', 'icon' => 'icons/other.png'), 
-    'A3NPD82ABCPIDP' => array('Sonos Beam', 'commandSupport' => 'true', 'icon' => 'icons/sonos.png'), 
-    'A3R9S4ZZECZ6YL' => array('Fire Tab HD 10', 'commandSupport' => 'true', 'icon' => 'icons/firetab.png'), 
-    'A3S5BH2HU6VAYF' => array('Echo Dot 2.Gen', 'commandSupport' => 'true', 'icon' => '/icons/echo_dot.png'), 
-    'A3SSG6GR8UU7SN' => array('Echo Sub', 'commandSupport' => 'true', 'icon' => '/icons/echo_sub.png'), 
-    'A7WXQPH584YP' => array('Echo 2.Gen', 'commandSupport' => 'true', 'icon' => '/icons/echo2.png'), 
-    'AB72C64C86AW2' => array('Echo', 'commandSupport' => 'true', 'icon' => '/icons/echo.png'), 
-    'ADVBD696BHNV5' => array('Fire TV Stick V1', 'commandSupport' => 'false', 'icon' => 'icons/firetv.png'), 
-    'AILBSA2LNTOYL' => array('reverb App', 'commandSupport' => 'false', 'icon' => 'icons/reverb.png'),
-    'AVE5HX13UR5NO' => array('Logitech Zero Touch', 'commandSupport' => 'false', 'icon' => 'icons/other.png'), 
-    'AWZZ5CVHX2CD' => array('Echo Show 2.Gen', 'commandSupport' => 'true', 'icon' => '/icons/echo_show2.png')
+    ('A10A33FOX2NUBK') => array( (TypeEcho) => 'Echo Spot', (commandSupport) => 'true', (icon) => 'spot'),
+    ('A12GXV8XMS007S') => array( (TypeEcho) => 'FireTV', (commandSupport) => 'false', (icon) => 'firetv'), 
+    ('A15ERDAKK5HQQG') => array( (TypeEcho) => 'Sonos', (commandSupport) => 'false', (icon) => 'sonos'),
+    ('A17LGWINFBUTZZ') => array( (TypeEcho) => 'Anker Roav Viva Alexa', (commandSupport) => 'false', (icon) => 'other'),
+    ('A18O6U1UQFJ0XK') => array( (TypeEcho) => 'Echo Plus 2.Gen', (commandSupport) => 'true', (icon) => 'echo_plus2'), 
+    ('A1DL2DVDQVK3Q') => array( (TypeEcho) => 'Apps', (commandSupport) => 'false', (icon) => 'other'), 
+    ('A1H0CMF1XM0ZP4') => array( (TypeEcho) => 'Echo Dot/Bose', (commandSupport) => 'false', (icon) => 'other'), 
+    ('A1J16TEDOYCZTN') => array( (TypeEcho) => 'Fire tab', (commandSupport) => 'true', (icon) => 'firetab'),
+    ('A1NL4BVLQ4L3N3') => array( (TypeEcho) => 'Echo Show', (commandSupport) => 'true', (icon) => 'echo_show'), 
+    ('A1RTAM01W29CUP') => array( (TypeEcho) => 'Windows App', (commandSupport) => 'false', (icon) => 'other'), 
+    ('A1X7HJX9QL16M5') => array( (TypeEcho) => 'Bespoken.io', (commandSupport) => 'false', (icon) => 'other'),
+    ('A21Z3CGI8UIP0F') => array( (TypeEcho) => 'Apps', (commandSupport) => 'false', (icon) => 'other'), 
+    ('A2825NDLA7WDZV') => array( (TypeEcho) => 'Apps', (commandSupport) => 'false', (icon) => 'other'), 
+    ('A2E0SNTXJVT7WK') => array( (TypeEcho) => 'Fire TV V1', (commandSupport) => 'false', (icon) => 'firetv'),
+    ('A2GFL5ZMWNE0PX') => array( (TypeEcho) => 'Fire TV', (commandSupport) => 'true', (icon) => 'firetv'), 
+    ('A2IVLV5VM2W81') => array( (TypeEcho) => 'Apps', (commandSupport) => 'false', (icon) => 'other'), 
+    ('A2L8KG0CT86ADW') => array( (TypeEcho) => 'RaspPi', (commandSupport) => 'false', (icon) => 'other'), 
+    ('A2LWARUGJLBYEW') => array( (TypeEcho) => 'Fire TV Stick V2', (commandSupport) => 'false', (icon) => 'firetv'), 
+    ('A2M35JJZWCQOMZ') => array( (TypeEcho) => 'Echo Plus', (commandSupport) => 'true', (icon) => 'echo'), 
+    ('A2M4YX06LWP8WI') => array( (TypeEcho) => 'Fire Tab', (commandSupport) => 'false', (icon) => 'firetab'), 
+    ('A2OSP3UA4VC85F') => array( (TypeEcho) => 'Sonos', (commandSupport) => 'true', (icon) => 'sonos'), 
+    ('A2T0P32DY3F7VB') => array( (TypeEcho) => 'echosim.io', (commandSupport) => 'false', (icon) => 'other'),
+    ('A2TF17PFR55MTB') => array( (TypeEcho) => 'Apps', (commandSupport) => 'false', (icon) => 'other'), 
+    ('A32DOYMUN6DTXA') => array( (TypeEcho) => 'Echo Dot 3.Gen', (commandSupport) => 'true', (icon) => 'echo_dot3'),
+    ('A37SHHQ3NUL7B5') => array( (TypeEcho) => 'Bose Homespeaker', (commandSupport) => 'false', (icon) => 'other'), 
+    ('A38BPK7OW001EX') => array( (TypeEcho) => 'Raspberry Alexa', (commandSupport) => 'false', (icon) => 'raspi'), 
+    ('A38EHHIB10L47V') => array( (TypeEcho) => 'Echo Dot', (commandSupport) => 'true', (icon) => 'echo_dot'), 
+    ('A3C9PE6TNYLTCH') => array( (TypeEcho) => 'Multiroom', (commandSupport) => 'true', (icon) => 'multiroom'), 
+    ('A3H674413M2EKB') => array( (TypeEcho) => 'echosim.io', (commandSupport) => 'false', (icon) => 'other'),
+    ('A3HF4YRA2L7XGC') => array( (TypeEcho) => 'Fire TV Cube', (commandSupport) => 'true', (icon) => 'other'), 
+    ('A3NPD82ABCPIDP') => array( (TypeEcho) => 'Sonos Beam', (commandSupport) => 'true', (icon) => 'sonos'), 
+    ('A3R9S4ZZECZ6YL') => array( (TypeEcho) => 'Fire Tab HD 10', (commandSupport) => 'true', (icon) => 'firetab'), 
+    ('A3S5BH2HU6VAYF') => array( (TypeEcho) => 'Echo Dot 2.Gen', (commandSupport) => 'true', (icon) => 'echo_dot'), 
+    ('A3SSG6GR8UU7SN') => array( (TypeEcho) => 'Echo Sub', (commandSupport) => 'true', (icon) => 'echo_sub'), 
+    ('A7WXQPH584YP') => array( (TypeEcho) => 'Echo 2.Gen', (commandSupport) => 'true', (icon) => 'echo2'), 
+    ('AB72C64C86AW2') => array( (TypeEcho) => 'Echo', (commandSupport) => 'true', (icon) => 'echo'), 
+    ('ADVBD696BHNV5') => array( (TypeEcho) => 'Fire TV Stick V1', (commandSupport) => 'false', (icon) => 'firetv'), 
+    ('AILBSA2LNTOYL') => array( (TypeEcho) => 'reverb App', (commandSupport) => 'false', (icon) => 'reverb'),
+    ('AVE5HX13UR5NO') => array( (TypeEcho) => 'Logitech Zero Touch', (commandSupport) => 'false', (icon) => 'other'), 
+    ('AWZZ5CVHX2CD') => array( (TypeEcho) => 'Echo Show 2.Gen', (commandSupport) => 'true', (icon) => 'echo_show2')
 );
+
+
 
 //---------------------------------------------------------------------------------------
 console.log($knownDeviceType);
@@ -195,13 +197,20 @@ function printEqLogic(data)
 <?php
 foreach ($eqLogics as $eqLogic)
 {
+	
+	
+	
+	
     $opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
     echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
-    echo '<center>';
 
-    $alternateImg = $eqLogic->getConfiguration('type');
+//$alternateImg = $knownDeviceType[$eqLogic->getConfiguration('type')]['icon'];
+$alternateImg = $eqLogic->getConfiguration('type');
+    echo '<center>';
     if (file_exists(dirname(__FILE__) . '/../../core/config/devices/' . $alternateImg . '.png'))
         echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/' . $alternateImg . '.png" height="105" width="105" />';
+    elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
+        echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" height="105" width="105" />';
     elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/default.png'))
         echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" height="105" width="105" />';
     else
@@ -315,19 +324,19 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
                 <div class="form-group">
                   <label class="col-sm-2 control-label">{{ID}}</label>
                   <div class="col-sm-8">
-                      <span class="eqLogicAttr" data-l1key="logicalId"></span>
+                      <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="logicalId"></span>
                   </div>
                 </div>
                 <div class="form-group">
                   <label class="col-sm-2 control-label">{{Type}}</label>
                   <div class="col-sm-8">
-                      <span class="eqLogicAttr" data-l1key="configuration" data-l2key="type"></span>
+                      <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="type"></span>
                   </div>
                 </div>
                 <div class="form-group">
                   <label class="col-sm-2 control-label">{{Famille}}</label>
                   <div class="col-sm-8">
-                      <span class="eqLogicAttr" data-l1key="configuration" data-l2key="family"></span>
+                      <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="family"></span>
                   </div>
                 </div>                <!-- Onglet "Image" -->
                 <div class="form-group">
