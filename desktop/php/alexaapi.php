@@ -180,6 +180,9 @@ function printEqLogic(data)
         </center>
         <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Historique}}</center></span>
       </div>
+<?php
+if(log::getLogLevel('alexaapi')<=200) :
+?>
 
       <div class="cursor" id="bt_req" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
         <center>
@@ -187,7 +190,9 @@ function printEqLogic(data)
         </center>
         <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Requêteur}}</center></span>
       </div>
-	  
+<?php
+endif;
+?>	  
 	  
     </div>
     <!-- Début de la liste des objets -->
