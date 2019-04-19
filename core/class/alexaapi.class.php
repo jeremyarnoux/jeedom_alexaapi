@@ -229,6 +229,7 @@ class alexaapi extends eqLogic {
 					$d = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
 					if ($d->isDue()) {
 						$alexaapi->refresh();
+sleep(2);
 					}
 				}
 				catch(Exception $exc) {
