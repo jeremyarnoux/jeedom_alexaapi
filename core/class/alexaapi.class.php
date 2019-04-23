@@ -233,7 +233,7 @@ sleep(2);
 					}
 				}
 				catch(Exception $exc) {
-					log::add('piHole', 'error', __('Expression cron non valide pour ', __FILE__) . $piHole->getHumanName() . ' : ' . $autorefresh);
+					log::add('alexaapi', 'error', __('Expression cron non valide pour ', __FILE__) . $alexaapi->getHumanName() . ' : ' . $autorefresh);
 				}
 			}
 
@@ -243,8 +243,11 @@ sleep(2);
 		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/checkAuth");
 		if ($json === false) $authenticated = "Démon pas prêt";
 		else {
-			$json = json_decode($json, true);
-			$authenticated = (($json['authenticated']) ? 'OK' : 'KO');
+			$jsonDec = json_decode($json, true);
+			$authenticated = (($jsonDec['authenticated']) ? 'OK' : 'KO');
+		}
+		if($authenticated != 'OK') {
+			log::add('alexaapi','warning',$json);	
 		}
 		return $authenticated;
 	}
