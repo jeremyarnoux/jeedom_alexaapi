@@ -125,7 +125,7 @@ function printEqLogic(data)
   </div>
 
   <script>
-    $('#bt_backupsZwave').on('click', function () {
+    $('#bt_backupsZwave').off('click').on('click', function () {
       $('#md_modal2').dialog({title: "{{Génération cookie Amazon}}"});
       $('#md_modal2').load('index.php?v=d&plugin=alexaapi&modal=cookie').dialog('open');
     });
@@ -173,6 +173,7 @@ function printEqLogic(data)
         </center>
         <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Rappels/Alarmes}}</center></span>
       </div>
+	  
 
       <div class="cursor" id="bt_history" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
         <center>
@@ -388,7 +389,11 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
           </tbody>
         </table>
 		
-    
+    <?php
+	
+	if (config::byKey('utilisateurExperimente', 'alexaapi')!="0")
+	{	
+	?>
 		
 		<form class="form-horizontal">
           <fieldset>
@@ -397,7 +402,9 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
             </div>
           </fieldset>
         </form>
-		
+<?php
+	}
+?>		
       </div>
 
 

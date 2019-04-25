@@ -944,7 +944,7 @@ class alexaapiCmd extends cmd {
 
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
 
-		log::add('alexaapi', 'debug', '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' . $arguments);
+		//log::add('alexaapi', 'debug', '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' . $arguments);
 
 		if ($command == 'speak' && strpos($arguments, '#volume#') !== false) 
 			return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');

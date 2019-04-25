@@ -100,7 +100,7 @@ echo "</td><td><center>";
 echo $texteaAfficher;
 echo "</center></td><td>";
 
-//echo  '<a class="btn btn-default pull-right refreshAction" data-action="refresh"><i class="fa fa-refresh"></i> Rafraichir</a>';
+echo  '<a class="btn btn-default pull-right refreshAction" data-action="refresh"><i class="fa fa-refresh"></i> Rafraichir</a>';
 echo  '<a class="btn btn-success pull-right" target="autre" href="http://'.config::byKey('internalAddr') . '/plugins/alexaapi/resources/data/'.$partieFichier.'"><i class="fa fa-upload"></i> Télécharger JSON</a>';
 	
  
@@ -167,8 +167,8 @@ function test()
 	
 }
 
-$('.refreshAction[data-action=refresh]').on('click',function(){
-//test();
+$('.refreshAction[data-action=refresh]').off('click').on('click',function(){
+test();
 });
 </script>
 <?php include_file('desktop', 'alexaapi', 'js', 'alexaapi');?>

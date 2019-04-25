@@ -126,7 +126,7 @@ $compteur++;
     
 <script>
 
-$('.refreshAction[data-action=refresh]').on('click',function(){
+$('.refreshAction[data-action=refresh]').off('click').on('click',function(){
 	//var selectElmt = document.getElementById("Liste15a5000");
 	//var selectedSize = selectElmt.options[selectElmt.selectedIndex].value;	
 

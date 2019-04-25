@@ -390,11 +390,86 @@ CommandAlexa.Push = function(req,res){
 	
 }
 
+/***** DeleteReminder *****
+  URL: /deletereminder
+
+  Return the list of reminders
+  [{
+    id - String - id of the reminder (unique identifier)
+  }]
+
+*/
+CommandAlexa.deleteReminder = function(req,res){
+	LancementCommande("deleteReminder",req);
+	res.type('json');
+
+	if ('id' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.DeleteReminder', 'Missing parameter "id"'));
+
+	const notification = {
+		'id': req.query.id
+	};
+
+	alexa.deleteNotification(notification, function(err) {
+		if (err)
+			return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.DeleteReminder', err));
+		res.status(200).json({});
+	});
+}
+
+
+//!!!!!!!!!!!!!!!! Ne fonctionne pas, Response: {"message":"user not authorized"}
+// Faudra creuser 
+/* 
+CommandAlexa.disableReminder = function(req,res){
+	LancementCommande("disableReminder",req);
+	res.type('json');
+
+	if ('id' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.disableReminder', 'Missing parameter "id"'));
+
+	const notification = {
+		'id': req.query.id
+	};
+	const value = {
+		'status': 'OFF'
+	};	
+config.logger('*************di>>>>>>>>>>>>>>>>>>>>><<<' );
+console.log(notification);
+	alexa.changeNotification(notification,value,function(err) {
+		if (err)
+			return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.disableReminder', err));
+		res.status(200).json({});
+	});
+}
+
+CommandAlexa.enableReminder = function(req,res){
+	LancementCommande("enableReminder",req);
+	res.type('json');
+
+	if ('id' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.disableReminder', 'Missing parameter "id"'));
+
+	const notification = {
+		'id': req.query.id
+	};
+	config.logger('*************en>>>>>>>>>>>>>>>>>>>>><<<' );
+
+	alexa.deleteNotification(notification, function(err) {
+		if (err)
+			return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.disableReminder', err));
+		res.status(200).json({});
+	});
+}
+*/
 app.get('/command', CommandAlexa.Command);
 app.get('/volume', CommandAlexa.Volume);
 app.get('/speak', CommandAlexa.Speak);
 app.get('/radio', CommandAlexa.Radio);
 app.get('/push', CommandAlexa.Push);
+app.get('/deletereminder', CommandAlexa.deleteReminder);
+//app.get('/enablereminder', CommandAlexa.enableReminder);
+//app.get('/disablereminder', CommandAlexa.disableReminder);
 
 /***** Alexa.Routine *****
   URL /routine?device=?&name=?
@@ -973,7 +1048,13 @@ app.get('/lists', CommandAlexa.lists);
 app.get('/carts', CommandAlexa.carts);
 app.get('/deviceNotificationState', CommandAlexa.deviceNotificationState);
 app.get('/deviceStatusList', CommandAlexa.deviceStatusList);
-//app.get('/doNotDisturb', CommandAlexa.doNotDisturb);
+
+
+
+
+
+
+
 
 
 app.get('/getvolume', (req, res) => {
@@ -1220,32 +1301,7 @@ app.get('/reminders', (req, res) => {
 });
 
 
-/***** DeleteReminder *****
-  URL: /deletereminder
 
-  Return the list of reminders
-  [{
-    id - String - id of the reminder (unique identifier)
-  }]
-
-*/
-app.get('/deletereminder', (req, res) => {
-	config.logger('Alexa-API: DeleteReminder');
-	res.type('json');
-
-	if ('id' in req.query === false)
-		return res.status(500).json(error(500, req.route.path, 'Alexa.DeleteReminder', 'Missing parameter "id"'));
-
-	const notification = {
-		'id': req.query.id
-	};
-
-	alexa.deleteNotification(notification, function(err) {
-		if (err)
-			return res.status(500).json(error(500, req.route.path, 'Alexa.Notifications.DeleteReminder', err));
-		res.status(200).json({});
-	});
-});
 
 
 /***** DeleteAllAlarms *****

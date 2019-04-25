@@ -33,7 +33,29 @@ ul, li {
 
                 make_tree($value);
             } else {
-                $tree .= '<li><FONT COLOR="#0000FF">'.$key.'</FONT> : <FONT COLOR="#FF00FF">'.$value.'</FONT></li>';
+						$tree .= '<li><FONT COLOR="#0000FF">'.$key.'</FONT> :';
+				
+						switch ($value) {
+							case "true":
+								$tree .= ' <FONT COLOR="#336600">true</FONT></li>';
+								break;
+							case "false":
+								$tree .= ' <FONT COLOR="#336600">false</FONT></li>';
+								break;							
+							case "":
+								$tree .= ' <FONT COLOR="#808080">null</FONT></li>';
+								break;								
+							default:
+								$tree .= ' <FONT COLOR="#FF00FF">'.$value.'</FONT></li>';
+						}
+				
+				
+				
+				
+				if ($value=="true")
+					$value="true";
+				
+				
             }
         }
         $tree .= "</ul></li>";

@@ -66,6 +66,17 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 </fieldset>
 </form>
 
+<form class="form-horizontal">
+    <fieldset>
+         <legend><i class="fa fa-list-alt"></i> {{Profil Utilisateur}}</legend>
+      <div class="form-group">
+        <label class="col-lg-4 control-label">{{Activer les fonctions réservées aux utilisateurs expérimentés}}</label>
+        <div class="col-lg-3">
+           <input type="checkbox" class="configKey" data-l1key="utilisateurExperimente" />
+       </div>
+	</div>
+   </fieldset>
+</form>
 
 
 <script>
@@ -154,7 +165,7 @@ if(nouvellefenetre)
     $('.bt_identificationCookie1').hide();
 
   // On appuie sur Le lancement du serveur... on lance "deamonCookieStart" via action=deamonCookieStart dans alexaapi.ajax.php
-  $('.bt_startDeamonCookie').on('click',function()
+  $('.bt_startDeamonCookie').off('click').on('click',function()
   {
 	clearTimeout(timeout_refreshDeamonInfo);
     jeedom.plugin.deamonCookieStart(
@@ -197,7 +208,7 @@ function lancer2() {
 }
 
 
-  $('.bt_stopDeamonCookie').on('click',function()
+  $('.bt_stopDeamonCookie').off('click').on('click',function()
   {
     clearTimeout(timeout_refreshDeamonInfo);
     jeedom.plugin.deamonCookieStop(
@@ -221,15 +232,15 @@ function lancer2() {
     });
   });
 
-  $('.bt_identificationCookie').on('click',function()
+  $('.bt_identificationCookie').off('click').on('click',function()
   {
   });
   
-  $('.bt_identificationCookie1').on('click',function()
+  $('.bt_identificationCookie1').off('click').on('click',function()
   {VerifierSiCookieGenere1();
   });  
   
-  $('#bt_reinstallNodeJS').on('click', function() {
+  $('#bt_reinstallNodeJS').off('click').on('click', function() {
 		bootbox.confirm('{{Etes-vous sûr de vouloir supprimer et reinstaller NodeJS ? <br /> Merci de patienter 10-20 secondes quand vous aurez cliqué...}}', function(result) {
 			if (result) {
 				$.showLoading();
