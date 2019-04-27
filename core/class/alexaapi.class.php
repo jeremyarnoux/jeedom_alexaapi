@@ -350,7 +350,7 @@ sleep(2);
 		// Fin mise à jour de la liste des routines
 		try {
 			foreach ($this->getCmd('action') as $cmd) {
-				//log::add('alexaapi', 'debug', 'Refresh: Test '.$cmd->getName()."/".$cmd->getConfiguration('RunWhenRefresh', 0));
+				log::add('alexaapi', 'debug', 'Refresh: Test '.$cmd->getName()."/".$cmd->getConfiguration('RunWhenRefresh', 0));
 				if ($cmd->getConfiguration('RunWhenRefresh', 0) != '1') {
 					continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
 				}
@@ -545,8 +545,25 @@ sleep(2);
 			$cmd->setConfiguration('request', 'whennextalarm?position=1');
 		}
 		$cmd->save();
-
+		
+		// whennextmusicalalarm command
+		$cmd = $this->getCmd(null, 'whennextmusicalalarm');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setIsVisible(0);
+			$cmd->setLogicalId('whennextmusicalalarm');
+			$cmd->setSubType('other');
+			$cmd->setConfiguration('infoName', 'Next Musical Alarm Hour');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Next Musical Alarm When');
+			$cmd->setDisplay('icon', '<i class="fa fa-bell"></i>');
+			$cmd->setConfiguration('RunWhenRefresh', 1);
+			$cmd->setConfiguration('request', 'whennextmusicalalarm?position=1');
+		}
+		$cmd->save();
 		// whennextreminder command
+		
 		$cmd = $this->getCmd(null, 'whennextreminder');
 		if (!is_object($cmd)) {
 			$cmd = new alexaapiCmd();
@@ -824,6 +841,9 @@ class alexaapiCmd extends cmd {
 			case 'whennextalarm':
 				$request = $this->buildNextAlarmRequest($_options);
 			break;
+			case 'whennextmusicalalarm':
+				$request = $this->buildNextMusicalAlarmRequest($_options);
+			break;			
 			case 'whennextreminder':
 				$request = $this->buildNextReminderRequest($_options);
 			break;
@@ -912,7 +932,14 @@ class alexaapiCmd extends cmd {
 
 		return str_replace(array('#position#'), array($_options['position']), $request);
 	}
+	
+	private function buildNextMusicalAlarmRequest($_options = array()) {
+		log::add('alexaapi', 'debug', 'buildNextMusicalAlarmRequest');
+		$request = $this->getConfiguration('request');
 
+		return str_replace(array('#position#'), array($_options['position']), $request);
+	}
+	
 	private function buildDeleteAllAlarmsRequest($_options = array()) {
 		log::add('alexaapi', 'debug', 'buildDeleteAllAlarmsRequest');
 		$request = $this->getConfiguration('request');

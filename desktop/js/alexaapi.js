@@ -110,7 +110,7 @@ function addCmdToTable(_cmd)
 					if (init(_cmd.logicalId)=="")
 					DefinitionDivPourCommandesPredefinies="";
 								
-  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == 'whennextalarm')) {
+  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == 'whennextalarm') || (init(_cmd.logicalId) == 'whennextmusicalalarm')) {
     return;
   }
   
