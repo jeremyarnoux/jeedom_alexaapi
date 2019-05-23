@@ -400,6 +400,9 @@ CommandAlexa.Push = function(req,res){
 
 */
 CommandAlexa.deleteReminder = function(req,res){
+	
+		config.logger('Alexa-API: deleteReminder' );
+	
 	LancementCommande("deleteReminder",req);
 	res.type('json');
 
@@ -1661,6 +1664,17 @@ app.get('/stop', (req, res) => {
 	});
 });
 
+
+/***** Restart server *****/
+app.get('/restart', (req, res) => {
+	config.logger('Alexa-API: Restart');
+	res.status(200).json({});
+		config.logger('Alexa-API: ******************************************************************');
+		config.logger('Alexa-API: *****************************ERROR détectée lors CRON*************');
+		config.logger('Alexa-API: ******************************************************************');
+	startServer();
+	
+});
 
 /* Main */
 fs.readFile(config.cookieLocation, 'utf8', (err, data) => {

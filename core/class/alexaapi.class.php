@@ -323,7 +323,15 @@ sleep(2);
 	public function refresh() {
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') return false;
-
+		
+		
+		// Rustine d'anti-connexion close Partie 1/2
+		// On va aller ajouter un rappel en 2060 et on va aller vérifier si elle a bien été ajoutée.
+		$cmd = $this->getCmd(null, 'reminder');
+		$options['when']="2060-12-31 23:59:00";
+		$options['text']="test Alexa-api";
+		$value = $cmd->execute($options);
+		
 		//	log::add('alexaapi', 'debug', 'execute : refresh');
 		// Met à jour la liste des routines des commandes action "routine"
 		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
@@ -366,6 +374,54 @@ sleep(2);
 			log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());
 		}
 		//log::add('alexaapi', 'debug', 'execute (fini) : refresh');
+		
+		
+		
+		// Rustine d'anti-connexion close Partie 2/2
+		// On liste les alarmes 
+		$trouveReminder=false;
+		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/reminders");
+		$json = json_decode($json, true);
+		foreach($json as $item)
+		{
+		if ($item['type']!="Reminder") break;
+		//log::add('alexaapi', 'debug', '*********************************************************On boucle sur item:'.$item['originalDate']);
+			if (($item['originalDate']=="2060-12-31") && ($item['reminderLabel']=="Test Alexa-api")) {
+				$trouveReminder=true;
+				$idReminderaSupprimer=$item['id'];
+				break; 
+			}
+		}
+		
+		if ($trouveReminder) {
+			// C'est bon, on a  trouvé le rappel de 2060, on le supprime et tout va bien
+		//log::add('alexaapi', 'debug', '********************** TROUVE***********************************');
+		$cmd = $this->getCmd(null, 'deleteReminder');
+		//$options['node_id']=$idReminderaSupprimer;
+		$options['id']=$idReminderaSupprimer;
+		//log::add('alexaapi', 'debug', '**********************Suppression Reminder id**'.$idReminderaSupprimer.'*********************************');
+		$value = $cmd->execute($options);	
+		//echo '<script>startServer55();</script>';
+		
+		//log::add('alexaapi', 'debug', '********************** AVANT RESTART***********************************');
+		
+
+		//	log::add('alexaapi', 'debug', '********************** APRES RESTART***********************************');
+	
+		}
+		else {
+		//log::add('alexaapi', 'debug', '**********************PAS TROUVE***********************************');
+		// Faudra lancer la relance du serveur
+				$cmd = new alexaapiCmd();
+				$cmd->setType('action');
+				$cmd->setLogicalId('restart');
+				$cmd->setSubType('message');
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setName('restart');
+				$cmd->setConfiguration('request', 'restart');
+				$value = $cmd->execute();
+				message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur, OK !');
+		}
 		
 	}
 
@@ -528,6 +584,23 @@ sleep(2);
 			$cmd->setDisplay('icon', '<i class="maison-poubelle"></i>');
 		}
 		$cmd->save();
+		
+		
+		// delete reminder
+		$cmd = $this->getCmd(null, 'deleteReminder');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('deleteReminder');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Delete Reminder');
+			$cmd->setConfiguration('request', 'deleteReminder?id=#id#');
+			$cmd->setIsVisible(0);
+			$cmd->setDisplay('icon', '<i class="maison-poubelle"></i>');
+		}
+		$cmd->save();
+		
 
 		// whennextalarm command
 		$cmd = $this->getCmd(null, 'whennextalarm');
@@ -719,6 +792,7 @@ class alexaapiCmd extends cmd {
 
 		//log::add('alexaapi', 'debug', 'execute : Début555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555');
 		//On construit la requete 
+		//log::add('alexaapi', 'info', 'Request AVANT : ' . $request);//Request : http://192.168.0.21:3456/volume?value=50&device=G090LF118173117U
 		$request = $this->buildRequest($_options);
 		log::add('alexaapi', 'info', 'Request : ' . $request);//Request : http://192.168.0.21:3456/volume?value=50&device=G090LF118173117U
 
@@ -758,7 +832,7 @@ class alexaapiCmd extends cmd {
 		//log::add('alexaapi', 'debug', '**TEST Connexion Close** dans la Class:'.$value);
 		if ($value =="Connexion Close")
 		{
-		message::add('alexaapi', 'Attention, Connexion close sur Alexa-API, Lien réinitialisé');
+		//message::add('alexaapi', 'Attention, Connexion close sur Alexa-API, Lien réinitialisé');
 		log::add('alexaapi', 'debug', '**On traite Connexion Close** dans la Class');
 		sleep(6);
 			if (ob_get_length()) {
@@ -766,7 +840,7 @@ class alexaapiCmd extends cmd {
 			flush();
 			}	
 		log::add('alexaapi', 'debug', '**On relance '.$request);
-		message::add('alexaapi', 'Connexion close détectée donc relance de la dernière commande :'.$request);
+		//message::add('alexaapi', 'Connexion close détectée donc relance de la dernière commande :'.$request);
 		//Lance la requete avec un time out à 2s et 3 essais
 		$result = $request_http->exec($this->getConfiguration('timeout', 2), $this->getConfiguration('maxHttpRetry', 3));
 		if (!result) throw new Exception(__('Serveur injoignable', __FILE__));
@@ -806,13 +880,14 @@ class alexaapiCmd extends cmd {
 	}
 
 	private function buildRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildRequest : Début');
+		log::add('alexaapi', 'debug', 'buildRequest : Début');
 		//log::add('alexaapi', 'debug', 'buildRequest : $this->getType()='.$this->getType());
 		//log::add('alexaapi', 'debug', 'buildRequest : $this->getConfiguration(request)='.$this->getConfiguration('request'));
 		if ($this->getType() != 'action') return $this->getConfiguration('request');
 
 		//log::add('alexaapi', 'debug', 'buildRequest : suite');
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
+		log::add('alexaapi', 'debug', 'buildRequest : suite1');
 		switch ($command) {
 			case 'volume':
 				$request = $this->buildVolumeRequest($_options);
@@ -850,11 +925,18 @@ class alexaapiCmd extends cmd {
 			case 'deleteallalarms':
 				$request = $this->buildDeleteAllAlarmsRequest($_options);
 			break;
-			default:
+			case 'deleteReminder':
+				$request = $this->buildDeleteReminderRequest($_options);
+			break;			
+			case 'restart':
+				$request = $this->buildRestartRequest($_options);
+			break;				default:
 				$request = '';
 			break;
 		}
+		//log::add('alexaapi', 'debug', 'buildRequest : suite2/'.$request);
 		$request = scenarioExpression::setTags($request);
+		//log::add('alexaapi', 'debug', 'buildRequest : suite3');
 
 		if (trim($request) == '') throw new Exception(__('Commande inconnue ou requête vide : ', __FILE__) . print_r($this, true));
 
@@ -870,7 +952,13 @@ class alexaapiCmd extends cmd {
 
 		return str_replace('#volume#', $_options['slider'], $request);
 	}
+	
+	private function buildRestartRequest($_options = array()) {
+		log::add('alexaapi', 'debug', 'buildRestartRequest');
+		$request = $this->getConfiguration('request')."?truc=vide";
 
+		return str_replace('#volume#', $_options['slider'], $request);
+	}
 	private function buildRadioRequest($_options = array()) {
 		log::add('alexaapi', 'debug', 'buildRadioRequest');
 		$request = $this->getConfiguration('request');
@@ -950,6 +1038,18 @@ class alexaapiCmd extends cmd {
 
 		return str_replace(array('#type#', '#status#'), array($_options['type'], $_options['status']), $request);
 	}
+	
+	private function builddeleteReminderRequest($_options = array()) {
+		log::add('alexaapi', 'debug', 'builddeleteReminderRequest');
+		$request = $this->getConfiguration('request');
+
+		if ($_options['id'] == "") $_options['id'] = "coucou";
+
+		if ($_options['status'] == "") $_options['status'] = "ON";
+
+		return str_replace(array('#id#', '#status#'), array($_options['id'], $_options['status']), $request);
+	}	
+	
 	private function buildCommandRequest($_options = array()) {
 		log::add('alexaapi', 'debug', 'buildCommandRequest');
 		$request = $this->getConfiguration('request');
