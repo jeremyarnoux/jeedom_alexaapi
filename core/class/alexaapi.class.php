@@ -198,6 +198,8 @@ class alexaapi extends eqLogic {
 	*/
 	public static function cron($_eqlogic_id = null) {
 		$autorefresh = '*/15 * * * *';
+		$autorefresh = '* * * * *';
+				//log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON------------------------');
 
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['state'] == 'ok') {
@@ -205,7 +207,9 @@ class alexaapi extends eqLogic {
 				$c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
 				if ($c->isDue()) {
 					$authenticated = self::checkAuth();
-
+				
+				log::add('alexaapi', 'debug', 'Etat authentification Amazon : ' . $authenticated);
+/*
 					switch ($authenticated) {
 						case 'OK':
 							log::add('alexaapi', 'debug', 'Etat authentification Amazon : ' . $authenticated);
@@ -216,7 +220,7 @@ class alexaapi extends eqLogic {
 						default:
 							log::add('alexaapi', 'info', 'Etat authentification Amazon : ' . $authenticated);
 						break;
-					}
+					}*/
 				}
 			}
 			catch(Exception $exc) {
@@ -224,11 +228,17 @@ class alexaapi extends eqLogic {
 			}
 
 			$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
+			$compteurNbTest2060OK=0;
 			foreach ($eqLogics as $alexaapi) {
+			//log::add('alexaapi', 'debug', '---------------------------------------------AVANT AVANT Boucle CRON------------------------');
 				try {
+				//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON------------------------');
 					$d = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
 					if ($d->isDue()) {
+						$compteurNbTest2060OK += $alexaapi->test2060();
+//log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK*'.$compteurNbTest2060OK.'*-----------------------');
 						$alexaapi->refresh();
+						//log::add('alexaapi', 'debug', '---------------------------------------------FIN Boucle CRON------------------------');
 sleep(2);
 					}
 				}
@@ -237,7 +247,26 @@ sleep(2);
 				}
 			}
 
+		// On va tester si la connexion est active à l'aide d'un rappel en 2060 qu'on retire derrière.
+		// $compteurNbTest2060OK correspond au nb de test qui on été OK, si =0 faut relancer le serveur
+			if ($compteurNbTest2060OK==0) {
+								$cmd = new alexaapiCmd();
+								$cmd->setType('action');
+								$cmd->setLogicalId('restart');
+								$cmd->setSubType('message');
+								$cmd->setEqLogic_id($this->getId());
+								$cmd->setName('restart');
+								$cmd->setConfiguration('request', 'restart');
+								$value = $cmd->execute();
+								message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur, OK !');
+			}
+			else //pourra $etre supprimé quand stable
+								log::add('alexaapi', 'debug', 'Connexion close non détectée dans le CRON, il y a eu '.$compteurNbTest2060OK.' tests OK.');
+				
 		}
+		
+						//log::add('alexaapi', 'debug', '---------------------------------------------FIN CRON------------------------');
+
 	}
 	public static function checkAuth() {
 		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/checkAuth");
@@ -323,15 +352,9 @@ sleep(2);
 	public function refresh() {
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') return false;
-		
-		
-		// Rustine d'anti-connexion close Partie 1/2
-		// On va aller ajouter un rappel en 2060 et on va aller vérifier si elle a bien été ajoutée.
-		$cmd = $this->getCmd(null, 'reminder');
-		$options['when']="2060-12-31 23:59:00";
-		$options['text']="test Alexa-api";
-		$value = $cmd->execute($options);
-		
+	log::add('alexaapi', 'debug', '-----Lancement refresh---*'.$this->getName().'*-----');
+
+
 		//	log::add('alexaapi', 'debug', 'execute : refresh');
 		// Met à jour la liste des routines des commandes action "routine"
 		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
@@ -339,6 +362,7 @@ sleep(2);
 		self::sortBy('utterance', $json, 'asc');
 
 		$ListeDesRoutines = [];
+	//log::add('alexaapi', 'debug', '---------------------------------------------Lancement refresh3------------------------');
 
 		foreach ($json as $item) {
 			if ($item['utterance'] != '') {
@@ -375,54 +399,81 @@ sleep(2);
 		}
 		//log::add('alexaapi', 'debug', 'execute (fini) : refresh');
 		
-		
-		
-		// Rustine d'anti-connexion close Partie 2/2
-		// On liste les alarmes 
-		$trouveReminder=false;
-		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/reminders");
-		$json = json_decode($json, true);
-		foreach($json as $item)
-		{
-		if ($item['type']!="Reminder") break;
-		//log::add('alexaapi', 'debug', '*********************************************************On boucle sur item:'.$item['originalDate']);
-			if (($item['originalDate']=="2060-12-31") && ($item['reminderLabel']=="Test Alexa-api")) {
-				$trouveReminder=true;
-				$idReminderaSupprimer=$item['id'];
-				break; 
-			}
-		}
-		
-		if ($trouveReminder) {
-			// C'est bon, on a  trouvé le rappel de 2060, on le supprime et tout va bien
-		//log::add('alexaapi', 'debug', '********************** TROUVE***********************************');
-		$cmd = $this->getCmd(null, 'deleteReminder');
-		//$options['node_id']=$idReminderaSupprimer;
-		$options['id']=$idReminderaSupprimer;
-		//log::add('alexaapi', 'debug', '**********************Suppression Reminder id**'.$idReminderaSupprimer.'*********************************');
-		$value = $cmd->execute($options);	
-		//echo '<script>startServer55();</script>';
-		
-		//log::add('alexaapi', 'debug', '********************** AVANT RESTART***********************************');
-		
+			
+	}
 
-		//	log::add('alexaapi', 'debug', '********************** APRES RESTART***********************************');
-	
-		}
-		else {
-		//log::add('alexaapi', 'debug', '**********************PAS TROUVE***********************************');
-		// Faudra lancer la relance du serveur
-				$cmd = new alexaapiCmd();
-				$cmd->setType('action');
-				$cmd->setLogicalId('restart');
-				$cmd->setSubType('message');
-				$cmd->setEqLogic_id($this->getId());
-				$cmd->setName('restart');
-				$cmd->setConfiguration('request', 'restart');
-				$value = $cmd->execute();
-				message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur, OK !');
-		}
+
+	public function test2060() {
+		$deamon_info = alexaapi::deamon_info();
+		if ($deamon_info['state'] != 'ok') return 0;
 		
+	//log::add('alexaapi', 'debug', '---------------------------------------------Lancement test2060Phase1---*'.$this->getName().'*---------------------');
+		
+		
+		// Rustine d'anti-connexion close Partie 1/2
+		// On va aller ajouter un rappel en 2060 et on va aller vérifier si elle a bien été ajoutée.
+		$cmd = $this->getCmd(null, 'reminder');
+		$faireTest2060=false;
+			if (is_object($cmd)) {
+				// Nous sommes sur un équipement qui a la function reminder, sinon on ne fait pas le test du rappel en 2060
+				$options['when']="2060-12-31 23:59:00";
+				$options['text']="test Alexa-api";
+				$value = $cmd->execute($options);
+				//log::add('alexaapi', 'debug', '---------------------------------------------Lancement refresh2------------------------');
+				$faireTest2060=true;
+			}	
+
+
+		if ($faireTest2060) {
+			// Rustine d'anti-connexion close Partie 2/2
+			// On liste les alarmes 
+			$trouveReminder=false;
+			$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/reminders");
+			$json = json_decode($json, true);
+			foreach($json as $item)
+			{
+			if ($item['type']!="Reminder") break;
+			//log::add('alexaapi', 'debug', '*********************************************************On boucle sur item:'.$item['originalDate']);
+				if (($item['originalDate']=="2060-12-31") && ($item['reminderLabel']=="Test Alexa-api")) {
+					$trouveReminder=true;
+					$idReminderaSupprimer=$item['id'];
+					break; 
+				}
+			}
+			
+			if ($trouveReminder) {
+				// C'est bon, on a  trouvé le rappel de 2060, on le supprime et tout va bien
+			//log::add('alexaapi', 'debug', '********************** TROUVE*'.$cmd->getName().'**********************************');
+			$cmd = $this->getCmd(null, 'deleteReminder');
+			//$options['node_id']=$idReminderaSupprimer;
+			$options['id']=$idReminderaSupprimer;
+			//log::add('alexaapi', 'debug', '**********************Suppression Reminder id**'.$idReminderaSupprimer.'*********************************');
+			$value = $cmd->execute($options);	
+			//echo '<script>startServer55();</script>';
+			
+			//log::add('alexaapi', 'debug', '********************** AVANT RESTART***********************************');
+			
+
+			//	log::add('alexaapi', 'debug', '********************** APRES RESTART***********************************');
+			return 1 ;
+			}
+			else {
+			//log::add('alexaapi', 'debug', '**********************PAS TROUVE**'.$cmd->getName().'*********************************');
+			return 0;
+			/*
+			// Faudra lancer la relance du serveur
+					$cmd = new alexaapiCmd();
+					$cmd->setType('action');
+					$cmd->setLogicalId('restart');
+					$cmd->setSubType('message');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setName('restart');
+					$cmd->setConfiguration('request', 'restart');
+					$value = $cmd->execute();
+					message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur, OK !');
+					*/
+			}
+		}		
 	}
 
 	public function postSave() {
@@ -880,14 +931,14 @@ class alexaapiCmd extends cmd {
 	}
 
 	private function buildRequest($_options = array()) {
-		log::add('alexaapi', 'debug', 'buildRequest : Début');
+		//log::add('alexaapi', 'debug', 'buildRequest : Début');
 		//log::add('alexaapi', 'debug', 'buildRequest : $this->getType()='.$this->getType());
 		//log::add('alexaapi', 'debug', 'buildRequest : $this->getConfiguration(request)='.$this->getConfiguration('request'));
 		if ($this->getType() != 'action') return $this->getConfiguration('request');
 
 		//log::add('alexaapi', 'debug', 'buildRequest : suite');
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
-		log::add('alexaapi', 'debug', 'buildRequest : suite1');
+		//log::add('alexaapi', 'debug', 'buildRequest : suite1');
 		switch ($command) {
 			case 'volume':
 				$request = $this->buildVolumeRequest($_options);
