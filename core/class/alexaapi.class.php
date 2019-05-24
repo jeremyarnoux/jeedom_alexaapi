@@ -198,8 +198,7 @@ class alexaapi extends eqLogic {
 	*/
 	public static function cron($_eqlogic_id = null) {
 		$autorefresh = '*/15 * * * *';
-		$autorefresh = '* * * * *';
-				//log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON------------------------');
+		log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON------------------------');
 
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['state'] == 'ok') {
@@ -232,15 +231,17 @@ class alexaapi extends eqLogic {
 			foreach ($eqLogics as $alexaapi) {
 			//log::add('alexaapi', 'debug', '---------------------------------------------AVANT AVANT Boucle CRON------------------------');
 				try {
-				//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON------------------------');
+				//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON-'.$alexaapi->getName().'-----------------------');
 					$d = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
-					if ($d->isDue()) {
+				//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON2-'.$alexaapi->getName().'-----------------------');
+					//if ($d->isDue()) {
+//log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-1*'.$compteurNbTest2060OK.'*-----------------------');
 						$compteurNbTest2060OK += $alexaapi->test2060();
-//log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK*'.$compteurNbTest2060OK.'*-----------------------');
+//log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-2*'.$compteurNbTest2060OK.'*-----------------------');
 						$alexaapi->refresh();
 						//log::add('alexaapi', 'debug', '---------------------------------------------FIN Boucle CRON------------------------');
 sleep(2);
-					}
+					//}
 				}
 				catch(Exception $exc) {
 					log::add('alexaapi', 'error', __('Expression cron non valide pour ', __FILE__) . $alexaapi->getHumanName() . ' : ' . $autorefresh);
@@ -350,9 +351,10 @@ sleep(2);
 
 	/*     * *********************Methode d'instance************************* */
 	public function refresh() {
+	log::add('alexaapi', 'debug', '-----Lancement refresh1---**-----');
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') return false;
-	log::add('alexaapi', 'debug', '-----Lancement refresh---*'.$this->getName().'*-----');
+	log::add('alexaapi', 'debug', '-----Lancement refresh2---*'.$this->getName().'*-----');
 
 
 		//	log::add('alexaapi', 'debug', 'execute : refresh');
@@ -407,7 +409,8 @@ sleep(2);
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') return 0;
 		
-	//log::add('alexaapi', 'debug', '---------------------------------------------Lancement test2060Phase1---*'.$this->getName().'*---------------------');
+	log::add('alexaapi', 'debug', '---------------------------------------------Lancement test2060Phase1------------------------');
+	log::add('alexaapi', 'debug', '---------------------------------------------Lancement test2060Phase1---*'.$this->getName().'*---------------------');
 		
 		
 		// Rustine d'anti-connexion close Partie 1/2
