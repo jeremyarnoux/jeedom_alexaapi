@@ -196,35 +196,14 @@ class alexaapi extends eqLogic {
 	       return $return;
 	   }
 	*/
-	public static function cron($_eqlogic_id = null) {
-		$autorefresh = '*/15 * * * *';
+	  public static function cron15($_eqlogic_id = null) {
+	//public static function cron($_eqlogic_id = null) {
+		//$autorefresh = '*/15 * * * *';
 		log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON------------------------');
 
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['state'] == 'ok') {
-			try {
-				$c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
-				if ($c->isDue()) {
-					$authenticated = self::checkAuth();
-				
-				log::add('alexaapi', 'debug', 'Etat authentification Amazon : ' . $authenticated);
-/*
-					switch ($authenticated) {
-						case 'OK':
-							log::add('alexaapi', 'debug', 'Etat authentification Amazon : ' . $authenticated);
-						break;
-						case 'KO':
-							log::add('alexaapi', 'error', 'Etat authentification Amazon : ' . $authenticated);
-						break;
-						default:
-							log::add('alexaapi', 'info', 'Etat authentification Amazon : ' . $authenticated);
-						break;
-					}*/
-				}
-			}
-			catch(Exception $exc) {
-				log::add('alexaapi', 'error', __('Expression cron non valide', __FILE__) . ' : ' . $autorefresh);
-			}
+
 
 			$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
 			$compteurNbTest2060OK=0;
@@ -232,9 +211,9 @@ class alexaapi extends eqLogic {
 			//log::add('alexaapi', 'debug', '---------------------------------------------AVANT AVANT Boucle CRON------------------------');
 				try {
 				//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON-'.$alexaapi->getName().'-----------------------');
-					$d = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
+				//	$d = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
 				//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON2-'.$alexaapi->getName().'-----------------------');
-					//if ($d->isDue()) {
+				//	if ($d->isDue()) {
 //log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-1*'.$compteurNbTest2060OK.'*-----------------------');
 						$compteurNbTest2060OK += $alexaapi->test2060();
 //log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-2*'.$compteurNbTest2060OK.'*-----------------------');
