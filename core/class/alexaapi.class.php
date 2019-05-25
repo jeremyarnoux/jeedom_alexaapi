@@ -351,10 +351,10 @@ sleep(2);
 
 	/*     * *********************Methode d'instance************************* */
 	public function refresh() {
-	log::add('alexaapi', 'debug', '-----Lancement refresh1---**-----');
+	//log::add('alexaapi', 'debug', '-----Lancement refresh1---**-----');
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') return false;
-	log::add('alexaapi', 'debug', '-----Lancement refresh2---*'.$this->getName().'*-----');
+	//log::add('alexaapi', 'debug', '-----Lancement refresh2---*'.$this->getName().'*-----');
 
 
 		//	log::add('alexaapi', 'debug', 'execute : refresh');
@@ -409,8 +409,8 @@ sleep(2);
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') return 0;
 		
-	log::add('alexaapi', 'debug', '---------------------------------------------Lancement test2060Phase1------------------------');
-	log::add('alexaapi', 'debug', '---------------------------------------------Lancement test2060Phase1---*'.$this->getName().'*---------------------');
+	//log::add('alexaapi', 'debug', '---------------------------------------------Lancement test2060Phase1------------------------');
+	log::add('alexaapi', 'debug', '------------------------------*'.$this->getName().'*---------------------');
 		
 		
 		// Rustine d'anti-connexion close Partie 1/2
