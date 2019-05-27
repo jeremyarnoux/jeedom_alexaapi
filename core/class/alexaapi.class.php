@@ -234,10 +234,13 @@ sleep(2);
 				
 							$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/restart");
 
-								message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur, OK !');
+								message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur '.date("Y-m-d H:i:s").' OK !');
 			}
 			else //pourra $etre supprimé quand stable
 								log::add('alexaapi', 'debug', 'Connexion close non détectée dans le CRON, il y a eu '.$compteurNbTest2060OK.' tests OK.');
+
+
+
 				
 		}
 		
@@ -421,7 +424,7 @@ sleep(2);
 			
 			if ($trouveReminder) {
 				// C'est bon, on a  trouvé le rappel de 2060, on le supprime et tout va bien
-			//log::add('alexaapi', 'debug', '********************** TROUVE*'.$cmd->getName().'**********************************');
+			log::add('alexaapi', 'debug', '********************** TROUVE*'.$cmd->getName().'**********************************');
 			$cmd = $this->getCmd(null, 'deleteReminder');
 			//$options['node_id']=$idReminderaSupprimer;
 			$options['id']=$idReminderaSupprimer;
@@ -436,7 +439,7 @@ sleep(2);
 			return 1 ;
 			}
 			else {
-			//log::add('alexaapi', 'debug', '**********************PAS TROUVE**'.$cmd->getName().'*********************************');
+			log::add('alexaapi', 'debug', '**********************PAS TROUVE**'.$cmd->getName().'*********************************');
 			return 0;
 			/*
 			// Faudra lancer la relance du serveur
