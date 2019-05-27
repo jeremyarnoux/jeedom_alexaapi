@@ -199,10 +199,11 @@ class alexaapi extends eqLogic {
 	  public static function cron15($_eqlogic_id = null) {
 	//public static function cron($_eqlogic_id = null) {
 		//$autorefresh = '*/15 * * * *';
-		log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON------------------------');
+		//log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON------------------------');
 
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['state'] == 'ok') {
+			//log::add('alexaapi', 'debug', '---------------------------------------------AVANT AVANT AVANT Boucle CRON------------------------');
 
 
 			$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
@@ -230,14 +231,9 @@ sleep(2);
 		// On va tester si la connexion est active à l'aide d'un rappel en 2060 qu'on retire derrière.
 		// $compteurNbTest2060OK correspond au nb de test qui on été OK, si =0 faut relancer le serveur
 			if ($compteurNbTest2060OK==0) {
-								$cmd = new alexaapiCmd();
-								$cmd->setType('action');
-								$cmd->setLogicalId('restart');
-								$cmd->setSubType('message');
-								$cmd->setEqLogic_id($this->getId());
-								$cmd->setName('restart');
-								$cmd->setConfiguration('request', 'restart');
-								$value = $cmd->execute();
+				
+							$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/restart");
+
 								message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur, OK !');
 			}
 			else //pourra $etre supprimé quand stable
@@ -248,9 +244,9 @@ sleep(2);
 						//log::add('alexaapi', 'debug', '---------------------------------------------FIN CRON------------------------');
 
 	}
-	public static function checkAuth() {
-		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/checkAuth");
-		if ($json === false) $authenticated = "Démon pas prêt";
+	public static function restartServeurPHP() {
+		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/restart");
+		/*if ($json === false) $authenticated = "Démon pas prêt";
 		else {
 			$jsonDec = json_decode($json, true);
 			$authenticated = (($jsonDec['authenticated']) ? 'OK' : 'KO');
@@ -258,7 +254,7 @@ sleep(2);
 		if($authenticated != 'OK') {
 			log::add('alexaapi','warning',$json);	
 		}
-		return $authenticated;
+		return $authenticated;*/
 	}
 	public static function scanAmazonAlexa($_logical_id = null, $_exclusion = 0) {
 
