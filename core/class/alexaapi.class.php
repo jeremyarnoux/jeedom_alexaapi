@@ -212,6 +212,8 @@ class alexaapi extends eqLogic {
 			$test2060NOK=true;
 			$hasOneReminderDevice=false;
 			foreach ($eqLogics as $alexaapi) {
+				$capa=$alexaapi->setConfiguration('capabilities',[]);
+				log::add('alexaapi','debug',"capa : ".json_encode($capa))
 				$cmd = $alexaapi->getCmd(null, 'reminder');
 				if(is_object($cmd)) {
 					$hasOneReminderDevice=true;
