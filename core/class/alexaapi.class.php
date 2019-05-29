@@ -208,15 +208,17 @@ class alexaapi extends eqLogic {
 
 			$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
 			$compteurNbTest2060OK=0;
+			$test2060NOK=true;
 			foreach ($eqLogics as $alexaapi) {
-			//log::add('alexaapi', 'debug', '---------------------------------------------AVANT AVANT Boucle CRON------------------------');
+			log::add('alexaapi', 'debug', '-----------------------------Boucle CRON de *'.$alexaapi->getName().'*------------------------');
 				try {
 				//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON-'.$alexaapi->getName().'-----------------------');
 				//	$d = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
 				//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON2-'.$alexaapi->getName().'-----------------------');
 				//	if ($d->isDue()) {
 //log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-1*'.$compteurNbTest2060OK.'*-----------------------');
-						$compteurNbTest2060OK += $alexaapi->test2060();
+						if ($test2060NOK)if ($alexaapi->test2060()) $test2060NOK=false;
+						
 //log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-2*'.$compteurNbTest2060OK.'*-----------------------');
 						$alexaapi->refresh();
 						//log::add('alexaapi', 'debug', '---------------------------------------------FIN Boucle CRON------------------------');
@@ -230,14 +232,14 @@ sleep(2);
 
 		// On va tester si la connexion est active à l'aide d'un rappel en 2060 qu'on retire derrière.
 		// $compteurNbTest2060OK correspond au nb de test qui on été OK, si =0 faut relancer le serveur
-			if ($compteurNbTest2060OK==0) {
+			if ($test2060NOK) {
 				
 							$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/restart");
 
 								message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur '.date("Y-m-d H:i:s").' OK !');
 			}
 			else //pourra $etre supprimé quand stable
-								log::add('alexaapi', 'debug', 'Connexion close non détectée dans le CRON, il y a eu '.$compteurNbTest2060OK.' tests OK.');
+								log::add('alexaapi', 'debug', 'Connexion close non détectée dans le CRON. Tout va bien.');
 
 
 
@@ -362,7 +364,7 @@ sleep(2);
 		// Fin mise à jour de la liste des routines
 		try {
 			foreach ($this->getCmd('action') as $cmd) {
-				log::add('alexaapi', 'debug', 'Refresh: Test '.$cmd->getName()."/".$cmd->getConfiguration('RunWhenRefresh', 0));
+				//log::add('alexaapi', 'debug', 'Refresh: Test '.$cmd->getName()."/".$cmd->getConfiguration('RunWhenRefresh', 0));
 				if ($cmd->getConfiguration('RunWhenRefresh', 0) != '1') {
 					continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
 				}
@@ -388,7 +390,7 @@ sleep(2);
 		if ($deamon_info['state'] != 'ok') return 0;
 		
 	//log::add('alexaapi', 'debug', '---------------------------------------------Lancement test2060Phase1------------------------');
-	log::add('alexaapi', 'debug', '------------------------------*'.$this->getName().'*---------------------');
+	//log::add('alexaapi', 'debug', '------------------------------test2060 *'.$this->getName().'*---------------------');
 		
 		
 		// Rustine d'anti-connexion close Partie 1/2
@@ -417,30 +419,31 @@ sleep(2);
 			//log::add('alexaapi', 'debug', '*********************************************************On boucle sur item:'.$item['originalDate']);
 				if (($item['originalDate']=="2060-12-31") && ($item['reminderLabel']=="Test Alexa-api")) {
 					$trouveReminder=true;
-					$idReminderaSupprimer=$item['id'];
-					break; 
+					// On supprime le rappel 2060
+					$cmd = $this->getCmd(null, 'deleteReminder');
+			log::add('alexaapi', 'debug', '**********************Suppression Reminder id**'.$item['id'].'*********************************');
+					$options['id']=$item['id'];
+					$value = $cmd->execute($options);	
+					//break; 
 				}
 			}
 			
 			if ($trouveReminder) {
 				// C'est bon, on a  trouvé le rappel de 2060, on le supprime et tout va bien
 			log::add('alexaapi', 'debug', '********************** TROUVE*'.$cmd->getName().'**********************************');
-			$cmd = $this->getCmd(null, 'deleteReminder');
 			//$options['node_id']=$idReminderaSupprimer;
-			$options['id']=$idReminderaSupprimer;
 			//log::add('alexaapi', 'debug', '**********************Suppression Reminder id**'.$idReminderaSupprimer.'*********************************');
-			$value = $cmd->execute($options);	
 			//echo '<script>startServer55();</script>';
 			
 			//log::add('alexaapi', 'debug', '********************** AVANT RESTART***********************************');
 			
 
 			//	log::add('alexaapi', 'debug', '********************** APRES RESTART***********************************');
-			return 1 ;
+			return true ;
 			}
 			else {
 			log::add('alexaapi', 'debug', '**********************PAS TROUVE**'.$cmd->getName().'*********************************');
-			return 0;
+			return false;
 			/*
 			// Faudra lancer la relance du serveur
 					$cmd = new alexaapiCmd();
