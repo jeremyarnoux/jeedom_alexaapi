@@ -430,7 +430,7 @@ sleep(2);
 			
 			if ($trouveReminder) {
 				// C'est bon, on a  trouvé le rappel de 2060, on le supprime et tout va bien
-			log::add('alexaapi', 'debug', '********************** TROUVE*'.$cmd->getName().'**********************************');
+			log::add('alexaapi', 'debug', '********************** TROUVE le Reminder 2060 donc c\'est OK**********************************');
 			//$options['node_id']=$idReminderaSupprimer;
 			//log::add('alexaapi', 'debug', '**********************Suppression Reminder id**'.$idReminderaSupprimer.'*********************************');
 			//echo '<script>startServer55();</script>';
