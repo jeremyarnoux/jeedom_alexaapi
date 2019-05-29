@@ -210,31 +210,39 @@ class alexaapi extends eqLogic {
 
 			$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
 			$test2060NOK=true;
+			$hasOneReminderDevice=false;
 			foreach ($eqLogics as $alexaapi) {
 				$cmd = $alexaapi->getCmd(null, 'reminder');
-				log::add('alexaapi', 'debug', '-----------------------------Boucle CRON de *'.$alexaapi->getName().'*------------------------');
-				//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON-'.$alexaapi->getName().'-----------------------');
-				//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON2-'.$alexaapi->getName().'-----------------------');
-				//log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-1*'.$compteurNbTest2060OK.'*-----------------------');
-				if ($test2060NOK && $alexaapi->test2060()) {
-					$test2060NOK=false;
-				} else {
-					break;	
-				}
+				if(is_object($cmd)) {
+					$hasOneReminderDevice=true;
+					log::add('alexaapi', 'debug', '-----------------------------Boucle CRON de *'.$alexaapi->getName().'*------------------------');
+					//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON-'.$alexaapi->getName().'-----------------------');
+					//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON2-'.$alexaapi->getName().'-----------------------');
+					//log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-1*'.$compteurNbTest2060OK.'*-----------------------');
+					if ($test2060NOK && $alexaapi->test2060()) {
+						$test2060NOK=false;
+					} else {
+						break;	
+					}
 
-				//log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-2*'.$compteurNbTest2060OK.'*-----------------------');
-				//log::add('alexaapi', 'debug', '---------------------------------------------FIN Boucle CRON------------------------');
-				sleep(2);
+					//log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-2*'.$compteurNbTest2060OK.'*-----------------------');
+					//log::add('alexaapi', 'debug', '---------------------------------------------FIN Boucle CRON------------------------');
+					sleep(2);
+				}
 			}
 
 			// On va tester si la connexion est active à l'aide d'un rappel en 2060 qu'on retire derrière.
 			// $compteurNbTest2060OK correspond au nb de test qui on été OK, si =0 faut relancer le serveur
-			if ($test2060NOK) {
+			if ($test2060NOK && $hasOneReminderDevice) {
 				self::restartServeurPHP();
 				message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur '.date("Y-m-d H:i:s").' OK !');
 			}
 			else {//pourra $etre supprimé quand stable
-				log::add('alexaapi', 'debug', 'Connexion close non détectée dans le CRON. Tout va bien.');
+				if($hasOneReminderDevice) {
+					log::add('alexaapi', 'debug', 'Connexion close non détectée dans le CRON. Tout va bien.');
+				} else {
+					log::add('alexaapi', 'debug', 'Aucun périphérique ne gère les rappels, on ne peut pas tester les connexions close.');
+				}
 			}
 		}
 		
