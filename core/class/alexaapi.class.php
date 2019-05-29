@@ -213,9 +213,8 @@ class alexaapi extends eqLogic {
 			$hasOneReminderDevice=false;
 			foreach ($eqLogics as $alexaapi) {
 				$capa=$alexaapi->getConfiguration('capabilities',[]);
-				log::add('alexaapi','debug',"capa : ".json_encode($capa));
-				$cmd = $alexaapi->getCmd(null, 'reminder');
-				if(is_object($cmd)) {
+				
+				if(array_search("REMINDERS",$capa)) {
 					$hasOneReminderDevice=true;
 					log::add('alexaapi', 'debug', '-----------------------------Boucle CRON de *'.$alexaapi->getName().'*------------------------');
 					//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON-'.$alexaapi->getName().'-----------------------');
