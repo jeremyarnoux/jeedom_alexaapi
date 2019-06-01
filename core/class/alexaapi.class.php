@@ -200,7 +200,7 @@ class alexaapi extends eqLogic {
 	public static function cron($_eqlogic_id = null) {
 		
 		$autorefresh = '*/15 * * * *';
-		$autorefresh = '* * * * *';
+		//$autorefresh = '* * * * *';
 		//log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON------------------------');
 		$d = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
 		$deamon_info = self::deamon_info();
