@@ -200,6 +200,7 @@ class alexaapi extends eqLogic {
 	public static function cron($_eqlogic_id = null) {
 		
 		$autorefresh = '*/15 * * * *';
+		$autorefresh = '* * * * *';
 		//log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON------------------------');
 		$d = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
 		$deamon_info = self::deamon_info();
@@ -216,20 +217,21 @@ class alexaapi extends eqLogic {
 				
 				if(array_search("REMINDERS",$capa)) {
 					$hasOneReminderDevice=true;
-					log::add('alexaapi', 'debug', '-----------------------------Boucle CRON de *'.$alexaapi->getName().'*------------------------');
-					//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON-'.$alexaapi->getName().'-----------------------');
-					//log::add('alexaapi', 'debug', '---------------------------------------------AVANT Boucle CRON2-'.$alexaapi->getName().'-----------------------');
-					//log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-1*'.$compteurNbTest2060OK.'*-----------------------');
+					log::add('alexaapi', 'debug', '-----------------------------Test     Lancé sur *'.$alexaapi->getName().'*------------------------');
 					if ($test2060NOK && $alexaapi->test2060()) {
 						$test2060NOK=false;
 					} else {
 						break;	
 					}
 
-					//log::add('alexaapi', 'debug', '---------------------------------------------compteurNbTest2060OK-2*'.$compteurNbTest2060OK.'*-----------------------');
+
 					//log::add('alexaapi', 'debug', '---------------------------------------------FIN Boucle CRON------------------------');
 					sleep(2);
 				}
+				else {
+				log::add('alexaapi', 'debug', '-----------------------------Test NON Lancé sur *'.$alexaapi->getName().'*------------------------');
+				log::add('alexaapi', 'debug', 'capabilities: '.json_encode($capa));
+				}			
 			}
 
 			// On va tester si la connexion est active à l'aide d'un rappel en 2060 qu'on retire derrière.
