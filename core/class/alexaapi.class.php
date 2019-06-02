@@ -1044,7 +1044,7 @@ class alexaapiCmd extends cmd {
 		return str_replace(array('#select#'), array(urlencode($_options['select'])), $request);
 	}
 	private function buildNextAlarmRequest($_options = array()) {
-		log::add('alexaapi', 'debug', 'buildNextAlarmRequest');
+		log::add('alexaapi', 'debug', 'buildNextAlarmRequest sur '.$this->getName());
 		$request = $this->getConfiguration('request');
 
 		return str_replace(array('#position#'), array($_options['position']), $request);
