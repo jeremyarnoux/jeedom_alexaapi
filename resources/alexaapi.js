@@ -222,20 +222,21 @@ CommandAlexa.Speak = function(req,res){
 	var BoucleEachOK=false;
 	forEachDevices(req.query.device, (serial) =>
 	{
-		BoucleEachOK=true;
+		BoucleEachOK=false;
 		alexa.sendSequenceCommand(serial, 'speak', req.query.text, 
 				function(testErreur){
-					
 					if (testErreur) {
 					traiteErreur(testErreur);
 					res.status(500).json({value: testErreur.message});
 					}
-					else
-					res.status(200).json({value: "OK"});				
+					else {
+					if (!BoucleEachOK) res.status(200).json({value: "OK"});
+					BoucleEachOK=true;
+					}
 				}
 			);
 	});
-	if (!BoucleEachOK) res.status(500).json({value: 'Souci Device'}); //par sécurité
+	//if (!BoucleEachOK) res.status(500).json({value: 'Souci Device'}); //par sécurité
 }
 
 
@@ -264,20 +265,20 @@ CommandAlexa.Radio = function(req,res){
 	
 	var BoucleEachOK=false;
 	forEachDevices(req.query.device, (serial) => {
-		BoucleEachOK=true;
 		alexa.setTunein(serial, req.query.station, 
 				function(testErreur){
-					
 					if (testErreur) {
 					traiteErreur(testErreur);
 					res.status(500).json({value: testErreur.message});
 					}
-					else
-					res.status(200).json({value: "OK"});				
+					else {
+					if (!BoucleEachOK) res.status(200).json({value: "OK"});
+					BoucleEachOK=true;
+					}
 				}
 			);
 	});
-	if (!BoucleEachOK) res.status(500).json({value: 'Souci Device'}); //par sécurité
+//	if (!BoucleEachOK) res.status(500).json({value: 'Souci Device'}); //par sécurité
 }
 
 
@@ -316,20 +317,20 @@ CommandAlexa.Volume = function(req,res){
 	
 	var BoucleEachOK=false;
 	forEachDevices(req.query.device, (serial) => {
-			BoucleEachOK=true;
 			alexa.sendSequenceCommand(serial, 'volume', req.query.value, 
 				function(testErreur){
-					
 					if (testErreur) {
 					traiteErreur(testErreur);
 					res.status(500).json({value: testErreur.message});
 					}
-					else
-					res.status(200).json({value: "OK"});				
+					else {
+					if (!BoucleEachOK) res.status(200).json({value: "OK"});
+					BoucleEachOK=true;
+					}
 				}
 			);
 	});
-	if (!BoucleEachOK) res.status(500).json({value: 'Souci Device'}); //par sécurité
+	//if (!BoucleEachOK) res.status(500).json({value: 'Souci Device'}); //par sécurité
 }
 
 /***** Alexa.Command *****
