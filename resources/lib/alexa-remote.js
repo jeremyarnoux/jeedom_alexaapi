@@ -506,7 +506,7 @@ class AlexaRemote extends EventEmitter {
                 {
                     if (!body)
                     {
-                        this._options.logger && this._options.logger('Alexa-Remote: Response: No body = OK');
+                        this._options.logger && this._options.logger('Alexa-Remote: Response: OK');
                         return callback && callback(null, null);
                     }
                     try
