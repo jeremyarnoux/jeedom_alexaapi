@@ -231,7 +231,7 @@ class alexaapi extends eqLogic {
 					sleep(2);
 				}
 				else {
-				log::add('alexaapi', 'debug', '-----------------------------Test NON Lancé sur *'.$alexaapi->getName().'*------------------------');
+					log::add('alexaapi', 'debug', '-----------------------------Test NON Lancé sur *'.$alexaapi->getName().'*------------------------');
 				}			
 			}
 
@@ -240,6 +240,7 @@ class alexaapi extends eqLogic {
 			if ($test2060NOK && $hasOneReminderDevice) {
 				self::restartServeurPHP();
 				message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur '.date("Y-m-d H:i:s").' OK !');
+				log::add('alexaapi', 'debug', 'Connexion close détectée dans le CRON, relance transparente du serveur '.date("Y-m-d H:i:s").' OK !');
 			}
 			else {//pourra $etre supprimé quand stable
 				if($hasOneReminderDevice) {
@@ -394,7 +395,10 @@ class alexaapi extends eqLogic {
 
 	public function test2060() {
 		$deamon_info = alexaapi::deamon_info();
-		if ($deamon_info['state'] != 'ok') return 0;
+		if ($deamon_info['state'] != 'ok') {
+			log::add('alexaapi', 'debug', '-----------------------------Demon non OK, Test annulé------------------------');
+			return 0;
+		}
 		
 	//log::add('alexaapi', 'debug', '---------------------------------------------Lancement test2060Phase1------------------------');
 	//log::add('alexaapi', 'debug', '------------------------------test2060 *'.$this->getName().'*---------------------');
