@@ -213,11 +213,7 @@ class alexaapi extends eqLogic {
 			$test2060NOK=true;
 			$hasOneReminderDevice=false;
 			foreach ($eqLogics as $alexaapi) {
-				$capa=$alexaapi->getConfiguration('capabilities',[]);
-				
-				log::add('alexaapi', 'debug', 'capabilities : '.$alexaapi->getName().' : '.json_encode($capa));
-				
-				if((array_search("REMINDERS",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
+				if($alexaapi->hasCapa("REMINDERS")) {
 					$hasOneReminderDevice=true;
 					log::add('alexaapi', 'debug', '-----------------------------Test     Lancé sur *'.$alexaapi->getName().'*------------------------');
 					if ($test2060NOK && $alexaapi->test2060()) {
@@ -264,6 +260,7 @@ class alexaapi extends eqLogic {
 		}
 						//log::add('alexaapi', 'debug', '---------------------------------------------FIN CRON------------------------');
 	}
+
 	public static function restartServeurPHP() {
 		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/restart");
 		sleep(2);
@@ -322,6 +319,15 @@ class alexaapi extends eqLogic {
 		return $newDevice;
 	}
 
+	public function hasCapa($thisCapa) {
+		$capa=$this->getConfiguration('capabilities',"");
+		log::add('alexaapi', 'debug', 'capabilities : '.json_encode($capa));
+		if(((gettype($capa) == "array" && array_search($thisCapa,$capa))) || ((gettype($capa) == "string" && strpos($capa, $thisCapa) !== false))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	public function sortBy($field, &$array, $direction = 'asc') {
 	usort($array, create_function('$a, $b', '
 		$a = $a["' . $field . '"];
@@ -471,9 +477,7 @@ class alexaapi extends eqLogic {
 		// Pour une raison inconnue, certains utilisateurs se retrouvent avec des "capabilites" vides, dans ce cas, on créera toutes les commandes
 		//  http://sigalou-domotique.fr/images/Sigalou/capabilites.jpg
 		
-		$capa=$this->getConfiguration('capabilities',[]);
 		$type=$this->getConfiguration('type','');
-		log::add('alexaapi', 'debug', '********** Test de "capabilities" de '.$this->getName().': '.json_encode($capa));
 
 		// Pas trouvé le capabilities qui correspond au PUSH
 		if (strstr($this->getName(), "Alexa Apps")) {
@@ -495,7 +499,7 @@ class alexaapi extends eqLogic {
 		}
 
 		//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
-		if (array_search("AUDIO_PLAYER",$capa)) { 
+		if ($this->hasCapa("AUDIO_PLAYER")) { 
 		
 			// Speak command
 			$cmd = $this->getCmd(null, 'speak');
@@ -521,7 +525,7 @@ class alexaapi extends eqLogic {
 		
 		
 		//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
-		if (array_search("AUDIO_PLAYER",$capa)) { 
+		if ($this->hasCapa("AUDIO_PLAYER")) { 
 
 	
 			// Radio command
@@ -567,7 +571,7 @@ class alexaapi extends eqLogic {
 		}
 		
 		
-		if (array_search("TIMERS_AND_ALARMS",$capa)) { 
+		if ($this->hasCapa("TIMERS_AND_ALARMS")) { 
 		
 			// alarm command
 			$cmd = $this->getCmd(null, 'alarm');
@@ -657,7 +661,7 @@ class alexaapi extends eqLogic {
 			log::add('alexaapi', 'warning', '****Rencontre du type A15ERDAKK5HQQG = Sonos Première Génération sur : '.$this->getName());
 			log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus !');
 		}
-		if (array_search("REMINDERS",$capa) && $type != "A15ERDAKK5HQQG") { 
+		if ($this->hasCapa("REMINDERS") && $type != "A15ERDAKK5HQQG") { 
 			// delete reminder
 			$cmd = $this->getCmd(null, 'deleteReminder');
 			if (!is_object($cmd)) {
@@ -771,7 +775,7 @@ class alexaapi extends eqLogic {
 		}
 
 		
-		if (array_search("VOLUME_SETTING",$capa)) { 
+		if ($this->hasCapa("VOLUME_SETTING")) { 
 
 			// Volume command
 			$cmd = $this->getCmd(null, 'volume');
@@ -797,7 +801,7 @@ class alexaapi extends eqLogic {
 		}
 
 
-			$this->refresh();
+		$this->refresh();
 	}
 
 	public static function dependancy_install($verbose = "false") {
