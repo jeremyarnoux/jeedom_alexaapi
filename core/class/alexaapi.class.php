@@ -214,6 +214,7 @@ class alexaapi extends eqLogic {
 			$hasOneReminderDevice=false;
 			foreach ($eqLogics as $alexaapi) {
 				$capa=$alexaapi->getConfiguration('capabilities',[]);
+				
 				log::add('alexaapi', 'debug', 'capabilities : '.$alexaapi->getName().' : '.json_encode($capa));
 				
 				if((array_search("REMINDERS",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
@@ -456,37 +457,38 @@ class alexaapi extends eqLogic {
 
 
 
-			/*       if ($this->getName() == 'Tous les appareils')
-				  {
-					  return;
-			}*/
+		/*       if ($this->getName() == 'Tous les appareils')
+			  {
+				  return;
+		}*/
 
 
-			// On va chercher le contenu de "capabilities" qui donne les capacité du device, on va donc créer les commandes en fonction de ses capacités
-			// Pour une raison inconnue, certains utilisateurs se retrouvent avec des "capabilites" vides, dans ce cas, on créera toutes les commandes
-			//  http://sigalou-domotique.fr/images/Sigalou/capabilites.jpg
-			
-			$capa=$this->getConfiguration('capabilities',[]);
-			log::add('alexaapi', 'debug', '********** Test de "capabilities" de '.$this->getName().': '.json_encode($capa));
+		// On va chercher le contenu de "capabilities" qui donne les capacité du device, on va donc créer les commandes en fonction de ses capacités
+		// Pour une raison inconnue, certains utilisateurs se retrouvent avec des "capabilites" vides, dans ce cas, on créera toutes les commandes
+		//  http://sigalou-domotique.fr/images/Sigalou/capabilites.jpg
+		
+		$capa=$this->getConfiguration('capabilities',[]);
+		$type=$this->getConfiguration('type','');
+		log::add('alexaapi', 'debug', '********** Test de "capabilities" de '.$this->getName().': '.json_encode($capa));
 
-			// Pas trouvé le capabilities qui correspond au PUSH
-			if (strstr($this->getName(), "Alexa Apps")) {
-				// Push command
-				$cmd = $this->getCmd(null, 'push');
-				if (!is_object($cmd)) {
-					$cmd = new alexaapiCmd();
-					$cmd->setType('action');
-					$cmd->setLogicalId('push');
-					$cmd->setSubType('message');
-					$cmd->setEqLogic_id($this->getId());
-					$cmd->setName('Push');
-					$cmd->setConfiguration('request', 'push?text=#message#');
-					$cmd->setDisplay('title_disable', 1);
-					$cmd->setIsVisible(1);
-				}
-				$cmd->save();
-				return;
+		// Pas trouvé le capabilities qui correspond au PUSH
+		if (strstr($this->getName(), "Alexa Apps")) {
+			// Push command
+			$cmd = $this->getCmd(null, 'push');
+			if (!is_object($cmd)) {
+				$cmd = new alexaapiCmd();
+				$cmd->setType('action');
+				$cmd->setLogicalId('push');
+				$cmd->setSubType('message');
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setName('Push');
+				$cmd->setConfiguration('request', 'push?text=#message#');
+				$cmd->setDisplay('title_disable', 1);
+				$cmd->setIsVisible(1);
 			}
+			$cmd->save();
+			return;
+		}
 
 		//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
 		if (array_search("AUDIO_PLAYER",$capa)) { 
@@ -506,6 +508,12 @@ class alexaapi extends eqLogic {
 				$cmd->setIsVisible(1);
 			}
 			$cmd->save();
+		} else {
+				$cmd = $this->getCmd(null, 'speak');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+            }
 		}
 		
 		
@@ -544,6 +552,16 @@ class alexaapi extends eqLogic {
 				$cmd->setIsVisible(0);
 			}
 			$cmd->save();
+		} else {
+				$cmd = $this->getCmd(null, 'radio');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+				$cmd = $this->getCmd(null, 'command');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+            }
 		}
 		
 		
@@ -614,9 +632,31 @@ class alexaapi extends eqLogic {
 			}
 			$cmd->save();
 			
+		} else {
+				$cmd = $this->getCmd(null, 'alarm');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+				$cmd = $this->getCmd(null, 'deleteallalarms');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+				$cmd = $this->getCmd(null, 'whennextalarm');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+				$cmd = $this->getCmd(null, 'whennextmusicalalarm');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+            }
 		}
-			
-		if (array_search("REMINDERS",$capa)) { 
+
+		if($type == "A15ERDAKK5HQQG") {
+			log::add('alexaapi', 'warning', '****Rencontre du type A15ERDAKK5HQQG = Sonos Première Génération sur : '.$this->getName());
+			log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus !');
+		}
+		if (array_search("REMINDERS",$capa) && $type != "A15ERDAKK5HQQG") { 
 			// delete reminder
 			$cmd = $this->getCmd(null, 'deleteReminder');
 			if (!is_object($cmd)) {
@@ -706,6 +746,28 @@ class alexaapi extends eqLogic {
 				$refresh->save();
 			}
 
+		} else {
+				$cmd = $this->getCmd(null, 'deleteReminder');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+				$cmd = $this->getCmd(null, 'whennextreminder');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+				$cmd = $this->getCmd(null, 'reminder');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+				$cmd = $this->getCmd(null, 'routine');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+				$cmd = $this->getCmd(null, 'refresh');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+            }
 		}
 
 		
@@ -727,6 +789,12 @@ class alexaapi extends eqLogic {
 				$cmd->setDisplay('icon', '<i class="fa fa-volume-up"></i>');
 			}
 			$cmd->save();
+		} else {
+				$cmd = $this->getCmd(null, 'volume');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+            }
 		}
 
 
