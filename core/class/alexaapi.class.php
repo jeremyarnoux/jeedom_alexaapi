@@ -513,8 +513,7 @@ class alexaapi extends eqLogic {
 				if (is_object($cmd)) {
 					$cmd->remove();
 				}
-            }
-		}
+        }
 		
 		
 		//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
@@ -553,15 +552,14 @@ class alexaapi extends eqLogic {
 			}
 			$cmd->save();
 		} else {
-				$cmd = $this->getCmd(null, 'radio');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-				$cmd = $this->getCmd(null, 'command');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-            }
+			$cmd = $this->getCmd(null, 'radio');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+			$cmd = $this->getCmd(null, 'command');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
 		}
 		
 		
@@ -633,23 +631,22 @@ class alexaapi extends eqLogic {
 			$cmd->save();
 			
 		} else {
-				$cmd = $this->getCmd(null, 'alarm');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-				$cmd = $this->getCmd(null, 'deleteallalarms');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-				$cmd = $this->getCmd(null, 'whennextalarm');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-				$cmd = $this->getCmd(null, 'whennextmusicalalarm');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-            }
+			$cmd = $this->getCmd(null, 'alarm');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+			$cmd = $this->getCmd(null, 'deleteallalarms');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+			$cmd = $this->getCmd(null, 'whennextalarm');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+			$cmd = $this->getCmd(null, 'whennextmusicalalarm');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
 		}
 
 		if($type == "A15ERDAKK5HQQG") {
@@ -747,27 +744,26 @@ class alexaapi extends eqLogic {
 			}
 
 		} else {
-				$cmd = $this->getCmd(null, 'deleteReminder');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-				$cmd = $this->getCmd(null, 'whennextreminder');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-				$cmd = $this->getCmd(null, 'reminder');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-				$cmd = $this->getCmd(null, 'routine');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-				$cmd = $this->getCmd(null, 'refresh');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-            }
+			$cmd = $this->getCmd(null, 'deleteReminder');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+			$cmd = $this->getCmd(null, 'whennextreminder');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+			$cmd = $this->getCmd(null, 'reminder');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+			$cmd = $this->getCmd(null, 'routine');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+			$cmd = $this->getCmd(null, 'refresh');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
 		}
 
 		
@@ -790,11 +786,10 @@ class alexaapi extends eqLogic {
 			}
 			$cmd->save();
 		} else {
-				$cmd = $this->getCmd(null, 'volume');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-            }
+			$cmd = $this->getCmd(null, 'volume');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
 		}
 
 
