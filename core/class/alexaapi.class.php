@@ -476,7 +476,7 @@ class alexaapi extends eqLogic {
 		// On va chercher le contenu de "capabilities" qui donne les capacité du device, on va donc créer les commandes en fonction de ses capacités
 		// Pour une raison inconnue, certains utilisateurs se retrouvent avec des "capabilites" vides, dans ce cas, on créera toutes les commandes
 		//  http://sigalou-domotique.fr/images/Sigalou/capabilites.jpg
-		
+		$capa=$this->getConfiguration('capabilities','');
 		$type=$this->getConfiguration('type','');
 
 		// Pas trouvé le capabilities qui correspond au PUSH
@@ -499,7 +499,7 @@ class alexaapi extends eqLogic {
 		}
 
 		//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
-		if ($this->hasCapa("AUDIO_PLAYER")) { 
+		if ($this->hasCapa("AUDIO_PLAYER") || (empty($capa))) { 
 		
 			// Speak command
 			$cmd = $this->getCmd(null, 'speak');
@@ -521,11 +521,11 @@ class alexaapi extends eqLogic {
 				if (is_object($cmd)) {
 					$cmd->remove();
 				}
-        }
+        	}
 		
 		
 		//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
-		if ($this->hasCapa("AUDIO_PLAYER")) { 
+		if ($this->hasCapa("AUDIO_PLAYER") || (empty($capa))) { 
 
 	
 			// Radio command
@@ -571,7 +571,7 @@ class alexaapi extends eqLogic {
 		}
 		
 		
-		if ($this->hasCapa("TIMERS_AND_ALARMS")) { 
+		if ($this->hasCapa("TIMERS_AND_ALARMS") || (empty($capa))) { 
 		
 			// alarm command
 			$cmd = $this->getCmd(null, 'alarm');
@@ -661,7 +661,7 @@ class alexaapi extends eqLogic {
 			log::add('alexaapi', 'warning', '****Rencontre du type A15ERDAKK5HQQG = Sonos Première Génération sur : '.$this->getName());
 			log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus !');
 		}
-		if ($this->hasCapa("REMINDERS") && $type != "A15ERDAKK5HQQG") { 
+		if (($this->hasCapa("REMINDERS") && $type != "A15ERDAKK5HQQG") || (empty($capa))) { 
 			// delete reminder
 			$cmd = $this->getCmd(null, 'deleteReminder');
 			if (!is_object($cmd)) {
@@ -775,7 +775,7 @@ class alexaapi extends eqLogic {
 		}
 
 		
-		if ($this->hasCapa("VOLUME_SETTING")) { 
+		if ($this->hasCapa("VOLUME_SETTING") || (empty($capa))) { 
 
 			// Volume command
 			$cmd = $this->getCmd(null, 'volume');
