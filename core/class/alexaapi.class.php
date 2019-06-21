@@ -800,7 +800,7 @@ class alexaapi extends eqLogic {
 				}
 			}
 		} else {
-			log::add('alexaapi', 'debug', 'Pas de capacité détectée, assurez-vous que le démon est OK');
+			log::add('alexaapi', 'warning', 'Pas de capacité détectée, assurez-vous que le démon est OK');
 		}
 
 		$this->refresh();
