@@ -1070,7 +1070,14 @@ class alexaapiCmd extends cmd {
 
 		if ($_options['volume'] == "" && $_options['slider'] == "") $_options['volume'] = "50";
 
-		return str_replace(array('#station#', '#volume#'), array(urlencode($_options['station']), isset($_options['volume']) ? $_options['volume'] : $_options['slider']), $request);
+		return str_replace(
+			array(
+				'#station#',
+				'#volume#'),
+			array(
+				isset($_options['select']) ? urlencode($_options['select']) : urlencode($_options['station']),
+				isset($_options['volume']) ? $_options['volume'] : $_options['slider']),
+			$request);
 	}
 
 	private function buildSpeakRequest($_options = array()) {
