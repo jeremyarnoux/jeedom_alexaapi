@@ -661,7 +661,7 @@ class alexaapi extends eqLogic {
 
 			if($type == "A15ERDAKK5HQQG") {
 				log::add('alexaapi', 'warning', '****Rencontre du type A15ERDAKK5HQQG = Sonos Première Génération sur : '.$this->getName());
-				log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus !');
+				log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus car bug!');
 			}
 			if ($this->hasCapa("REMINDERS")) { 
 				// delete reminder
