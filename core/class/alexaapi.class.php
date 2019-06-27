@@ -321,8 +321,10 @@ class alexaapi extends eqLogic {
 
 	public function hasCapa($thisCapa) {
 		$capa=$this->getConfiguration('capabilities',"");
+		$type=$this->getConfiguration('type',"");
 		log::add('alexaapi', 'debug', 'capabilities : '.json_encode($capa));
 		if(((gettype($capa) == "array" && array_search($thisCapa,$capa))) || ((gettype($capa) == "string" && strpos($capa, $thisCapa) !== false))) {
+			if($thisCapa == "REMINDERS" && $type == "A15ERDAKK5HQQG") return false;
 			return true;
 		} else {
 			return false;
@@ -661,7 +663,7 @@ class alexaapi extends eqLogic {
 				log::add('alexaapi', 'warning', '****Rencontre du type A15ERDAKK5HQQG = Sonos Première Génération sur : '.$this->getName());
 				log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus !');
 			}
-			if ($this->hasCapa("REMINDERS") && $type != "A15ERDAKK5HQQG") { 
+			if ($this->hasCapa("REMINDERS")) { 
 				// delete reminder
 				$cmd = $this->getCmd(null, 'deleteReminder');
 				if (!is_object($cmd)) {
