@@ -201,19 +201,33 @@ class alexaapi extends eqLogic {
 		
 		$autorefresh = '*/15 * * * *';
 		//$autorefresh = '* * * * *';
-		//log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON------------------------');
+		
 		$d = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
 		$deamon_info = self::deamon_info();
 		
 		if ($d->isDue() && $deamon_info['state'] == 'ok') {
+			log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON-'.$autorefresh.'-----------------------');
 
-			//log::add('alexaapi', 'debug', '---------------------------------------------AVANT AVANT AVANT Boucle CRON------------------------');
-
+			
+			#Update all status
+			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
+			$json = json_decode($json, true);
+			$status=[];
+			foreach ($json as $item) {
+				if ($item['name'] == 'This Device') continue;
+				
+				$eq=eqLogic::byLogicalId($item['serial'],'alexaapi');
+				if(is_object($eq)) {
+					log::add('alexaapi','debug','updating online status of '.$item['name'].' to '.(($item['online'])?'true':'false'));
+					$eq->setStatus('online', (($item['online'])?true:false));
+				}
+			}
+			
 			$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
 			$test2060NOK=true;
 			$hasOneReminderDevice=false;
 			foreach ($eqLogics as $alexaapi) {
-				if($alexaapi->hasCapa("REMINDERS")) {
+				if($alexaapi->hasCapa("REMINDERS") && $alexaapi->getStatus('online') == true) {
 					$hasOneReminderDevice=true;
 					log::add('alexaapi', 'debug', '-----------------------------Test     Lancé sur *'.$alexaapi->getName().'*------------------------');
 					if ($test2060NOK && $alexaapi->test2060()) {
@@ -296,7 +310,7 @@ class alexaapi extends eqLogic {
 			$device->setConfiguration('family', $item['family']);
 			$device->setConfiguration('members', $item['members']);
 			$device->setConfiguration('capabilities', $item['capabilities']);
-			$device->setStatus('online', $item['online']);
+			$device->setStatus('online', (($item['online'])?true:false));
 			$device->save();
 
 			$numDevices++;
