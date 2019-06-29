@@ -444,7 +444,7 @@ class alexaapi extends eqLogic {
 			$json = json_decode($json, true);
 			foreach($json as $item)
 			{
-				if ($item['type']!="Reminder") break;
+				if ($item['type']!="Reminder") continue;
 				//log::add('alexaapi', 'debug', '*********************************************************On boucle sur item:'.$item['originalDate']);
 				if (($item['originalDate']=="2060-12-31") && ($item['reminderLabel']=="Test Alexa-api")) {
 					$trouveReminder=true;
