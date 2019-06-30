@@ -77,23 +77,6 @@ let server = null;
 /* Objet contenant les commandes pour appeler via chaine */
 var CommandAlexa = {};
 
-/* Apply callback on every cluster's membre (for multiroom device) */
-function forEachDevices(nameOrSerial, callback) {
-	
-	var device = alexa.find(nameOrSerial);
-	if (device === undefined)
-		return;
-
-	if (device.clusterMembers.length == 0)
-		callback(device.serialNumber);
-
-	for (var i in device.clusterMembers) {
-		if (device.clusterMembers.hasOwnProperty(i)) {
-			// We are sure that obj[key] belongs to the object and was not inherited.
-			callback(device.clusterMembers[i]);
-		}
-	}
-}
 
 
 function LancementCommande(commande, req) 
@@ -292,43 +275,191 @@ CommandAlexa.Radio = function(req,res){
   FIXME: Currently, the librarie returns an "false" error when the command succeed but no body was returned by Amazon
 */
 
-CommandAlexa.Volume = function(req,res){
+/*
+CommandAlexa.Volume = async function(req,res){
 	
 	LancementCommande("Volume", req);
+
 	res.type('json');
 
-	//Quand Volume est lancé par une autre fonction, la valeur du volume n'est pas value mais volume
+
 	if ('volume' in req.query) 
 		req.query.value=req.query.volume
 
-	config.logger('Alexa-API: device: ' + req.query.device+' & value: ' + req.query.value);
-
 	if ('device' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
 
 	if ('value' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "value"'));
+	config.logger('Alexa-API: value: ' + req.query.value);
 	
-	boucleSurSerials(req, 'volume');
-	boucleSurSerials(req, 'volume');
-	boucleSurSerials(req, 'volume');
-	boucleSurSerials(req, 'volume');
-	boucleSurSerials(req, 'volume');
-	boucleSurSerials(req, 'volume');
-	res.status(200).json({value: "Send"});	//ne teste pas le résultat
-}
-
-
-function boucleSurSerials (req, action, callback) {
-		resultatEnvoi=  forEachDevices(req.query.device, (serial) => {
-			alexa.sendSequenceCommand(serial, action, req.query.value, 
+	var BoucleEachOK=false;
+/*	forEachDevices(req.query.device, (serial) => {
+		MaFunctionTest(serial, 'volume', req.query.value, BoucleEachOK,
+//			alexa.sendSequenceCommand(serial, 'volume', req.query.value, 
 				function(testErreur){
-					if (testErreur) traiteErreur(testErreur);
+					if (testErreur) {
+					traiteErreur(testErreur);
+					res.status(500).json({value: testErreur.message});
+					}
+					else {
+					if (!BoucleEachOK) res.status(200).json({value: "OK"});
+					BoucleEachOK=true;
+					}
 				}
 			);
-		});
+	});------
+	config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API0: avant BoucleSerial');
+	var resultat= await BoucleSerial(req, 'volume', BoucleEachOK);
+	config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API4: resultat4: ' + resultat);
+	//if (!BoucleEachOK) res.status(500).json({value: 'Souci Device'}); //par sécurité
+}
+async function BoucleSerial (req, action, BoucleEachOK, callback) {
+		var resultatEnvoi="début";
+		resultatEnvoi= await forEachDevices(req.query.device, (serial) => {
+		await MaFunctionTest(serial, action, req.query.value, BoucleEachOK,
+//			alexa.sendSequenceCommand(serial, 'volume', req.query.value, 
+				function(testErreur){
+					config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API2: testErreur: '+testErreur);
+					if (testErreur) {
+					traiteErreur(testErreur);
+					resultatEnvoi="erreur";
+					//res.status(500).json({value: testErreur.message});
+					config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API2b: resultatEnvoi: '+resultatEnvoi);
+					return "coucou";
+					}
+					else {
+					//if (!BoucleEachOK) res.status(200).json({value: "OK"});
+					resultatEnvoi="pas erreur";
+					BoucleEachOK=true;
+					config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API2t: resultatEnvoi: '+resultatEnvoi);
+
+					return "pas coucou";
+					}
+				}
+			);
+	});
+			config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API3: resultatEnvoi: '+resultatEnvoi);
+	return resultatEnvoi;
 }
 
+async function MaFunctionTest (serial, action, valeur, BoucleEachOK, callback) {
+		config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API: serial: ' + serial);
+		config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API: action: ' + action);
+		config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API: valeur: ' + valeur);
+		alexa.sendSequenceCommand(serial, action, valeur, callback);
+		config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API1: MaFunctionTest: retour de MaFunctionTest');
+
+		return "retour de MaFunctionTest";
+}
+*/
+
+
+CommandAlexa.Volume = async function(req,res){
+
+	config.logger('*******************************************************************************************************************');
+	
+	config.logger('>>>>>>> Alexa-API0: ********************** Lancement CommandAlexa.Volume');
+	var BoucleEachOK=false;
+	var resultat= await BoucleSerial(req, 'volume', BoucleEachOK);
+	/*
+	boucleSynchrone(5);
+	toutesLesSecondes();
+	console.log("coucou");
+	toutesLesSecondes();
+	console.log("coucou");
+	toutesLesSecondes();
+	console.log("coucou");
+	*/
+	//resultat= await BoucleSerial(req, 'volume', BoucleEachOK);
+	//resultat= await BoucleSerial(req, 'volume', BoucleEachOK);
+	config.logger('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Alexa-API4: ********************** Fin CommandAlexa.Volume');
+	//if (!BoucleEachOK) res.status(500).json({value: 'Souci Device'}); //par sécurité
+	//faudra le virer :
+	res.status(200).json({value: "OK"});
+}
+
+
+
+/* Apply callback on every cluster's membre (for multiroom device) */
+async function forEachDevices(nameOrSerial, callback) {
+	
+	var device = alexa.find(nameOrSerial);
+	if (device === undefined)
+		return;
+	
+	config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API2: forEachDevices');
+
+	if (device.clusterMembers.length == 0)
+		callback(device.serialNumber);
+
+	for (var i in device.clusterMembers) {
+		if (device.clusterMembers.hasOwnProperty(i)) {
+			// We are sure that obj[key] belongs to the object and was not inherited.
+			callback(device.clusterMembers[i]);
+		}
+	}
+}
+
+
+//https://maxlab.fr/javascript/javascript-methodes-avancees/
+
+async function BoucleSerial (req, action, BoucleEachOK, callback) {
+		var resultatEnvoi="début";
+	config.logger('>>>>>>>>>>>>>>> Alexa-API1: BoucleSerial');
+		resultatEnvoi= await forEachDevices(req.query.device, (serial) => {
+			
+	config.logger('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Alexa-API3: Début : '+serial);
+
+// retour !
+		return MaFunctionTest(serial, action, req.query.value, BoucleEachOK,
+					//alexa.sendSequenceCommand(serial, 'volume', req.query.value,
+							function(testErreur){
+								config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API2: testErreur: '+testErreur);
+								if (testErreur) {
+								traiteErreur(testErreur);
+								resultatEnvoi="erreur";
+								//res.status(500).json({value: testErreur.message});
+								config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API2b: resultatEnvoi: '+resultatEnvoi);
+								return "coucou";
+								}
+								else {
+								//if (!BoucleEachOK) res.status(200).json({value: "OK"});
+								resultatEnvoi="pas erreur";
+								BoucleEachOK=true;
+								config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API2t: resultatEnvoi: '+resultatEnvoi);
+
+								return "pas coucou";
+								
+								}
+							}
+						
+					//)
+		);
+			
+	});
+	config.logger('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Alexa-API3: Fin  : '+serial);
+			//config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API3: resultatEnvoi: '+resultatEnvoi);
+	 
+}
+
+function MaFunctionTest (serial, action, valeur, BoucleEachOK, callback) {
+	/*
+		//config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API: serial: ' + serial);
+		//config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API: action: ' + action);
+		//config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API: valeur: ' + valeur);
+		//setTimeout( "alexa.sendSequenceCommand(serial, action, valeur, callback)", 5000);
+		setTimeout(function(){
+		config.logger('Pause Pause Pause Pause Pause Pause Pause Pause Pause Pause Pause ');
+}, 5000);
+
+		alexa.sendSequenceCommand(serial, action, valeur, callback);
+		config.logger('>>>>>>>>>>>>>>>>>>>>>>> Alexa-API4: MaFunctionTest: retour de MaFunctionTest');
+
+		return "454565465489876546879";
+		*/
+}
 
 
 /***** Alexa.Command *****
@@ -383,7 +514,7 @@ CommandAlexa.Push = function(req,res){
 					res.status(500).json({value: testErreur.message});
 					}
 					else
-					res.status(200).json({value: "OK"});				
+					res.status(200).json({value: "OK"});			
 				}
 			);
 	

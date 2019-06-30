@@ -224,7 +224,11 @@ $alternateImg = $eqLogic->getConfiguration('type');
 
     echo '</center>';
     echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
-    echo '</div>';
+	
+	if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps"))) {
+    echo '<br><span class="label label-danger" style="text-shadow : none;">Déconnecté</span>';    
+	}
+	echo '</div>';
 }
 ?>
     </div>
@@ -343,12 +347,6 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
                   <label class="col-sm-2 control-label">{{Famille}}</label>
                   <div class="col-sm-8">
                       <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="family"></span>
-                  </div>
-                </div>
-				<div class="form-group">
-                  <label class="col-sm-2 control-label">{{Capacités}}</label>
-                  <div class="col-sm-8">
-                      <span style="position:relative;top:+5px;left:+5px;font-size: 10px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="capabilities"></span>
                   </div>
                 </div>                <!-- Onglet "Image" -->
                 <div class="form-group">
