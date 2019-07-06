@@ -533,7 +533,11 @@ class AlexaRemote extends EventEmitter {
 						}
                        return callback && callback(new Error(ValeurdelErreur), body);
                     }
-                    this._options.logger && this._options.logger('Alexa-Remote: Response: ' + JSON.stringify(ret));
+					
+					if (JSON.stringify(ret)=='{"error":null}')
+						this._options.logger && this._options.logger('Alexa-Remote: Response: OK');
+						else
+						this._options.logger && this._options.logger('Alexa-Remote: Response: ' + JSON.stringify(ret));
                     return callback && callback (null, ret);
                 }
             });
