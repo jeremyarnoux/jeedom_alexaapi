@@ -249,7 +249,7 @@ class alexaapi extends eqLogic {
 			// $compteurNbTest2060OK correspond au nb de test qui on été OK, si =0 faut relancer le serveur
 			if ($test2060NOK && $hasOneReminderDevice) {
 				self::restartServeurPHP();
-				message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur '.date("Y-m-d H:i:s").' OK !');
+				//message::add('alexaapi', 'Connexion close détectée dans le CRON, relance transparente du serveur '.date("Y-m-d H:i:s").' OK !');
 				log::add('alexaapi', 'debug', 'Connexion close détectée dans le CRON, relance transparente du serveur '.date("Y-m-d H:i:s").' OK !');
 			}
 			else {//pourra $etre supprimé quand stable

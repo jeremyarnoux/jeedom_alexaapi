@@ -310,11 +310,12 @@ CommandAlexa.Volume = function(req,res){
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "value"'));
 	
 	boucleSurSerials(req, 'volume');
+	/*boucleSurSerials(req, 'volume');
 	boucleSurSerials(req, 'volume');
 	boucleSurSerials(req, 'volume');
 	boucleSurSerials(req, 'volume');
-	boucleSurSerials(req, 'volume');
-	boucleSurSerials(req, 'volume');
+	boucleSurSerials(req, 'volume');*/
+	
 	res.status(200).json({value: "Send"});	//ne teste pas le résultat
 }
 
@@ -1749,20 +1750,15 @@ function startServer() {
 function traiteErreur(err) {
 		
 	
-//message::add('alexaapi', 'Connexion close détectée');
-	//var hasError = false;
 if (err)
 {
 		config.logger('Alexa-API: ******************************************************************');
 		config.logger('Alexa-API: *****************************ERROR********************************');
 		config.logger('Alexa-API: ******************************************************************');
 
-		//var errorMessage = err.message;
-		//hasError = true;
 		if (err.message == "Connexion Close") {
 			config.logger("Connexion Close détectée dans la détection d'erreur et donc relance de l'initialisation");
 			startServer();
-			//AllerVoirSilYaDesCommandesenFileAttente();
 		}
 		else
 		{
@@ -1776,12 +1772,7 @@ if (err)
 		
 		
 }		
-	//hasError = true;
-	//errorMessage = err.message;
 
-
-//if(typeof(next) == "function") next(); Le garder si un jour on enchaine les commandes, pour avoir la synthaxe.
-		//config.logger('Alexa-API: 2222222EEEEEEEEERRRRRRREEEEEEEEEEUUUUUUUUUUUURRRRR : '+err);
 		
 }
 function error(status, source, title, detail) {
