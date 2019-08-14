@@ -1,8 +1,8 @@
 #!/bin/bash
 
 PROGRESS_FILE=/tmp/jeedom/${2}/dependance
-installVer='8' 	#NodeJS major version to be installed
-minVer='8'	#min NodeJS major version to be accepted
+installVer='12' 	#NodeJS major version to be installed
+minVer='12'	#min NodeJS major version to be accepted
 
 touch ${PROGRESS_FILE}
 echo 0 > ${PROGRESS_FILE}
@@ -103,8 +103,8 @@ else
   arch=`arch`
   if [[ $arch == "armv6l" ]]
   then
-    echo "Raspberry 1, 2 ou zéro détecté, utilisation du paquet v${installVer} pour ${arch}"
     installVer='10'
+    echo "Raspberry 1, 2 ou zéro détecté, utilisation du paquet v${installVer} pour ${arch}"
     wget -nd -nH -nc -np -e robots=off -r -l1 --no-parent -A"node-*-linux-${arch}.tar.gz" https://nodejs.org/download/release/latest-v${installVer}.x/
     tar -xvf node-*-linux-${arch}.tar.gz
     cd node-*-linux-${arch}
