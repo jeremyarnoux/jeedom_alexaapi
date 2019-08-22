@@ -450,7 +450,7 @@ class AlexaRemote extends EventEmitter {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Referer': `https://${this.baseUrl}/spa/index.html`,
                 'Origin': `https://${this.baseUrl}`,
-                'Content-Type': 'application/json',
+                //'Content-Type': 'application/json',
                 //'Connection': 'keep-alive', // new
                 'csrf' : this.csrf,
                 'Cookie' : this.cookie
