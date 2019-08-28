@@ -72,18 +72,25 @@ echo "--20%"
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lsb_release
 
+echo 30 > ${PROGRESS_FILE}
+echo "--30%"
+type nodejs &>/dev/null
+if [ $? -eq 0 ]; then actual=`nodejs -v`; fi
+echo "Version actuelle : ${actual}"
+arch=`arch`
+
+if [[ $arch == "armv6l" ]]
+then
+  installVer='8' 	#NodeJS major version to be installed
+  minVer='8'	#min NodeJS major version to be accepted  
+fi
+
 lsb_release -c | grep jessie
 if [ $? -eq 0 ]
 then
   installVer='8' 	#NodeJS major version to be installed
   minVer='8'	#min NodeJS major version to be accepted  
 fi
-
-echo 30 > ${PROGRESS_FILE}
-echo "--30%"
-type nodejs &>/dev/null
-if [ $? -eq 0 ]; then actual=`nodejs -v`; fi
-echo "Version actuelle : ${actual}"
 
 testVer=`php -r "echo version_compare('${actual}','v${minVer}','>=');"`
 if [[ $testVer == "1" ]]
@@ -108,10 +115,8 @@ else
 
   echo 45 > ${PROGRESS_FILE}
   echo "--45%"
-  arch=`arch`
   if [[ $arch == "armv6l" ]]
   then
-    installVer='10'
     echo "Raspberry 1, 2 ou zéro détecté, utilisation du paquet v${installVer} pour ${arch}"
     wget -nd -nH -nc -np -e robots=off -r -l1 --no-parent -A"node-*-linux-${arch}.tar.gz" https://nodejs.org/download/release/latest-v${installVer}.x/
     tar -xvf node-*-linux-${arch}.tar.gz
