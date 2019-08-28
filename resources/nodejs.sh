@@ -70,7 +70,7 @@ fi
 echo 20 > ${PROGRESS_FILE}
 echo "--20%"
 sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lsb_release
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lsb-release
 
 echo 30 > ${PROGRESS_FILE}
 echo "--30%"
