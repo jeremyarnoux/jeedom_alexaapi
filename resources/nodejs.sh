@@ -73,7 +73,7 @@ sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lsb_release
 
 lsb_release -c | grep jessie
-if [ $? -eq 0]
+if [ $? -eq 0 ]
 then
   installVer='8' 	#NodeJS major version to be installed
   minVer='8'	#min NodeJS major version to be accepted  
