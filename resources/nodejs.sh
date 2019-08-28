@@ -70,6 +70,14 @@ fi
 echo 20 > ${PROGRESS_FILE}
 echo "--20%"
 sudo apt-get update
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lsb_release
+
+lsb_release | grep jessie
+if [ $? -eq 0]
+then
+  installVer='8' 	#NodeJS major version to be installed
+  minVer='8'	#min NodeJS major version to be accepted  
+fi
 
 echo 30 > ${PROGRESS_FILE}
 echo "--30%"
