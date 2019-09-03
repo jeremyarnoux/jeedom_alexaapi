@@ -184,7 +184,8 @@ function getCSRFFromCookies(cookie, _options, callback) {
     // get CSRF
     let options = {
         'host': 'alexa.' + _options.amazonPage,
-        'path': '/api/language',
+        //'path': '/api/language',
+		'path': '/templates/oobe/d-device-pick.handlebars',
         'method': 'GET',
         'headers': {
             'DNT': '1',

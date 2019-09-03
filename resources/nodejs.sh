@@ -1,8 +1,8 @@
 #!/bin/bash
 
 PROGRESS_FILE=/tmp/jeedom/${2}/dependance
-installVer='8' 	#NodeJS major version to be installed
-minVer='8'	#min NodeJS major version to be accepted
+installVer='12' 	#NodeJS major version to be installed
+minVer='12'	#min NodeJS major version to be accepted
 
 touch ${PROGRESS_FILE}
 echo 0 > ${PROGRESS_FILE}
@@ -70,12 +70,27 @@ fi
 echo 20 > ${PROGRESS_FILE}
 echo "--20%"
 sudo apt-get update
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lsb-release
 
 echo 30 > ${PROGRESS_FILE}
 echo "--30%"
 type nodejs &>/dev/null
 if [ $? -eq 0 ]; then actual=`nodejs -v`; fi
 echo "Version actuelle : ${actual}"
+arch=`arch`
+
+if [[ $arch == "armv6l" ]]
+then
+  installVer='8' 	#NodeJS major version to be installed
+  minVer='8'	#min NodeJS major version to be accepted  
+fi
+
+lsb_release -c | grep jessie
+if [ $? -eq 0 ]
+then
+  installVer='8' 	#NodeJS major version to be installed
+  minVer='8'	#min NodeJS major version to be accepted  
+fi
 
 testVer=`php -r "echo version_compare('${actual}','v${minVer}','>=');"`
 if [[ $testVer == "1" ]]
@@ -100,7 +115,6 @@ else
 
   echo 45 > ${PROGRESS_FILE}
   echo "--45%"
-  arch=`arch`
   if [[ $arch == "armv6l" ]]
   then
     echo "Raspberry 1, 2 ou zéro détecté, utilisation du paquet v${installVer} pour ${arch}"
@@ -129,6 +143,12 @@ else
 
   new=`nodejs -v`;
   echo "Version actuelle : ${new}"
+fi
+
+type npm &>/dev/null
+if [ $? -ne 0 ]; then
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y npm  
+  sudo npm install -g npm
 fi
 
 echo 50 > ${PROGRESS_FILE}

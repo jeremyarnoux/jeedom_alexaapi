@@ -111,9 +111,9 @@ switch ($item['type']) {
 	
 
 	if ($item['status'] == 'ON'){
-		$present = '<span class="label label-success" style="font-size : 1em;" title="{{Actif}}"><i class="fa fa-check-circle"></i></span>';
+		$present = '<a class="btn btn-success disableReminder" data-id="'. $item['id'] .'"><span class="label label-success" style="font-size : 1em;" title="{{Actif}}"><i class="fa fa-check-circle"></i></span></a>';
 	} else {
-		$present = '<span class="label label-default" style="font-size : 1em;" title="{{Inactif}}"><i class="fa fa-times-circle"></i></span>';
+		$present = '<a class="btn btn-default enableReminder" data-id="'. $item['id'] .'"><span class="label label-default" style="font-size : 1em;" title="{{Inactif}}"><i class="fa fa-times-circle"></i></span></a>';
 		$couleur="default";
 	}
 
@@ -218,9 +218,9 @@ $repetition="";
 <script>
 
 
-$('.deleteReminder').on('click',function(){
+$('.deleteReminder').off('click').on('click',function(){
     jeedom.plugin.node.action({
-        action : 'testNode',
+        action : 'delete',
         node_id: $(this).attr('data-id'),
         error: function (error) {
 	//$('#div_alert').showAlert({message: error.message, level: 'danger'});
@@ -238,14 +238,53 @@ $('.deleteReminder').on('click',function(){
  });
 });
 
+$('.disableReminder').off('click').on('click',function(){
+    jeedom.plugin.node.action({
+        action : 'disable',
+        node_id: $(this).attr('data-id'),
+        error: function (error) {
+	//$('#div_alert').showAlert({message: error.message, level: 'danger'});
+	$('#md_modal').dialog('close');
+	$('#md_modal').dialog({title: "{{Rappels / Alarmes}}"});
+	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
 
-$('.deleteReminder2').on('click',function(){
+       },
+       success: function (data) {
+        // $('#div_alert').showAlert({message: '{{Action réalisée avec succès}}', level: 'success'});
+	$('#md_modal').dialog('close');
+	$('#md_modal').dialog({title: "{{Rappels / Alarmes}}"});
+	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+     }
+ });
+});
+
+$('.enableReminder').off('click').on('click',function(){
+    jeedom.plugin.node.action({
+        action : 'enable',
+        node_id: $(this).attr('data-id'),
+        error: function (error) {
+	//$('#div_alert').showAlert({message: error.message, level: 'danger'});
+	$('#md_modal').dialog('close');
+	$('#md_modal').dialog({title: "{{Rappels / Alarmes}}"});
+	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+
+       },
+       success: function (data) {
+        // $('#div_alert').showAlert({message: '{{Action réalisée avec succès}}', level: 'success'});
+	$('#md_modal').dialog('close');
+	$('#md_modal').dialog({title: "{{Rappels / Alarmes}}"});
+	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+     }
+ });
+});
+
+$('.deleteReminder2').off('click').on('click',function(){
 	$('#md_modal').dialog('close');
 	$('#md_modal').dialog({title: "{{Rappels / Alarmes}}"});
 	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
 });
 
-$('.refreshAction[data-action=refresh]').on('click',function(){
+$('.refreshAction[data-action=refresh]').off('click').on('click',function(){
 	$('#md_modal').dialog('close');
 	$('#md_modal').dialog({title: "{{Rappels / Alarmes}}"});
 	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');

@@ -141,7 +141,7 @@ $("body").undelegate('.bt_removeAction', 'click').delegate('.bt_removeAction', '
   $(this).closest('.' + type).remove();
 });
 
-$('.bt_addAction').off('click').on('click',function(){
+$('.bt_addAction').off('click').off('click').on('click',function(){
   addAction({}, $(this).attr('data-type'), '{{Action}}');
 });
 
@@ -165,7 +165,7 @@ $('.calendarAction[data-action=allDay]').off('click').on('click', function () {
   $('.calendarAttr[data-l1key=endDate]').value(startDate + ' 23:59:00');
 });
 
-$('#bt_chooseIcon').on('click', function () {
+$('#bt_chooseIcon').off('click').on('click', function () {
   chooseIcon(function (_icon) {
     $('.calendarAttr[data-l1key=cmd_param][data-l2key=icon]').empty().append(_icon);
   });
@@ -217,7 +217,7 @@ $('.datetimepicker').datetimepicker({lang: 'fr',
   format: 'Y-m-d H:i:00',
   step: 15
 });
-$('#md_eventEditSave').on('click', function () {
+$('#md_eventEditSave').off('click').on('click', function () {
   var calendarEvent = $('#div_eventEdit').getValues('.calendarAttr');
   calendarEvent = calendarEvent[0];
   calendarEvent.cmd_param.start = $('#div_start .start').getValues('.expressionAttr');
@@ -250,13 +250,13 @@ $('#md_eventEditSave').on('click', function () {
  });
 });
 
-$('#md_eventEditDuplicate').on('click', function () {
+$('#md_eventEditDuplicate').off('click').on('click', function () {
   $('.calendarAttr[data-l1key=id]').value('');
   $('#md_eventEditRemove').hide();
   $(this).hide();
 });
 
-$('#md_eventEditRemove').on('click', function () {
+$('#md_eventEditRemove').off('click').on('click', function () {
   if (calendarEvent != null && is_array(calendarEvent) && calendarEvent.repeat.enable == 1 && dateEvent != null && dateEvent != '') {
     bootbox.dialog({
       message: "{{Voulez vous supprimer cette occurence ou l\'evenement ?}}",

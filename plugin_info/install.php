@@ -19,9 +19,10 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function alexaapi_update() {
+	alexaapi::scanAmazonAlexa();
 	foreach (eqLogic::byType('alexaapi') as $alexaapi) {
 		$alexaapi->save();
-    }
+    	}
 }
 
 ?>

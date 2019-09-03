@@ -34,6 +34,9 @@ if (!isConnect('admin')) {
 </div>
 
 <?php
+
+log::add('alexaapi', 'debug', '=============================================================Routines');
+
 $json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
 //echo $json;
 $json = json_decode($json,true);
@@ -157,7 +160,7 @@ sortBy('utterance', $json, 'asc');
 <a class="btn btn-default pull-right refreshAction" data-action="refresh"><i class="fa fa-refresh"></i>  {{Rafraichir}}</a>
 
 <script>
-$('.RunRoutine').on('click',function(){
+$('.RunRoutine').off('click').on('click',function(){
 	//if($(this).hasClass('btn-default')) return false;
 	var selectElmt = document.getElementById("ListeDevices");
 	console.log(selectElmt);
@@ -181,11 +184,11 @@ $('.RunRoutine').on('click',function(){
 	});
 });
 
-$('.refreshAction[data-action=refresh]').on('click',function(){
+$('.refreshAction[data-action=refresh]').off('click').on('click',function(){
 	$('#md_modal').dialog('close');
 	$('#md_modal').dialog({title: "{{Routines}}"});
 	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=routines&id=alexaapi').dialog('open');
 });
 </script>
 
-<?php include_file('desktop', 'alexaapi', 'js', 'alexaapi');
+<?php include_file('desktop', 'alexaapi', 'js', 'alexaapi');?>

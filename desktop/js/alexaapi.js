@@ -15,57 +15,71 @@
 
 */
 
-$("#bt_addespeasyAction").on('click', function(event)
+$("#bt_addespeasyAction").off('click').on('click', function(event)
 {
   var _cmd = {type: 'action'};
   addCmdToTable(_cmd);
 });
- $('#bt_addEvent').on('click', function () {
+ $('#bt_addEvent').off('click').on('click', function () {
 	$('#bt_calendartab').trigger('click');
     $('#md_modal').dialog({title: "{{Ajouter évènement}}"});
     $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=alarm&eqLogic_id=' + $('.eqLogicAttr[data-l1key=id]').value()).dialog('open');
 });
 
-$('#bt_media').on('click', function ()
+$('#bt_media').off('click').on('click', function ()
 {
   $('#md_modal').dialog({title: "{{Info Media}}"});
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=media&iddevice='+ $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
 });
 
-$('#bt_sante').on('click', function ()
+$('#bt_req').off('click').on('click', function ()
+{
+  $('#md_modal').dialog({title: "{{Requêteur}}"});
+  $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=req&iddevice='+ $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
+});
+$('#bt_sante').off('click').on('click', function ()
 {
   $('#md_modal').dialog({title: "{{Liste Amazon Echo}}"});
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=health').dialog('open');
 });
 
-$('#bt_reminders').on('click', function ()
+$('#bt_reminders').off('click').on('click', function ()
 {
   $('#md_modal').dialog({title: "{{Rappels/Alarmes}}"});
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders').dialog('open');
 });
 
-$('#bt_history').on('click', function ()
+$('#bt_history').off('click').on('click', function ()
 {
   $('#md_modal').dialog({title: "{{Historique}}"});
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=history').dialog('open');
 });
 
-$('#bt_routines').on('click', function ()
+$('#bt_routines').off('click').on('click', function ()
 {
   $('#md_modal').dialog({title: "{{Routines}}"});
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=routines').dialog('open');
 });
 
 
- $('#bt_scan').on('click', function () {
+ $('#bt_scan').off('click').on('click', function () {
     scanAmazonAlexa();
 });
 
 $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').on('change', function ()
 {
-  $icon = $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value();
-  if($icon != '' && $icon != null)
-    $('#img_device').attr("src", 'plugins/alexaapi/core/config/devices/' + $icon + '.png');
+	$icon = $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value();
+	if($icon != '' && $icon != null)
+		$('#img_device').attr("src", 'plugins/alexaapi/core/config/devices/' + $icon + '.png');
+
+	var id=$('.eqLogicAttr[data-l1key=id]')[0].value;
+	if(id) {
+		jeedom.eqLogic.byId({"id":$('.eqLogicAttr[data-l1key=id]')[0].value,noCache:true,success:function(obj){
+			if(obj && obj.configuration && obj.configuration.capabilities && obj.configuration.capabilities.length) {
+				$('.eqLogicAttr[data-l1key=configuration][data-l2key=capabilities]')[0].innerHTML = obj.configuration.capabilities.join(', ');
+			}
+		}});
+	}
 });
 
 function scanAmazonAlexa()
@@ -105,7 +119,7 @@ function addCmdToTable(_cmd)
 					if (init(_cmd.logicalId)=="")
 					DefinitionDivPourCommandesPredefinies="";
 								
-  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == 'whennextalarm')) {
+  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == 'whennextalarm') || (init(_cmd.logicalId) == 'whennextmusicalalarm')) {
     return;
   }
   
@@ -384,11 +398,12 @@ jeedom.plugin.VerifiePresenceCookie = function(_params)
  		(_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
  		return;
  	}
+
  	var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
  	var paramsAJAX = jeedom.private.getParamsAJAX(params);
  	paramsAJAX.url = 'plugins/alexaapi/desktop/php/alexaapiProxy.php';
  	paramsAJAX.data = {
- 		request: 'deletereminder?id='+_params.node_id+'&type=action&action='+_params.action,
+ 		request: _params.action+'reminder?id='+_params.node_id+'&type=action&action='+_params.action,
  	};
  	$.ajax(paramsAJAX);
  }

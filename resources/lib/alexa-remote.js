@@ -450,7 +450,7 @@ class AlexaRemote extends EventEmitter {
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Referer': `https://${this.baseUrl}/spa/index.html`,
                 'Origin': `https://${this.baseUrl}`,
-                'Content-Type': 'application/json',
+                //'Content-Type': 'application/json',
                 //'Connection': 'keep-alive', // new
                 'csrf' : this.csrf,
                 'Cookie' : this.cookie
@@ -506,7 +506,7 @@ class AlexaRemote extends EventEmitter {
                 {
                     if (!body)
                     {
-                        this._options.logger && this._options.logger('Alexa-Remote: Response: No body = OK');
+                        this._options.logger && this._options.logger('Alexa-Remote: Response: OK');
                         return callback && callback(null, null);
                     }
                     try
@@ -533,7 +533,11 @@ class AlexaRemote extends EventEmitter {
 						}
                        return callback && callback(new Error(ValeurdelErreur), body);
                     }
-                    this._options.logger && this._options.logger('Alexa-Remote: Response: ' + JSON.stringify(ret));
+					
+					if (JSON.stringify(ret)=='{"error":null}')
+						this._options.logger && this._options.logger('Alexa-Remote: Response: OK');
+						else
+						this._options.logger && this._options.logger('Alexa-Remote: Response: ' + JSON.stringify(ret));
                     return callback && callback (null, ret);
                 }
             });
@@ -595,30 +599,13 @@ class AlexaRemote extends EventEmitter {
     }
 
 
-	getMedia2(serialOrName,callback) 
-	{
-		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2');
-
-		this.getMedia(serialOrName,(err, res) => 
-		{
-		        //this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): getMedia2 dans boucle');
-			//console.log(res);	
-			//if (err || !res || !res.volume || !Array.isArray(res.volume)) return callback && callback();
-			if (err || !res ) return callback && callback();
-			callback && callback(res);
-		});
-	}
-
-
-
-
-
     getPlayerInfo(serialOrName, callback) {
         let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
 
         this.httpsGet (`/api/np/player?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
     }
+
 
     getList(serialOrName, listType, options, callback) {
         let dev = this.find(serialOrName);
@@ -684,14 +671,6 @@ class AlexaRemote extends EventEmitter {
         this.httpsGet (`/api/wake-word?_=%t`, callback);
     }
 
-	getWakeWords2(callback) 
-	{
-		this.getWakeWords((err, res) => 
-		{
-			if (err || !res || !res.wakeWords || !Array.isArray(res.wakeWords)) return callback && callback();
-			callback && callback(res.wakeWords);
-		});
-	}
 
     createNotificationObject(serialOrName, type, label, value, status, sound) { // type = Reminder, Alarm
         if (status && typeof status === 'object') {
@@ -995,6 +974,17 @@ this.deleteNotification(notification, callback);
 			callback && callback(res);
 		});
 	}
+	
+	getActivities2(options,callback) 
+	{
+		this.getActivities(options, (err, res) => 
+		{
+			        //this._options.logger && this._options.logger('coucou'+res);
+
+			if (err || !res || !res || !Array.isArray(res)) return callback && callback();
+			callback && callback(res);
+		});
+	}	
 	
     getActivities(options, callback) {
         if (typeof options === 'function') {
@@ -1608,11 +1598,14 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
     }
 
     getDevicePreferences(callback) {
-        this.httpsGet ('https://${this.baseUrl}/api/device-preferences?cached=true&_=%t', callback);
+//        this.httpsGet ('https://${this.baseUrl}/api/device-preferences?cached=true&_=%t', callback); //bug
+        this.httpsGet ('https://'+this.baseUrl+'/api/device-preferences?cached=true&_=%t', callback); //corrigé Sigalou 12042019
     }
 
+
     getSmarthomeDevices(callback) {
-        this.httpsGet ('https://${this.baseUrl}/api/phoenix?_=%t', function (err, res) {
+        //this.httpsGet ('https://${this.baseUrl}/api/phoenix?_=%t', function (err, res) {
+        this.httpsGet ('https://'+this.baseUrl+'/api/phoenix?_=%t', function (err, res) {
             if (err || !res || !res.networkDetail) return callback(err, res);
             try {
                 res = JSON.parse(res.networkDetail);
@@ -1625,8 +1618,10 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
     }
 
     getSmarthomeGroups(callback) {
-        this.httpsGet ('https://${this.baseUrl}/api/phoenix/group?_=%t', callback);
+      //  this.httpsGet ('https://${this.baseUrl}/api/phoenix/group?_=%t', callback);
+        this.httpsGet ('https://'+this.baseUrl+'/api/phoenix/group?_=%t', callback);
     }
+	getSmarthomeGroups2(callback){this.getSmarthomeGroups((err, res)=>{if (err) return callback && callback();callback && callback(res);});}
 
     getSmarthomeEntities(callback) {
         this.httpsGet ('/api/behaviors/entities?skillId=amzn1.ask.1p.smarthome',
@@ -1638,6 +1633,7 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
             }
         );
     }
+	
 
     getSmarthomeBehaviourActionDefinitions(callback) {
         this.httpsGet ('/api/behaviors/actionDefinitions?skillId=amzn1.ask.1p.smarthome',

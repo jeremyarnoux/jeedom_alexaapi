@@ -108,7 +108,7 @@ foreach($myObject as $item):
 ?>
 <script>
 
-$('.refreshAction[data-action=refresh]').on('click',function(){
+$('.refreshAction[data-action=refresh]').off('click').on('click',function(){
 	
 /*	const Url='http://192.168.0.21:3456/volume';
 	const data={
