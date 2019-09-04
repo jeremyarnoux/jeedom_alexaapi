@@ -129,14 +129,14 @@ else
     #upgrade to recent npm
     sudo npm install -g npm
   else
-    if [ -f /media/boot/multiboot/meson64_odroidc2.dtb.linux ]; then
+    #if [ -f /media/boot/multiboot/meson64_odroidc2.dtb.linux ]; then
       #smart
-      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
-    else
+    #  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
+    #else
       echo "Utilisation du dépot officiel"
       curl -sL https://deb.nodesource.com/setup_${installVer}.x | sudo -E bash -
       sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs  
-    fi
+    #fi
   fi
 
   npm config set prefix ${npmPrefix}
