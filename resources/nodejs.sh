@@ -67,6 +67,13 @@ if [ -f /etc/apt/sources.list.d/jeedom.list* ]; then
   fi
 fi
 
+#prioritize nodesource nodejs
+sudo bash -c "cat >> /etc/apt/preferences.d/nodesource" << EOL
+Package: nodejs
+Pin: origin deb.nodesource.com
+Pin-Priority: 600
+EOL
+
 echo 20 > ${PROGRESS_FILE}
 echo "--20%"
 sudo apt-get update
@@ -169,6 +176,8 @@ sudo chown -R www-data node_modules
 
 echo 95 > ${PROGRESS_FILE}
 echo "--95%"
+sudo rm -f /etc/apt/preferences.d/nodesource
+
 if [ -f /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${2} ]; then
   echo "Réactivation de la source deb-multimedia qu'on avait désactivé !"
   sudo mv /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${2} /etc/apt/sources.list.d/deb-multimedia.list
