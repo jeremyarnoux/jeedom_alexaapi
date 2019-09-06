@@ -100,7 +100,8 @@ then
 fi
 
 bits=`getconf LONG_BIT`
-if { [ "$arch" = "i386" ] || [ "$arch" = "i686" ]; } && [ "$bits" -eq "32" ]
+vers=`lsb_release -c | grep stretch | wc -l`
+if { [ "$arch" = "i386" ] || [ "$arch" = "i686" ]; } && [ "$bits" -eq "32" ] && [ "$vers" -eq "1" ]
 then 
   installVer='8' 	#NodeJS major version to be installed
   minVer='8'	#min NodeJS major version to be accepted  
