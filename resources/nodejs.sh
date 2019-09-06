@@ -67,8 +67,6 @@ if [ -f /etc/apt/sources.list.d/jeedom.list* ]; then
   fi
 fi
 
-apt-cache policy nodejs
-
 #prioritize nodesource nodejs
 sudo bash -c "cat >> /etc/apt/preferences.d/nodesource" << EOL
 Package: nodejs
@@ -80,8 +78,6 @@ echo 20 > ${PROGRESS_FILE}
 echo "--20%"
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lsb-release
-
-apt-cache policy nodejs
 
 echo 30 > ${PROGRESS_FILE}
 echo "--30%"
@@ -109,7 +105,6 @@ then
   installVer='8' 	#NodeJS major version to be installed
   minVer='8'	#min NodeJS major version to be accepted  
 fi
-
 
 testVer=`php -r "echo version_compare('${actual}','v${minVer}','>=');"`
 if [[ $testVer == "1" ]]
@@ -149,14 +144,9 @@ else
     #upgrade to recent npm
     sudo npm install -g npm
   else
-    #if [ -f /media/boot/multiboot/meson64_odroidc2.dtb.linux ]; then
-      #smart
-    #  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
-    #else
       echo "Utilisation du dépot officiel"
       curl -sL https://deb.nodesource.com/setup_${installVer}.x | sudo -E bash -
       sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs  
-    #fi
   fi
 
   npm config set prefix ${npmPrefix}
