@@ -99,6 +99,13 @@ then
   minVer='8'	#min NodeJS major version to be accepted  
 fi
 
+bits=`getconf LONG_BIT`
+if { [ "$arch" = "i386" ] || [ "$arch" = "i686" ]; } && [ "$bits" -eq "32" ]
+then 
+  installVer='8' 	#NodeJS major version to be installed
+  minVer='8'	#min NodeJS major version to be accepted  
+fi
+
 testVer=`php -r "echo version_compare('${actual}','v${minVer}','>=');"`
 if [[ $testVer == "1" ]]
 then
@@ -118,7 +125,8 @@ else
   else
     npmPrefix="/usr"
   fi
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove nodejs npm
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove npm
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove nodejs
 
   echo 45 > ${PROGRESS_FILE}
   echo "--45%"
@@ -136,14 +144,9 @@ else
     #upgrade to recent npm
     sudo npm install -g npm
   else
-    #if [ -f /media/boot/multiboot/meson64_odroidc2.dtb.linux ]; then
-      #smart
-    #  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
-    #else
       echo "Utilisation du dépot officiel"
       curl -sL https://deb.nodesource.com/setup_${installVer}.x | sudo -E bash -
       sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs  
-    #fi
   fi
 
   npm config set prefix ${npmPrefix}
