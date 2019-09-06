@@ -126,7 +126,9 @@ class alexaapi extends eqLogic {
 		log::add('alexaapi', 'info', 'Suppression du Code NodeJS');
 		$cmd = system::getCmdSudo() . 'rm -rf ' . dirname(__FILE__) . '/../../resources/node_modules &>/dev/null';
 		log::add('alexaapi', 'info', 'Suppression de NodeJS');
-		$cmd = system::getCmdSudo() . 'apt-get -y --purge autoremove nodejs npm';
+		$cmd = system::getCmdSudo() . 'apt-get -y --purge autoremove npm';
+		exec($cmd);
+		$cmd = system::getCmdSudo() . 'apt-get -y --purge autoremove nodejs';
 		exec($cmd);
 		log::add('alexaapi', 'info', 'Réinstallation des dependances');
 		$pluginalexaapi->dependancy_install(true);
