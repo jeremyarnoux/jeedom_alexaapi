@@ -103,6 +103,14 @@ then
   minVer='8'	#min NodeJS major version to be accepted  
 fi
 
+$bits=`getconf LONG_BIT`
+if { [ "$arch" -eq "i386" ] || [ "$arch" -eq "i686" ]; } && [ "$bits" -eq "32" ]
+then 
+  installVer='8' 	#NodeJS major version to be installed
+  minVer='8'	#min NodeJS major version to be accepted  
+fi
+
+
 testVer=`php -r "echo version_compare('${actual}','v${minVer}','>=');"`
 if [[ $testVer == "1" ]]
 then
