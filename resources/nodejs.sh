@@ -67,7 +67,7 @@ if [ -f /etc/apt/sources.list.d/jeedom.list* ]; then
   fi
 fi
 
-apt-cach policy nodejs
+apt-cache policy nodejs
 
 #prioritize nodesource nodejs
 sudo bash -c "cat >> /etc/apt/preferences.d/nodesource" << EOL
@@ -81,7 +81,7 @@ echo "--20%"
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lsb-release
 
-apt-cach policy nodejs
+apt-cache policy nodejs
 
 echo 30 > ${PROGRESS_FILE}
 echo "--30%"
