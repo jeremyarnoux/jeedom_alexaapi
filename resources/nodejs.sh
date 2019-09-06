@@ -103,8 +103,8 @@ then
   minVer='8'	#min NodeJS major version to be accepted  
 fi
 
-$bits=`getconf LONG_BIT`
-if { [ "$arch" -eq "i386" ] || [ "$arch" -eq "i686" ]; } && [ "$bits" -eq "32" ]
+bits=`getconf LONG_BIT`
+if { [ "$arch" = "i386" ] || [ "$arch" = "i686" ]; } && [ "$bits" -eq "32" ]
 then 
   installVer='8' 	#NodeJS major version to be installed
   minVer='8'	#min NodeJS major version to be accepted  
