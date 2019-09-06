@@ -122,7 +122,8 @@ else
   else
     npmPrefix="/usr"
   fi
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove nodejs npm
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove npm
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove nodejs
 
   echo 45 > ${PROGRESS_FILE}
   echo "--45%"
