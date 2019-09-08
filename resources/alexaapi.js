@@ -991,7 +991,7 @@ app.get('/history', (req, res) => {
 
 */
 app.get('/routines', (req, res) => {
-	config.logger('Alexa-API: routines');
+	config.logger('Alexa-API: routines ');
 	res.type('json');
 
 	//config.logger('Alexa-API: type of devices : '+typeof devices);

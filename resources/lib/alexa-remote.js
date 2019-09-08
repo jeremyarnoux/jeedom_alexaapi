@@ -1461,7 +1461,7 @@ this.deleteNotification(notification, callback);
             callback = limit;
             limit = 0;
         }
-        limit = limit || 2000;
+        limit = limit || 200;
         this.httpsGet (`/api/behaviors/automations?limit=${limit}`, callback);
     }
 
