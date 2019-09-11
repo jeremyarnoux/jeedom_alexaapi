@@ -265,12 +265,15 @@ class alexaapi extends eqLogic {
 		
 		// boucle refresh
 		$autorefreshR = '*/15 * * * *';
+
 		$r = new Cron\CronExpression($autorefreshR, new Cron\FieldFactory);
 		if ($r->isDue() && $deamon_info['state'] == 'ok') {
 			$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
 
+			$premierdelaboucle=true; // premierdelaboucle cest pour ne pas lancer autant de fois le test sur routines que de devices, ne sera lancé qu'une fois.
 			foreach ($eqLogics as $alexaapi) {
-				$alexaapi->refresh();
+				$alexaapi->refresh($premierdelaboucle); 				
+				if ($premierdelaboucle) $premierdelaboucle=false;
 				sleep(2);
 			}			
 		}
@@ -282,6 +285,8 @@ class alexaapi extends eqLogic {
 		sleep(2);
 	}
 	public static function scanAmazonAlexa($_logical_id = null, $_exclusion = 0) {
+
+
 
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['launchable'] != "ok") {
@@ -317,8 +322,11 @@ class alexaapi extends eqLogic {
 
 			$numDevices++;
 		}
+		
+		// A voir s'il faut ou pas actualiser les routines ici apres le scan (cela se fera au premier refresh)
 
 		event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . ' ajouté(s)', __FILE__)));
+
 	}
 
 	private static function createNewDevice($deviceName, $deviceSerial) {
@@ -338,7 +346,7 @@ class alexaapi extends eqLogic {
 	public function hasCapa($thisCapa) {
 		$capa=$this->getConfiguration('capabilities',"");
 		$type=$this->getConfiguration('type',"");
-		log::add('alexaapi', 'debug', 'capabilities : '.json_encode($capa));
+		//log::add('alexaapi', 'debug', 'capabilities : '.json_encode($capa));
 		if(((gettype($capa) == "array" && array_search($thisCapa,$capa))) || ((gettype($capa) == "string" && strpos($capa, $thisCapa) !== false))) {
 			if($thisCapa == "REMINDERS" && $type == "A15ERDAKK5HQQG") return false;
 			return true;
@@ -362,38 +370,43 @@ class alexaapi extends eqLogic {
 	}
 
 	/*     * *********************Methode d'instance************************* */
-	public function refresh() {
+	public function refresh($_routines=true) { //$_routines c'est pour éviter de charger les routines lors du scan
 	//log::add('alexaapi', 'debug', '-----Lancement refresh1---**-----');
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') return false;
 	//log::add('alexaapi', 'debug', '-----Lancement refresh2---*'.$this->getName().'*-----');
 
+	if ($_routines)
+	{
 
-		//	log::add('alexaapi', 'debug', 'execute : refresh');
-		// Met à jour la liste des routines des commandes action "routine"
-		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
-		$json = json_decode($json, true);
-		self::sortBy('utterance', $json, 'asc');
+			//	log::add('alexaapi', 'debug', 'execute : refresh');
+			// Met à jour la liste des routines des commandes action "routine"
+			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
+			$json = json_decode($json, true);
+			self::sortBy('utterance', $json, 'asc');
 
-		$ListeDesRoutines = [];
-	//log::add('alexaapi', 'debug', '---------------------------------------------Lancement refresh3------------------------');
+			$ListeDesRoutines = [];
+		//log::add('alexaapi', 'debug', '---------------------------------------------Lancement refresh3------------------------');
 
-		foreach ($json as $item) {
-			if ($item['utterance'] != '') {
-				$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
+			foreach ($json as $item) {
+				if ($item['utterance'] != '') {
+					$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
+				}
+				else {
+					if ($item['triggerTime'] != '') $resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
+					$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
+				}
 			}
-			else {
-				if ($item['triggerTime'] != '') $resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
-				$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
+			$cmd = $this->getCmd(null, 'routine');
+			if (is_object($cmd)) {
+				//routine existe on  met à jour la liste des routines
+				$cmd->setConfiguration('listValue', join(';',$ListeDesRoutines));
+				$cmd->save();
 			}
-		}
-		$cmd = $this->getCmd(null, 'routine');
-		if (is_object($cmd)) {
-			//routine existe on  met à jour la liste des routines
-			$cmd->setConfiguration('listValue', join(';',$ListeDesRoutines));
-			$cmd->save();
-		}
-		// Fin mise à jour de la liste des routines
+			// Fin mise à jour de la liste des routines
+			
+	}
+		
 		try {
 			foreach ($this->getCmd('action') as $cmd) {
 				//log::add('alexaapi', 'debug', 'Refresh: Test '.$cmd->getName()."/".$cmd->getConfiguration('RunWhenRefresh', 0));
@@ -482,6 +495,7 @@ class alexaapi extends eqLogic {
 	public function postSave() {
 
 
+				//log::add('alexaapi', 'debug', '**********************postSave DEBUT***********************************');
 
 
 
@@ -515,6 +529,7 @@ class alexaapi extends eqLogic {
 				$cmd->save();
 				return;
 			}
+
 
 			//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
 			if ($this->hasCapa("AUDIO_PLAYER")) { 
@@ -821,7 +836,8 @@ class alexaapi extends eqLogic {
 			log::add('alexaapi', 'warning', 'Pas de capacité détectée, assurez-vous que le démon est OK');
 		}
 
-		$this->refresh();
+		$this->refresh(false); //false c'est pour ne pas lancer l'actualisation des routines au scan
+
 	}
 
 	public static function dependancy_install($verbose = "false") {

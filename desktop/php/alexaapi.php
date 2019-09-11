@@ -223,7 +223,7 @@ $alternateImg = $eqLogic->getConfiguration('type');
         echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="105" />';
 
     echo '</center>';
-    echo '<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
+    echo '<span  class="name"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
 	
 	if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps"))) {
     echo '<br><span class="label label-danger" style="text-shadow : none;">Déconnecté</span>';    
