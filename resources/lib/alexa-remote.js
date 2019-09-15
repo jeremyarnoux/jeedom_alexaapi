@@ -658,7 +658,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
         });
     }
 
-/* modif 0.3.0
+// modif 0.3.0
     getDevices(callback)
     {
       var isReady = false;
@@ -667,10 +667,10 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
         callback && callback(this.serialNumbers);
       });
     }
-*/
-    getDevices(callback) {
-        this.httpsGet ('/api/devices-v2/device?cached=true&_=%t', callback);
-    }
+//
+   // getDevices(callback) {
+   //     this.httpsGet ('/api/devices-v2/device?cached=true&_=%t', callback);
+  //  }
 
 
 
