@@ -567,21 +567,26 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
 //SIMULER UN BUG !!!
 //if (flags.data !=undefined) body="Connection: close";
 
+			this._options.logger && this._options.logger('>>> DEBUG res.statusCode: '+res.statusCode);
+			this._options.logger && this._options.logger('>>> DEBUG res.statusMessage: '+res.statusMessage);
+			this._options.logger && this._options.logger('>>> DEBUG res.httpVersion: '+res.httpVersion);
+			this._options.logger && this._options.logger('>>> DEBUG res.headers: '+JSON.stringify(res.headers));
+			//this._options.logger && this._options.logger('>>> DEBUG res.rawHeaders : '+res.rawHeaders);
 
             res.on('data', (chunk) => {
                 body += chunk;
+				this._options.logger && this._options.logger('>>> DEBUG chunk: '+body);
             });
-        //this._options.logger && this._options.logger('DEBUG2');
 
             res.on('end', () =>
             {
-        //this._options.logger && this._options.logger('DEBUG3');
+				this._options.logger && this._options.logger('>>> DEBUG body: '+body);
                 let ret;
                 if (typeof callback === 'function')
                 {
                     if (!body)
                     {
-                        this._options.logger && this._options.logger('Alexa-Remote: Response: OK');
+                        this._options.logger && this._options.logger('Alexa-Remote: Response3: OK');
                         return callback && callback(null, null);
                     }
                     try
@@ -610,9 +615,9 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                     }
 					
 					if (JSON.stringify(ret)=='{"error":null}')
-						this._options.logger && this._options.logger('Alexa-Remote: Response: OK');
+						this._options.logger && this._options.logger('Alexa-Remote: Response2: OK');
 						else
-						this._options.logger && this._options.logger('Alexa-Remote: Response: ' + JSON.stringify(ret));
+						this._options.logger && this._options.logger('Alexa-Remote: Response1: ' + JSON.stringify(ret));
                     return callback && callback (null, ret);
                 }
             });
@@ -620,6 +625,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
 
         req.on('error', function(e)
         {
+		this._options.logger && this._options.logger('>>> DEBUG error: '+e);
             if(typeof callback === 'function')
                 return callback (e, null);
         });
