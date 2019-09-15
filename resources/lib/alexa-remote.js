@@ -63,12 +63,23 @@ class AlexaRemote extends EventEmitter {
             return this.setCookie(_cookie.cookie);
         }
 
+// Ligne ajoutée dans alexa-remote.js par Apollon77 21 juin 2019
+if (!this.cookie || typeof this.cookie !== 'string') return;
+
+
         let ar = this.cookie.match(/csrf=([^;]+)/);
         if (!ar || ar.length < 2)
           ar = this.cookie.match(/csrf=([^;]+)/);
 
         if (!this.csrf && ar && ar.length >= 2)
             this.csrf = ar[1];
+		
+// Ligne ajoutée dans alexa-remote.js par Apollon77 21 juin 2019
+        if (!this.csrf) {
+            this.cookie = null;
+            return;
+        }
+//-----------------------------------------------
 
         this._options.csrf = this.csrf;
         this._options.cookie = this.cookie;
@@ -168,6 +179,7 @@ class AlexaRemote extends EventEmitter {
             if (!this.csrf)
                 return callback && callback(new Error('no csrf found'));
 
+/* ancienne version
             this.checkAuthentication((authenticated) =>
             {
                 this._options.logger && this._options.logger('Alexa-Remote: Authentication checked: ' + authenticated);
@@ -200,6 +212,41 @@ class AlexaRemote extends EventEmitter {
                     callback && callback();
                 });
             });
+			*/
+	// nouvelle version
+            this.checkAuthentication((authenticated, err) => {
+                if (err && authenticated === null) {
+                    return callback && callback(new Error('Error while checking Authentication: ' + err));
+                }
+                this._options.logger && this._options.logger('Alexa-Remote: Authentication checked: ' + authenticated);
+                if (! authenticated && !this._options.cookieJustCreated) {
+                    this._options.logger && this._options.logger('Alexa-Remote: Cookie was set, but authentication invalid');
+                    delete this._options.cookie;
+                    delete this._options.csrf;
+                    delete this._options.localCookie;
+                    return this.init(this._options, callback);
+                }
+                this.lastAuthCheck = new Date().getTime();
+                if (this.cookieRefreshTimeout) {
+                    clearTimeout(this.cookieRefreshTimeout);
+                    this.cookieRefreshTimeout = null;
+                }
+                if (this._options.cookieRefreshInterval) {
+                    this.cookieRefreshTimeout = setTimeout(() => {
+                        this.cookieRefreshTimeout = null;
+                        this._options.cookie = this.cookieData;
+                        delete this._options.csrf;
+                        this.init(this._options, callback);
+                    }, this._options.cookieRefreshInterval);
+                }
+                this.prepare(() => {
+                    if (this._options.useWsMqtt) {
+                        this.initWsMqttConnection();
+                    }
+                    callback && callback();
+                });
+            });
+	//--------	
         });
     }
 
@@ -416,7 +463,9 @@ class AlexaRemote extends EventEmitter {
             this._options.logger && this._options.logger('Alexa-Remote: No authentication check needed (time elapsed ' + (new Date().getTime() - this.lastAuthCheck) + ')');
             return this.httpsGetCall(path, callback, flags);
         }
-        this.checkAuthentication((authenticated) => {
+
+/* Ancienne version modif juin2019
+        this.checkAuthentication((authenticated) => { change juin 2019
             if (authenticated) {
                 this._options.logger && this._options.logger('Alexa-Remote: Authentication check successfull');
                 this.lastAuthCheck = new Date().getTime();
@@ -436,8 +485,34 @@ class AlexaRemote extends EventEmitter {
             }
             this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error and no email and password. STOP');
             callback(new Error('Cookie invalid'));
+*/
+
+        this.checkAuthentication((authenticated, err) => {
+            if (authenticated) {
+                this._options.logger && this._options.logger('Alexa-Remote: Authentication check successfull');
+                this.lastAuthCheck = new Date().getTime();
+                return this.httpsGetCall(path, callback, flags);
+            }
+            else if (err && authenticated === null) {
+                this._options.logger && this._options.logger('Alexa-Remote: Authentication check returned error: ' + err + '. Still try request');
+                return this.httpsGetCall(path, callback, flags);
+            }
+            this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error, try re-init');
+            delete this._options.csrf;
+            delete this._options.cookie;
+            this.init(this._options, function(err) {
+                if (err) {
+                    this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error and renew unsuccessfull. STOP');
+                    return callback(new Error('Cookie invalid, Renew unsuccessfull'));
+                }
+                return this.httpsGet(path, callback, flags);
+            });
+//----------------------------
+
         });
     }
+
+
 
     httpsGetCall(path, callback, flags = {}) {
         let options = {
@@ -556,6 +631,7 @@ class AlexaRemote extends EventEmitter {
 
 
 /// Public
+/* modif jui 2019
     checkAuthentication(callback) {
         this.httpsGetCall ('/api/bootstrap?version=0', function (err, res) {
             if (res && res.authentication && res.authentication.authenticated !== undefined) {
@@ -563,8 +639,20 @@ class AlexaRemote extends EventEmitter {
             }
             return callback(false);
         });
+    }*/
+    checkAuthentication(callback) {
+        this.httpsGetCall ('/api/bootstrap?version=0', function (err, res) {
+            if (res && res.authentication && res.authentication.authenticated !== undefined) {
+                return callback(res.authentication.authenticated, err);
+            }
+            if (err && !err.message.includes('no body')) {
+                return callback(null, err);
+            }
+            callback(false, err);
+        });
     }
 
+/* modif 0.3.0
     getDevices(callback)
     {
       var isReady = false;
@@ -573,6 +661,12 @@ class AlexaRemote extends EventEmitter {
         callback && callback(this.serialNumbers);
       });
     }
+*/
+    getDevices(callback) {
+        this.httpsGet ('/api/devices-v2/device?cached=true&_=%t', callback);
+    }
+
+
 
     getCards(limit, beforeCreationTime, callback) {
         if (typeof limit === 'function') {
@@ -798,6 +892,12 @@ return this.parseValue4Notification(notification, value);    }
                 if (notification.type !== 'Timer') {
                     value = new Date(value);
                     notification.alarmTime = value.getTime();
+					// ajout juin 2019 
+		            if (value.getTime() > new Date().getTime()) {
+                        notification.originalDate = `${value.getFullYear()}-${_00(value.getMonth() + 1)}-${_00(value.getDate())}`;
+                    }			
+					//------------------------
+	
                     notification.originalTime = `${_00 (value.getHours ())}:${_00 (value.getMinutes ())}:${_00 (value.getSeconds ())}.000`;
                 }
                 /*else {
@@ -807,6 +907,23 @@ return this.parseValue4Notification(notification, value);    }
             case 'boolean':
                 notification.status = value ? 'ON' : 'OFF';
                 break;
+			            
+			// Bizarre oublé, ajouté 14/09/2019
+			case 'date':
+                if (notification.type !== 'Timer') {
+                    notification.alarmTime = value.getTime();
+                    notification.originalTime = `${_00 (value.getHours ())}:${_00 (value.getMinutes ())}:${_00 (value.getSeconds ())}.000`;
+                }
+                /*else {
+                    let duration = value.getTime() - Date.now();
+                    if (duration < 0) duration = value.getTime();
+                    notification.remainingTime = duration;
+                }*/
+                break;
+				//---
+				
+				
+				
             case 'string':
                 let ar = value.split(':');
                 if (notification.type !== 'Timer') {
@@ -1057,10 +1174,14 @@ this.deleteNotification(notification, callback);
         );
     }
 
+
     getAccount(callback) {
         this.httpsGet (`https://alexa-comms-mobile-service.amazon.com/accounts`, callback);
     }
 
+   // getContacts(options, callback) a ajouter car présent dans la librairie si besoin
+
+	
     getConversations(options, callback) {
         if (typeof options === 'function') {
             callback = options;
@@ -1194,12 +1315,33 @@ this.deleteNotification(notification, callback);
         );
     }
 
+/* Ancienne version juin 2019
     createSequenceNode(command, value, callback) {
         const seqNode = {
             '@type': 'com.amazon.alexa.behaviors.model.OpaquePayloadOperationNode',
             'operationPayload': {
                 'deviceType': 'ALEXA_CURRENT_DEVICE_TYPE',
                 'deviceSerialNumber': 'ALEXA_CURRENT_DSN',
+				
+				-----------------------*/
+				
+    createSequenceNode(command, value, serialOrName, callback) {
+        if (typeof serialOrName === 'function') {
+            callback = serialOrName;
+            serialOrName = undefined;
+        }
+        let deviceSerialNumber = 'ALEXA_CURRENT_DSN';
+        let deviceType= 'ALEXA_CURRENT_DEVICE_TYPE';
+        if (serialOrName && !Array.isArray(serialOrName)) {
+            const currDevice = this.find(serialOrName);
+            deviceSerialNumber = currDevice.serialNumber;
+            deviceType = currDevice.deviceType;
+        }
+        const seqNode = {
+            '@type': 'com.amazon.alexa.behaviors.model.OpaquePayloadOperationNode',
+            'operationPayload': {
+                'deviceType': deviceType,
+                'deviceSerialNumber': deviceSerialNumber,
                 'locale': 'ALEXA_CURRENT_LOCALE',
                 'customerId':'ALEXA_CUSTOMER_ID'
             }
@@ -1244,8 +1386,10 @@ this.deleteNotification(notification, callback);
                 seqNode.type = 'Alexa.DeviceControls.Stop';
                 seqNode.operationPayload.devices = [
                     {
-                        "deviceSerialNumber": "ALEXA_CURRENT_DSN",
-                        "deviceType": "ALEXA_CURRENT_DEVICE_TYPE"
+                        //"deviceSerialNumber": "ALEXA_CURRENT_DSN",
+                        //"deviceType": "ALEXA_CURRENT_DEVICE_TYPE"
+						"deviceSerialNumber": deviceSerialNumber,
+                        "deviceType": deviceType
                     }
                 ];
                 seqNode.operationPayload.isAssociatedDevice = false;
@@ -1332,7 +1476,8 @@ this.deleteNotification(notification, callback);
                         "locale": "fr-FR",
                         "display": {
                             "title": "ioBroker",
-                            "body": value
+                            //"body": value
+							"body": value.replace(/<[^>]+>/g, '')
                         },
                         "speak": {
                             "type": (command === 'ssml') ? 'ssml' : 'text',
@@ -1344,11 +1489,28 @@ this.deleteNotification(notification, callback);
                     "customerId": "ALEXA_CUSTOMER_ID",
                     "devices": [
                         {
-                            "deviceSerialNumber": "ALEXA_CURRENT_DSN",
-                            "deviceTypeId": "ALEXA_CURRENT_DEVICE_TYPE"
+                            "deviceSerialNumber": deviceSerialNumber,
+                            "deviceTypeId": deviceType
                         }
                     ]
                 };
+				
+				// ajouté juin 2019
+				if (serialOrName && Array.isArray(serialOrName)) {
+                    seqNode.operationPayload.target.devices = [];
+                    serialOrName.forEach((deviceId) => {
+                        const currDevice = this.find(deviceId);
+                        if (!currDevice) return;
+                        seqNode.operationPayload.target.devices.push({
+                            "deviceSerialNumber": currDevice.serialNumber,
+                            "deviceTypeId": currDevice.deviceType
+                        });
+                    });
+                }
+				//-----
+
+				
+				
                 delete seqNode.operationPayload.deviceType;
                 delete seqNode.operationPayload.deviceSerialNumber;
                 delete seqNode.operationPayload.locale;
@@ -1368,7 +1530,8 @@ this.deleteNotification(notification, callback);
 
         let nodes = [];
         for (let command of commands) {
-            const commandNode = this.createSequenceNode(command.command, command.value, callback);
+            //const commandNode = this.createSequenceNode(command.command, command.value, callback);
+			const commandNode = this.createSequenceNode(command.command, command.value, command.device ? command.device : serialOrName, callback);
             if (commandNode) nodes.push(commandNode);
         }
 
@@ -1391,7 +1554,9 @@ this.deleteNotification(notification, callback);
        
 //this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 1 '+command);
 
-	   let dev = this.find(serialOrName);
+		let dev = this.find(Array.isArray(serialOrName) ? serialOrName[0] : serialOrName);
+	   //let dev = this.find(serialOrName); modif juin 2019
+	   
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
 //this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 2');
 
@@ -1533,6 +1698,7 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
     }
 
     sendTextMessage(conversationId, text, callback) {
+		// a revoir avec la librairie si c'est utilisé car modifié juin 2019
         let o = {
             type: 'message/text',
             payload: {
