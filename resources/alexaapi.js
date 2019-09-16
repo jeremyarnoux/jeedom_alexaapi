@@ -1629,6 +1629,10 @@ if (err)
 			config.logger("Connexion Close détectée dans la détection d'erreur et donc relance de l'initialisation");
 			startServer();
 		}
+		else if (err.message == "Unauthorized") {
+			config.logger("Unauthorized détecté dans la détection d'erreur et donc relance de l'initialisation");
+			startServer();
+		}		
 		else
 		{
 		config.logger(err.message);

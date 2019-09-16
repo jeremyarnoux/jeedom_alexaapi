@@ -209,7 +209,11 @@ foreach ($eqLogics as $eqLogic)
 	
     $opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
     echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
-
+	
+	if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps"))) 
+		echo '<i class="fas fa-times" style="float:right" title="Offline"></i>';
+	
+	
 //$alternateImg = $knownDeviceType[$eqLogic->getConfiguration('type')]['icon'];
 $alternateImg = $eqLogic->getConfiguration('type');
     echo '<center>';
@@ -225,9 +229,6 @@ $alternateImg = $eqLogic->getConfiguration('type');
     echo '</center>';
     echo '<span  class="name"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
 	
-	if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps"))) {
-    echo '<br><span class="label label-danger" style="text-shadow : none;">Déconnecté</span>';    
-	}
 	echo '</div>';
 }
 ?>

@@ -586,8 +586,12 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                 {
                     if (!body)
                     {
-                        this._options.logger && this._options.logger('Alexa-Remote: Response3: OK');
+						this._options.logger && this._options.logger('Alexa-Remote: Response(3): '+res.statusMessage);
+                        
+						if (res.statusMessage=="200") // C'est OK
                         return callback && callback(null, null);
+						else
+						return callback && callback(new Error(res.statusMessage), body);
                     }
                     try
                     {
@@ -615,9 +619,9 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                     }
 					
 					if (JSON.stringify(ret)=='{"error":null}')
-						this._options.logger && this._options.logger('Alexa-Remote: Response2: OK');
+						this._options.logger && this._options.logger('Alexa-Remote: Response(2): OK');
 						else
-						this._options.logger && this._options.logger('Alexa-Remote: Response1: ' + JSON.stringify(ret));
+						this._options.logger && this._options.logger('Alexa-Remote: Response(1): ' + JSON.stringify(ret));
                     return callback && callback (null, ret);
                 }
             });
@@ -658,7 +662,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
         });
     }
 
-// modif 0.3.0
+
     getDevices(callback)
     {
       var isReady = false;
@@ -667,7 +671,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
         callback && callback(this.serialNumbers);
       });
     }
-//
+//// modif 0.3.0 NE PAS FAIRE LA MAJ
    // getDevices(callback) {
    //     this.httpsGet ('/api/devices-v2/device?cached=true&_=%t', callback);
   //  }
