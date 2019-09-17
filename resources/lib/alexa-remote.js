@@ -579,7 +579,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
 			var resstatusCode=res.statusCode;
 
 //SIMULER UN BUG UNAUTHORIZED!!!
-resstatusCode="123";		resstatusMessage="Unauthorized";	
+//resstatusCode="123";		resstatusMessage="Unauthorized";	
 
             res.on('data', (chunk) => {
                 body += chunk;

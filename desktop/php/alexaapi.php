@@ -211,7 +211,7 @@ foreach ($eqLogics as $eqLogic)
     echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
 	
 	if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps"))) 
-		echo '<i class="fas fa-times" style="float:right" title="Offline"></i>';
+		echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
 	
 	
 //$alternateImg = $knownDeviceType[$eqLogic->getConfiguration('type')]['icon'];
