@@ -563,15 +563,23 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
         //console.log(res+"FIN de RES");
             let body  = '';
         //this._options.logger && this._options.logger('DEBUG1');
+		
 			
-//SIMULER UN BUG !!!
+//SIMULER UN BUG CONNEXION CLOSE!!!
 //if (flags.data !=undefined) body="Connection: close";
+//if (flags.data !=undefined) body="Unauthorized";
+
 
 			this._options.logger && this._options.logger('>>> DEBUG res.statusCode: '+res.statusCode);
 			this._options.logger && this._options.logger('>>> DEBUG res.statusMessage: '+res.statusMessage);
 			this._options.logger && this._options.logger('>>> DEBUG res.httpVersion: '+res.httpVersion);
 			this._options.logger && this._options.logger('>>> DEBUG res.headers: '+JSON.stringify(res.headers));
 			//this._options.logger && this._options.logger('>>> DEBUG res.rawHeaders : '+res.rawHeaders);
+			var resstatusMessage=res.statusMessage;
+			var resstatusCode=res.statusCode;
+
+//SIMULER UN BUG UNAUTHORIZED!!!
+resstatusCode="123";		resstatusMessage="Unauthorized";	
 
             res.on('data', (chunk) => {
                 body += chunk;
@@ -586,12 +594,12 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                 {
                     if (!body)
                     {
-						this._options.logger && this._options.logger('Alexa-Remote: Response(3): '+res.statusMessage);
+						this._options.logger && this._options.logger('Alexa-Remote: Response(3): '+resstatusMessage);
                         
-						if (res.statusMessage=="200") // C'est OK
+						if (resstatusCode=="200") // C'est OK
                         return callback && callback(null, null);
 						else
-						return callback && callback(new Error(res.statusMessage), body);
+						return callback && callback(new Error(resstatusMessage), body);
                     }
                     try
                     {

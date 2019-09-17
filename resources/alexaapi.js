@@ -1608,7 +1608,7 @@ function startServer() {
 	}
 	else
 	{
-	config.logger('Alexa-API:    ******************** Lancement Serveur annulé***********************');
+	config.logger('Alexa-API:    ******************** Lancement Serveur annulé (dernière relance trop récente)***********************');
 	}
 }
 
