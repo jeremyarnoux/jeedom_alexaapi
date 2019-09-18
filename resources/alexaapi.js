@@ -110,16 +110,19 @@ function LancementCommande(commande, req)
   }]
 
 */
-app.get('/checkAuth', (req, res) => {
-	config.logger('Alexa-API: checkAuth');
+CommandAlexa.checkAuth = function(req,res){
+	
 	res.type('json');
+	
+	config.logger('Alexa-API:    Lancement /checkAuth');
 
 	alexa.checkAuthentication(function(auth) {
 		res.status(200).json({
 			authenticated: auth
 		});
 	});
-});
+	
+}
 
 
 /**** Alexa.Speak *****
@@ -224,7 +227,8 @@ function boucleSurSerials_sendSequenceCommand (req, action, callback) {
 					if (testErreur) traiteErreur(testErreur);
 				}
 			);
-		});
+		});	
+	//config.logger('Alexa-API:    Test temporaire de resultatEnvoi: ' + resultatEnvoi); NON synchrone !
 }
 function boucleSurSerials_sendCommand (req, callback) {
 		resultatEnvoi=  forEachDevices(req.query.device, (serial) => {
@@ -256,7 +260,6 @@ CommandAlexa.Push = function(req,res){
 	
 	res.status(200).json({value: "Send"});	//ne teste pas le résultat
 }
-
 
 
 /***** DeleteReminder *****
@@ -334,6 +337,7 @@ CommandAlexa.enableReminder = function(req,res){
 	});
 }
 */
+app.get('/checkAuth', CommandAlexa.checkAuth);
 app.get('/command', CommandAlexa.Command);
 app.get('/volume', CommandAlexa.Volume);
 app.get('/speak', CommandAlexa.Speak);
@@ -1539,7 +1543,7 @@ app.get('/restart', (req, res) => {
 	config.logger('Alexa-API: Restart');
 	res.status(200).json({});
 		config.logger('Alexa-API: ******************************************************************');
-		config.logger('Alexa-API: *****************************ERROR détectée lors CRON*************');
+		config.logger('Alexa-API: *****************************Relance forcée du Serveur*************');
 		config.logger('Alexa-API: ******************************************************************');
 	startServer();
 	

@@ -263,6 +263,21 @@ class alexaapi extends eqLogic {
 			}
 		}
 		
+		
+		
+		// boucle Test checkAuth
+		$autorefreshC = '*/6 * * * *';
+
+		$c = new Cron\CronExpression($autorefreshC, new Cron\FieldFactory);
+		if ($c->isDue() && $deamon_info['state'] == 'ok') {
+		//log::add('alexaapi', 'debug', '---------------------------------------------autorefreshC -----------------------');
+		self::checkAuth();		
+		}		
+		
+		//log::add('alexaapi', 'debug', '---------------------------------------------boucle -----------------------');
+		
+		
+
 		// boucle refresh
 		$autorefreshR = '*/15 * * * *';
 
@@ -278,6 +293,20 @@ class alexaapi extends eqLogic {
 			}			
 		}
 						//log::add('alexaapi', 'debug', '---------------------------------------------FIN CRON------------------------');
+	}
+
+	public static function checkAuth() {
+				$result = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/checkAuth");
+				$resultjson = json_decode($result, true);
+				$value = $resultjson['authenticated'];	
+		if ($value==1)	
+			log::add('alexaapi', 'debug', 'Résultat du checkAuth  OK ('.$value.')');
+		else
+		{
+			log::add('alexaapi', 'debug', 'Résultat du checkAuth NOK ('.$value.') ==> Relance Serveur');
+			self::restartServeurPHP();
+			message::add('alexaapi', '(Beta Alexa-api) Authentification Amazon revalidée, tout va bien');
+		}
 	}
 
 	public static function restartServeurPHP() {
@@ -369,6 +398,7 @@ class alexaapi extends eqLogic {
 		return true;
 	}
 
+
 	/*     * *********************Methode d'instance************************* */
 	public function refresh($_routines=true) { //$_routines c'est pour éviter de charger les routines lors du scan
 	//log::add('alexaapi', 'debug', '-----Lancement refresh1---**-----');
@@ -428,8 +458,7 @@ class alexaapi extends eqLogic {
 		
 			
 	}
-
-
+		
 	public function test2060() {
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') {
