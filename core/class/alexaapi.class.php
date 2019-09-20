@@ -265,16 +265,16 @@ class alexaapi extends eqLogic {
 		
 		
 		
-		// boucle Test checkAuth
-		$autorefreshC = '*/6 * * * *';
+		/* 
+		boucle Test checkAuth ==> basculé dans le cron des routines dessous
+		$autorefreshC = '*6 * * * *'; caractère / supprimé
 
 		$c = new Cron\CronExpression($autorefreshC, new Cron\FieldFactory);
 		if ($c->isDue() && $deamon_info['state'] == 'ok') {
-		//log::add('alexaapi', 'debug', '---------------------------------------------autorefreshC -----------------------');
 		self::checkAuth();		
-		}		
+		}	
+		*/	
 		
-		//log::add('alexaapi', 'debug', '---------------------------------------------boucle -----------------------');
 		
 		
 
@@ -290,8 +290,10 @@ class alexaapi extends eqLogic {
 				$alexaapi->refresh($premierdelaboucle); 				
 				if ($premierdelaboucle) $premierdelaboucle=false;
 				sleep(2);
-			}			
+			}	
+		self::checkAuth();		
 		}
+		
 						//log::add('alexaapi', 'debug', '---------------------------------------------FIN CRON------------------------');
 	}
 
