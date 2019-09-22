@@ -263,6 +263,21 @@ class alexaapi extends eqLogic {
 			}
 		}
 		
+		
+		
+		/* 
+		boucle Test checkAuth ==> basculé dans le cron des routines dessous
+		$autorefreshC = '*6 * * * *'; caractère / supprimé
+
+		$c = new Cron\CronExpression($autorefreshC, new Cron\FieldFactory);
+		if ($c->isDue() && $deamon_info['state'] == 'ok') {
+		self::checkAuth();		
+		}	
+		*/	
+		
+		
+		
+
 		// boucle refresh
 		$autorefreshR = '*/15 * * * *';
 
@@ -275,9 +290,25 @@ class alexaapi extends eqLogic {
 				$alexaapi->refresh($premierdelaboucle); 				
 				if ($premierdelaboucle) $premierdelaboucle=false;
 				sleep(2);
-			}			
+			}	
+		self::checkAuth();		
 		}
+		
 						//log::add('alexaapi', 'debug', '---------------------------------------------FIN CRON------------------------');
+	}
+
+	public static function checkAuth() {
+				$result = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/checkAuth");
+				$resultjson = json_decode($result, true);
+				$value = $resultjson['authenticated'];	
+		if ($value==1)	
+			log::add('alexaapi', 'debug', 'Résultat du checkAuth  OK ('.$value.')');
+		else
+		{
+			log::add('alexaapi', 'debug', 'Résultat du checkAuth NOK ('.$value.') ==> Relance Serveur');
+			self::restartServeurPHP();
+			message::add('alexaapi', '(Beta Alexa-api) Authentification Amazon revalidée, tout va bien');
+		}
 	}
 
 	public static function restartServeurPHP() {
@@ -369,6 +400,7 @@ class alexaapi extends eqLogic {
 		return true;
 	}
 
+
 	/*     * *********************Methode d'instance************************* */
 	public function refresh($_routines=true) { //$_routines c'est pour éviter de charger les routines lors du scan
 	//log::add('alexaapi', 'debug', '-----Lancement refresh1---**-----');
@@ -428,8 +460,7 @@ class alexaapi extends eqLogic {
 		
 			
 	}
-
-
+		
 	public function test2060() {
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') {
@@ -1104,7 +1135,14 @@ class alexaapiCmd extends cmd {
 
 		if ($_options['volume'] == "" && $_options['slider'] == "") $_options['volume'] = "50";
 
-		return str_replace(array('#station#', '#volume#'), array(urlencode($_options['station']), isset($_options['volume']) ? $_options['volume'] : $_options['slider']), $request);
+		return str_replace(
+			array(
+				'#station#',
+				'#volume#'),
+			array(
+				isset($_options['select']) ? urlencode($_options['select']) : urlencode($_options['station']),
+				isset($_options['volume']) ? $_options['volume'] : $_options['slider']),
+			$request);
 	}
 
 	private function buildSpeakRequest($_options = array()) {
