@@ -379,8 +379,8 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
 -->
 <?php
 
-	if ($eqLogic->getConfiguration('devicetype')!="Smarthome")
-	{
+	//if ($eqLogic->getConfiguration('devicetype')!="Smarthome")
+	//{
 ?>		
           <div class="col-sm-5">
             <form class="form-horizontal">
@@ -430,11 +430,11 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
           </div>
 		  
 <?php
-	}
+	/*}
 	else
 	{
 		echo "coucou";
-	}
+	}*/
 ?>		  
 		  
 		  
