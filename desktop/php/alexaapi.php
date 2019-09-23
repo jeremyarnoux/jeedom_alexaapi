@@ -75,10 +75,19 @@ var logicalIdToHumanReadable = <?php echo json_encode($logicalIdToHumanReadable)
 
 function printEqLogic(data)
 {
+	
+  //if (data.configuration.family === undefined)
+  //{
+//	 $('#family').hide(); //ajouté, masque Famille si c'est vide
+ // }	
+  
+	// Traitement de Multiroom sur les infos du device
   $('#multiroom-members').empty();
   if (data.configuration.members === undefined)
   {
-     $('#multiroom-members').append('Configuration incomplete.');
+     //$('#multiroom-members').append('Configuration incomplete.'); //supprimé
+	 $('#multiroom-members').parent().hide(); //ajouté
+
      return;
   }
   if (data.configuration.members.length === 0)
@@ -204,6 +213,8 @@ endif;
 foreach ($eqLogics as $eqLogic)
 {
 	
+	if ($eqLogic->getConfiguration('devicetype')!="Smarthome")
+	{	
 	
 	
 	
@@ -230,10 +241,49 @@ $alternateImg = $eqLogic->getConfiguration('type');
     echo '<span  class="name"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
 	
 	echo '</div>';
+	}
 }
 ?>
     </div>
-  </div>
+    <!-- Début de la liste des objets -->
+    <legend><i class="fa fa-table"></i> {{Mes Amazon Smarthome}}</legend>
+    <!-- Container de la liste -->
+    <div class="eqLogicThumbnailContainer">
+<?php
+foreach ($eqLogics as $eqLogic)
+{
+	if ($eqLogic->getConfiguration('devicetype')=="Smarthome")
+	{
+	
+	
+	
+    $opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
+    echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
+	
+	if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps"))) 
+		echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
+	
+	
+//$alternateImg = $knownDeviceType[$eqLogic->getConfiguration('type')]['icon'];
+$alternateImg = $eqLogic->getConfiguration('type');
+    echo '<center>';
+    if (file_exists(dirname(__FILE__) . '/../../core/config/devices/' . $alternateImg . '.png'))
+        echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/' . $alternateImg . '.png" height="105" width="105" />';
+    elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
+        echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" height="105" width="105" />';
+    elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/default.png'))
+        echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" height="105" width="105" />';
+    else
+        echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="105" />';
+
+    echo '</center>';
+    echo '<span  class="name"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
+	
+	echo '</div>';
+	}
+}
+?>
+    </div>  </div>
   <!-- Container du panneau de contrôle -->
   <div class="col-lg-10 col-md-9 col-sm-8 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
     <!-- Bouton sauvegarder -->
@@ -327,8 +377,11 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
 <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Test}}</center></span>
 </div>
 -->
+<?php
 
-	  
+	if ($eqLogic->getConfiguration('devicetype')!="Smarthome")
+	{
+?>		
           <div class="col-sm-5">
             <form class="form-horizontal">
               <fieldset>
@@ -344,14 +397,14 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
                       <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="type"></span>
                   </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="family">
                   <label class="col-sm-2 control-label">{{Famille}}</label>
                   <div class="col-sm-8">
                       <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="family"></span>
                   </div>
                 </div>                <!-- Onglet "Image" -->
 		<div class="form-group">
-                  <label class="col-sm-2 control-label">{{Capacités}}</label>
+                  <label class="col-sm-2 control-label">{{Fonctionnalités}}</label>
                   <div class="col-sm-8">
                       <span style="position:relative;top:+5px;left:+5px;font-size: 10px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="capabilities"></span>
                   </div>		      
@@ -375,6 +428,25 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
               </fieldset>
             </form>
           </div>
+		  
+<?php
+	}
+	else
+	{
+		echo "coucou";
+	}
+?>		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
+		  
         </div>
       </div>
 

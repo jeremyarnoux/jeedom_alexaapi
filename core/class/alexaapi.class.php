@@ -325,6 +325,8 @@ class alexaapi extends eqLogic {
 			return;
 		}
 
+// --- Mise à jour des Amazon Echo
+
 		event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
 		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
 		$json = json_decode($json, true);
@@ -345,14 +347,54 @@ class alexaapi extends eqLogic {
 			// Update device configuration
 			$device->setConfiguration('device', $item['name']);
 			$device->setConfiguration('type', $item['type']);
+			$device->setConfiguration('devicetype', "Echo");
 			$device->setConfiguration('family', $item['family']);
 			$device->setConfiguration('members', $item['members']);
 			$device->setConfiguration('capabilities', $item['capabilities']);
 			$device->setStatus('online', (($item['online'])?true:false));
 			$device->save();
 
+
 			$numDevices++;
 		}
+		
+// --- Mise à jour des SmartHome Devices
+		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeEntities");
+		$json = json_decode($json, true);
+		foreach ($json as $item) {
+
+
+			// Retireve the device (if already registered in Jeedom)
+			$device = alexaapi::byLogicalId($item['id'], 'alexaapi');
+			if (!is_object($device)) {
+				$device = self::createNewDevice($item['displayName'], $item['id']);
+				$numNewDevices++;
+			}
+			
+			
+
+	//log::add('alexaapi', 'debug', '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'.json_encode($item['providerData']).'<<<<<<<<<<<<<<<<<<<');
+			// Update device configuration
+			$device->setConfiguration('device', $item['displayName']);
+			//$device->setConfiguration('type', $item['description']); a voir si on utilise ou pas descriotion
+			$device->setConfiguration('type', $item['providerData']['deviceType']);
+			$device->setConfiguration('devicetype', "Smarthome");
+			$device->setConfiguration('family', $item['providerData']['categoryType']);
+			//$device->setConfiguration('members', $item['members']);
+			$device->setConfiguration('capabilities', $item['supportedProperties']);
+			//On va mettre dispo, on traite plus tard.
+			//$device->setStatus('online', (($item['online'])?true:false));
+			$device->setStatus('online', 'true');
+			$device->save();
+
+			$numDevices++;
+		}
+
+
+
+
+
+
 		
 		// A voir s'il faut ou pas actualiser les routines ici apres le scan (cela se fera au premier refresh)
 
@@ -376,9 +418,15 @@ class alexaapi extends eqLogic {
 
 	public function hasCapa($thisCapa) {
 		$capa=$this->getConfiguration('capabilities',"");
-		$type=$this->getConfiguration('type',"");
+		$type=$this->getConfiguration('type',"");		
+		
+		
+	//	log::add('alexaapi', 'debug', 'capabilitiesarray : '.$thisCapa.'/'.json_encode($capa));
+
+
 		//log::add('alexaapi', 'debug', 'capabilities : '.json_encode($capa));
-		if(((gettype($capa) == "array" && array_search($thisCapa,$capa))) || ((gettype($capa) == "string" && strpos($capa, $thisCapa) !== false))) {
+//		if(((gettype($capa) == "array" && array_search($thisCapa,$capa))) || ((gettype($capa) == "string" && strpos($capa, $thisCapa) !== false))) {
+		if(((gettype($capa) == "array" && in_array($thisCapa,$capa))) || ((gettype($capa) == "string" && strpos($capa, $thisCapa) !== false))) {
 			if($thisCapa == "REMINDERS" && $type == "A15ERDAKK5HQQG") return false;
 			return true;
 		} else {
@@ -586,7 +634,51 @@ class alexaapi extends eqLogic {
 						$cmd->remove();
 					}
 				}
-			
+// SmartHome
+
+			if ($this->hasCapa("turnOff")) { 
+				$cmd = $this->getCmd(null, 'turnOff');
+				if (!is_object($cmd)) {
+					$cmd = new alexaapiCmd();
+					$cmd->setType('action');
+					$cmd->setLogicalId('turnOff');
+					$cmd->setSubType('message');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setName('turnOff');
+					$cmd->setConfiguration('request', 'SmarthomeCommand?command=turnOff');
+					$cmd->setDisplay('title_disable', 1);
+					$cmd->setDisplay('icon', '<i class="fa jeedomapp-audiospeak"></i>');
+					$cmd->setIsVisible(1);
+				}
+				$cmd->save();
+			} else {
+					$cmd = $this->getCmd(null, 'turnOff');
+					if (is_object($cmd)) {
+						$cmd->remove();
+					}
+				}
+				
+			if ($this->hasCapa("turnOn")) { 
+				$cmd = $this->getCmd(null, 'turnOn');
+				if (!is_object($cmd)) {
+					$cmd = new alexaapiCmd();
+					$cmd->setType('action');
+					$cmd->setLogicalId('turnOn');
+					$cmd->setSubType('message');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setName('turnOn');
+					$cmd->setConfiguration('request', 'SmarthomeCommand?command=turnOn');
+					$cmd->setDisplay('title_disable', 1);
+					$cmd->setDisplay('icon', '<i class="fa jeedomapp-audiospeak"></i>');
+					$cmd->setIsVisible(1);
+				}
+				$cmd->save();
+			} else {
+					$cmd = $this->getCmd(null, 'turnOn');
+					if (is_object($cmd)) {
+						$cmd->remove();
+					}
+				}			
 			
 			//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
 			if ($this->hasCapa("AUDIO_PLAYER")) { 
@@ -1074,6 +1166,9 @@ class alexaapiCmd extends cmd {
 			case 'radio':
 				$request = $this->buildRadioRequest($_options);
 			break;
+			case 'SmarthomeCommand':
+				$request = $this->buildSmarthomeCommandRequest($_options);
+			break;			
 			case 'command':
 				$request = $this->buildCommandRequest($_options);
 			break;
@@ -1101,9 +1196,9 @@ class alexaapiCmd extends cmd {
 				$request = '';
 			break;
 		}
-		//log::add('alexaapi', 'debug', 'buildRequest : suite2/'.$request);
+		log::add('alexaapi', 'debug', 'buildRequest : suite2/'.$request);
 		$request = scenarioExpression::setTags($request);
-		//log::add('alexaapi', 'debug', 'buildRequest : suite3');
+		log::add('alexaapi', 'debug', 'buildRequest : suite3');
 
 		if (trim($request) == '') throw new Exception(__('Commande inconnue ou requête vide : ', __FILE__) . print_r($this, true));
 
@@ -1123,9 +1218,15 @@ class alexaapiCmd extends cmd {
 	private function buildRestartRequest($_options = array()) {
 		log::add('alexaapi', 'debug', 'buildRestartRequest');
 		$request = $this->getConfiguration('request')."?truc=vide";
-
 		return str_replace('#volume#', $_options['slider'], $request);
 	}
+	
+	private function buildSmarthomeCommandRequest($_options = array()) {
+		log::add('alexaapi', 'debug', 'buildSmarthomeCommandRequest');
+		$request = $this->getConfiguration('request');
+		return $request;
+	}	
+	
 	private function buildRadioRequest($_options = array()) {
 		log::add('alexaapi', 'debug', 'buildRadioRequest');
 		$request = $this->getConfiguration('request');

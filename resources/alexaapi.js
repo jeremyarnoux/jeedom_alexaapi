@@ -206,6 +206,38 @@ CommandAlexa.Command = function(req,res){
 	res.status(200).json({value: "Send"});	//ne teste pas le résultat
 }
 
+/***** Alexa.SmarthomeCommand *****
+  URL: /SmarthomeCommand?device=?&command=?
+    device - String - name of the device
+    command - String - command : pause|play|next|prev|fwd|rwd|shuffle|repeat
+*/
+CommandAlexa.SmarthomeCommand = function(req,res){
+	
+		res.type('json');
+
+	config.logger('Alexa-API:    Lancement /SmarthomeCommand avec paramètres -> device: ' + req.query.device+' & command: ' + req.query.command);
+
+	if ('device' in req.query === false)  return res.status(500).json(error(500, req.route.path, 'Alexa.SmarthomeCommand', 'Missing parameter "device"'));
+	if ('command' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.SmarthomeCommand', 'Missing parameter "command"'));
+
+						parameters = {};
+						parameters.action = 'turnOn'; // Même opération mais d'une autre manière
+						parameters.action = 'turnOff'; // Même opération mais d'une autre manière
+						parameters.action = req.query.command; 
+						if (req.query.entityType=='')
+							req.query.entityType="APPLIANCE";
+							
+    //executeSmarthomeDeviceAction(entityIds, parameters, entityType, callback) {
+		
+    alexa.executeSmarthomeDeviceAction(req.query.device, parameters, req.query.entityType,
+				function(testErreur){
+					if (testErreur) traiteErreur(testErreur);
+				}
+			);
+	res.status(200).json({value: "Send"});	//ne teste pas le résultat
+
+}
+
 
 
 // Les boucles qui lancent les commandes sur chaques device d'un multiroom
@@ -339,6 +371,7 @@ CommandAlexa.enableReminder = function(req,res){
 */
 app.get('/checkAuth', CommandAlexa.checkAuth);
 app.get('/command', CommandAlexa.Command);
+app.get('/SmarthomeCommand', CommandAlexa.SmarthomeCommand);
 app.get('/volume', CommandAlexa.Volume);
 app.get('/speak', CommandAlexa.Speak);
 app.get('/radio', CommandAlexa.Radio);

@@ -68,6 +68,7 @@ $('#bt_routines').off('click').on('click', function ()
 
 $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').on('change', function ()
 {
+	// Ici il faudra faire comme dans desktop/php/alexaapi.php ligne 268 chercher type et à défaut family
 	$icon = $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value();
 	if($icon != '' && $icon != null)
 		$('#img_device').attr("src", 'plugins/alexaapi/core/config/devices/' + $icon + '.png');

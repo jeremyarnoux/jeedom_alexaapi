@@ -1953,6 +1953,11 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
         };
         this.httpsGet (`/api/phoenix/state`, callback, flags);
         /*
+		
+data={"behaviorId":"PREVIEW","sequenceJson":"{\"@type\":\"com.amazon.alexa.behaviors.model.Sequence\",\"startNode\":{\"@type\":\"com.amazon.alexa.behaviors.model.OpaquePayloadOperationNode\",\"operationPayload\":{\"deviceType\":\"A3S5BH2HU6VAYF\",\"deviceSerialNumber\":\"G090LF118173117U\",\"locale\":\"fr-FR\",\"customerId\":\"A1P3694S7PYD78\",\"value\":50},\"type\":\"Alexa.DeviceControls.Volume\"}}","status":"ENABLED"}
+
+{"controlRequests":[{"entityId":"c9bad1e0-2be1-4c82-a469-fb55211c5d84","entityType":"APPLIANCE","parameters":[{"action":"turnOn"}]}]}
+{"controlRequests":[{"entityId":"c9bad1e0-2be1-4c82-a469-fb55211c5d84","entityType":"APPLIANCE","parameters":{"action":"turnOn"}}]}
         {
             'controlRequests': [
                 {
