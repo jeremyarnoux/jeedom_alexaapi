@@ -265,7 +265,6 @@ class alexaapi extends eqLogic {
 		
 		
 		
-		
 		/* boucle Test checkAuth ==> basculé dans le cron des routines dessous*/
 		$autorefreshC = '*/6 * * * *'; //caractère / supprimé
 
@@ -274,6 +273,13 @@ class alexaapi extends eqLogic {
 		self::checkAuth();		
 		}	
 			
+		/* boucle qui relance la connexion au serveur*/
+		$autorefreshRR = config::byKey('autorefresh', 'alexaapi', '33 3 * * *');
+
+		$c = new Cron\CronExpression($autorefreshRR, new Cron\FieldFactory);
+		if ($c->isDue() && $deamon_info['state'] == 'ok') {
+		self::restartServeurPHP();		
+		}
 		
 		
 		
@@ -291,7 +297,6 @@ class alexaapi extends eqLogic {
 				if ($premierdelaboucle) $premierdelaboucle=false;
 				sleep(2);
 			}	
-		//self::checkAuth();		
 		}
 		
 						//log::add('alexaapi', 'debug', '---------------------------------------------FIN CRON------------------------');
@@ -1196,9 +1201,9 @@ class alexaapiCmd extends cmd {
 				$request = '';
 			break;
 		}
-		log::add('alexaapi', 'debug', 'buildRequest : suite2/'.$request);
+		//log::add('alexaapi', 'debug', 'buildRequest : suite2/'.$request);
 		$request = scenarioExpression::setTags($request);
-		log::add('alexaapi', 'debug', 'buildRequest : suite3');
+		//log::add('alexaapi', 'debug', 'buildRequest : suite3');
 
 		if (trim($request) == '') throw new Exception(__('Commande inconnue ou requête vide : ', __FILE__) . print_r($this, true));
 

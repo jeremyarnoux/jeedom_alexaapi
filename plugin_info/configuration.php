@@ -47,6 +47,9 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 		<a class="btn btn-danger btn-sm" id="bt_reinstallNodeJS"><i class="fa fa-recycle"></i> {{Réparation de NodeJS}} </a>
 	</center>
 
+
+
+
 <form class="form-horizontal">
     <fieldset>
     <legend><i class="icon nature-planet5"></i> {{Options internationales}}</legend>
@@ -76,6 +79,26 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
        </div>
 	</div>
    </fieldset>
+</form>
+
+
+<form class="form-horizontal">
+    <fieldset>
+    <legend><i class="icon nature-planet5"></i> {{Option Lien serveur}}</legend>
+
+	<div class="form-group">
+			<label class="col-sm-4 control-label">{{Relance de l'identification au serveur}}</label>
+				<div class="col-lg-2">
+					<div class="input-group">
+					<input type="text" class="configKey form-control" data-l1key="autorefresh" placeholder="33 3 * * *"/>
+					<span class="input-group-btn">
+					<a class="btn btn-success btn-sm " id="bt_cronGenerator" ><i class="fas fa-question-circle"></i></a>
+					</span>
+					</div>
+				</div>
+			</div>
+</div>
+</fieldset>
 </form>
 
 

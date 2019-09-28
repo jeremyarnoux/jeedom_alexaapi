@@ -15,6 +15,12 @@
 
 */
 
+$('#bt_cronGenerator').off('click').on('click',function(){
+    jeedom.getCronSelectModal({},function (result) {
+        $('.configKey[data-l1key=autorefresh]').value(result.value);
+    });
+});
+
 $("#bt_addespeasyAction").off('click').on('click', function(event)
 {
   var _cmd = {type: 'action'};
