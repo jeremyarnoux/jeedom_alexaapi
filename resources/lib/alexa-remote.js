@@ -515,11 +515,45 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
 
 
     httpsGetCall(path, callback, flags = {}) {
+		
+var host=this.baseUrl;
+var pathQuery=null;
+var methodQuery=null;
+var timeout=10000;
+var flagsQuery= {};
+		
+if (path.startsWith('{')) // Pour détecter le requeteur
+	{
+	this._options.logger && this._options.logger('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+const query = JSON.parse(path);
+if (query.host!= null) host=query.host;
+if (query.path!= null) path=query.path;
+if (query.method!= null) methodQuery=query.method;
+if (query.timeout!= null) timeout=query.timeout;
+
+//this._options.logger && this._options.logger(flags.behaviorId); 
+
+//this._options.logger && this._options.logger(flags.sequenceJson); 
+
+flagsQuery["method"]="POST";
+flagsQuery["data"]=flags;
+//this._options.logger && this._options.logger(JSON.stringify(flags)); 
+flags=	flagsQuery;
+//this._options.logger && this._options.logger(JSON.stringify(flags)); 
+	this._options.logger && this._options.logger('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+	}
+
+//		console.log ("*************************== Données recues ==*****************************************");
+//		console.log (flags);
+//		console.log ("****************************************************************************************");
+
+//this._options.logger && this._options.logger("FLAGS:"+JSON.stringify(flags)); 
+		
         let options = {
-            host: this.baseUrl,
+            host: host,
             path: '',
             method: 'GET',
-            timeout: 10000,
+            timeout: timeout,
             headers: {
                 'User-Agent' : this._options.userAgent,
                 'Content-Type': 'application/json; charset=UTF-8',
@@ -539,7 +573,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
             options.host = ar[1];
             path = ar[2];
         } else {
-            options.host = this.baseUrl;
+            options.host = host;
         }
         let time = new Date().getTime();
         path = path.replace(/%t/g, time);
@@ -547,8 +581,12 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
         options.path = path;
         options.method = flags.method? flags.method : flags.data ? 'POST' : 'GET';
 
+if (methodQuery!= null) options.method=methodQuery;
+
         if (flags.headers) Object.keys(flags.headers).forEach(n => {
             options.headers [n] = flags.headers[n];
+	this._options.logger && this._options.logger("----------------->>>>>>>>>"+flags.headers[n]); 	
+		
         });
 
         const logOptions = JSON.parse(JSON.stringify(options));
@@ -558,9 +596,36 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
         delete logOptions.headers['Content-Type'];
         delete logOptions.headers.Referer;
         delete logOptions.headers.Origin;
-        this._options.logger && this._options.logger('Alexa-Remote: Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? 'and data=' + flags.data : ''));
+	
+/*const obj = JSON.parse(JSON.stringify(options));
+
+
+this._options.logger && this._options.logger(obj.path); 
+this._options.logger && this._options.logger(obj.method); 
+this._options.logger && this._options.logger(obj.timeout); 	
+this._options.logger && this._options.logger(obj.headers); 	
+	*/
+	
+	
+	
+        this._options.logger && this._options.logger('Alexa-Remote: Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? ' and data=' + flags.data : ''));
+//	}	
+	    //this._options.logger && this._options.logger('Alexa-Remote: >>>>> ' + JSON.stringify(options)+"<<<<" );
+	    //this._options.logger && this._options.logger('Alexa-Remote: >>>>> ' + options+"<<<<" );
+/*		console.log ("*************************== Trame envoyée ==********************************************");
+		console.log (options);
+		console.log ("****************************************************************************************");
+		console.log ("*************************== Données envoyées ==*****************************************");
+		console.log (flags);
+		console.log ("****************************************************************************************");
+	    //this._options.logger && this._options.logger('Alexa-Remote: data >>>>> ' + JSON.stringify(flags.data) );
+	
+	*/	
+		
+		
+		
 		let req = https.request(options, (res) => {
-        //console.log(res+"FIN de RES");
+        //console.log(JSON.stringify(res)+"FIN de RES");
             let body  = '';
         //this._options.logger && this._options.logger('DEBUG1');
 		
@@ -570,11 +635,11 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
 //if (flags.data !=undefined) body="Unauthorized";
 
 
-			this._options.logger && this._options.logger('>>> DEBUG res.statusCode: '+res.statusCode);
-			this._options.logger && this._options.logger('>>> DEBUG res.statusMessage: '+res.statusMessage);
-			this._options.logger && this._options.logger('>>> DEBUG res.httpVersion: '+res.httpVersion);
-			this._options.logger && this._options.logger('>>> DEBUG res.headers: '+JSON.stringify(res.headers));
-			//this._options.logger && this._options.logger('>>> DEBUG res.rawHeaders : '+res.rawHeaders);
+			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusCode: '+res.statusCode);
+			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusMessage: '+res.statusMessage);
+			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.httpVersion: '+res.httpVersion);
+			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.headers: '+JSON.stringify(res.headers));
+			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.rawHeaders : '+res.rawHeaders);
 			var resstatusMessage=res.statusMessage;
 			var resstatusCode=res.statusCode;
 
@@ -583,7 +648,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
 
             res.on('data', (chunk) => {
                 body += chunk;
-				this._options.logger && this._options.logger('>>> DEBUG chunk: '+body);
+				this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  chunk: '+body);
             });
 
             res.on('end', () =>

@@ -100,6 +100,26 @@ function LancementCommande(commande, req)
 
 }
 
+CommandAlexa.query = function(req,res){
+	
+	res.type('json');
+	
+	//config.logger('Alexa-API:    Lancement /query');
+	config.logger('VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
+	config.logger('VVVVVVVVVVVVVVVVVVVVVVVV--- R E Q U E T E U R ---VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
+	config.logger('VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
+	config.logger('Send Request with '+decodeURIComponent(req.query.query));
+	config.logger('and data='+decodeURIComponent(req.query.data));
+	config.logger('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+
+	alexa.httpsGetCall(decodeURIComponent(req.query.query), function(err) {
+		if (err)
+			return res.status(500).json(error(500, req.route.path, 'Requeteur', err));
+		res.status(200).json({});
+	}, decodeURIComponent(req.query.data));
+	
+	
+}
 
 /***** checkAuth *****
   URL: /checkAuth
@@ -182,9 +202,26 @@ CommandAlexa.Volume = function(req,res){
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "device"'));
 	if ('value' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "value"'));
 	
-	boucleSurSerials_sendSequenceCommand(req, 'volume');
+	// Suppression de la boucle des serial, en effet, si on envoi sur un groupe, le volume est bien changé sur tous les équipements du groupe
+	//boucleSurSerials_sendSequenceCommand(req, 'volume');
+	//resultatEnvoi=  forEachDevices(req.query.device, (serial) => {
+			
+			alexa.sendSequenceCommand(req.query.device, 'volume', req.query.value, 
+				function(testErreur){
+						if (testErreur) 
+						{traiteErreur(testErreur);
+						res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', testErreur.message));
+						}
+						else
+						res.status(200).json({value: "OK"});	//ne teste pas le résultat
+					}
+			);
+		//});	
 	
-	res.status(200).json({value: "Send"});	//ne teste pas le résultat
+
+	
+	
+	
 }
 
 /***** Alexa.Command *****
@@ -370,6 +407,7 @@ CommandAlexa.enableReminder = function(req,res){
 }
 */
 app.get('/checkAuth', CommandAlexa.checkAuth);
+app.get('/query', CommandAlexa.query);
 app.get('/command', CommandAlexa.Command);
 app.get('/SmarthomeCommand', CommandAlexa.SmarthomeCommand);
 app.get('/volume', CommandAlexa.Volume);

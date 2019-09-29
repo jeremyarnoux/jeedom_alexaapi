@@ -15,6 +15,35 @@
 
 */
 
+$('#bt_Lancer').off('click').on('click',function(){
+var tempo=0;
+if(requeteremotevidecache.checked) 
+	{
+		tempo=2000;
+		jeedom.log.clear({
+		log : log_display_name,
+	});
+	}
+
+setTimeout("envoiQuery(requeteremote.value, requetedata.value)", tempo);
+
+    
+//console.log ("fini");
+});
+
+function envoiQuery(query, data) {
+	//if (query=='') query='{"host":"alexa.amazon.fr","path":"/api/bootstrap?version=0","method":"GET","timeout":10000,"headers":{}}';
+	if (query=='') query='{"host":"alexa.amazon.fr","path":"/api/behaviors/preview","method":"POST","timeout":12345,"headers":{}}';
+	if (data=='') data='{"behaviorId":"PREVIEW","sequenceJson":"{\"@type\":\"com.amazon.alexa.behaviors.model.Sequence\",\"startNode\":{\"@type\":\"com.amazon.alexa.behaviors.model.OpaquePayloadOperationNode\",\"operationPayload\":{\"deviceType\":\"A3S5BH2HU6VAYF\",\"deviceSerialNumber\":\"G090LF118173117U\",\"locale\":\"fr-FR\",\"customerId\":\"A1P3694S7PYD78\",\"value\":50},\"type\":\"Alexa.DeviceControls.Volume\"}}","status":"ENABLED"}';
+var yourUrl = "http://192.168.0.21:3456/query?query="+encodeURIComponent(query)+"&data="+encodeURIComponent(data);
+    var http = new XMLHttpRequest();
+console.log ("adresse:"+yourUrl);
+    http.open('GET', yourUrl, true);
+    http.send(); 
+}
+
+
+
 $('#bt_cronGenerator').off('click').on('click',function(){
     jeedom.getCronSelectModal({},function (result) {
         $('.configKey[data-l1key=autorefresh]').value(result.value);
@@ -37,11 +66,15 @@ $('#bt_media').off('click').on('click', function ()
   $('#md_modal').dialog({title: "{{Info Media}}"});
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=media&iddevice='+ $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
 });
-
 $('#bt_req').off('click').on('click', function ()
 {
-  $('#md_modal').dialog({title: "{{Requêteur}}"});
+  $('#md_modal').dialog({title: "{{Requêteur JSON}}"});
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=req&iddevice='+ $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
+});
+$('#bt_req2').off('click').on('click', function ()
+{
+  $('#md_modal').dialog({title: "{{Requêteur}}"});
+  $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=req2&iddevice='+ $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
 });
 $('#bt_sante').off('click').on('click', function ()
 {
