@@ -80,9 +80,12 @@ class alexaapi extends eqLogic {
 		      $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
 		}
 		*/
-		//    $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/Alexa-Remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
-		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ' . config::byKey('internalAddr') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr');
+		   // $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/Alexa-Remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
+		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ' . config::byKey('internalAddr') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr').' '.jeedom::getApiKey('alexaapi');
+//network::getNetworkAccess('internal') . '/plugins/blea/core/php/jeeBlea.php';
+
 		log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
+
 		$result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
 		if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
 			log::add('alexaapi', 'error', $result);
@@ -960,6 +963,62 @@ class alexaapi extends eqLogic {
 					$cmd->remove();
 				}
 			}
+			
+			if ($this->hasCapa("VOLUME_SETTING")) { 
+
+				// Volume command
+				$cmd = $this->getCmd(null, 'volumeinfo');
+				if (!is_object($cmd)) {
+					$cmd = new alexaapiCmd();
+					$cmd->setType('info');
+					$cmd->setLogicalId('volumeinfo');
+					$cmd->setSubType('string');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setName('VolumeInfo');
+					$cmd->setConfiguration('minValue', '0');
+					$cmd->setConfiguration('maxValue', '100');
+					$cmd->setIsVisible(1);
+					$cmd->setDisplay('icon', '<i class="fa fa-volume-up"></i>');
+				}
+				$cmd->save();
+			} else {
+				$cmd = $this->getCmd(null, 'volumeinfo');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+			}			
+			
+			
+			
+			
+			
+			if ($this->hasCapa("ALEXA_PRESENCE")) { 
+			
+				// Dernière Intéraction
+				$cmd = $this->getCmd(null, 'interactioninfo');
+				if (!is_object($cmd)) {
+					$cmd = new alexaapiCmd();
+					$cmd->setType('info');
+					$cmd->setLogicalId('interactioninfo');
+					$cmd->setSubType('string');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setName('InteractionInfo');
+					$cmd->setIsVisible(1);
+					$cmd->setDisplay('icon', '<i class="fa jeedomapp-audiospeak"></i>');
+					}
+				$cmd->save();
+			} else {
+				$cmd = $this->getCmd(null, 'interactioninfo');
+				if (is_object($cmd)) {
+					$cmd->remove();
+				}
+			}			
+	
+			
+			
+			
+			
+			
 		} else {
 			log::add('alexaapi', 'warning', 'Pas de capacité détectée, assurez-vous que le démon est OK');
 		}

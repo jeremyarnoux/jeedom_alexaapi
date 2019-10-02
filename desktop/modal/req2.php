@@ -21,11 +21,12 @@ if (!isConnect('admin')) {
 //sendVarToJS('log_display_name', init('log', 'event'));
 sendVarToJS('log_display_name', "alexaapi_node");
 sendVarToJS('log_default_search', init('search', ''));
+/*
 if(init('log','event') == 'event'){
 	if(log::getLogLevel('event') > 200){
 		echo '<div class="alert alert-danger">{{Attention votre niveau de log (event) est inférieure à info, vous ne pouvez donc pas voir de temps réel}}</div>';
 	}
-}
+}*/ 
 ?>
 
 <textarea class="form-control marketAttr" id="requeteremote" placeholder='{"host":"alexa.amazon.fr","path":"/api/bootstrap?version=0","method":"GET","timeout":10000,"headers":{}}

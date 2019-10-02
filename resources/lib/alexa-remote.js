@@ -11,11 +11,17 @@ const https = require('https');
 const querystring = require('querystring');
 const os = require('os');
 const extend = require('extend');
-
-const EventEmitter = require('events');
+const request = require('request');
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
+
+// Pour WQTT
+const AlexaWsMqtt = require('./alexa-wsmqtt.js');
+//const uuidv1 = require('uuid/v1'); A VOIR
+
+
+const EventEmitter = require('events');
 
 function _00(val) {
     let s = val.toString();
@@ -39,6 +45,11 @@ class AlexaRemote extends EventEmitter {
 
         this.baseUrl = alexaserver; //alexa.amazon.fr
    }
+
+
+
+
+
 
     setCookie(_cookie)
     {
@@ -239,7 +250,9 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                         this.init(this._options, callback);
                     }, this._options.cookieRefreshInterval);
                 }
-                this.prepare(() => {
+					
+					this.prepare(() => {
+					//this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Test2'+this._options.useWsMqtt);                
                     if (this._options.useWsMqtt) {
                         this.initWsMqttConnection();
                     }
@@ -252,11 +265,11 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
 
     prepare(callback) {
         this.getAccount((err, result) => {
-			//this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: getAccount');
+			//this._options.logger && this._options.logger('888888888888888888888888888888888888Alexa-xxxxxxxxxxxxx: getAccount');
             if (!err && result && Array.isArray(result)) {
                 result.forEach ((account) => {
                     if (!this.commsId) this.commsId = account.commsId;
-					//this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: getAccount:'+account.commsId);
+					this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: getAccount:'+account.commsId);
                     //if (!this.directedId) this.directedId = account.directedId;
                 });
             }
@@ -433,11 +446,331 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
             callback && callback();
         }
     }
+	
+	// MQTT ajouté
+	
+	    initWsMqttConnection() {
+        if (this.alexaWsMqtt) {
+            this.alexaWsMqtt.removeAllListeners();
+            this.alexaWsMqtt.disconnect();
+            this.alexaWsMqtt = null;
+        }
+        this.alexaWsMqtt = new AlexaWsMqtt(this._options, this.cookie);
+        if (!this.alexaWsMqtt) return;
 
+        this.alexaWsMqtt.on('disconnect', (retries, msg) => {
+            this.emit('ws-disconnect', retries, msg);
+        });
+        this.alexaWsMqtt.on('error', (error) => {
+            this.emit('ws-error', error);
+        });
+        this.alexaWsMqtt.on('connect', () => {
+            this.emit('ws-connect');
+        });
+        this.alexaWsMqtt.on('unknown', (incomingMsg) => {
+            this.emit('ws-unknown-message', incomingMsg);
+        });
+        this.alexaWsMqtt.on('command', (command, payload) => {
+            switch(command) {
+                case 'PUSH_DOPPLER_CONNECTION_CHANGE':
+                    /*
+                    {
+                        'destinationUserId': 'A3NSX4MMJVG96V',
+                        'dopplerId': {
+                            'deviceSerialNumber': 'c6c113ab49ff498185aa1ee5eb50cd73',
+                            'deviceType': 'A3H674413M2EKB'
+                        },
+                        'dopplerConnectionState': 'OFFLINE' / 'ONLINE'
+                    }
+                    */
+                    this.httpPost('ws-device-connection-change', {
+                        destinationUserId: payload.destinationUserId,
+                        deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
+                        deviceType: payload.dopplerId.deviceType,
+                        connectionState: payload.dopplerConnectionState
+                    });
+                    return;
+                case 'PUSH_BLUETOOTH_STATE_CHANGE':
+                    /*
+                    {
+                        'destinationUserId': 'A3NSX4MMJVG96V',
+                        'dopplerId': {
+                            'deviceSerialNumber': 'G090LF09643202VS',
+                            'deviceType': 'A3S5BH2HU6VAYF'
+                        },
+                        'bluetoothEvent': 'DEVICE_DISCONNECTED',
+                        'bluetoothEventPayload': null,
+                        'bluetoothEventSuccess': false/true
+                    }
+                    */
+                    this.httpPost('ws-bluetooth-state-change', {
+                        destinationUserId: payload.destinationUserId,
+                        deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
+                        deviceType: payload.dopplerId.deviceType,
+                        bluetoothEvent: payload.bluetoothEvent,
+                        bluetoothEventPayload: payload.bluetoothEventPayload,
+                        bluetoothEventSuccess: payload.bluetoothEventSuccess
+                    });
+                    return;
+                case 'PUSH_AUDIO_PLAYER_STATE':
+                    /*
+                    {
+                        'destinationUserId': 'A3NSX4MMJVG96V',
+                        'mediaReferenceId': '2868373f-058d-464c-aac4-12e12aa58883:2',
+                        'dopplerId': {
+                            'deviceSerialNumber': 'G090LF09643202VS',
+                            'deviceType': 'A3S5BH2HU6VAYF'
+                        },
+                        'error': false,
+                        'audioPlayerState': 'INTERRUPTED', / 'FINISHED' / 'PLAYING'
+                        'errorMessage': null
+                    }
+                    */
+                    this.httpPost('ws-audio-player-state-change', {
+                        destinationUserId: payload.destinationUserId,
+                        deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
+                        deviceType: payload.dopplerId.deviceType,
+                        mediaReferenceId: payload.mediaReferenceId,
+                        audioPlayerState: payload.audioPlayerState, //  'INTERRUPTED', / 'FINISHED' / 'PLAYING'
+                        error: payload.error,
+                        errorMessage: payload.errorMessage
+                    });
+                    return;
+                case 'PUSH_MEDIA_QUEUE_CHANGE':
+                    /*
+                    {
+                        'destinationUserId': 'A3NSX4MMJVG96V',
+                        'changeType': 'NEW_QUEUE',
+                        'playBackOrder': null,
+                        'trackOrderChanged': false,
+                        'loopMode': null,
+                        'dopplerId': {
+                            'deviceSerialNumber': 'G090LF09643202VS',
+                            'deviceType': 'A3S5BH2HU6VAYF'
+                        }
+                    }
+                    */
+                    this.httpPost('ws-media-queue-change', {
+                        destinationUserId: payload.destinationUserId,
+                        deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
+                        deviceType: payload.dopplerId.deviceType,
+                        changeType: payload.changeType,
+                        playBackOrder: payload.playBackOrder,
+                        trackOrderChanged: payload.trackOrderChanged,
+                        loopMode: payload.loopMode
+                    });
+                    return;
+                case 'PUSH_MEDIA_CHANGE':
+                    /*
+                    {
+                        'destinationUserId': 'A3NT1OXG4QHVPX',
+                        'mediaReferenceId': '71c4d721-0e94-4b3e-b912-e1f27fcebba1:1',
+                        'dopplerId': {
+                            'deviceSerialNumber': 'G000JN0573370K82',
+                            'deviceType': 'A1NL4BVLQ4L3N3'
+                        }
+                    }
+                    */
+                    this.httpPost('ws-media-change', {
+                        destinationUserId: payload.destinationUserId,
+                        deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
+                        deviceType: payload.dopplerId.deviceType,
+                        mediaReferenceId: payload.mediaReferenceId
+                    });
+                    return;
+                case 'PUSH_MEDIA_PROGRESS_CHANGE':
+                    /*
+                    {
+                        "destinationUserId": "A2Z2SH760RV43M",
+                        "progress": {
+                            "mediaProgress": 899459,
+                            "mediaLength": 0
+                        },
+                        "dopplerId": {
+                            "deviceSerialNumber": "G2A0V7048513067J",
+                            "deviceType": "A18O6U1UQFJ0XK"
+                        },
+                        "mediaReferenceId": "c4a72dbe-ef6b-42b7-8104-0766aa32386f:1"
+                    }
+                    */
+                    this.httpPost('ws-media-progress-change', {
+                        destinationUserId: payload.destinationUserId,
+                        deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
+                        deviceType: payload.dopplerId.deviceType,
+                        mediaReferenceId: payload.mediaReferenceId,
+                        mediaProgress: payload.progress ? payload.progress.mediaProgress : null,
+                        mediaLength: payload.progress ? payload.progress.mediaLength : null
+                    });
+                    return;
+                case 'PUSH_VOLUME_CHANGE':
+                    /*
+                    {
+                        'destinationUserId': 'A3NSX4MMJVG96V',
+                        'dopplerId': {
+                            'deviceSerialNumber': 'c6c113ab49ff498185aa1ee5eb50cd73',
+                            'deviceType': 'A3H674413M2EKB'
+                        },
+                        'isMuted': false,
+                        'volumeSetting': 50
+                    }
+                    */
+                    this.httpPost('ws-volume-change', {
+                        destinationUserId: payload.destinationUserId,
+                        deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
+                        deviceType: payload.dopplerId.deviceType,
+                        isMuted: payload.isMuted,
+                        volume: payload.volumeSetting
+                    });
+                    return;
+                case 'PUSH_CONTENT_FOCUS_CHANGE':
+                    /*
+                    {
+                        'destinationUserId': 'A3NSX4MMJVG96V',
+                        'clientId': '{value=Dee-Domain-Music}',
+                        'dopplerId': {
+                            'deviceSerialNumber': 'G090LF09643202VS',
+                            'deviceType': 'A3S5BH2HU6VAYF'
+                        },
+                        'deviceComponent': 'com.amazon.dee.device.capability.audioplayer.AudioPlayer'
+                    }
+                    */
+                    this.httpPost('ws-content-focus-change', {
+                        destinationUserId: payload.destinationUserId,
+                        deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
+                        deviceType: payload.dopplerId.deviceType,
+                        deviceComponent: payload.deviceComponent
+                    });
+                    return;
+                case 'PUSH_EQUALIZER_STATE_CHANGE':
+                    /*
+                    {
+                        'destinationUserId': 'A3NSX4MMJVG96V',
+                        'bass': 0,
+                        'treble': 0,
+                        'dopplerId': {
+                            'deviceSerialNumber': 'G090LA09751707NU',
+                            'deviceType': 'A2M35JJZWCQOMZ'
+                        },
+                        'midrange': 0
+                    }
+                    */
+                    this.httpPost('ws-equilizer-state-change', {
+                        destinationUserId: payload.destinationUserId,
+                        deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
+                        deviceType: payload.dopplerId.deviceType,
+                        bass: payload.bass,
+                        treble: payload.treble,
+                        midrange: payload.midrange
+                    });
+                    return;
+                case 'PUSH_NOTIFICATION_CHANGE':
+                    /*
+                    {
+                        'destinationUserId': 'A3NSX4MMJVG96V',
+                        'dopplerId': {
+                            'deviceSerialNumber': 'G090LF09643202VS',
+                            'deviceType': 'A3S5BH2HU6VAYF'
+                        },
+                        'eventType': 'UPDATE',
+                        'notificationId': 'd676d954-3c34-3559-83ac-606754ff6ec1',
+                        'notificationVersion': 2
+                    }
+                    */
+                    this.httpPost('ws-notification-change', {
+                        destinationUserId: payload.destinationUserId,
+                        deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
+                        deviceType: payload.dopplerId.deviceType,
+                        eventType: payload.eventType,
+                        notificationId: payload.notificationId,
+                        notificationVersion: payload.notificationVersion
+                    });
+                    return;
+
+                case 'PUSH_ACTIVITY':
+                    /*
+                    {
+                        'destinationUserId': 'A3NSX4MMJVG96V',
+                        'key': {
+                            'entryId': '1533932315288#A3S5BH2HU6VAYF#G090LF09643202VS',
+                            'registeredUserId': 'A3NSX4MMJVG96V'
+                        },
+                        'timestamp': 1533932316865
+                    }
+                    {
+                        '_disambiguationId': null,
+                        'activityStatus': 'SUCCESS', // DISCARDED_NON_DEVICE_DIRECTED_INTENT // FAULT
+                        'creationTimestamp': 1533932315288,
+                        'description': '{\'summary\':\'spiel Mike Oldfield von meine bibliothek\',\'firstUtteranceId\':\'TextClient:1.0/2018/08/10/20/G090LF09643202VS/18:35::TNIH_2V.cb0c133b-3f90-4f7f-a052-3d105529f423LPM\',\'firstStreamId\':\'TextClient:1.0/2018/08/10/20/G090LF09643202VS/18:35::TNIH_2V.cb0c133b-3f90-4f7f-a052-3d105529f423LPM\'}',
+                        'domainAttributes': '{\'disambiguated\':false,\'nBestList\':[{\'entryType\':\'PlayMusic\',\'mediaOwnerCustomerId\':\'A3NSX4MMJVG96V\',\'playQueuePrime\':false,\'marketplace\':\'A1PA6795UKMFR9\',\'imageURL\':\'https://album-art-storage-eu.s3.amazonaws.com/93fff3ba94e25a666e300facd1ede29bf84e6e17083dc7e60c6074a77de71a1e_256x256.jpg?response-content-type=image%2Fjpeg&x-amz-security-token=FQoGZXIvYXdzEP3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDInhZqxchOhE%2FCQ3bSKrAWGE9OKTrShkN7rSKEYzYXH486T6c%2Bmcbru4RGEGu9Sq%2BL%2FpG5o2EWsHnRULSM4cpreC1KG%2BIfzo8nuskQk8fklDgIyrK%2B%2B%2BFUm7rxmTKWBjavbKQxEtrnQATgo7%2FghmztEmXC5r742uvyUyAjZcZ4chCezxa%2Fkbr00QTv1HX18Hj5%2FK4cgItr5Kyv2bfmFTZ2Jlvr8IbAQn0X0my1XpGJyjUuW8IGIPhqiCQyi627fbBQ%3D%3D&AWSAccessKeyId=ASIAZZLLX6KM4MGDNROA&Expires=1533935916&Signature=OozE%2FmJbIVVvK2CRhpa2VJPYudE%3D\',\'artistName\':\'Mike Oldfield\',\'serviceName\':\'CLOUD_PLAYER\',\'isAllSongs\':true,\'isPrime\':false}]}',
+                        'domainType': null,
+                        'feedbackAttributes': null,
+                        'id': 'A3NSX4MMJVG96V#1533932315288#A3S5BH2HU6VAYF#G090LF09643202VS',
+                        'intentType': null,
+                        'providerInfoDescription': null,
+                        'registeredCustomerId': 'A3NSX4MMJVG96V',
+                        'sourceActiveUsers': null,
+                        'sourceDeviceIds': [{
+                            'deviceAccountId': null,
+                            'deviceType': 'A3S5BH2HU6VAYF',
+                            'serialNumber': 'G090LF09643202VS'
+                        }],
+                        'utteranceId': 'TextClient:1.0/2018/08/10/20/G090LF09643202VS/18:35::TNIH_2V.cb0c133b-3f90-4f7f-a052-3d105529f423LPM',
+                        'version': 1
+                    }
+                    */
+                    this.getActivities({size: 3, filter: false}, (err, res) => {
+                        if (err || !res) return;
+                        let activity = null;
+                        for (let i = 0; i < res.length; i++) {
+                            if (res[i].data.id.endsWith('#' + payload.key.entryId) && res[i].data.registeredCustomerId === payload.key.registeredUserId) {
+                                activity = res[i];
+                                break;
+                            }
+                        }
+
+                        if (!activity) {
+                            this._options.logger && this._options.logger('Alexa-Remote: Activity for id ' + payload.key.entryId + ' not found');
+                            return;
+                        }
+                        //this._options.logger && this._options.logger('Alexa-Remote: Activity found for id ' + payload.key.entryId + ': ' + JSON.stringify(activity));
+
+                        activity.destinationUserId = payload.destinationUserId;
+                        this.httpPost('ws-device-activity', activity);
+                    });
+                    return;
+                case 'PUSH_TODO_CHANGE':
+                case 'PUSH_LIST_ITEM_CHANGE':
+                case 'PUSH_LIST_CHANGE':
+
+                case 'PUSH_MICROPHONE_STATE':
+                case 'PUSH_DELETE_DOPPLER_ACTIVITIES':
+                    break;
+
+            }
+
+            this.emit('ws-unknown-command', command, payload);
+        });
+
+        this.alexaWsMqtt.connect();
+    }
+	
+	
+//---------------------------
+//En attendant de comprendre à quoi sert emit(xx
+emitt(event, a1, a2, a3, a4, a5) 
+{
+this.emit(event, a1, a2, a3, a4, a5);
+this.httpPost() ;
+}
     stop() {
+		
         if (this.cookieRefreshTimeout) {
             clearTimeout(this.cookieRefreshTimeout);
             this.cookieRefreshTimeout = null;
+        }
+		
+		if (this.alexaWsMqtt) {
+            this.alexaWsMqtt.disconnect();
         }
     }
 
@@ -711,6 +1044,53 @@ this._options.logger && this._options.logger(obj.headers);
             req.write(flags.data);
         req.end();
     }
+
+httpPost(nom, jsonaenvoyer) {
+	
+var url="http://192.168.0.21/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey=qbJmwUJsOmOgCnau47luy1u2cAUxK1Gw";
+ 
+ jsonaenvoyer=JSON.stringify(jsonaenvoyer);
+this._options.logger && this._options.logger('envoyé:'+jsonaenvoyer);
+this._options.logger && this._options.logger('9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999');
+
+
+request.post(url, {
+
+			json : true,
+
+			gzip : false,
+			
+ 
+	
+multipart: [
+      {
+		body: jsonaenvoyer
+      }
+    ]
+
+		}, function (err, response, json) {
+
+			if (!err && response.statusCode == 200) {
+
+				//if(!json.result && json.error)
+				//{
+			//		//error json.error
+			//	}
+			//	else {
+			//		//json.result;
+			//	}
+
+			} else 
+			{
+				//error err est une erreur html
+			}
+
+});
+
+ 
+    }
+
+
 
 
 /// Public

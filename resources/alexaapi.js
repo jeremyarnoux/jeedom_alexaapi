@@ -19,6 +19,7 @@ const config = {
 	cookieRefreshInterval: 7 * 24 * 60 * 1000,
 	logger: consoleSigalou,
 	alexaServiceHost: alexaserver,
+    useWsMqtt: true, // optional, true to use the Websocket/MQTT direct push connection
 	listeningPort: 3456
 };
 
@@ -1645,7 +1646,8 @@ function startServer() {
 				cookie: config.cookie,
 				logger: config.logger,
 				alexaServiceHost: config.alexaServiceHost,
-				cookieRefreshInterval: config.cookieRefreshInterval
+				cookieRefreshInterval: config.cookieRefreshInterval,
+				useWsMqtt: config.useWsMqtt
 			},
 			(err) => {
 				// Unable to init alexa
