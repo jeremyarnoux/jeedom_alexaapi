@@ -15,6 +15,7 @@ const request = require('request');
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
+const IPJeedom = process.argv[2];
 
 // Pour WQTT
 const AlexaWsMqtt = require('./alexa-wsmqtt.js');
@@ -653,7 +654,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                         },
                         'midrange': 0
                     }
-                    */
+                    
                     this.httpPost('ws-equilizer-state-change', {
                         destinationUserId: payload.destinationUserId,
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
@@ -661,7 +662,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                         bass: payload.bass,
                         treble: payload.treble,
                         midrange: payload.midrange
-                    });
+                    });*/
                     return;
                 case 'PUSH_NOTIFICATION_CHANGE':
                     /*
@@ -743,6 +744,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                 case 'PUSH_LIST_CHANGE':
 
                 case 'PUSH_MICROPHONE_STATE':
+
                 case 'PUSH_DELETE_DOPPLER_ACTIVITIES':
                     break;
 
@@ -1047,11 +1049,11 @@ this._options.logger && this._options.logger(obj.headers);
 
 httpPost(nom, jsonaenvoyer) {
 	
-var url="http://192.168.0.21/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey=qbJmwUJsOmOgCnau47luy1u2cAUxK1Gw";
+var url="http://"+IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey=qbJmwUJsOmOgCnau47luy1u2cAUxK1Gw&nom="+nom;
  
- jsonaenvoyer=JSON.stringify(jsonaenvoyer);
+jsonaenvoyer=JSON.stringify(jsonaenvoyer);
 this._options.logger && this._options.logger('envoyé:'+jsonaenvoyer);
-this._options.logger && this._options.logger('9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999');
+//this._options.logger && this._options.logger('9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999');
 
 
 request.post(url, {

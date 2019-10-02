@@ -7,6 +7,7 @@ let alexa;
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
+const IPJeedom = process.argv[2];
 
 //const debug=1; //mettre 1 pour debug
 

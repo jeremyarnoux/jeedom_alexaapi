@@ -18,7 +18,7 @@ class AlexaWsMqtt extends EventEmitter {
 		
 
         this._options = options;
-console.log('8888888888888888888888888888888888888 Alexa-Remote WS-MQTT: options :'+JSON.stringify(options));
+//console.log('8888888888888888888888888888888888888 Alexa-Remote WS-MQTT: options :'+JSON.stringify(options));
         this.stop = false;
         let serialArr = null;
         this.cookie = cookie;

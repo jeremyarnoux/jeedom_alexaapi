@@ -35,7 +35,7 @@ $chaineRecuperee=file_get_contents("php://input");
 
 
 
-//log::add('alexaapi_mqtt', 'debug',  $chaineRecuperee);
+log::add('alexaapi_mqtt', 'debug',  "-----[".$_GET["nom"]."]-----" );
 $debut=strpos($chaineRecuperee, "{");
 $fin=strrpos($chaineRecuperee, "}");
 $longeur=1+intval($fin)-intval($debut);
@@ -49,7 +49,7 @@ if (!is_array($result)) {
 	log::add('alexaapi_mqtt', 'debug', 'Format Invalide');
 	die();
 }
-log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialNumber']);
+//log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialNumber']);
 $logical_id = $result['deviceSerialNumber'];
 
 
