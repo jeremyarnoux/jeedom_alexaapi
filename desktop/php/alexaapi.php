@@ -115,104 +115,71 @@ function printEqLogic(data)
 
 <!-- Container global (Ligne bootstrap) -->
 <div class="row row-overflow">
-  <!-- Container bootstrap du menu latéral -->
-  <div class="col-lg-2 col-md-3 col-sm-4">
-    <!-- Container du menu latéral -->
-    <div class="bs-sidebar">
-    <!-- Menu latéral -->
-      <ul id="ul_eqLogic" class="nav nav-list bs-sidenav">
-        <!-- Filtre des objets -->
-        <li class="filter" style="margin-bottom: 5px; width: 100%"><input class="filter form-control input-sm" placeholder="{{Rechercher}}"/></li>
-        <!-- Liste des objets -->
-        <?php foreach ($eqLogics as $eqLogic) : ?>
-        <li class="cursor li_eqLogic" data-eqLogic_id="<?php echo $eqLogic->getId(); ?>">
-          <a><?php echo $eqLogic->getHumanName(true); ?></a>
-        </li>
-        <?php endforeach; ?>
-      </ul>
-    </div>
-  </div>
-
-  <script>
-    $('#bt_backupsZwave').off('click').on('click', function () {
-      $('#md_modal2').dialog({title: "{{Génération cookie Amazon}}"});
-      $('#md_modal2').load('index.php?v=d&plugin=alexaapi&modal=cookie').dialog('open');
-    });
-  </script>
-
   <!-- Container des listes de commandes / éléments -->
-  <div class="col-lg-10 col-md-9 col-sm-8 eqLogicThumbnailDisplay">
-    <legend><i class="fa fa-cog"></i> {{Gestion}}</legend>
+  <div class="col-xs-12 eqLogicThumbnailDisplay">
+    <legend><i class="fas fa-cog"></i> {{Gestion}}</legend>
     <div class="eqLogicThumbnailContainer">
-      <!-- Bouton de scan des objets -->
-      <div class="cursor" id="bt_scan" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        <center>
-          <i class="fa fa-bullseye" style="font-size : 6em;color:#94ca02;"></i>
-        </center>
-          <span style="font-size : 1.1em;position:relative; top : 23px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#94ca02"><center>{{Scan}}</center></span>
-      </div>
-	  
-	        <!-- Bouton d accès à la configuration -->
-      <div class="cursor eqLogicAction" data-action="gotoPluginConf" style="background-color : #ffffff; height : 140px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
-        <center>
-          <i class="fa fa-wrench" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 23px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Configuration}}</center></span>
-      </div>
-	  
-      <div class="cursor" id="bt_sante" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        <center>
-          <i class="fa fa-medkit" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Santé}}</center></span>
-      </div>
-	  
-	  
-      <div class="cursor" id="bt_routines" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        <center>
-          <i class="fa divers-viral" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Routines}}</center></span>
-       </div>
-	  
-	  
-      <div class="cursor" id="bt_reminders" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        <center>
-          <i class="fa fa-clock" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Rappels/Alarmes}}</center></span>
-      </div>
-	  
+		<!-- Bouton de scan des objets -->
+		<div class="cursor logoPrimary" id="bt_scan">
+			<i class="fas fa-bullseye"></i>
+			<br />
+			<span>{{Scan}}</span>
+		</div>
 
-      <div class="cursor" id="bt_history" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        <center>
-          <i class="fa fa-list-alt" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Historique}}</center></span>
-      </div>
+		<!-- Bouton d accès à la configuration -->
+		<div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
+			<i class="fas fa-wrench"></i>
+			<br />
+			<span>{{Configuration}}</span>
+		</div>
+
+		<div class="cursor logoSecondary" id="bt_sante">
+			<i class="fas fa-medkit"></i>
+			<br />
+			<span>{{Santé}}</span>
+		</div>
+
+
+		<div class="cursor logoSecondary" id="bt_routines">
+			<i class="fas divers-viral"></i>
+			<br />
+			<span>{{Routines}}</span>
+		</div>
+
+
+		<div class="cursor logoSecondary" id="bt_reminders">
+			<i class="fas fa-clock"></i>
+			<br />
+			<span>{{Rappels/Alarmes}}</span>
+		</div>
+
+
+		<div class="cursor logoSecondary" id="bt_history">
+			<i class="fas fa-list-alt"></i>
+			<br />
+			<span>{{Historique}}</span>
+		</div>
 <?php
 if(log::getLogLevel('alexaapi')<200) :
 ?>
 
-      <div class="cursor" id="bt_req" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        <center>
-          <i class="fa fa-key" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Requêteur JSON}}</center></span>
-      </div>
-	  
-      <div class="cursor" id="bt_req2" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
-        <center>
-          <i class="fa fa-key" style="font-size : 6em;color:#767676;"></i>
-        </center>
-        <span style="font-size : 1.1em;position:relative; top : 25px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676"><center>{{Requêteur}}</center></span>
-      </div><?php
+		<div class="cursor logoSecondary" id="bt_req">
+			<i class="fas fa-key"></i>
+			<br />
+			<span>{{Requêteur JSON}}</span>
+		</div>
+
+		<div class="cursor logoSecondary" id="bt_req2">
+			<i class="fas fa-key"></i>
+			<br />
+			<span>{{Requêteur}}</span>
+		</div><?php
 endif;
 ?>	  
 	  
     </div>
     <!-- Début de la liste des objets -->
-    <legend><i class="fa fa-table"></i> {{Mes Amazon Echo}}</legend>
+    <legend><i class="fas fa-table"></i> {{Mes Amazon Echo}}</legend>
     <!-- Container de la liste -->
     <div class="eqLogicThumbnailContainer">
 <?php
