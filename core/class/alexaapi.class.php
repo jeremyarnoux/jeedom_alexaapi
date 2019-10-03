@@ -86,10 +86,10 @@ class alexaapi extends eqLogic {
 
 		log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
 
-		//$result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
-		$cmdStart='nohup ' . $cmd . ' | tee >(grep "WS-MQTT">>'.log::getPathToLog('alexaapi_mqtt').') >(grep -v "WS-MQTT">>'. log::getPathToLog('alexaapi_node') . ')';
-		log::add('alexaapi','debug','cmd executee : '.$cmdStart);
-		$result = exec($cmdStart);
+		$result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
+		//$cmdStart='nohup ' . $cmd . ' | tee >(grep "WS-MQTT">>'.log::getPathToLog('alexaapi_mqtt').') >(grep -v "WS-MQTT">>'. log::getPathToLog('alexaapi_node') . ')';
+		//log::add('alexaapi','debug','cmd executee : '.$cmdStart);
+		//$result = exec($cmdStart);
 		if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
 			log::add('alexaapi', 'error', $result);
 			return false;
