@@ -582,7 +582,7 @@ class alexaapi extends eqLogic {
 	public function postSave() {
 
 
-				//log::add('alexaapi', 'debug', '**********************postSave DEBUT***********************************');
+				log::add('alexaapi', 'debug', '**********************postSave DEBUT***********************************');
 
 
 

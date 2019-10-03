@@ -67,25 +67,25 @@ log::add('alexaapi_mqtt', 'debug',  'Device non trouvé: '.$logical_id);
 log::add('alexaapi_mqtt', 'debug',  'Device trouvé: '.$logical_id);
 			}
 			
-			
+		
 // ----------------- VOLUME ------------------
 			
 if ($result['volume']!=null)
 {
 log::add('alexaapi_mqtt', 'debug',  'Volume trouvé: '.$result['volume']);
 				$alexaapi->checkAndUpdateCmd('volumeinfo', $result['volume']);
-				$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
-				$alexaapi->save();
+				//$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
+				//$alexaapi->save();
 }
-
+	die();
 // ----------------- INTERACTION ------------------
 			
 if ($result['description']['summary']!=null)
 {
 log::add('alexaapi_mqtt', 'debug',  'Intéraction trouvée: '.$result['description']['summary']);
 				$alexaapi->checkAndUpdateCmd('interactioninfo', $result['description']['summary']);
-				$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
-				$alexaapi->save();
+				//$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
+				//$alexaapi->save();
 }
 
 /*
