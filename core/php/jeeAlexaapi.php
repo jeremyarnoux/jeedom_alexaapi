@@ -36,6 +36,7 @@ $chaineRecuperee=file_get_contents("php://input");
 
 
 log::add('alexaapi_mqtt', 'debug',  "-----[".$_GET["nom"]."]-----" );
+
 $debut=strpos($chaineRecuperee, "{");
 $fin=strrpos($chaineRecuperee, "}");
 $longeur=1+intval($fin)-intval($debut);

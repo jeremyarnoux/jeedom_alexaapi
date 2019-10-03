@@ -16,6 +16,7 @@ const request = require('request');
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
 const IPJeedom = process.argv[2];
+const ClePlugin = process.argv[5];
 
 // Pour WQTT
 const AlexaWsMqtt = require('./alexa-wsmqtt.js');
@@ -1049,7 +1050,7 @@ this._options.logger && this._options.logger(obj.headers);
 
 httpPost(nom, jsonaenvoyer) {
 	
-var url="http://"+IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey=qbJmwUJsOmOgCnau47luy1u2cAUxK1Gw&nom="+nom;
+var url="http://"+IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey="+ClePlugin+"&nom="+nom;
  
 jsonaenvoyer=JSON.stringify(jsonaenvoyer);
 this._options.logger && this._options.logger('envoyé:'+jsonaenvoyer);
