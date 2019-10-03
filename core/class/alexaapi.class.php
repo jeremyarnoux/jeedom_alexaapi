@@ -81,7 +81,7 @@ class alexaapi extends eqLogic {
 		}
 		*/
 		   // $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/Alexa-Remote-http/index.js ' . config::byKey('internalAddr') . ' ' . $url . ' ' . $log;
-		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ' . config::byKey('internalAddr') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr').' '.jeedom::getApiKey('alexaapi');
+		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ' . network::getNetworkAccess('internal') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr').' '.jeedom::getApiKey('alexaapi');
 //network::getNetworkAccess('internal') . '/plugins/blea/core/php/jeeBlea.php';
 
 		log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
