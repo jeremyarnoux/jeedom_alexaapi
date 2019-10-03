@@ -1050,7 +1050,7 @@ this._options.logger && this._options.logger(obj.headers);
 
 httpPost(nom, jsonaenvoyer) {
 	
-var url="http://"+IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey="+ClePlugin+"&nom="+nom;
+var url=IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey="+ClePlugin+"&nom="+nom;
  
 jsonaenvoyer=JSON.stringify(jsonaenvoyer);
 this._options.logger && this._options.logger('URL envoyée: '+url);
