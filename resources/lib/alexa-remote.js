@@ -1038,7 +1038,7 @@ this._options.logger && this._options.logger(obj.headers);
 
         req.on('error', function(e)
         {
-		this._options.logger && this._options.logger('>>> DEBUG error: '+e);
+		//this._options.logger && this._options.logger('>>> DEBUG error: '+e);
             if(typeof callback === 'function')
                 return callback (e, null);
         });
