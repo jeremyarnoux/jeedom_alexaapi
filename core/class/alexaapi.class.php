@@ -992,7 +992,7 @@ class alexaapi extends eqLogic {
 			
 			
 			
-			if ($this->hasCapa("ALEXA_PRESENCE")) { 
+			if ($this->hasCapa("DIALOG_INTERFACE_VERSION")) { 
 			
 				// Dernière Intéraction
 				$cmd = $this->getCmd(null, 'interactioninfo');
