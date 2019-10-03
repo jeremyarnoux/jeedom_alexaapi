@@ -26,6 +26,7 @@ if (!jeedom::apiAccess(init('apikey'), 'alexaapi')) {
 	die();
 }
 
+	log::add('alexaapi', 'debug',  'Réception données sur jeeAlexaapi');
 	log::add('alexaapi_mqtt', 'debug',  'Clé Plugin Valide');
 
 if (init('test') != '') {
