@@ -271,7 +271,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
             if (!err && result && Array.isArray(result)) {
                 result.forEach ((account) => {
                     if (!this.commsId) this.commsId = account.commsId;
-					this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: getAccount:'+account.commsId);
+					//this._options.logger && this._options.logger('Alexa-xxxxxxxxxxxxx: getAccount:'+account.commsId);
                     //if (!this.directedId) this.directedId = account.directedId;
                 });
             }
@@ -1053,8 +1053,8 @@ httpPost(nom, jsonaenvoyer) {
 var url="http://"+IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey="+ClePlugin+"&nom="+nom;
  
 jsonaenvoyer=JSON.stringify(jsonaenvoyer);
-this._options.logger && this._options.logger('envoyé:'+jsonaenvoyer);
-//this._options.logger && this._options.logger('9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999');
+this._options.logger && this._options.logger('URL envoyée: '+url);
+this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer);
 
 
 request.post(url, {
