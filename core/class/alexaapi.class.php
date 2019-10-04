@@ -283,7 +283,7 @@ class alexaapi extends eqLogic {
 			$test2060NOK=true;
 			$hasOneReminderDevice=false;
 			foreach ($eqLogics as $alexaapi) {
-				if($alexaapi->hasCapa("REMINDERS") && $alexaapi->getStatus('online') == true) {
+				if($alexaapi->hasCapaorFamilyorType("REMINDERS") && $alexaapi->getStatus('online') == true) {
 					$hasOneReminderDevice=true;
 					log::add('alexaapi', 'debug', '-----------------------------Test     Lancé sur *'.$alexaapi->getName().'*------------------------');
 					if ($test2060NOK && $alexaapi->test2060()) {
@@ -475,9 +475,17 @@ class alexaapi extends eqLogic {
 		return $newDevice;
 	}
 
-	public function hasCapa($thisCapa) {
+	public function hasCapaorFamilyorType($thisCapa) {
 		$capa=$this->getConfiguration('capabilities',"");
 		$type=$this->getConfiguration('type',"");		
+		$family=$this->getConfiguration('family',"");		
+		
+		// Si c'est la bonne famille, on dit OK tout de suite
+		if($thisCapa == $family) return true; // ajouté pour filtrer sur la famille (pour les groupes par exemple)
+			
+		// Si c'est le bon type, on dit OK tout de suite
+		if($thisCapa == $type) return true; // 
+			
 		
 		
 	//	log::add('alexaapi', 'debug', 'capabilitiesarray : '.$thisCapa.'/'.json_encode($capa));
@@ -670,7 +678,7 @@ class alexaapi extends eqLogic {
 
 
 			//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
-			if ($this->hasCapa("AUDIO_PLAYER")) { 
+			if ($this->hasCapaorFamilyorType("AUDIO_PLAYER")) { 
 			
 				// Speak command
 				$cmd = $this->getCmd(null, 'speak');
@@ -695,7 +703,7 @@ class alexaapi extends eqLogic {
 				}
 // SmartHome
 
-			if ($this->hasCapa("turnOff")) { 
+			if ($this->hasCapaorFamilyorType("turnOff")) { 
 				$cmd = $this->getCmd(null, 'turnOff');
 				if (!is_object($cmd)) {
 					$cmd = new alexaapiCmd();
@@ -717,7 +725,7 @@ class alexaapi extends eqLogic {
 					}
 				}
 				
-			if ($this->hasCapa("turnOn")) { 
+			if ($this->hasCapaorFamilyorType("turnOn")) { 
 				$cmd = $this->getCmd(null, 'turnOn');
 				if (!is_object($cmd)) {
 					$cmd = new alexaapiCmd();
@@ -740,7 +748,7 @@ class alexaapi extends eqLogic {
 				}			
 			
 			//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
-			if ($this->hasCapa("AUDIO_PLAYER")) { 
+			if ($this->hasCapaorFamilyorType("AUDIO_PLAYER")) { 
 
 		
 				// Radio command
@@ -786,7 +794,7 @@ class alexaapi extends eqLogic {
 			}
 			
 			
-			if ($this->hasCapa("TIMERS_AND_ALARMS")) { 
+			if ($this->hasCapaorFamilyorType("TIMERS_AND_ALARMS")) { 
 			
 				// alarm command
 				$cmd = $this->getCmd(null, 'alarm');
@@ -876,7 +884,7 @@ class alexaapi extends eqLogic {
 				log::add('alexaapi', 'warning', '****Rencontre du type A15ERDAKK5HQQG = Sonos Première Génération sur : '.$this->getName());
 				log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus car bug!');
 			}
-			if ($this->hasCapa("REMINDERS")) { 
+			if ($this->hasCapaorFamilyorType("REMINDERS")) { 
 				// delete reminder
 				$cmd = $this->getCmd(null, 'deleteReminder');
 				if (!is_object($cmd)) {
@@ -990,7 +998,7 @@ class alexaapi extends eqLogic {
 			}
 
 			
-			if ($this->hasCapa("VOLUME_SETTING")) { 
+			if ($this->hasCapaorFamilyorType("VOLUME_SETTING")) { 
 
 				// Volume command
 				$cmd = $this->getCmd(null, 'volume');
@@ -1015,7 +1023,7 @@ class alexaapi extends eqLogic {
 				}
 			}
 			
-			if ($this->hasCapa("VOLUME_SETTING")) { 
+			if (($this->hasCapaorFamilyorType("VOLUME_SETTING")) && (!$this->hasCapaorFamilyorType("WHA"))) { 
 
 				// Volume command
 				$cmd = $this->getCmd(null, 'volumeinfo');
@@ -1041,10 +1049,7 @@ class alexaapi extends eqLogic {
 			
 			
 			
-			
-			
-			//if ($this->hasCapa("DIALOG_INTERFACE_VERSION")) { 
-			
+			if ((!$this->hasCapaorFamilyorType("WHA")) && (!$this->hasCapaorFamilyorType("FIRE_TV")) && (!$this->hasCapaorFamilyorType("AMAZONMOBILEMUSIC_ANDROID"))) { 
 				// Dernière Intéraction
 				$cmd = $this->getCmd(null, 'interactioninfo');
 				if (!is_object($cmd)) {
@@ -1058,17 +1063,14 @@ class alexaapi extends eqLogic {
 					$cmd->setDisplay('icon', '<i class="fa jeedomapp-audiospeak"></i>');
 					}
 				$cmd->save();
-			/*} else {
+			} else {
 				$cmd = $this->getCmd(null, 'interactioninfo');
 				if (is_object($cmd)) {
 					$cmd->remove();
 				}
-			}*/			
+			}		
 	
-			
-			
-			
-			
+					
 			
 		} else {
 			log::add('alexaapi', 'warning', 'Pas de capacité détectée, assurez-vous que le démon est OK');

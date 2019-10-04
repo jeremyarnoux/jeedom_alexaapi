@@ -110,13 +110,13 @@ if(log::getLogLevel('alexaapi')<200) :
 		<div class="cursor logoSecondary" id="bt_req">
 			<i class="fas fa-key"></i>
 			<br />
-			<span>{{Requêteur JSON}}</span>
+			<span>{{Requêteur Infos}}</span>
 		</div>
 
 		<div class="cursor logoSecondary" id="bt_req2">
 			<i class="fas fa-key"></i>
 			<br />
-			<span>{{Requêteur}}</span>
+			<span>{{Requêteur Actions}}</span>
 		</div><?php
 endif;
 ?>	  
