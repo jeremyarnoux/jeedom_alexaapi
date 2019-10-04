@@ -1,8 +1,7 @@
 <?php
-include_file('core', 'authentification', 'php');
-
-if (!isConnect('admin'))
-  throw new Exception('{{401 - Refused access}}');
+if (!isConnect('admin')) {
+	throw new Exception('{{401 - Accès non autorisé}}');
+}
 
 // Obtenir l'identifiant du plugin
 $plugin = plugin::byId('alexaapi');
@@ -12,57 +11,6 @@ sendVarToJS('eqType', $plugin->getId());
 
 // Accéder aux données du plugin
 $eqLogics = eqLogic::byType($plugin->getId());
-
-//---------------------------------------------------------------------------------------
-// récupéré de https://github.com/Apollon77/ioBroker.alexa2/blob/master/main.js
-$knownDeviceType = array(
-    ('A10A33FOX2NUBK') => array( (TypeEcho) => 'Echo Spot', (commandSupport) => 'true', (icon) => 'spot'),
-    ('A12GXV8XMS007S') => array( (TypeEcho) => 'FireTV', (commandSupport) => 'false', (icon) => 'firetv'), 
-    ('A15ERDAKK5HQQG') => array( (TypeEcho) => 'Sonos', (commandSupport) => 'false', (icon) => 'sonos'),
-    ('A17LGWINFBUTZZ') => array( (TypeEcho) => 'Anker Roav Viva Alexa', (commandSupport) => 'false', (icon) => 'other'),
-    ('A18O6U1UQFJ0XK') => array( (TypeEcho) => 'Echo Plus 2.Gen', (commandSupport) => 'true', (icon) => 'echo_plus2'), 
-    ('A1DL2DVDQVK3Q') => array( (TypeEcho) => 'Apps', (commandSupport) => 'false', (icon) => 'other'), 
-    ('A1H0CMF1XM0ZP4') => array( (TypeEcho) => 'Echo Dot/Bose', (commandSupport) => 'false', (icon) => 'other'), 
-    ('A1J16TEDOYCZTN') => array( (TypeEcho) => 'Fire tab', (commandSupport) => 'true', (icon) => 'firetab'),
-    ('A1NL4BVLQ4L3N3') => array( (TypeEcho) => 'Echo Show', (commandSupport) => 'true', (icon) => 'echo_show'), 
-    ('A1RTAM01W29CUP') => array( (TypeEcho) => 'Windows App', (commandSupport) => 'false', (icon) => 'other'), 
-    ('A1X7HJX9QL16M5') => array( (TypeEcho) => 'Bespoken.io', (commandSupport) => 'false', (icon) => 'other'),
-    ('A21Z3CGI8UIP0F') => array( (TypeEcho) => 'Apps', (commandSupport) => 'false', (icon) => 'other'), 
-    ('A2825NDLA7WDZV') => array( (TypeEcho) => 'Apps', (commandSupport) => 'false', (icon) => 'other'), 
-    ('A2E0SNTXJVT7WK') => array( (TypeEcho) => 'Fire TV V1', (commandSupport) => 'false', (icon) => 'firetv'),
-    ('A2GFL5ZMWNE0PX') => array( (TypeEcho) => 'Fire TV', (commandSupport) => 'true', (icon) => 'firetv'), 
-    ('A2IVLV5VM2W81') => array( (TypeEcho) => 'Apps', (commandSupport) => 'false', (icon) => 'other'), 
-    ('A2L8KG0CT86ADW') => array( (TypeEcho) => 'RaspPi', (commandSupport) => 'false', (icon) => 'other'), 
-    ('A2LWARUGJLBYEW') => array( (TypeEcho) => 'Fire TV Stick V2', (commandSupport) => 'false', (icon) => 'firetv'), 
-    ('A2M35JJZWCQOMZ') => array( (TypeEcho) => 'Echo Plus', (commandSupport) => 'true', (icon) => 'echo'), 
-    ('A2M4YX06LWP8WI') => array( (TypeEcho) => 'Fire Tab', (commandSupport) => 'false', (icon) => 'firetab'), 
-    ('A2OSP3UA4VC85F') => array( (TypeEcho) => 'Sonos', (commandSupport) => 'true', (icon) => 'sonos'), 
-    ('A2T0P32DY3F7VB') => array( (TypeEcho) => 'echosim.io', (commandSupport) => 'false', (icon) => 'other'),
-    ('A2TF17PFR55MTB') => array( (TypeEcho) => 'Apps', (commandSupport) => 'false', (icon) => 'other'), 
-    ('A32DOYMUN6DTXA') => array( (TypeEcho) => 'Echo Dot 3.Gen', (commandSupport) => 'true', (icon) => 'echo_dot3'),
-    ('A37SHHQ3NUL7B5') => array( (TypeEcho) => 'Bose Homespeaker', (commandSupport) => 'false', (icon) => 'other'), 
-    ('A38BPK7OW001EX') => array( (TypeEcho) => 'Raspberry Alexa', (commandSupport) => 'false', (icon) => 'raspi'), 
-    ('A38EHHIB10L47V') => array( (TypeEcho) => 'Echo Dot', (commandSupport) => 'true', (icon) => 'echo_dot'), 
-    ('A3C9PE6TNYLTCH') => array( (TypeEcho) => 'Multiroom', (commandSupport) => 'true', (icon) => 'multiroom'), 
-    ('A3H674413M2EKB') => array( (TypeEcho) => 'echosim.io', (commandSupport) => 'false', (icon) => 'other'),
-    ('A3HF4YRA2L7XGC') => array( (TypeEcho) => 'Fire TV Cube', (commandSupport) => 'true', (icon) => 'other'), 
-    ('A3NPD82ABCPIDP') => array( (TypeEcho) => 'Sonos Beam', (commandSupport) => 'true', (icon) => 'sonos'), 
-    ('A3R9S4ZZECZ6YL') => array( (TypeEcho) => 'Fire Tab HD 10', (commandSupport) => 'true', (icon) => 'firetab'), 
-    ('A3S5BH2HU6VAYF') => array( (TypeEcho) => 'Echo Dot 2.Gen', (commandSupport) => 'true', (icon) => 'echo_dot'), 
-    ('A3SSG6GR8UU7SN') => array( (TypeEcho) => 'Echo Sub', (commandSupport) => 'true', (icon) => 'echo_sub'), 
-    ('A7WXQPH584YP') => array( (TypeEcho) => 'Echo 2.Gen', (commandSupport) => 'true', (icon) => 'echo2'), 
-    ('AB72C64C86AW2') => array( (TypeEcho) => 'Echo', (commandSupport) => 'true', (icon) => 'echo'), 
-    ('ADVBD696BHNV5') => array( (TypeEcho) => 'Fire TV Stick V1', (commandSupport) => 'false', (icon) => 'firetv'), 
-    ('AILBSA2LNTOYL') => array( (TypeEcho) => 'reverb App', (commandSupport) => 'false', (icon) => 'reverb'),
-    ('AVE5HX13UR5NO') => array( (TypeEcho) => 'Logitech Zero Touch', (commandSupport) => 'false', (icon) => 'other'), 
-    ('AWZZ5CVHX2CD') => array( (TypeEcho) => 'Echo Show 2.Gen', (commandSupport) => 'true', (icon) => 'echo_show2')
-);
-
-
-
-//---------------------------------------------------------------------------------------
-console.log($knownDeviceType);
-
 $logicalIdToHumanReadable = array();
 foreach ($eqLogics as $eqLogic)
 {
@@ -72,7 +20,6 @@ foreach ($eqLogics as $eqLogic)
 
 <script>
 var logicalIdToHumanReadable = <?php echo json_encode($logicalIdToHumanReadable); ?>
-
 function printEqLogic(data)
 {
 	
@@ -87,7 +34,6 @@ function printEqLogic(data)
   {
      //$('#multiroom-members').append('Configuration incomplete.'); //supprimé
 	 $('#multiroom-members').parent().hide(); //ajouté
-
      return;
   }
   if (data.configuration.members.length === 0)
@@ -95,7 +41,6 @@ function printEqLogic(data)
     $('#multiroom-members').parent().hide();
     return;
   }
-
   var html = '<ul style="list-style-type: none;">';
   for (var i in data.configuration.members)
   {
@@ -106,17 +51,15 @@ function printEqLogic(data)
       html += '<li style="margin-top: 5px;"><span class="label label-default" style="text-shadow : none;"><i>(Non configuré)</i></span> ' + logicalId + '</li>';
   }
   html += '</ul>';
-
   $('#multiroom-members').parent().show();
   $('#multiroom-members').append(html);
 }
-
 </script>
 
 <!-- Container global (Ligne bootstrap) -->
 <div class="row row-overflow">
   <!-- Container des listes de commandes / éléments -->
-  <div class="col-xs-12 eqLogicThumbnailDisplay">
+  <div class="col-lg-12 eqLogicThumbnailDisplay">
     <legend><i class="fas fa-cog"></i> {{Gestion}}</legend>
     <div class="eqLogicThumbnailContainer">
 		<!-- Bouton de scan des objets -->
@@ -193,26 +136,24 @@ foreach($eqLogics as $eqLogic) {
 
 	if ($eqLogic->getConfiguration('devicetype') != "Smarthome") {
 
-		$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-		echo '<div class="eqLogicDisplayCard cursor prem" data-eqLogic_id="'.$eqLogic->getId().'" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;'.$opacity.'" >';
+		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
+		echo '<div class="eqLogicDisplayCard cursor prem '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'" >';
 
 		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")))
 			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
 
-		//$alternateImg = $knownDeviceType[$eqLogic->getConfiguration('type')]['icon'];
 		$alternateImg = $eqLogic->getConfiguration('type');
-		echo '<center>';
 		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" height="105" width="105" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" />';
 		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" height="105" width="105" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" />';
 		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" height="105" width="105" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" />';
 		else
-			echo '<img src="'.$plugin->getPathImgIcon().'" height="105" width="105" />';
+			echo '<img src="'.$plugin->getPathImgIcon().'" />';
 
-		echo '</center>';
-		echo '<span  class="name"><center>'.$eqLogic->getHumanName(true, true).'</center></span>';
+		echo '<br/>';
+		echo '<span class="name"><center>'.$eqLogic->getHumanName(true, true).'</center></span>';
 
 		echo '</div>';
 	}
@@ -233,48 +174,45 @@ foreach($eqLogics as $eqLogic) {
 foreach($eqLogics as $eqLogic) {
 	if ($eqLogic->getConfiguration('devicetype') == "Smarthome") {
 
-		$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-		echo '<div class="eqLogicDisplayCard cursor second" data-eqLogic_id="'.$eqLogic->getId().'" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;'.$opacity.'" >';
+		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
+		echo '<div class="eqLogicDisplayCard cursor second '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'">';
 
 		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")))
 			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
 
-		//$alternateImg = $knownDeviceType[$eqLogic->getConfiguration('type')]['icon'];
 		$alternateImg = $eqLogic->getConfiguration('type');
-		echo '<center>';
 		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" height="105" width="105" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" />';
 		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" height="105" width="105" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" />';
 		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" height="105" width="105" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" />';
 		else
-			echo '<img src="'.$plugin->getPathImgIcon().'" height="105" width="105" />';
+			echo '<img src="'.$plugin->getPathImgIcon().'" />';
 
-		echo '</center>';
-		echo '<span  class="name"><center>'.$eqLogic->getHumanName(true, true).'</center></span>';
-
+		echo '<br/>';
+		echo '<span class="name"><center>'.$eqLogic->getHumanName(true, true).'</center></span>';
 		echo '</div>';
 	}
 }
 ?>
     </div>  </div>
   <!-- Container du panneau de contrôle -->
-  <div class="col-lg-10 col-md-9 col-sm-8 eqLogic" style="border-left: solid 1px #EEE; padding-left: 25px;display: none;">
+  <div class="col-lg-12 eqLogic" style="display: none;">
     <!-- Bouton sauvegarder -->
-    <a class="btn btn-success eqLogicAction pull-right" data-action="save"><i class="fa fa-check-circle"></i> {{Sauvegarder}}</a>
+    <a class="btn btn-success eqLogicAction pull-right" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}</a>
     <!-- Bouton Supprimer -->
-    <a class="btn btn-danger eqLogicAction pull-right" data-action="remove"><i class="fa fa-minus-circle"></i> {{Supprimer}}</a>
+    <a class="btn btn-danger eqLogicAction pull-right" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}</a>
     <!-- Bouton configuration avancée -->
-    <a class="btn btn-default eqLogicAction pull-right" data-action="configure"><i class="fa fa-cogs"></i> {{Configuration avancée}}</a>
+    <a class="btn btn-default eqLogicAction pull-right" data-action="configure"><i class="fas fa-cogs"></i> {{Configuration avancée}}</a>
     <!-- Liste des onglets -->
     <ul class="nav nav-tabs" role="tablist">
       <!-- Bouton de retour -->
       <li role="presentation"><a class="eqLogicAction cursor" aria-controls="home" role="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
       <!-- Onglet "Equipement" -->
-      <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fa fa-tachometer"></i> {{Equipement}}</a></li>
+      <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
       <!-- Onglet "Commandes" -->
-      <li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Commandes}}</a></li>
+      <li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-list-alt"></i> {{Commandes}}</a></li>
     </ul>
     <!-- Container du contenu des onglets -->
     <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
@@ -378,7 +316,7 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
                       <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="family"></span>
                   </div>
                 </div>                <!-- Onglet "Image" -->
-		<div class="form-group">
+				<div class="form-group">
                   <label class="col-sm-2 control-label">{{Fonctionnalités}}</label>
                   <div class="col-sm-8">
                       <span style="position:relative;top:+5px;left:+5px;font-size: 10px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="capabilities"></span>
@@ -403,24 +341,6 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
               </fieldset>
             </form>
           </div>
-		  
-<?php
-	/*}
-	else
-	{
-		echo "coucou";
-	}*/
-?>		  
-		  
-		  
-		  
-		  
-		  
-		  
-		  
-		  
-		  
-		  
 		  
         </div>
       </div>
