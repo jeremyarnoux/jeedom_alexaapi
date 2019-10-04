@@ -476,23 +476,23 @@ class alexaapi extends eqLogic {
 	}
 
 	public function hasCapaorFamilyorType($thisCapa) {
-		$capa=$this->getConfiguration('capabilities',"");
-		$type=$this->getConfiguration('type',"");		
-		$family=$this->getConfiguration('family',"");		
 		
 		// Si c'est la bonne famille, on dit OK tout de suite
+		$family=$this->getConfiguration('family',"");	
 		if($thisCapa == $family) return true; // ajouté pour filtrer sur la famille (pour les groupes par exemple)
 			
 		// Si c'est le bon type, on dit OK tout de suite
+		$type=$this->getConfiguration('type',"");	
 		if($thisCapa == $type) return true; // 
 			
 		
-		
+		$capa=$this->getConfiguration('capabilities',"");
 	//	log::add('alexaapi', 'debug', 'capabilitiesarray : '.$thisCapa.'/'.json_encode($capa));
 
 
 		//log::add('alexaapi', 'debug', 'capabilities : '.json_encode($capa));
 //		if(((gettype($capa) == "array" && array_search($thisCapa,$capa))) || ((gettype($capa) == "string" && strpos($capa, $thisCapa) !== false))) {
+		
 		if(((gettype($capa) == "array" && in_array($thisCapa,$capa))) || ((gettype($capa) == "string" && strpos($capa, $thisCapa) !== false))) {
 			if($thisCapa == "REMINDERS" && $type == "A15ERDAKK5HQQG") return false;
 			return true;
