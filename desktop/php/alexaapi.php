@@ -180,79 +180,81 @@ endif;
     </div>
     <!-- Début de la liste des objets -->
     <legend><i class="fas fa-table"></i> {{Mes Amazon Echo}}</legend>
+	<div class="input-group" style="margin-bottom:5px;">
+		<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic" />
+		<div class="input-group-btn">
+			<a id="bt_resetEqlogicSearch" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
+		</div>
+	</div>	
     <!-- Container de la liste -->
-    <div class="eqLogicThumbnailContainer">
+    <div class="eqLogicThumbnailContainer prem">
 <?php
-foreach ($eqLogics as $eqLogic)
-{
-	
-	if ($eqLogic->getConfiguration('devicetype')!="Smarthome")
-	{	
-	
-	
-	
-    $opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-    echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
-	
-	if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps"))) 
-		echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
-	
-	
-//$alternateImg = $knownDeviceType[$eqLogic->getConfiguration('type')]['icon'];
-$alternateImg = $eqLogic->getConfiguration('type');
-    echo '<center>';
-    if (file_exists(dirname(__FILE__) . '/../../core/config/devices/' . $alternateImg . '.png'))
-        echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/' . $alternateImg . '.png" height="105" width="105" />';
-    elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
-        echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" height="105" width="105" />';
-    elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/default.png'))
-        echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" height="105" width="105" />';
-    else
-        echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="105" />';
+foreach($eqLogics as $eqLogic) {
 
-    echo '</center>';
-    echo '<span  class="name"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
-	
-	echo '</div>';
+	if ($eqLogic->getConfiguration('devicetype') != "Smarthome") {
+
+		$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
+		echo '<div class="eqLogicDisplayCard cursor prem" data-eqLogic_id="'.$eqLogic->getId().'" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;'.$opacity.'" >';
+
+		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")))
+			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
+
+		//$alternateImg = $knownDeviceType[$eqLogic->getConfiguration('type')]['icon'];
+		$alternateImg = $eqLogic->getConfiguration('type');
+		echo '<center>';
+		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" height="105" width="105" />';
+		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" height="105" width="105" />';
+		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" height="105" width="105" />';
+		else
+			echo '<img src="'.$plugin->getPathImgIcon().'" height="105" width="105" />';
+
+		echo '</center>';
+		echo '<span  class="name"><center>'.$eqLogic->getHumanName(true, true).'</center></span>';
+
+		echo '</div>';
 	}
 }
 ?>
     </div>
     <!-- Début de la liste des objets -->
-    <legend><i class="fa fa-table"></i> {{Mes Amazon Smarthome}}</legend>
+    <legend><i class="fas fa-table"></i> {{Mes Amazon Smarthome}}</legend>
+	<div class="input-group" style="margin-bottom:5px;">
+		<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic2" />
+		<div class="input-group-btn">
+			<a id="bt_resetEqlogicSearch2" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
+		</div>
+	</div>	
     <!-- Container de la liste -->
-    <div class="eqLogicThumbnailContainer">
+    <div class="eqLogicThumbnailContainer second">
 <?php
-foreach ($eqLogics as $eqLogic)
-{
-	if ($eqLogic->getConfiguration('devicetype')=="Smarthome")
-	{
-	
-	
-	
-    $opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
-    echo '<div class="eqLogicDisplayCard cursor" data-eqLogic_id="' . $eqLogic->getId() . '" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;' . $opacity . '" >';
-	
-	if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps"))) 
-		echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
-	
-	
-//$alternateImg = $knownDeviceType[$eqLogic->getConfiguration('type')]['icon'];
-$alternateImg = $eqLogic->getConfiguration('type');
-    echo '<center>';
-    if (file_exists(dirname(__FILE__) . '/../../core/config/devices/' . $alternateImg . '.png'))
-        echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/' . $alternateImg . '.png" height="105" width="105" />';
-    elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
-        echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" height="105" width="105" />';
-    elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/default.png'))
-        echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" height="105" width="105" />';
-    else
-        echo '<img src="' . $plugin->getPathImgIcon() . '" height="105" width="105" />';
+foreach($eqLogics as $eqLogic) {
+	if ($eqLogic->getConfiguration('devicetype') == "Smarthome") {
 
-    echo '</center>';
-    echo '<span  class="name"><center>' . $eqLogic->getHumanName(true, true) . '</center></span>';
-	
-	echo '</div>';
+		$opacity = ($eqLogic->getIsEnable()) ? '' : jeedom::getConfiguration('eqLogic:style:noactive');
+		echo '<div class="eqLogicDisplayCard cursor second" data-eqLogic_id="'.$eqLogic->getId().'" style="background-color : #ffffff; height : 200px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;'.$opacity.'" >';
+
+		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")))
+			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
+
+		//$alternateImg = $knownDeviceType[$eqLogic->getConfiguration('type')]['icon'];
+		$alternateImg = $eqLogic->getConfiguration('type');
+		echo '<center>';
+		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" height="105" width="105" />';
+		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" height="105" width="105" />';
+		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" height="105" width="105" />';
+		else
+			echo '<img src="'.$plugin->getPathImgIcon().'" height="105" width="105" />';
+
+		echo '</center>';
+		echo '<span  class="name"><center>'.$eqLogic->getHumanName(true, true).'</center></span>';
+
+		echo '</div>';
 	}
 }
 ?>
@@ -474,3 +476,23 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
 <?php include_file('desktop', 'alexaapi', 'js', 'alexaapi'); ?>
 <?php include_file('desktop', 'alexaapi', 'css', 'alexaapi'); ?>
 <?php include_file('core', 'plugin.template', 'js'); ?>
+<script>
+$('#in_searchEqlogic').off('keyup').keyup(function () {
+  var search = $(this).value().toLowerCase();
+  search = search.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+  if(search == ''){
+    $('.eqLogicDisplayCard.prem').show();
+    $('.eqLogicThumbnailContainer.prem').packery();
+    return;
+  }
+  $('.eqLogicDisplayCard.prem').hide();
+  $('.eqLogicDisplayCard.prem .name').each(function(){
+    var text = $(this).text().toLowerCase();
+    text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+    if(text.indexOf(search) >= 0){
+      $(this).closest('.eqLogicDisplayCard.prem').show();
+    }
+  });
+  $('.eqLogicThumbnailContainer.prem').packery();
+});
+</script>
