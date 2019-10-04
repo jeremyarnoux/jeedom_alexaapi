@@ -31,6 +31,35 @@ setTimeout("envoiQuery(requeteremote.value, requetedata.value)", tempo);
 //console.log ("fini");
 });
 
+$('#bt_resetEqlogicSearch').on('click', function () {
+  $('#in_searchEqlogic').val('')
+  $('#in_searchEqlogic').keyup()
+})
+
+$('#in_searchEqlogic2').off('keyup').keyup(function () {
+  var search = $(this).value().toLowerCase();
+  search = search.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+  if(search == ''){
+    $('.eqLogicDisplayCard.second').show();
+    $('.eqLogicThumbnailContainer.second').packery();
+    return;
+  }
+  $('.eqLogicDisplayCard.second').hide();
+  $('.eqLogicDisplayCard.second .name').each(function(){
+    var text = $(this).text().toLowerCase();
+    text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+    if(text.indexOf(search) >= 0){
+      $(this).closest('.eqLogicDisplayCard.second').show();
+    }
+  });
+  $('.eqLogicThumbnailContainer.second').packery();
+});
+$('#bt_resetEqlogicSearch2').on('click', function () {
+  $('#in_searchEqlogic2').val('')
+  $('#in_searchEqlogic2').keyup()
+})
+
+
 function envoiQuery(query, data) {
 	//if (query=='') query='{"host":"alexa.amazon.fr","path":"/api/bootstrap?version=0","method":"GET","timeout":10000,"headers":{}}';
 	if (query=='') query='{"host":"alexa.amazon.fr","path":"/api/behaviors/preview","method":"POST","timeout":12345,"headers":{}}';
