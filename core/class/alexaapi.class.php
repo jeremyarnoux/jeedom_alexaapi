@@ -1043,7 +1043,7 @@ class alexaapi extends eqLogic {
 			
 			
 			
-			if ($this->hasCapa("DIALOG_INTERFACE_VERSION")) { 
+			//if ($this->hasCapa("DIALOG_INTERFACE_VERSION")) { 
 			
 				// Dernière Intéraction
 				$cmd = $this->getCmd(null, 'interactioninfo');
@@ -1058,12 +1058,12 @@ class alexaapi extends eqLogic {
 					$cmd->setDisplay('icon', '<i class="fa jeedomapp-audiospeak"></i>');
 					}
 				$cmd->save();
-			} else {
+			/*} else {
 				$cmd = $this->getCmd(null, 'interactioninfo');
 				if (is_object($cmd)) {
 					$cmd->remove();
 				}
-			}			
+			}*/			
 	
 			
 			
