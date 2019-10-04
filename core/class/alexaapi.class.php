@@ -1001,7 +1001,7 @@ class alexaapi extends eqLogic {
 
 				// Volume command
 				$vol = $this->getCmd(null, 'volumeinfo');
-				if (!is_object($cmd)) {
+				if (!is_object($vol)) {
 					$vol = new alexaapiCmd();
 					$vol->setType('info');
 					$vol->setLogicalId('volumeinfo');
@@ -1016,7 +1016,7 @@ class alexaapi extends eqLogic {
 				$vol->save();
 			} else {
 				$vol = $this->getCmd(null, 'volumeinfo');
-				if (is_object($cmd)) {
+				if (is_object($vol)) {
 					$vol->remove();
 				}
 			}			
