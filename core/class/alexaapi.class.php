@@ -997,6 +997,30 @@ class alexaapi extends eqLogic {
 				}
 			}
 
+			if (($this->hasCapaorFamilyorType("VOLUME_SETTING")) && (!$this->hasCapaorFamilyorType("WHA"))) { 
+
+				// Volume command
+				$vol = $this->getCmd(null, 'volumeinfo');
+				if (!is_object($cmd)) {
+					$vol = new alexaapiCmd();
+					$vol->setType('info');
+					$vol->setLogicalId('volumeinfo');
+					$vol->setSubType('string');
+					$vol->setEqLogic_id($this->getId());
+					$vol->setName('VolumeInfo');
+					$vol->setConfiguration('minValue', '0');
+					$vol->setConfiguration('maxValue', '100');
+					$vol->setIsVisible(1);
+					$vol->setDisplay('icon', '<i class="fa fa-volume-up"></i>');
+				}
+				$vol->save();
+			} else {
+				$vol = $this->getCmd(null, 'volumeinfo');
+				if (is_object($cmd)) {
+					$vol->remove();
+				}
+			}			
+			
 			
 			if ($this->hasCapaorFamilyorType("VOLUME_SETTING")) { 
 
@@ -1015,6 +1039,9 @@ class alexaapi extends eqLogic {
 					$cmd->setIsVisible(1);
 					$cmd->setDisplay('icon', '<i class="fa fa-volume-up"></i>');
 				}
+				if(is_object($vol)) {
+					$cmd->setValue($vol->getId());
+				}
 				$cmd->save();
 			} else {
 				$cmd = $this->getCmd(null, 'volume');
@@ -1023,29 +1050,7 @@ class alexaapi extends eqLogic {
 				}
 			}
 			
-			if (($this->hasCapaorFamilyorType("VOLUME_SETTING")) && (!$this->hasCapaorFamilyorType("WHA"))) { 
-
-				// Volume command
-				$cmd = $this->getCmd(null, 'volumeinfo');
-				if (!is_object($cmd)) {
-					$cmd = new alexaapiCmd();
-					$cmd->setType('info');
-					$cmd->setLogicalId('volumeinfo');
-					$cmd->setSubType('string');
-					$cmd->setEqLogic_id($this->getId());
-					$cmd->setName('VolumeInfo');
-					$cmd->setConfiguration('minValue', '0');
-					$cmd->setConfiguration('maxValue', '100');
-					$cmd->setIsVisible(1);
-					$cmd->setDisplay('icon', '<i class="fa fa-volume-up"></i>');
-				}
-				$cmd->save();
-			} else {
-				$cmd = $this->getCmd(null, 'volumeinfo');
-				if (is_object($cmd)) {
-					$cmd->remove();
-				}
-			}			
+			
 			
 			
 			
