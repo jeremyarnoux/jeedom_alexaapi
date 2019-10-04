@@ -20,6 +20,7 @@ foreach ($eqLogics as $eqLogic)
 
 <script>
 var logicalIdToHumanReadable = <?php echo json_encode($logicalIdToHumanReadable); ?>
+
 function printEqLogic(data)
 {
 	
