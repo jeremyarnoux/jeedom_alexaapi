@@ -76,9 +76,11 @@ log::add('alexaapi_mqtt', 'debug',  'Volume trouvé: '.$result['volume']);
 				$alexaapi->checkAndUpdateCmd('volumeinfo', $result['volume']);
 				//$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
 				//$alexaapi->save();
+				die();
 }
-	die();
+
 // ----------------- INTERACTION ------------------
+	
 			
 if ($result['description']['summary']!=null)
 {
@@ -86,6 +88,7 @@ log::add('alexaapi_mqtt', 'debug',  'Intéraction trouvée: '.$result['descripti
 				$alexaapi->checkAndUpdateCmd('interactioninfo', $result['description']['summary']);
 				//$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
 				//$alexaapi->save();
+				die();
 }
 
 /*
