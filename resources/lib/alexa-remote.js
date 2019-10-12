@@ -533,7 +533,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
                         deviceType: payload.dopplerId.deviceType,
                         mediaReferenceId: payload.mediaReferenceId,
-                        audioPlayerState: payload.audioPlayerState, //  'INTERRUPTED', / 'FINISHED' / 'PLAYING'
+                        audioPlayerState: payload.audioPlayerState, //  'INTERRUPTED', / 'FINISHED' / 'PLAYING' ou IDLE
                         error: payload.error,
                         errorMessage: payload.errorMessage
                     });
@@ -1497,8 +1497,49 @@ this.deleteNotification(notification, callback);
     getDeviceStatusList(callback) {
         this.httpsGet (`/api/dnd/device-status-list?_=%t`, callback);
     }
-
-    // alarm volume
+	
+	// Liste les Playlists
+    Playlists(serialOrName, callback) {
+		let dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+		this.httpsGet (`/api/cloudplayer/playlists?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&mediaOwnerCustomerId=${dev.deviceOwnerCustomerId}&_=%t`, callback);
+   }
+   
+   // Lit une playlist
+   //http://192.168.0.21:3456/playlist?playlist=a8feaaf9-40a4-4e33-bd4d-b6dd71af85fd&device=G0911W079304113M
+    playList(serialOrName, _playlistId, callback) {
+		let dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+		
+        let flags = {
+            data: JSON.stringify({
+                playlistId: _playlistId,
+                playQueuePrime: true
+            }),
+            method: 'POST'
+        };	
+		
+		this.httpsGet (`/api/cloudplayer/queue-and-play?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&mediaOwnerCustomerId=${dev.deviceOwnerCustomerId}&shuffle=false&_=%t`, callback, flags);
+   }
+   
+   // Lit une MusicTrack
+   //http://192.168.0.21:3456/playmusictrack?trackId=53bfa26d-f24c-4b13-97a8-8c3debdf06f0&device=G0911W079304113M
+    playMusicTrack(serialOrName, _trackId, callback) {
+		let dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+		
+        let flags = {
+            data: JSON.stringify({
+                trackId: _trackId,
+                playQueuePrime: true
+            }),
+            method: 'POST'
+        };	
+		
+		this.httpsGet (`/api/cloudplayer/queue-and-play?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&mediaOwnerCustomerId=${dev.deviceOwnerCustomerId}&shuffle=false&_=%t`, callback, flags);
+   }
+   
+   // alarm volume
     getDeviceNotificationState(serialOrName, callback) {
         let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));

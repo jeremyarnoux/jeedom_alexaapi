@@ -187,6 +187,7 @@ CommandAlexa.Radio = function(req,res){
 
 }
 
+
 /***** Alexa.Volume *****
   URL: /volume?device=?&value=?
     device - String - name of the device
@@ -219,13 +220,62 @@ CommandAlexa.Volume = function(req,res){
 					}
 			);
 		//});	
+		
+}
+/***** Alexa.playList *****
+  URL: /volume?device=?&value=?
+    device - String - name of the device
+    value - Integer - Determine the volume level between 0 to 100 (0 is mute and 100 is max)
+*/
+CommandAlexa.playList = function(req,res){
 	
+	res.type('json');
 
-	
-	
-	
+	config.logger('Alexa-API:    Lancement /playList avec paramètres -> device: ' + req.query.device+' & playlist: ' + req.query.playlist);
+
+	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.playList', 'Missing parameter "device"'));
+	if ('playlist' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.playList', 'Missing parameter "playlist"'));
+
+			
+			alexa.playList(req.query.device, req.query.playlist, 
+				function(testErreur){
+						if (testErreur) 
+						{traiteErreur(testErreur);
+						res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.playList', testErreur.message));
+						}
+						else
+						res.status(200).json({value: "OK"});	//ne teste pas le résultat
+					}
+			);
+			
+		
 }
 
+/***** CommandAlexa.playMusicTrack *****
+*/
+CommandAlexa.playMusicTrack = function(req,res){
+	
+	res.type('json');
+
+	config.logger('Alexa-API:    Lancement /playMusicTrack avec paramètres -> device: ' + req.query.device+' & trackId: ' + req.query.trackId);
+
+	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.playList', 'Missing parameter "device"'));
+	if ('trackId' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.playList', 'Missing parameter "trackId"'));
+
+			
+			alexa.playMusicTrack(req.query.device, req.query.trackId, 
+				function(testErreur){
+						if (testErreur) 
+						{traiteErreur(testErreur);
+						res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.trackId', testErreur.message));
+						}
+						else
+						res.status(200).json({value: "OK"});	//ne teste pas le résultat
+					}
+			);
+			
+		
+}
 /***** Alexa.Command *****
   URL: /command?device=?&command=?
     device - String - name of the device
@@ -246,9 +296,7 @@ CommandAlexa.Command = function(req,res){
 }
 
 /***** Alexa.SmarthomeCommand *****
-  URL: /SmarthomeCommand?device=?&command=?
-    device - String - name of the device
-    command - String - command : pause|play|next|prev|fwd|rwd|shuffle|repeat
+
 */
 CommandAlexa.SmarthomeCommand = function(req,res){
 	
@@ -430,6 +478,11 @@ app.get('/deletereminder', CommandAlexa.deleteReminder);
 
 CommandAlexa.Routine = function(req,res){
 	LancementCommande("Routine",req);
+	
+	
+		//config.logger('Alexa-API:    Lancement /Routine avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.routine);
+
+	
 	res.type('json');
 
 	if ('device' in req.query === false)
@@ -769,6 +822,7 @@ CommandAlexa.deviceStatusList = function(req, res) {
 	});
 }
 
+
 /*
 CommandAlexa.doNotDisturb = function(req, res) {
 	commandeEnvoyee = req.path.replace("/", "");
@@ -808,6 +862,24 @@ CommandAlexa.playerInfo = function(req, res) {
 	config.logger('Alexa-API: device: ' + req.query.device);
 
 	Appel_getPlayerInfo(req.query.device, function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
+
+
+CommandAlexa.Playlists = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: /'+commandeEnvoyee);
+	res.type('json');
+
+	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+
+	Appel_Playlists(req.query.device, function(retourAmazon) {
+		config.logger('Alexa-API: retour: ' + commandeEnvoyee);
 		fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500)});
@@ -947,6 +1019,12 @@ function Appel_getDeviceStatusList(callback)
 	alexa.getDeviceStatusList((err, res) => {if (err) return callback && callback();
 	callback && callback(res);});
 	}
+	
+function Appel_Playlists(serialOrName,callback) 
+	{
+	alexa.Playlists(serialOrName,(err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}	
 	/*
 function Appel_getDoNotDisturb(callback) 
 	{
@@ -997,12 +1075,9 @@ app.get('/lists', CommandAlexa.lists);
 app.get('/carts', CommandAlexa.carts);
 app.get('/deviceNotificationState', CommandAlexa.deviceNotificationState);
 app.get('/deviceStatusList', CommandAlexa.deviceStatusList);
-
-
-
-
-
-
+app.get('/playlists', CommandAlexa.Playlists);
+app.get('/playlist', CommandAlexa.playList);
+app.get('/playmusictrack', CommandAlexa.playMusicTrack);
 
 
 

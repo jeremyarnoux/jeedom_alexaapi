@@ -135,7 +135,7 @@ endif;
 <?php
 foreach($eqLogics as $eqLogic) {
 
-	if ($eqLogic->getConfiguration('devicetype') != "Smarthome") {
+	if (($eqLogic->getConfiguration('devicetype') != "Smarthome") && ($eqLogic->getConfiguration('devicetype') != "Player")) {
 
 		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
 		echo '<div class="eqLogicDisplayCard cursor prem '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'" >';
@@ -161,6 +161,50 @@ foreach($eqLogics as $eqLogic) {
 }
 ?>
     </div>
+	
+	    <legend><i class="fas fa-table"></i> {{Mes Amazon Player}}</legend>
+	<div class="input-group" style="margin-bottom:5px;">
+		<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic" />
+		<div class="input-group-btn">
+			<a id="bt_resetEqlogicSearch" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
+		</div>
+	</div>	
+    <!-- Container de la liste -->
+    <div class="eqLogicThumbnailContainer prem">
+<?php
+foreach($eqLogics as $eqLogic) {
+
+	if ($eqLogic->getConfiguration('devicetype') == "Player") {
+
+		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
+		echo '<div class="eqLogicDisplayCard cursor prem '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'" >';
+
+		if (($eqLogic->getStatus('online') != 'true'))
+			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
+		else
+			echo '<i class="fas loisir-musical7" style="color: #2c8af6;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>'; // Dire que c'est un Player
+		
+
+		$alternateImg = $eqLogic->getConfiguration('type');
+		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" />';
+		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" />';
+		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" />';
+		else
+			echo '<img src="'.$plugin->getPathImgIcon().'" />';
+
+		echo '<br/>';
+		echo '<span class="name"><center>'.$eqLogic->getHumanName(true, true).'</center></span>';
+
+		echo '</div>';
+	}
+}
+?>
+    </div>
+	
+	
     <!-- Début de la liste des objets -->
     <legend><i class="fas fa-table"></i> {{Mes Amazon Smarthome}}</legend>
 	<div class="input-group" style="margin-bottom:5px;">
@@ -178,7 +222,7 @@ foreach($eqLogics as $eqLogic) {
 		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
 		echo '<div class="eqLogicDisplayCard cursor second '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'">';
 
-		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")))
+		if (($eqLogic->getStatus('online') != 'true'))
 			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
 
 		$alternateImg = $eqLogic->getConfiguration('type');

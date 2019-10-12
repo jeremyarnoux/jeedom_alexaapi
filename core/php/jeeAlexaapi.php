@@ -27,7 +27,7 @@ if (!jeedom::apiAccess(init('apikey'), 'alexaapi')) {
 }
 
 	log::add('alexaapi', 'debug',  'Réception données sur jeeAlexaapi');
-	log::add('alexaapi_mqtt', 'debug',  'Clé Plugin Valide');
+	//log::add('alexaapi_mqtt', 'debug',  'Clé Plugin Valide');
 
 if (init('test') != '') {
 	echo 'OK';
@@ -35,47 +35,93 @@ if (init('test') != '') {
 }
 
 $chaineRecuperee=file_get_contents("php://input");
+$nom=$_GET["nom"];
+log::add('alexaapi_mqtt', 'info',  " -----[".$nom."]-----" );
 
-
-
-log::add('alexaapi_mqtt', 'debug',  "-----[".$_GET["nom"]."]-----" );
 
 $debut=strpos($chaineRecuperee, "{");
 $fin=strrpos($chaineRecuperee, "}");
 $longeur=1+intval($fin)-intval($debut);
 $chaineRecupereeCorrigee=substr($chaineRecuperee, $debut, $longeur);
+
+$chaineRecupereeCorrigee=str_replace ("[", "", $chaineRecupereeCorrigee);
+$chaineRecupereeCorrigee=str_replace ("]", "", $chaineRecupereeCorrigee);
+
 log::add('alexaapi_mqtt', 'debug',  $chaineRecupereeCorrigee);
 
 $result = json_decode($chaineRecupereeCorrigee, true);
+
 
 
 if (!is_array($result)) {
 	log::add('alexaapi_mqtt', 'debug', 'Format Invalide');
 	die();
 }
-//log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialNumber']);
-$logical_id = $result['deviceSerialNumber'];
-
-
+log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialNumber']);
+$logical_id = $result['deviceSerialNumber']."_player";
 $alexaapi=alexaapi::byLogicalId($logical_id, 'alexaapi');
-
-			if (!is_object($alexaapi)) {
-log::add('alexaapi_mqtt', 'debug',  'Device non trouvé: '.$logical_id);
-	die();
-			}
-			else{
-log::add('alexaapi_mqtt', 'debug',  'Device trouvé: '.$logical_id);
-			}
+$alexaapi2=alexaapi::byLogicalId($result['deviceSerialNumber'], 'alexaapi'); // Le device Amazon Echo
 			
+			
+
+
+			
+	switch ($nom) {
 		
+		
+			case 'ws-volume-change':
+				metAJour("Volume", $result['volume'], 'volumeinfo', false , $alexaapi);
+				metAJour("Volume", $result['volume'], 'volumeinfo', false , $alexaapi2);
+			break;	
+			
+			case 'ws-media-queue-change':
+				metAJour("loopMode", $result['loopMode'], 'loopMode', false , $alexaapi);
+				metAJour("playBackOrder", $result['playBackOrder'], 'playBackOrder', false , $alexaapi);
+			break;	
+			
+			case 'ws-device-activity':
+		
+
+				metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , $alexaapi);
+				metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , $alexaapi2);
+				
+				metAJour("activityStatus", $result['activityStatus'], 'activityStatus', true , $alexaapi);
+
+				metAJour("Radio", $result['domainAttributes']['nBestList']['stationCallSign'], 'radioinfo', false , $alexaapi);
+				
+				metAJour("Radio", $result['domainAttributes']['nBestList']['stationName'], 'radioinfo', false , $alexaapi);
+				
+				metAJour("playlistName", $result['domainAttributes']['nBestList']['playlistName'], 'playlistName', true , $alexaapi);
+				
+				//metAJour("songName", $result['domainAttributes']['nBestList']['songName'], 'songName', true , $alexaapi);
+				
+			break;			
+		
+			case 'ws-audio-player-state-change':
+				metAJour("Audio Player State", $result['audioPlayerState'], 'audioPlayerState', true , $alexaapi);
+			case 'refreshPlayer':
+				metAJourPlayer($logical_id, $result['audioPlayerState'], $alexaapi);
+
+			break;
+			
+			default:
+
+				if (!is_object($alexaapi)) {
+				log::add('alexaapi_mqtt', 'debug',  'Device non trouvé: '.$logical_id);
+				die();
+				}
+				else{
+				log::add('alexaapi_mqtt', 'debug',  'Device trouvé: '.$logical_id);
+				}
+		
+	}
+	/*
 // ----------------- VOLUME ------------------
 			
 if ($result['volume']!=null)
 {
 log::add('alexaapi_mqtt', 'debug',  'Volume trouvé: '.$result['volume']);
 				$alexaapi->checkAndUpdateCmd('volumeinfo', $result['volume']);
-				//$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
-				//$alexaapi->save();
 				die();
 }
 
@@ -86,205 +132,153 @@ if ($result['description']['summary']!=null)
 {
 log::add('alexaapi_mqtt', 'debug',  'Intéraction trouvée: '.$result['description']['summary']);
 				$alexaapi->checkAndUpdateCmd('interactioninfo', $result['description']['summary']);
-				//$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
-				//$alexaapi->save();
 				die();
 }
 
-/*
-if (isset($result['devices'])) {
-	foreach ($result['devices'] as $key => $datas) {
-		$explode = explode('_',$key);
-		$key = $explode[0];
-		if ($key == 'aquara'){
-			if (!($datas['cmd'] == 'heartbeat' || $datas['cmd'] == 'report' || $datas['cmd'] == 'read_ack')) {
-				continue;
-			}
-			if (!isset($datas['sid'])) {
-				continue;
-			}
-			$logical_id = $datas['sid'];
-			if ($datas['model'] == 'gateway') {
-				$logical_id = $datas['source'];
-			}
-			$alexaapi=alexaapi::byLogicalId($logical_id, 'alexaapi');
-			if (!is_object($alexaapi)) {
-				if ($datas['model'] == 'gateway') {
-					//test si gateway qui a changé d'ip
-					foreach (eqLogic::byType('alexaapi') as $gateway) {
-						if ($gateway->getConfiguration('sid') == $datas['sid']) {
-							$gateway->setConfiguration('gateway',$datas['source']);
-							$gateway->setLogicalId($datas['source']);
-							$gateway->save();
-							return;
-						}
-					}
-				}
-				$alexaapi= alexaapi::createFromDef($datas,$key);
-				if (!is_object($alexaapi)) {
-					log::add('alexaapi', 'debug', __('Aucun équipement trouvé pour : ', __FILE__) . secureXSS($datas['sid']));
-					continue;
-				}
-				sleep(2);
-				event::add('jeedom::alert', array(
-					'level' => 'warning',
-					'page' => 'alexaapi',
-					'message' => '',
-				));
-				event::add('alexaapi::includeDevice', $alexaapi->getId());
-			}
-			if (!$alexaapi->getIsEnable()) {
-				continue;
-			}
-			if ($alexaapi->getConfiguration('gateway') != $datas['source'] && $datas['model'] != 'gateway') {
-				$alexaapi->setConfiguration('gateway',$datas['source']);
-				$alexaapi->save();
-			}
-			if ($datas['sid'] !== null && $datas['model'] !== null) {
-				if (isset($datas['data'])) {
-					$data = $datas['data'];
-					foreach ($data as $key => $value) {
-						if ($datas['cmd'] == 'heartbeat' && $key == 'status') {
-							continue;
-						}
-						if ($datas['model'] == 'gateway'){
-							alexaapi::receiveAquaraData($datas['source'], $datas['model'], $key, $value);
-						} else {
-							alexaapi::receiveAquaraData($datas['sid'], $datas['model'], $key, $value);
-						}
-					}
-				}
-				$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
-				$alexaapi->save();
-			}
-		}
-		elseif ($key == 'yeelight'){
-			if (!isset($datas['capabilities']['id'])) {
-				continue;
-			}
-			$logical_id = $datas['ip'];
-			$alexaapi=alexaapi::byLogicalId($logical_id, 'alexaapi');
-			if (!is_object($alexaapi)) {
-				foreach (eqLogic::byType('alexaapi') as $yeelight) {
-					if ($yeelight->getConfiguration('gateway') == $datas['ip']) {
-						$yeelight->setLogicalId($datas['ip']);
-						$yeelight->save();
-						return;
-					}
-				}
-				if (!isset($datas['capabilities']['model'])) {
-					continue;
-				}
-				$alexaapi= alexaapi::createFromDef($datas,$key);
-				if (!is_object($alexaapi)) {
-					log::add('alexaapi', 'debug', __('Aucun équipement trouvé pour : ', __FILE__) . secureXSS($datas['capabilities']['id']));
-					continue;
-				}
-				sleep(2);
-				event::add('jeedom::alert', array(
-					'level' => 'warning',
-					'page' => 'alexaapi',
-					'message' => '',
-				));
-				event::add('alexaapi::includeDevice', $alexaapi->getId());
-			}
-			if (!$alexaapi->getIsEnable()) {
-				continue;
-			}
-			if (isset($datas['capabilities'])) {
-				$data = $datas['capabilities'];
-				$power = ($data['power'] == 'off')? 0:1;
-				$alexaapi->checkAndUpdateCmd('status', $power);
-				$alexaapi->checkAndUpdateCmd('brightness', $data['bright']);
-				if ($alexaapi->getConfiguration('model') != 'mono' && $alexaapi->getConfiguration('model') != 'ceiling') {
-					$alexaapi->checkAndUpdateCmd('color_mode', $data['color_mode']);
-					$alexaapi->checkAndUpdateCmd('rgb', '#' . str_pad(dechex($data['rgb']), 6, "0", STR_PAD_LEFT));
-					$alexaapi->checkAndUpdateCmd('hsv', $data['hue']);
-					$alexaapi->checkAndUpdateCmd('saturation', $data['sat']);
-				}
-				if ($alexaapi->getConfiguration('model') != 'mono') {
-					$alexaapi->checkAndUpdateCmd('temperature', $data['ct']);
-				}
-				if ($alexaapi->getConfiguration('model') == 'ceiling4' || $alexaapi->getConfiguration('model') == 'ceiling10') {
-					$bgpower = ($data['bg_power'] == 'off')? 0:1;
-					$alexaapi->checkAndUpdateCmd('bg_status', $bgpower);
-					$alexaapi->checkAndUpdateCmd('bg_bright', $data['bg_bright']);
-					$alexaapi->checkAndUpdateCmd('bg_rgb', $data['bg_rgb']);
-				}
-				$alexaapi->setConfiguration('ipwifi', $datas['ip']);
-				$alexaapi->setConfiguration('gateway', $datas['ip']);
-				$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
-				$alexaapi->save();
-			}
-		}
-		elseif ($key == 'wifi'){
-			if (isset($datas['notfound'])){
-				$logical_id = $datas['ip'];
-				$alexaapi=alexaapi::byLogicalId($logical_id, 'alexaapi');
-				event::add('alexaapi::notfound', $alexaapi->getId());
-				continue;
-			}
-			if (isset($datas['found'])){
-				$logical_id = $datas['ip'];
-				$alexaapi=alexaapi::byLogicalId($logical_id, 'alexaapi');
-				$alexaapi->setConfiguration('gateway',$datas['ip']);
-				$alexaapi->setConfiguration('sid',$datas['serial']);
-				$alexaapi->setConfiguration('short_id',$datas['devtype']);
-				$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
-				$alexaapi->setIsEnable(1);
-				$alexaapi->setIsVisible(1);
-				if (!in_array($datas['model'], array('vacuum','philipsceiling'))){
-					$alexaapi->setConfiguration('password',$datas['token']);
-				}
-				$alexaapi->save();
-				event::add('alexaapi::found', $alexaapi->getId());
-				$refreshcmd = alexaapiCmd::byEqLogicIdAndLogicalId($alexaapi->getId(),'refresh');
-				$refreshcmd->execCmd();
-				continue;
-			}
-			if (!isset($datas['model']) || !isset($datas['ip'])) {
-				continue;
-			}
-			$logical_id = $datas['ip'];
-			$alexaapi=alexaapi::byLogicalId($logical_id, 'alexaapi');
-			if (!is_object($alexaapi)) {
-				continue;
-			}
-			if (!$alexaapi->getIsEnable()) {
-				continue;
-			}
-			log::add('alexaapi', 'debug', 'Status ' . print_r($datas, true));
-			foreach ($alexaapi->getCmd('info') as $cmd) {
-				$logicalId = $cmd->getLogicalId();
-				if ($logicalId == '') {
-					continue;
-				}
-				$path = explode('::', $logicalId);
-				$value = $datas;
-				foreach ($path as $key) {
-					if (!isset($value[$key])) {
-						continue (2);
-					}
-					$value = $value[$key];
-					if (!is_array($value) && strpos($value, 'toggle') !== false && $cmd->getSubType() == 'binary') {
-						$value = $cmd->execCmd();
-						$value = ($value != 0) ? 0 : 1;
-					}
-				}
-				if (!is_array($value)) {
-					if ($cmd->getSubType() == 'numeric') {
-						$value = round($value, 2);
-					}
-					$cmd->event($value);
-				}
-				if (strpos($logicalId,'battery') !== false) {
-					$alexaapi->batteryStatus($value);
-				}
-				$alexaapi->setStatus('lastCommunication',date('Y-m-d H:i:s'));
-				$alexaapi->save();
-			}
-		}
-	}
+// ----------------- audioPlayerState ------------------
+	
+			
+if ($result['audioPlayerState']!=null)
+{
+log::add('alexaapi_mqtt', 'debug',  'Changement état Audio Player: '.$result['audioPlayerState']);
+				$alexaapi->checkAndUpdateCmd('audioPlayerState', $result['audioPlayerState']);
+				die();
 }
 */
+
+function metAJour($nom, $variable, $commandejeedom, $effaceSiNull, $_alexaapi) {
+	try {
+		if (isset($variable)) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] find: '.json_encode($variable));
+			$_alexaapi->checkAndUpdateCmd($commandejeedom, $variable);
+			}
+			else {
+			log::add('alexaapi_mqtt', 'debug',  '['.$nom.':'.$commandejeedom.'] non trouvé: '.$variable);
+				if ($effaceSiNull) {
+					$_alexaapi->checkAndUpdateCmd($commandejeedom, null);
+					log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] non trouvé et vidé');
+				}
+			}	
+	} catch (Exception $e) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+				
+		} catch (Error $e) {
+				log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+
+			}	
+}
+
+function metAJourBoutonPlayer($nom, $variable, $commandejeedom, $nomBouton, $_alexaapi) {
+	try {
+		if (isset($variable)) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] find: '.json_encode($variable));
+			$_alexaapi->checkAndUpdateCmd($commandejeedom, $variable);
+			if ($variable=='ENABLED') $visible=1; else $visible=0;
+				$cmd = $_alexaapi->getCmd(null, $nomBouton);
+				if (is_object($cmd)) {
+				log::add('alexaapi_mqtt', 'info',  ' ok invisible');
+				$cmd->setIsVisible($visible);
+				$cmd->save();
+				}
+			}
+	} catch (Exception $e) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+				
+		} catch (Error $e) {
+				log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+
+			}	
+}
+
+function metAJourImage($nom, $variable, $commandejeedom, $effaceSiNull, $_alexaapi) {
+	
+	try {
+		
+		
+		//if ($variable!=null)
+		if (isset($variable)) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] find: '.json_encode($variable));
+			//$_alexaapi->checkAndUpdateCmd($commandejeedom, $variable);
+			$_alexaapi->checkAndUpdateCmd($commandejeedom, "<img width='150' height='150' src='".$variable."' />");
+			//die();
+			}
+			else
+			{
+			log::add('alexaapi_mqtt', 'debug',  '['.$nom.':'.$commandejeedom.'] non trouvé: '.$variable);
+			if ($effaceSiNull) {
+				$_alexaapi->checkAndUpdateCmd($commandejeedom, null);
+				log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] non trouvé et vidé');
+			}
+			//die();
+			}	
+	} catch (Exception $e) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+				
+	} catch (Error $e) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+
+	}	
+}	
+
+function metAJourPlayer($serialdevice, $audioPlayerState, $alexaapi) {
+		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
+
+	try {
+		
+		log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzzzz metAJourPlayer:'.$audioPlayerState);
+		//if (($audioPlayerState=="PLAYING") || ($audioPlayerState=="REFRESH") || ($audioPlayerState=="PAUSED"))	{
+		if ($audioPlayerState!="FINISHED") 	{
+		//log::add('alexaapi_mqtt', 'debug',  ' metAJourPlayer:'.$serialdevice);
+		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/playerInfo?device=".str_replace ("_player", "", $serialdevice));
+		$result = json_decode($json,true);		
+		log::add('alexaapi_mqtt', 'debug',  ' JSON:'.$json);
+		
+		}
+		else {
+	metAJour("state", $audioPlayerState, 'state', false , $alexaapi);		
+	// Pour supprimer les éléments MQTT qui étaient arrivés précédemment
+		//metAJour("playlistName", "", 'playlistName', true , $alexaapi);
+		}
+		
+metAJour("subText1", $result['playerInfo']['infoText']['subText1'], 'subText1', true , $alexaapi);
+metAJour("subText2", $result['playerInfo']['infoText']['subText2'], 'subText2', true , $alexaapi);
+metAJour("title", $result['playerInfo']['infoText']['title'], 'title', true , $alexaapi);
+metAJourImage("url", $result['playerInfo']['mainArt']['url'], 'url', true , $alexaapi);
+metAJour("mediaLength", $result['playerInfo']['progress']['mediaLength'], 'mediaLength', true , $alexaapi);
+metAJour("mediaProgress", $result['playerInfo']['progress']['mediaProgress'], 'mediaProgress', true , $alexaapi);
+
+metAJour("state", $result['playerInfo']['state'], 'state', false , $alexaapi);
+
+// NEXT ET PREVIOUS MIS A JOUR PAR requete Player Info
+
+metAJourBoutonPlayer("nextState", $result['playerInfo']['transport']['next'], 'nextState', 'next' , $alexaapi);
+metAJourBoutonPlayer("previousState", $result['playerInfo']['transport']['previous'], 'previousState', 'previous' , $alexaapi);
+
+// Play et Pause Mis à jour en fonction de $audioPlayerState
+	if ($audioPlayerState=="PLAYING") {
+			$etatdePlay='DISABLED'; 
+			$etatdePause='ENABLED';
+		}
+		else {
+			$etatdePlay='ENABLED';
+			$etatdePause='DISABLED';
+		}
+
+metAJourBoutonPlayer("playPauseState", $etatdePause , 'playPauseState', 'pause' , $alexaapi);
+metAJourBoutonPlayer("playPauseState", $etatdePlay, 'playPauseState', 'play' , $alexaapi);
+
+// Ancienne mise à jour par Amazon
+//metAJourBoutonPlayer("playPauseState", $result['playerInfo']['transport']['playPause'], 'playPauseState', 'pause' , $alexaapi);//PAR requete Player Info
+// metAJourBoutonPlayer("playPauseState", $result['playerInfo']['transport']['playPause'], 'playPauseState', 'play' , $alexaapi); //PAR requete Player Info
+	
+
+	} catch (Exception $e) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+				
+	} catch (Error $e) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+
+	}	
+}	
+	
 ?>

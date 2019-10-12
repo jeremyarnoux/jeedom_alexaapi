@@ -31,6 +31,7 @@ if (empty($_GET['json']))
 						case 'media':
 						case 'lists':
 						case 'deviceNotificationState':
+						case 'playlists':
 						case 'playerInfo':
 							$masquedevice=false;
 							$partieFichier=$_GET['json']."-".$_GET['device'].".json";
@@ -73,6 +74,7 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 <option value="media" <?php if ($_GET['json']=="media") echo "selected"?>>Media</option>
 <option value="musicProviders" <?php if ($_GET['json']=="musicProviders") echo "selected"?>>Music Providers</option>
 <option value="playerInfo" <?php if ($_GET['json']=="playerInfo") echo "selected"?>>Player Info</option>?>
+<option value="playlists" <?php if ($_GET['json']=="playlists") echo "selected"?>>Playlists</option>?>
 <option value="remindersFull" <?php if ($_GET['json']=="remindersFull") echo "selected"?>>Notifications</option>?>
 <option value="lists" <?php if ($_GET['json']=="lists") echo "selected"?>>Lists</option>?>
 <option value="carts" <?php if ($_GET['json']=="carts") echo "selected"?>>Carts</option>?>
@@ -86,9 +88,11 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 		$eqLogics = alexaapi::byType('alexaapi');
 		foreach ($eqLogics as $eqLogic)
 		{  
-			echo '<option ';
-			if ($_GET['device']==$eqLogic->getConfiguration('serial')) echo "selected ";
-			echo 'value="'.$eqLogic->getConfiguration('serial').'">'.$eqLogic->getName().'</option>';
+			if ($eqLogic->getConfiguration('devicetype') != "Player") {
+				echo '<option ';
+				if ($_GET['device']==$eqLogic->getConfiguration('serial')) echo "selected ";
+				echo 'value="'.$eqLogic->getConfiguration('serial').'">'.$eqLogic->getName().'</option>';
+			}
 		}
 	?>
 	</select>
@@ -146,7 +150,7 @@ if (ob_get_length()) {
 
 if ($texteaAfficher!="Dernière mise à jour : à l'instant")
 $regenerejson=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device']);
-//echo "http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device'];
+echo "http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device'];
 
 
 ?>
