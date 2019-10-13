@@ -493,11 +493,16 @@ class alexaapi extends eqLogic {
 	}
 
 	private static function createNewDevice($deviceName, $deviceSerial) {
+
+		$defaultRoom = intval(config::byKey('defaultParentObject','alexaapi','',true));
+		log::add('alexaapi', 'debug', '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>0>>>>>>>>>>>>>>>>>>>>>>>>>>defaultRoom:'.$defaultRoom);
+
 		$newDevice = new alexaapi();
 		$newDevice->setName($deviceName);
 		$newDevice->setLogicalId($deviceSerial);
 		$newDevice->setEqType_name('alexaapi');
 		$newDevice->setIsVisible(1);
+		if($defaultRoom) $newDevice->setObject_id($defaultRoom);
 		$newDevice->setConfiguration('device', $deviceName);
 		$newDevice->setConfiguration('serial', $deviceSerial);
 		$newDevice->setIsEnable(1);

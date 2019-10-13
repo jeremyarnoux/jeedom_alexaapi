@@ -306,13 +306,15 @@ tr+= ' data-l1key="configuration" data-l2key="request">';
   //   +   '<td>'
      //+     '<small><small><span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span></small></small><br><br>';
  
+ /*
+ supprimé 13/10/2019 pour next previous play...
   if ((init(_cmd.subType) == 'other') && (init(_cmd.logicalId)!="refresh"))
 
   {
     tr +=
 	     '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="infoName" placeholder="{{Nom de la Commande Info}}" style="width : 250px;" />';
   }
-
+*/
     tr +=   '</td>';
 	tr +=   '<td>';
 	

@@ -78,6 +78,18 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
            <input type="checkbox" class="configKey" data-l1key="utilisateurExperimente" />
        </div>
 	</div>
+	<div class="form-group">
+		  <label class="col-lg-4 control-label" >{{Ajouter automatiquement les équipements détectés dans :}}</label>
+		  <div class="col-lg-3">
+			<select id="sel_object" class="configKey form-control" data-l1key="defaultParentObject">
+			  <option value="">{{Aucune}}</option>
+			  <?php
+				foreach (object::all() as $object) {
+				  echo '<option value="' . $object->getId() . '">' . $object->getName() . '</option>';
+				}
+			  ?>
+			</select>
+		  </div>
    </fieldset>
 </form>
 
