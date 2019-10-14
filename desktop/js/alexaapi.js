@@ -144,7 +144,7 @@ $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').on('change', functi
 	var id=$('.eqLogicAttr[data-l1key=id]')[0].value;
 	if(id) {
 		jeedom.eqLogic.byId({"id":$('.eqLogicAttr[data-l1key=id]')[0].value,noCache:true,success:function(obj){
-			if(obj && obj.configuration && obj.configuration.capabilities && obj.configuration.capabilities.length) {
+			if(obj && obj.configuration && obj.configuration.capabilities && obj.configuration.capabilities.length && obj.configuration.capabilities instanceof Array) {
 				$('.eqLogicAttr[data-l1key=configuration][data-l2key=capabilities]')[0].innerHTML = obj.configuration.capabilities.join(', ');
 			}
 		}});
