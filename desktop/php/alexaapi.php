@@ -23,7 +23,15 @@ var logicalIdToHumanReadable = <?php echo json_encode($logicalIdToHumanReadable)
 
 function printEqLogic(data)
 {
-	
+
+// On masque la ligne "Activer le widget Playlist" si c'est pas un player
+var str=data.logicalId
+  if (str.substring(str.length - 6, str.length) != "player")
+	$('#widgetPlayListEnable').parent().hide();
+	else
+	$('#widgetPlayListEnable').parent().show();
+ 
+
   //if (data.configuration.family === undefined)
   //{
 //	 $('#family').hide(); //ajouté, masque Famille si c'est vide
@@ -135,7 +143,7 @@ endif;
 <?php
 foreach($eqLogics as $eqLogic) {
 
-	if (($eqLogic->getConfiguration('devicetype') != "Smarthome") && ($eqLogic->getConfiguration('devicetype') != "Player") && ($eqLogic->getConfiguration('devicetype') != "PlayList")) {
+	if (($eqLogic->getConfiguration('devicetype') != "Smarthome") && ($eqLogic->getConfiguration('devicetype') != "Player") && ($eqLogic->getConfiguration('devicetype') != "PlayList**")) {
 
 		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
 		echo '<div class="eqLogicDisplayCard cursor prem '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'" >';
@@ -305,17 +313,12 @@ foreach (jeeObject::all() as $object)
                   </div>
                 </div>
 				<!-- Onglet "Device Playlist" -->
-<?php
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//A n'afficher que sur les Devices "Player"
-?>                <div class="form-group">
+                <div class="form-group">
                   <label class="col-sm-4 control-label">Option</label>
-                  <div class="col-sm-8">
-                    <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="widgetPlayListEnable" checked/>{{Activer le widget Playlist}}</label>
+                  <div class="col-sm-8" id="widgetPlayListEnable">
+                    <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="widgetPlayListEnable" />{{Activer le widget Playlist}}</label>
                   </div>
-	</div><?php
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	?>
+	</div>
                 <!-- Catégorie" -->
                 <div class="form-group">
                   <label class="col-sm-4 control-label">{{Catégorie}}</label>

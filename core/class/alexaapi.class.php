@@ -374,9 +374,11 @@ class alexaapi extends eqLogic {
 		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/restart");
 		sleep(2);
 	}
+
+
+
+
 	public static function scanAmazonAlexa($_logical_id = null, $_exclusion = 0) {
-
-
 
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['launchable'] != "ok") {
@@ -406,6 +408,7 @@ class alexaapi extends eqLogic {
 					$device = alexaapi::byLogicalId($item['serial']."_playlist", 'alexaapi');
 					if (!is_object($device)) {
 						$device = self::createNewDevice($item['name']." PlayList", $item['serial']."_playlist");
+						$device->setIsVisible(0);					
 					}
 					// Update device configuration
 					$device->setConfiguration('device', $item['name']);
@@ -413,6 +416,8 @@ class alexaapi extends eqLogic {
 					$device->setConfiguration('devicetype', "PlayList");
 					$device->setConfiguration('family', $item['family']);
 					$device->setConfiguration('members', $item['members']);
+					$device->setIsVisible(0);
+					$device->setIsEnable(0);
 					$device->setConfiguration('capabilities', $item['capabilities']);
 					$device->setStatus('online', (($item['online'])?true:false));
 					$device->save();
@@ -429,6 +434,7 @@ class alexaapi extends eqLogic {
 					$device->setConfiguration('type', $item['type']);
 					$device->setConfiguration('devicetype', "Player");
 					$device->setConfiguration('family', $item['family']);
+					$device->setConfiguration('widgetPlayListEnable', 0);
 					$device->setConfiguration('members', $item['members']);
 					$device->setConfiguration('capabilities', $item['capabilities']);
 					$device->setStatus('online', (($item['online'])?true:false));
@@ -635,7 +641,7 @@ $_playlists=true;
 			foreach ($value as $key2 => $playlist) {
 				foreach ($playlist as $key3 => $value2) {
 				//log::add('alexaapi', 'debug', '-----------------v:'.$value2);
-				log::add('alexaapi', 'debug', '-----------------playlistId:'.$value2['playlistId']);
+				//log::add('alexaapi', 'debug', '-----------------playlistId:'.$value2['playlistId']);
 				//log::add('alexaapi', 'debug', '-----------------title:'.$value2['title']);
 				//log::add('alexaapi', 'debug', '-----------------trackCount:'.$value2['trackCount']);
 				$ListeDesPlaylists[]= $value2['playlistId'] . '|' . $value2['title']." (".$value2['trackCount'].")";
@@ -1694,6 +1700,27 @@ $_playlists=true;
 		}
 
 		$this->refresh(false); //false c'est pour ne pas lancer l'actualisation des routines au scan
+
+
+
+
+$device_playlist=str_replace("_player", "", $this->getConfiguration('serial'))."_playlist"; //Nom du device de la playlist
+// Si la case "Activer le widget Playlist" est cochée, on rend le device _playlist visible sinon on le passe invisible		
+/*	if ($this->getConfiguration('widgetPlayListEnable'))
+		log::add('alexaapi', 'warning', 'Rendre Visible'.$device_playlist);
+	else
+		log::add('alexaapi', 'warning', 'Rendre Invisible'.$device_playlist);
+*/
+		$eq=eqLogic::byLogicalId($device_playlist,'alexaapi');
+				if(is_object($eq)) {
+					log::add('alexaapi', 'warning', '*********************'.$device_playlist);
+					log::add('alexaapi', 'warning', '*********0****0********'.$eq->getName());
+					//$eq->setIsVisible($this->getConfiguration('widgetPlayListEnable'));
+					$eq->setIsVisible($this->getConfiguration('widgetPlayListEnable'));
+					$eq->setIsEnable($this->getConfiguration('widgetPlayListEnable'));
+					$eq->save();
+				}
+
 
 	}
 
