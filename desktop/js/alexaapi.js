@@ -72,7 +72,7 @@ $('#in_searchEqlogic3').off('keyup').keyup(function () {
     var text = $(this).text().toLowerCase();
     text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
     if(text.indexOf(search) >= 0){
-      $(this).closest('.eqLogicDisplayCard.second').show();
+      $(this).closest('.eqLogicDisplayCard.third').show();
     }
   });
   $('.eqLogicThumbnailContainer.third').packery();
