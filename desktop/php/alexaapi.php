@@ -106,7 +106,6 @@ function printEqLogic(data)
 <?php
 if(log::getLogLevel('alexaapi')<200) :
 ?>
-
 		<div class="cursor logoSecondary" id="bt_req">
 			<i class="fas fa-key"></i>
 			<br />
@@ -120,7 +119,6 @@ if(log::getLogLevel('alexaapi')<200) :
 		</div><?php
 endif;
 ?>	  
-	  
     </div>
     <!-- Début de la liste des objets -->
     <legend><i class="fas fa-table"></i> {{Mes Amazon Echo}}</legend>
@@ -135,7 +133,7 @@ endif;
 <?php
 foreach($eqLogics as $eqLogic) {
 
-	if (($eqLogic->getConfiguration('devicetype') != "Smarthome") && ($eqLogic->getConfiguration('devicetype') != "Player")) {
+	if (($eqLogic->getConfiguration('devicetype') != "Smarthome") && ($eqLogic->getConfiguration('devicetype') != "Player") && ($eqLogic->getConfiguration('devicetype') != "PlayList")) {
 
 		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
 		echo '<div class="eqLogicDisplayCard cursor prem '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'" >';
@@ -161,7 +159,6 @@ foreach($eqLogics as $eqLogic) {
 }
 ?>
     </div>
-	
 	    <legend><i class="fas fa-table"></i> {{Mes Amazon Player}}</legend>
 	<div class="input-group" style="margin-bottom:5px;">
 		<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic" />
@@ -294,6 +291,18 @@ foreach (jeeObject::all() as $object)
                     </select>
                   </div>
                 </div>
+				<!-- Onglet "Device Playlist" -->
+<?php
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//A n'afficher que sur les Devices "Player"
+?>                <div class="form-group">
+                  <label class="col-sm-4 control-label">Option</label>
+                  <div class="col-sm-8">
+                    <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="widgetPlayListEnable" checked/>{{Activer le widget Playlist}}</label>
+                  </div>
+	</div><?php
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	?>
                 <!-- Catégorie" -->
                 <div class="form-group">
                   <label class="col-sm-4 control-label">{{Catégorie}}</label>

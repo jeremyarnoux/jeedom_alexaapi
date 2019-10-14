@@ -399,30 +399,41 @@ class alexaapi extends eqLogic {
 			
 			
 			
-			
-			
-			// On teste s'il faut créer un autre Device Player
+						// On teste s'il faut créer un autre Device Player
 			if (in_array("AUDIO_PLAYER",$item['capabilities'])) {
-			// Retireve the device (if already registered in Jeedom)
-			$device = alexaapi::byLogicalId($item['serial']."_player", 'alexaapi');
-			if (!is_object($device)) {
-				$device = self::createNewDevice($item['name']." Player", $item['serial']."_player");
-				$numNewDevices++;
-			}
-
-			// Update device configuration
-			$device->setConfiguration('device', $item['name']);
-			//$device->setConfiguration('device', $item['name']." Player");
-			$device->setConfiguration('type', $item['type']);
-			$device->setConfiguration('devicetype', "Player");
-			$device->setConfiguration('family', $item['family']);
-			$device->setConfiguration('members', $item['members']);
-			$device->setConfiguration('capabilities', $item['capabilities']);
-			$device->setStatus('online', (($item['online'])?true:false));
-			$device->save();
-
-
-			$numDevices++;
+				
+					// Device PLAYLIST
+					$device = alexaapi::byLogicalId($item['serial']."_playlist", 'alexaapi');
+					if (!is_object($device)) {
+						$device = self::createNewDevice($item['name']." PlayList", $item['serial']."_playlist");
+					}
+					// Update device configuration
+					$device->setConfiguration('device', $item['name']);
+					$device->setConfiguration('type', $item['type']);
+					$device->setConfiguration('devicetype', "PlayList");
+					$device->setConfiguration('family', $item['family']);
+					$device->setConfiguration('members', $item['members']);
+					$device->setConfiguration('capabilities', $item['capabilities']);
+					$device->setStatus('online', (($item['online'])?true:false));
+					$device->save();
+					
+			
+					// Device PLAYER
+					$device = alexaapi::byLogicalId($item['serial']."_player", 'alexaapi');
+						if (!is_object($device)) {
+							$device = self::createNewDevice($item['name']." Player", $item['serial']."_player");
+							$numNewDevices++;
+						}
+					// Update device configuration
+					$device->setConfiguration('device', $item['name']);
+					$device->setConfiguration('type', $item['type']);
+					$device->setConfiguration('devicetype', "Player");
+					$device->setConfiguration('family', $item['family']);
+					$device->setConfiguration('members', $item['members']);
+					$device->setConfiguration('capabilities', $item['capabilities']);
+					$device->setStatus('online', (($item['online'])?true:false));
+					$device->save();
+					$numDevices++;
 			}
 
 
