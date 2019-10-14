@@ -60,7 +60,7 @@ function printEqLogic(data)
 <!-- Container global (Ligne bootstrap) -->
 <div class="row row-overflow">
   <!-- Container des listes de commandes / éléments -->
-  <div class="col-lg-12 eqLogicThumbnailDisplay">
+  <div class="col-xs-12 eqLogicThumbnailDisplay">
     <legend><i class="fas fa-cog"></i> {{Gestion}}</legend>
     <div class="eqLogicThumbnailContainer">
 		<!-- Bouton de scan des objets -->
@@ -129,7 +129,9 @@ endif;
 		</div>
 	</div>	
     <!-- Container de la liste -->
-    <div class="eqLogicThumbnailContainer prem">
+	<div class="panel">
+		<div class="panel-body">
+			<div class="eqLogicThumbnailContainer prem">
 <?php
 foreach($eqLogics as $eqLogic) {
 
@@ -151,15 +153,17 @@ foreach($eqLogics as $eqLogic) {
 		else
 			echo '<img src="'.$plugin->getPathImgIcon().'" />';
 
-		echo '<br/>';
-		echo '<span class="name"><center>'.$eqLogic->getHumanName(true, true).'</center></span>';
+		echo "<br />";
+		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
 
 		echo '</div>';
 	}
 }
 ?>
+			</div>
+		</div>
     </div>
-	    <legend><i class="fas fa-table"></i> {{Mes Amazon Player}}</legend>
+	<legend><i class="fas fa-table"></i> {{Mes Amazon Player}}</legend>
 	<div class="input-group" style="margin-bottom:5px;">
 		<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic2" />
 		<div class="input-group-btn">
@@ -167,7 +171,9 @@ foreach($eqLogics as $eqLogic) {
 		</div>
 	</div>	
     <!-- Container de la liste -->
-    <div class="eqLogicThumbnailContainer second">
+	<div class="panel">
+		<div class="panel-body">
+			<div class="eqLogicThumbnailContainer second">
 <?php
 foreach($eqLogics as $eqLogic) {
 
@@ -192,13 +198,15 @@ foreach($eqLogics as $eqLogic) {
 		else
 			echo '<img src="'.$plugin->getPathImgIcon().'" />';
 
-		echo '<br/>';
-		echo '<span class="name"><center>'.$eqLogic->getHumanName(true, true).'</center></span>';
+		echo '<br />';
+		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
 
 		echo '</div>';
 	}
 }
 ?>
+			</div>
+		</div>
     </div>
 	
 	
@@ -211,7 +219,9 @@ foreach($eqLogics as $eqLogic) {
 		</div>
 	</div>	
     <!-- Container de la liste -->
-    <div class="eqLogicThumbnailContainer third">
+	<div class="panel">
+		<div class="panel-body">
+			<div class="eqLogicThumbnailContainer third">
 <?php
 foreach($eqLogics as $eqLogic) {
 	if ($eqLogic->getConfiguration('devicetype') == "Smarthome") {
@@ -232,13 +242,16 @@ foreach($eqLogics as $eqLogic) {
 		else
 			echo '<img src="'.$plugin->getPathImgIcon().'" />';
 
-		echo '<br/>';
-		echo '<span class="name"><center>'.$eqLogic->getHumanName(true, true).'</center></span>';
+		echo '<br />';
+		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
 		echo '</div>';
 	}
 }
 ?>
-    </div>  </div>
+			</div>
+		</div>
+    </div>  
+  </div>
   <!-- Container du panneau de contrôle -->
   <div class="col-lg-12 eqLogic" style="display: none;">
     <!-- Bouton sauvegarder -->
