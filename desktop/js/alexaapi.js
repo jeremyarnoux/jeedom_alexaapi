@@ -59,6 +59,29 @@ $('#bt_resetEqlogicSearch2').on('click', function () {
   $('#in_searchEqlogic2').keyup()
 })
 
+$('#in_searchEqlogic3').off('keyup').keyup(function () {
+  var search = $(this).value().toLowerCase();
+  search = search.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+  if(search == ''){
+    $('.eqLogicDisplayCard.third').show();
+    $('.eqLogicThumbnailContainer.third').packery();
+    return;
+  }
+  $('.eqLogicDisplayCard.third').hide();
+  $('.eqLogicDisplayCard.third .name').each(function(){
+    var text = $(this).text().toLowerCase();
+    text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+    if(text.indexOf(search) >= 0){
+      $(this).closest('.eqLogicDisplayCard.second').show();
+    }
+  });
+  $('.eqLogicThumbnailContainer.third').packery();
+});
+$('#bt_resetEqlogicSearch3').on('click', function () {
+  $('#in_searchEqlogic3').val('')
+  $('#in_searchEqlogic3').keyup()
+})
+
 
 function envoiQuery(query, data) {
 	//if (query=='') query='{"host":"alexa.amazon.fr","path":"/api/bootstrap?version=0","method":"GET","timeout":10000,"headers":{}}';
