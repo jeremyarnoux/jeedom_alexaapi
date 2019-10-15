@@ -90,6 +90,14 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 			  ?>
 			</select>
 		  </div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-lg-4 col-md-3 col-sm-4 col-xs-6 control-label">{{Supprimer tous les devices !!}}</label>
+		<div class="col-lg-3 col-md-4 col-sm-5 col-xs-6">
+			<a class="btn btn-danger bt_supprimeTouslesDevices"><i class="fas fa-exclamation-triangle"></i> {{Lancer}}</a>
+		</div>
+	</div>
    </fieldset>
 </form>
 
@@ -222,6 +230,64 @@ if(nouvellefenetre)
 }
     });
   });
+  
+  
+ $('.bt_supprimeTouslesDevices').off('click').on('click', function() {
+	 
+	 
+	 bootbox.confirm({
+    message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API ?",
+    buttons: {
+        confirm: {
+            label: 'Oui',
+            className: 'btn-success'
+        },
+        cancel: {
+            label: 'Non',
+            className: 'btn-danger'
+        }
+    },
+    callback: function (result) {
+
+
+
+
+
+if (result) {
+
+    jeedom.plugin.supprimeTouslesDevices(
+    {
+      id : plugin_id,
+      forceRestart: 1,
+      error: function (error)
+      {
+
+      },
+      success:function(){
+
+}
+    });
+
+
+
+
+
+
+			}
+
+
+
+    }
+});
+	 
+	 
+	 
+		/*bootbox.confirm('{{Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API ?}}', function(result) {
+			
+		});*/
+	});	
+
+
 
 
 function attendre() {

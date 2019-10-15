@@ -186,7 +186,6 @@ class alexaapi extends eqLogic {
 		exec($cmd);
 		log::add('alexaapi', 'info', 'Réinstallation des dependances');
 		$pluginalexaapi->dependancy_install(true);
-
 		return true;
 	}
 	//*********** Demon Cookie***************
@@ -242,7 +241,14 @@ class alexaapi extends eqLogic {
 		$return['state']=$state;
 		return $return;
 	}
+	
+	public static function supprimeTouslesDevices() {
+	
+	log::add('alexaapi', 'debug', '---------------------------------------------supprimer tous les devices-----------------------');
 
+	}
+		
+		
 	/*   public static function VerifiePresenceCookie()
 	   {
 	           //return true;
@@ -253,8 +259,8 @@ class alexaapi extends eqLogic {
 	   }
 	*/
 	//public static function cron15($_eqlogic_id = null) {
-	public static function cron($_eqlogic_id = null) {
-		
+
+	public static function cron($_eqlogic_id = null) {		
 		$autorefresh = '*/15 * * * *';
 		//$autorefresh = '* * * * *';
 		

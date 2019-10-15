@@ -1705,8 +1705,15 @@ fs.readFile(config.cookieLocation, 'utf8', (err, data) => {
 		process.exit(-1);
 	}
 
+
+	try {
 	config.cookie = JSON.parse(data);
+	} catch (err) {
+		config.logger('Alexa-API: Si vous voyez ce message, relancez la génération du COOKIE AMAZON, il y a un souci dessus');
+		config.logger('Alexa-API: ' + err);
+	}
 	startServer();
+
 });
 
 function startServer() {

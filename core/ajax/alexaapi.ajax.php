@@ -103,7 +103,10 @@ try {
 		$ret=alexaapi::reinstallNodeJS();
 		ajax::success($ret);
 	break;
-    }
+	case 'supprimeTouslesDevices':
+		$ret=alexaapi::supprimeTouslesDevices();
+		ajax::success($ret);
+	break;    }
     throw new \Exception('Aucune methode correspondante');
 }
 catch(\Exception $e) {
