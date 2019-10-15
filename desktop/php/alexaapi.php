@@ -153,13 +153,13 @@ foreach($eqLogics as $eqLogic) {
 
 		$alternateImg = $eqLogic->getConfiguration('type');
 		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" style="min-height:75px !important;" />';
 		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" style="min-height:75px !important;" />';
 		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" style="min-height:75px !important;" />';
 		else
-			echo '<img src="'.$plugin->getPathImgIcon().'" />';
+			echo '<img class="lazy" src="'.$plugin->getPathImgIcon().'" style="min-height:75px !important;" />';
 
 		echo "<br />";
 		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
@@ -198,13 +198,13 @@ foreach($eqLogics as $eqLogic) {
 
 		$alternateImg = $eqLogic->getConfiguration('type');
 		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" style="min-height:75px !important;" />';
 		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" style="min-height:75px !important;" />';
 		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" style="min-height:75px !important;" />';
 		else
-			echo '<img src="'.$plugin->getPathImgIcon().'" />';
+			echo '<img class="lazy" src="'.$plugin->getPathImgIcon().'" style="min-height:75px !important;" />';
 
 		echo '<br />';
 		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
@@ -242,13 +242,13 @@ foreach($eqLogics as $eqLogic) {
 
 		$alternateImg = $eqLogic->getConfiguration('type');
 		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" style="min-height:75px !important;" />';
 		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" style="min-height:75px !important;" />';
 		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" />';
+			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" style="min-height:75px !important;" />';
 		else
-			echo '<img src="'.$plugin->getPathImgIcon().'" />';
+			echo '<img class="lazy" src="'.$plugin->getPathImgIcon().'" style="min-height:75px !important;" />';
 
 		echo '<br />';
 		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
