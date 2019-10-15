@@ -234,58 +234,51 @@ if(nouvellefenetre)
   
  $('.bt_supprimeTouslesDevices').off('click').on('click', function() {
 	 
-	 
-	 bootbox.confirm({
-    message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API ?",
-    buttons: {
-        confirm: {
-            label: 'Oui',
-            className: 'btn-success'
-        },
-        cancel: {
-            label: 'Non',
-            className: 'btn-danger'
-        }
-    },
-    callback: function (result) {
+		bootbox.confirm({
+			message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API ?",
+			buttons: {
+				confirm: {
+					label: 'Oui',
+					className: 'btn-danger'
+				},
+				cancel: {
+					label: 'Non',
+					className: 'btn-success'
+				}
+			},
+			callback: function (result) {
 
-
-
-
-
-if (result) {
-
-    jeedom.plugin.supprimeTouslesDevices(
-    {
-      id : plugin_id,
-      forceRestart: 1,
-      error: function (error)
-      {
-
-      },
-      success:function(){
-
-}
-    });
-
-
-
-
-
-
+			if (result) {
+				//$.showLoading(); ??
+				$.ajax({
+					type : 'POST',
+					url : 'plugins/alexaapi/core/ajax/alexaapi.ajax.php',
+					data : {
+						action : 'supprimeTouslesDevices',
+					},
+					dataType : 'json',
+					global : false,
+					error : function(request, status, error) {
+						//$.hideLoading(); ??
+						$('#div_alert').showAlert({
+							message : error.message,
+							level : 'danger'
+						});
+					},
+					success : function(data) {
+						//$.hideLoading();??
+						//$('li.li_plugin.active').click();??
+						$('#div_alert').showAlert({
+							message : "{{Suppression de tous les devices effectuée, Appuyez sur F5 pour actualiser votre écran puis lancez un SCAN}}",
+							level : 'success'
+						});
+					}
+				});
+			}			
 			}
-
-
-
-    }
-});
+		});
 	 
-	 
-	 
-		/*bootbox.confirm('{{Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API ?}}', function(result) {
-			
-		});*/
-	});	
+});	
 
 
 

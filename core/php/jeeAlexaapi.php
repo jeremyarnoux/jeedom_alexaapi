@@ -61,10 +61,8 @@ log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialN
 $logical_id = $result['deviceSerialNumber']."_player";
 $alexaapi=alexaapi::byLogicalId($logical_id, 'alexaapi');
 $alexaapi2=alexaapi::byLogicalId($result['deviceSerialNumber'], 'alexaapi'); // Le device Amazon Echo
-			
-			
 
-
+$alexaapi3=alexaapi::byLogicalId($result['deviceSerialNumber']."_playlist", 'alexaapi'); // Le device PlayList
 			
 	switch ($nom) {
 		
@@ -101,6 +99,7 @@ $alexaapi2=alexaapi::byLogicalId($result['deviceSerialNumber'], 'alexaapi'); // 
 				metAJour("Audio Player State", $result['audioPlayerState'], 'audioPlayerState', true , $alexaapi);
 			case 'refreshPlayer':
 				metAJourPlayer($logical_id, $result['audioPlayerState'], $alexaapi);
+				metAJourPlayList($logical_id, $result['audioPlayerState'], $alexaapi3);
 
 			break;
 			
@@ -225,7 +224,7 @@ function metAJourPlayer($serialdevice, $audioPlayerState, $alexaapi) {
 
 	try {
 		
-		log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzzzz metAJourPlayer:'.$audioPlayerState);
+		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzzzz metAJourPlayer:'.$audioPlayerState);
 		//if (($audioPlayerState=="PLAYING") || ($audioPlayerState=="REFRESH") || ($audioPlayerState=="PAUSED"))	{
 		if ($audioPlayerState!="FINISHED") 	{
 		//log::add('alexaapi_mqtt', 'debug',  ' metAJourPlayer:'.$serialdevice);
@@ -279,6 +278,56 @@ metAJourBoutonPlayer("playPauseState", $etatdePlay, 'playPauseState', 'play' , $
 			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
 
 	}	
+}
+
+function metAJourPlaylist($serialdevice, $audioPlayerState, $alexaapi) {
+		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
+
+	try {
+		
+		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzzzz metAJourPlayer:'.$audioPlayerState);
+		//if (($audioPlayerState=="PLAYING") || ($audioPlayerState=="REFRESH") || ($audioPlayerState=="PAUSED"))	{
+		if ($audioPlayerState!="FINISHED") 	{
+		//log::add('alexaapi_mqtt', 'debug',  ' metAJourPlayer:'.$serialdevice);
+		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/media?device=".str_replace ("_player", "", $serialdevice));
+		$result = json_decode($json,true);		
+		log::add('alexaapi_mqtt', 'debug',  '++++++++++++++++++++++++++++++++++ JSON:'.$json);
+		
+		}
+		else {
+	//metAJour("state", $audioPlayerState, 'state', false , $alexaapi);		
+	// Pour supprimer les éléments MQTT qui étaient arrivés précédemment
+		//metAJour("playlistName", "", 'playlistName', true , $alexaapi);
+		}
+
+
+//$image=$result['queue']['0']['imageURL'];
+//log::add('alexaapi_mqtt', 'debug',  '++++++>+++++++++>+++++++++>++++++++++ $image:'.$image);
+log::add('alexaapi_mqtt', 'debug', '-->'.json_encode($result));
+$html="";
+        foreach ($result['queue'] as $key => $value) {
+				log::add('alexaapi_mqtt', 'debug', '-----------------album:'.$value['album']);
+				log::add('alexaapi_mqtt', 'debug', '-----------------artist:'.$value['artist']);
+				log::add('alexaapi_mqtt', 'debug', '-----------------imageURL:'.$value['imageURL']);			
+				log::add('alexaapi_mqtt', 'debug', '-----------------title:'.$value['title']);			
+				log::add('alexaapi_mqtt', 'debug', '-----------------durationSeconds:'.$value['durationSeconds']);			
+$html.=" <p align=left> <img width=50 height=50 src='".$value['imageURL']."' /> ".$value['title']." - ".$value['artist']." <small>(".$value['album'].") </small> ".$value['durationSeconds']."s</p>";		
 }	
+
+
+metAJour("test", $html, 'test', true , $alexaapi);
+
+
+
+	} catch (Exception $e) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+				
+	} catch (Error $e) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+
+	}	
+}	
+
+	
 	
 ?>

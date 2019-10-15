@@ -244,7 +244,22 @@ class alexaapi extends eqLogic {
 	
 	public static function supprimeTouslesDevices() {
 	
-	log::add('alexaapi', 'debug', '---------------------------------------------supprimer tous les devices-----------------------');
+$plugin = plugin::byId('alexaapi');
+// Charger le javascript
+//sendVarToJS('eqType', $plugin->getId());
+//sendVarToJS('serveurtest', 'lionel dans alexaapi.php');
+
+// Accéder aux données du plugin
+$eqLogics = eqLogic::byType($plugin->getId());
+foreach ($eqLogics as $eqLogic)
+{
+//  $logicalIdToHumanReadable[$eqLogic->getLogicalId()] = $eqLogic->getHumanName(true, false);
+  $eqLogic->remove();
+  log::add('alexaapi', 'debug', 'Suppression de '.$eqLogic->getLogicalId());
+
+}
+
+
 
 	}
 		
@@ -843,7 +858,29 @@ $_playlists=true;
 			}
 
 
-			//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
+			if ($this->getConfiguration('devicetype') == "PlayList") { 
+			
+			
+				$cmd = $this->getCmd(null, 'test');
+				if (!is_object($cmd)) {
+					$cmd = new alexaapiCmd();
+					$cmd->setType('info');
+					$cmd->setLogicalId('test');
+					$cmd->setSubType('string');
+					$cmd->setEqLogic_id($this->getId());
+					$cmd->setName('test');
+					$cmd->setIsVisible(1);
+					//$cmd->setOrder(79);
+					//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+					//$cmd->setDisplay('title_disable', 1);
+				}
+				$cmd->save();			
+			
+			
+				return;
+			}
+
+
 			
 		
 			if (($this->hasCapaorFamilyorType("AUDIO_PLAYER")) && ($this->getConfiguration('devicetype') == "Player")) { 
@@ -1712,18 +1749,12 @@ $_playlists=true;
 
 $device_playlist=str_replace("_player", "", $this->getConfiguration('serial'))."_playlist"; //Nom du device de la playlist
 // Si la case "Activer le widget Playlist" est cochée, on rend le device _playlist visible sinon on le passe invisible		
-/*	if ($this->getConfiguration('widgetPlayListEnable'))
-		log::add('alexaapi', 'warning', 'Rendre Visible'.$device_playlist);
-	else
-		log::add('alexaapi', 'warning', 'Rendre Invisible'.$device_playlist);
-*/
 		$eq=eqLogic::byLogicalId($device_playlist,'alexaapi');
 				if(is_object($eq)) {
-					log::add('alexaapi', 'warning', '*********************'.$device_playlist);
-					log::add('alexaapi', 'warning', '*********0****0********'.$eq->getName());
 					//$eq->setIsVisible($this->getConfiguration('widgetPlayListEnable'));
 					$eq->setIsVisible($this->getConfiguration('widgetPlayListEnable'));
 					$eq->setIsEnable($this->getConfiguration('widgetPlayListEnable'));
+					$eq->setObject_id($this->getObject_id()); // Attribue au widget Playlist la même pièce que son Player
 					$eq->save();
 				}
 
@@ -1744,7 +1775,19 @@ $device_playlist=str_replace("_player", "", $this->getConfiguration('serial'))."
 
 	public function preUpdate() {
 	}
-
+	
+	public function preRemove () {
+		
+		// Si c'est un type Player, il faut supprimer le Device Playlist
+		if ($this->getConfiguration('devicetype') == "Player") { 
+			$device_playlist=str_replace("_player", "", $this->getConfiguration('serial'))."_playlist"; //Nom du device de la playlist
+		$eq=eqLogic::byLogicalId($device_playlist,'alexaapi');
+				if(is_object($eq)) {
+					$eq->remove();
+				}
+		}
+	}
+	
 	public function preSave() {
 	}
 }

@@ -26,7 +26,7 @@ try {
         throw new \Exception('401 Unauthorized');
     }
 //            $('.deamonCookieState').empty().append('<span class="label label-success" style="font-size:1em;">00012300</span>');
-    log::add('alexaapi', 'info', 'Lancement Serveur pour Cookie - action='.init('action'));
+    //log::add('alexaapi', 'info', 'Lancement Serveur pour Cookie - action='.init('action'));
     switch (init('action')) {
         case 'createCookie':
             //log::add('alexaapi', 'info', 'Debut');
