@@ -304,16 +304,26 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $alexaapi) {
 //$image=$result['queue']['0']['imageURL'];
 //log::add('alexaapi_mqtt', 'debug',  '++++++>+++++++++>+++++++++>++++++++++ $image:'.$image);
 log::add('alexaapi_mqtt', 'debug', '-->'.json_encode($result));
-$html="";
+$html="<table border='0' cellspacing=4 cellpadding=4 width='100%'>";
         foreach ($result['queue'] as $key => $value) {
 				log::add('alexaapi_mqtt', 'debug', '-----------------album:'.$value['album']);
 				log::add('alexaapi_mqtt', 'debug', '-----------------artist:'.$value['artist']);
 				log::add('alexaapi_mqtt', 'debug', '-----------------imageURL:'.$value['imageURL']);			
 				log::add('alexaapi_mqtt', 'debug', '-----------------title:'.$value['title']);			
 				log::add('alexaapi_mqtt', 'debug', '-----------------durationSeconds:'.$value['durationSeconds']);			
-$html.=" <p align=left> <img width=50 height=50 src='".$value['imageURL']."' /> ".$value['title']." - ".$value['artist']." <small>(".$value['album'].") </small> ".$value['durationSeconds']."s</p>";		
-}	
 
+$html.="    <tr>
+        <td rowspan='2' width='50'><img width=50 height=50 src='".$value['imageURL']."' /></td>
+        <td width='100%'>".$value['title']."</td>
+    </tr>
+    <tr>
+        <td width='100%'><small>".$value['artist']." - <font size=1><em>".date('i:s', $value['durationSeconds'])."</em></font></small></td>
+    </tr>";
+
+
+//$html.=" <p align=left> <img width=50 height=50 src='".$value['imageURL']."' /> ".$value['title']."<br><small>".$value['artist']."</small> ".$value['durationSeconds']."s</p>";		
+}	
+$html.="</table>";
 
 metAJour("test", $html, 'test', true , $alexaapi);
 
