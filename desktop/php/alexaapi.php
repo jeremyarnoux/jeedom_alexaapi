@@ -3,7 +3,7 @@ if (!isConnect('admin')) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
 
-// Obtenir l'identifiant du plugin
+// Obtenir l'identifiant du plugin 
 $plugin = plugin::byId('alexaapi');
 // Charger le javascript
 sendVarToJS('eqType', $plugin->getId());
