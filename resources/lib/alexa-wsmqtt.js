@@ -3,7 +3,7 @@
 /* jshint strict: false */
 /* jslint node: true */
 /* jslint esversion: 6 */
-
+  
 
 // Source : https://github.com/Apollon77/alexa-remote/blob/master/alexa-wsmqtt.js
 
@@ -206,7 +206,8 @@ class AlexaWsMqtt extends EventEmitter {
                 let command = message.content.payload.command;
                 let payload = message.content.payload.payload;
 
-                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Command ' + command + ': ' + JSON.stringify(payload, null, 4));
+                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Command --{' + command + '}-- : ' + JSON.stringify(payload, null, 4));
+                //this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Command --{' + command + '}--  détail désactivé ');// + JSON.stringify(payload, null, 4));
                 this.emit('command', command, payload);
                 return;
             }

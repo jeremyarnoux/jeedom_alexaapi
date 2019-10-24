@@ -4,7 +4,7 @@
 /* jslint node: true */
 /* jslint esversion: 6 */
 'use strict';
-
+  
 // Source : https://github.com/Apollon77/alexa-remote/blob/master/alexa-remote.js
 
 const https = require('https');
@@ -971,10 +971,10 @@ this._options.logger && this._options.logger(obj.headers);
 //if (flags.data !=undefined) body="Unauthorized";
 
 
-			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusCode: '+res.statusCode);
+			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusCode: '+res.statusCode);
 			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusMessage: '+res.statusMessage);
-			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.httpVersion: '+res.httpVersion);
-			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.headers: '+JSON.stringify(res.headers));
+			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.httpVersion: '+res.httpVersion);
+			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.headers: '+JSON.stringify(res.headers));
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.rawHeaders : '+res.rawHeaders);
 			var resstatusMessage=res.statusMessage;
 			var resstatusCode=res.statusCode;
@@ -984,7 +984,7 @@ this._options.logger && this._options.logger(obj.headers);
 
             res.on('data', (chunk) => {
                 body += chunk;
-				this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  chunk: '+body);
+				//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  chunk: '+body);
             });
 
             res.on('end', () =>
@@ -1056,40 +1056,30 @@ jsonaenvoyer=JSON.stringify(jsonaenvoyer);
 this._options.logger && this._options.logger('URL envoyée: '+url);
 this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer);
 
-
-request.post(url, {
+	request.post(url, {
 
 			json : true,
-
 			gzip : false,
-			
- 
-	
-multipart: [
-      {
-		body: jsonaenvoyer
-      }
-    ]
-
+			multipart: [
+				  {
+					body: jsonaenvoyer
+				  }
+				]
 		}, function (err, response, json) {
 
 			if (!err && response.statusCode == 200) {
-
-				//if(!json.result && json.error)
-				//{
-			//		//error json.error
-			//	}
-			//	else {
-			//		//json.result;
-			//	}
-
-			} else 
-			{
-				//error err est une erreur html
-			}
-
-});
-
+					//if(!json.result && json.error)
+					//{
+				//		//error json.error
+				//	}
+				//	else {
+				//		//json.result;
+				//	}
+				} else 
+				{
+					//error err est une erreur html
+				}
+			});
  
     }
 

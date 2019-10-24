@@ -3,12 +3,13 @@ const express = require('express');
 const fs = require('fs');
 const Alexa = require('./lib/alexa-remote.js');
 let alexa;
-//var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+//var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest  ;
+const request = require('request');
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
 const IPJeedom = process.argv[2];
-
+const ClePlugin = process.argv[5];
 //const debug=1; //mettre 1 pour debug
 
 // Références :
@@ -282,7 +283,6 @@ CommandAlexa.playMusicTrack = function(req,res){
     command - String - command : pause|play|next|prev|fwd|rwd|shuffle|repeat
 */
 CommandAlexa.Command = function(req,res){
-	
 	res.type('json');
 
 	config.logger('Alexa-API:    Lancement /Command avec paramètres -> device: ' + req.query.device+' & command: ' + req.query.command);
@@ -292,8 +292,27 @@ CommandAlexa.Command = function(req,res){
 	
 	boucleSurSerials_sendCommand(req);
 	
+
+	
 	res.status(200).json({value: "Send"});	//ne teste pas le résultat
+
+setTimeout(refreshPlayer.bind(null, req.query.device), 3000); // Dans 3s, actualiser le player
+	
 }
+
+
+function refreshPlayer(deviceSerialNumber) {
+	//config.logger('Alexa-API:    *******************************************7 Lancement /Command avec paramètres -> device: ');
+
+	var action="REFRESH";
+	httpPost('refreshPlayer', {
+                        deviceSerialNumber: deviceSerialNumber,
+						audioPlayerState: action
+                    });	
+	//config.logger('Alexa-API:    *******************************************8 Lancement /Command avec paramètres -> device: ');
+}
+
+
 
 /***** Alexa.SmarthomeCommand *****
 
@@ -349,6 +368,8 @@ function boucleSurSerials_sendSequenceCommand (req, action, callback) {
 		});	
 	//config.logger('Alexa-API:    Test temporaire de resultatEnvoi: ' + resultatEnvoi); NON synchrone !
 }
+
+/* version sans le refresh
 function boucleSurSerials_sendCommand (req, callback) {
 		resultatEnvoi=  forEachDevices(req.query.device, (serial) => {
 			alexa.sendCommand(serial, req.query.command, 
@@ -357,8 +378,40 @@ function boucleSurSerials_sendCommand (req, callback) {
 				}
 			);
 		});
+}*/
+function boucleSurSerials_sendCommand (req, callback) {
+		resultatEnvoi=  forEachDevices(req.query.device, (serial) => {
+			
+			 alexa.sendCommand(serial, req.query.command, 
+				function(testErreur){
+					if (testErreur) traiteErreur(testErreur);
+					config.logger('Alexa-API:    >>>>>>>>>>>>>>>>>>>>>>>on est la 8888888888>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> OK Refresh playinfo ');
+				}	
+			);
+			
+		//setTimeout(function() {  RefreshApresCommand (serial); }, 5000);
+			
+		});
 }
-
+/*
+function RefreshApresCommand (serial) {
+	
+			config.logger('Alexa-API:    >>>>>>>>>>>>>>>>>>>>>>>on est la>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> OK Refresh playinfo ');
+					
+					
+				Appel_getPlayerInfo(serial, function(retourAmazon) {
+				fichierjson = __dirname + '/data/playerInfo-'+serial+'.json';
+				fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+				{
+			config.logger('Alexa-API:    >>>>>>>>>>>>>>>>>>>>>>>on est la 5555>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> OK Refresh playinfo ');
+				
+				//if (err) return res.sendStatus(500)
+						});
+			config.logger('Alexa-API:    >>>>>>>>>>>>>>>>>>>>>>>on est la 66666>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> OK Refresh playinfo ');
+				//res.status(200).json(retourAmazon);
+				});		
+}
+*/
 
 
 /***** Alexa.Notifications.SendMobilePush *****
@@ -855,7 +908,7 @@ CommandAlexa.media = function(req, res) {
 
 CommandAlexa.playerInfo = function(req, res) {
 	commandeEnvoyee = req.path.replace("/", "");
-	config.logger('Alexa-API: /'+commandeEnvoyee);
+	config.logger('Alexa-API: **************/'+commandeEnvoyee);
 	res.type('json');
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
@@ -1808,6 +1861,45 @@ if (err)
 
 		
 }
+
+function httpPost(nom, jsonaenvoyer) {
+
+config.logger && config.logger('httpPost httpPost httpPost httpPost httpPost httpPost httpPost httpPost httpPost httpPost httpPost ');
+	
+var url=IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey="+ClePlugin+"&nom="+nom;
+config.logger && config.logger('URL envoyée: '+url);
+ 
+jsonaenvoyer=JSON.stringify(jsonaenvoyer);
+config.logger && config.logger('DATA envoyé:'+jsonaenvoyer);
+
+	request.post(url, {
+
+			json : true,
+			gzip : false,
+			multipart: [
+				  {
+					body: jsonaenvoyer
+				  }
+				]
+		}, function (err, response, json) {
+
+			if (!err && response.statusCode == 200) {
+					//if(!json.result && json.error)
+					//{
+				//		//error json.error
+				//	}
+				//	else {
+				//		//json.result;
+				//	}
+				} else 
+				{
+					//error err est une erreur html
+				}
+			});
+ /**/
+    }
+
+
 function error(status, source, title, detail) {
 	let error = {
 		'status': status,
