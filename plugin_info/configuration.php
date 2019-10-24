@@ -5,12 +5,12 @@ if (!isConnect())
   die();
 }
 /* This file is part of Jeedom.
-*
+*  
 * Jeedom is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
-*
+* 
 * Jeedom is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -28,6 +28,11 @@ include_file('core', 'authentification', 'php');
 include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 
         //log::add('alexaapi', 'debug', 'Test de config::byKey dans config: ' . config::byKey('amazonserver','alexaapi'));
+
+// code trouvé dans core\ajax\plugin.ajax.php
+		$update = update::byLogicalId('alexaapi');
+		$return = utils::o2a($update);
+		$versionJeedom = $return['configuration']['version'];
 
 ?>
 
@@ -78,6 +83,24 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
            <input type="checkbox" class="configKey" data-l1key="utilisateurExperimente" />
        </div>
 	</div>
+      <div class="form-group">
+        <label class="col-lg-4 control-label">{{Activer les fonctions Domotique des Amazon SmartHome}}</label>
+        <div class="col-lg-3">
+           <input type="checkbox"  <?php if ($versionJeedom=="stable") echo 'disabled="disabled"';?> class="configKey" data-l1key="utilisateurSmarthome" /><em>(activable uniquement en Béta pour l'instant)</em>
+       </div> 
+	</div>      
+	<div class="form-group">
+        <label class="col-lg-4 control-label">{{Activer les fonctions Multimedia (Player/Playlist)}}</label>
+        <div class="col-lg-3">
+           <input type="checkbox" <?php if ($versionJeedom=="stable") echo 'disabled="disabled"';?> class="configKey" data-l1key="utilisateurMultimedia" /><em>(activable uniquement en Béta pour l'instant)</em>
+       </div> 
+	</div>	
+	<!--<div class="form-group"> 
+        <label class="col-lg-4 control-label">{{Activer le client MQTT Amazon (conseillé pour les fonctions multimédia)}}</label>
+        <div class="col-lg-3">
+           <input type="checkbox" class="configKey" data-l1key="utilisateurMQTT" /><em>(activable uniquement en Béta pour l'instant)</em>
+       </div> 
+	</div>	-->	
 	<div class="form-group">
 		  <label class="col-lg-4 control-label" >{{Ajouter automatiquement les équipements détectés dans :}}</label>
 		  <div class="col-lg-3">
@@ -93,7 +116,7 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 	</div>
 	
 	<div class="form-group">
-		<label class="col-lg-4 col-md-3 col-sm-4 col-xs-6 control-label">{{Supprimer tous les devices !!}}</label>
+		<label class="col-lg-4 col-md-3 col-sm-4 col-xs-6 control-label">{{Supprimer tous les devices !! et relancer un Scan}}</label>
 		<div class="col-lg-3 col-md-4 col-sm-5 col-xs-6">
 			<a class="btn btn-danger bt_supprimeTouslesDevices"><i class="fas fa-exclamation-triangle"></i> {{Lancer}}</a>
 		</div>
@@ -233,9 +256,10 @@ if(nouvellefenetre)
   
   
  $('.bt_supprimeTouslesDevices').off('click').on('click', function() {
-	 
+	$('#md_modal').dialog('close'); 
+	
 		bootbox.confirm({
-			message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API ?",
+			message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API ? Il faudra refaire les scénarios.",
 			buttons: {
 				confirm: {
 					label: 'Oui',
@@ -247,7 +271,10 @@ if(nouvellefenetre)
 				}
 			},
 			callback: function (result) {
-
+						$('#div_alert').showAlert({
+							message : "{{Suppression en cours ...}}",
+							level : 'success'
+						});
 			if (result) {
 				//$.showLoading(); ??
 				$.ajax({
@@ -268,10 +295,7 @@ if(nouvellefenetre)
 					success : function(data) {
 						//$.hideLoading();??
 						//$('li.li_plugin.active').click();??
-						$('#div_alert').showAlert({
-							message : "{{Suppression de tous les devices effectuée, Appuyez sur F5 pour actualiser votre écran puis lancez un SCAN}}",
-							level : 'success'
-						});
+						
 					}
 				});
 			}			
