@@ -3,9 +3,7 @@ if (!isConnect('admin')) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
 
-
-
-// Obtenir l'identifiant du plugin 
+// Obtenir l'identifiant du plugin
 $plugin = plugin::byId('alexaapi');
 // Charger le javascript
 sendVarToJS('eqType', $plugin->getId());
@@ -114,7 +112,7 @@ var str=data.logicalId
 			<span>{{Historique}}</span>
 		</div>
 <?php
-if(log::getLogLevel('alexaapi')<200) :
+if (((config::byKey('utilisateurExperimente', 'alexaapi')!="0")) && (log::getLogLevel('alexaapi')<200)) :
 ?>
 		<div class="cursor logoSecondary" id="bt_req">
 			<i class="fas fa-key"></i>
@@ -173,6 +171,13 @@ foreach($eqLogics as $eqLogic) {
 			</div>
 		</div>
     </div>
+	<?php echo config::byKey('plugin::branch'); ?>
+	
+	<?php	
+	if (config::byKey('utilisateurMultimedia', 'alexaapi')!="0")
+	{	
+?>
+	
 	<legend><i class="fas fa-table"></i> {{Mes Amazon Player}}</legend>
 	<div class="input-group" style="margin-bottom:5px;">
 		<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic2" />
@@ -219,7 +224,11 @@ foreach($eqLogics as $eqLogic) {
 		</div>
     </div>
 	
-	
+<?php	
+	}
+	if (config::byKey('utilisateurSmarthome', 'alexaapi')!="0")
+	{	
+?>
     <!-- Début de la liste des objets -->
     <legend><i class="fas fa-table"></i> {{Mes Amazon Smarthome}}</legend>
 	<div class="input-group" style="margin-bottom:5px;">
@@ -261,6 +270,12 @@ foreach($eqLogics as $eqLogic) {
 			</div>
 		</div>
     </div>  
+
+<?php	
+	}	
+?>
+
+	
   </div>
   <!-- Container du panneau de contrôle -->
   <div class="col-lg-12 eqLogic" style="display: none;">

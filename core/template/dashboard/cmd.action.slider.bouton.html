@@ -1,0 +1,56 @@
+<div class="cmd cmd-widget" data-type="action" data-subtype="slider" data-template="button" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
+  <div class="title #hide_name#">
+    <div class="cmdName">#name_display#</div>
+  </div>
+  <div class="content-sm ">
+	<i style="position: relative;top: 20px; left: -75px;" class="fa fa-volume-up"></i>
+    <div class="input-group buttons">
+
+	  <span class="input-group-btn" style="position: relative;">
+        <a class="btn btn-default btn-sm bt_minus roundedLeft"><i class="fas fa-minus"></i></a>
+      </span>
+      <input type="text" class="input-sm in_value form-control" value="#state# #unite#" disabled/>
+      <span class="input-group-btn" style="position: relative;">
+        <a class="btn btn-default btn-sm bt_plus roundedRight"><i class="fa fa-plus"></i></a>
+      </span>
+    </div>
+  </div>
+  <script>
+    $('.cmd[data-cmd_uid=#uid#] .bt_plus').on('click', function () {
+      var max = ('#maxValue#' == '') ?  Number.MAX_VALUE : parseFloat('#maxValue#');
+      var step = (isNaN(parseFloat('#step#'))) ?  0.5 : parseFloat('#step#');
+      if (parseFloat($('.cmd[data-cmd_uid=#uid#] .in_value').val()) <= max - step ){
+        jeedom.cmd.update['#id#']({display_value:parseFloat($('.cmd[data-cmd_uid=#uid#] .in_value').val()) + step});
+        $('.cmd[data-cmd_uid=#uid#] .in_value').trigger('change');
+      }
+	  else {
+        jeedom.cmd.update['#id#']({display_value:parseFloat(max)});
+        $('.cmd[data-cmd_uid=#uid#] .in_value').trigger('change');
+      }
+    });
+    $('.cmd[data-cmd_uid=#uid#] .bt_minus').on('click', function () {
+      var min = ('#minValue#' == '') ? Number.MIN_VALUE : parseFloat('#minValue#');
+      var step = (isNaN(parseFloat('#step#'))) ?  0.5 : parseFloat('#step#');
+      if (parseFloat($('.cmd[data-cmd_uid=#uid#] .in_value').val()) >= min + step){
+        jeedom.cmd.update['#id#']({display_value:parseFloat($('.cmd[data-cmd_uid=#uid#] .in_value').val()) - step});
+        $('.cmd[data-cmd_uid=#uid#] .in_value').trigger('change');
+      }
+	  else {
+        jeedom.cmd.update['#id#']({display_value:parseFloat(min)});
+        $('.cmd[data-cmd_uid=#uid#] .in_value').trigger('change');
+      }
+    });
+    $('.cmd[data-cmd_uid=#uid#] .in_value').on('change', function () {
+      if (typeof timerHandle#uid# !== 'undefined') {
+        clearTimeout(timerHandle#uid#);
+      }
+      timerHandle#uid# = setTimeout(function() {
+        jeedom.cmd.execute({id:'#id#', value: {slider: $('.cmd[data-cmd_uid=#uid#] .in_value').val().replace("#unite#", "").replace(" ", "")}});
+      }, 1000)
+    });
+    jeedom.cmd.update['#id#'] = function(_options){
+      $('.cmd[data-cmd_uid=#uid#] .in_value').val(_options.display_value+' #unite#');
+    }
+    jeedom.cmd.update['#id#']({display_value:'#state#'});
+  </script>
+</div>

@@ -5,12 +5,12 @@ if (!isConnect())
   die();
 }
 /* This file is part of Jeedom.
-*  
+*
 * Jeedom is free software: you can redistribute it and/or modify
-* it u nder the terms of the GNU General Public License as published by
+* it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
-*  
+*
 * Jeedom is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
@@ -95,7 +95,7 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
            <input type="checkbox" <?php if ($versionJeedom=="stable") echo 'disabled="disabled"';?> class="configKey" data-l1key="utilisateurMultimedia" /><em>(activable uniquement en Béta pour l'instant)</em>
        </div> 
 	</div>	
-	<!--<div class="form-group"> 
+	<!--<div class="form-group">
         <label class="col-lg-4 control-label">{{Activer le client MQTT Amazon (conseillé pour les fonctions multimédia)}}</label>
         <div class="col-lg-3">
            <input type="checkbox" class="configKey" data-l1key="utilisateurMQTT" /><em>(activable uniquement en Béta pour l'instant)</em>
