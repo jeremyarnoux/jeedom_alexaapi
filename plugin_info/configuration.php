@@ -114,7 +114,12 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 			</select>
 		  </div>
 	</div>
-	
+	<div class="form-group">
+		<label class="col-lg-4 col-md-3 col-sm-4 col-xs-6 control-label">{{Recharger la configuration par défaut de toutes les commandes}}</label>
+		<div class="col-lg-3 col-md-4 col-sm-5 col-xs-6">
+			<a class="btn btn-warning bt_forcerDefaultAllCmd"><i class="fas fa-search"></i> {{Lancer}}</a>
+		</div>
+	</div>	
 	<div class="form-group">
 		<label class="col-lg-4 col-md-3 col-sm-4 col-xs-6 control-label">{{Supprimer tous les devices !! et relancer un Scan}}</label>
 		<div class="col-lg-3 col-md-4 col-sm-5 col-xs-6">
@@ -271,10 +276,10 @@ if(nouvellefenetre)
 				}
 			},
 			callback: function (result) {
-						$('#div_alert').showAlert({
+						/*$('#div_alert').showAlert({
 							message : "{{Suppression en cours ...}}",
 							level : 'success'
-						});
+						});*/
 			if (result) {
 				//$.showLoading(); ??
 				$.ajax({
@@ -304,7 +309,54 @@ if(nouvellefenetre)
 	 
 });	
 
-
+ $('.bt_forcerDefaultAllCmd').off('click').on('click', function() {
+	$('#md_modal').dialog('close'); 
+	
+		bootbox.confirm({
+			message: "Voulez-vous recharger la configuration par défaut de toutes les commandes du plugin Alexa-API ?",
+			buttons: {
+				confirm: {
+					label: 'Oui',
+					className: 'btn-danger'
+				},
+				cancel: {
+					label: 'Non',
+					className: 'btn-success'
+				}
+			},
+			callback: function (result) {
+						/*$('#div_alert').showAlert({
+							message : "{{Suppression en cours ...}}",
+							level : 'success'
+						});*/
+			if (result) {
+				//$.showLoading(); ??
+				$.ajax({
+					type : 'POST',
+					url : 'plugins/alexaapi/core/ajax/alexaapi.ajax.php',
+					data : {
+						action : 'forcerDefaultAllCmd',
+					},
+					dataType : 'json',
+					global : false,
+					error : function(request, status, error) {
+						//$.hideLoading(); ??
+						$('#div_alert').showAlert({
+							message : error.message,
+							level : 'danger'
+						});
+					},
+					success : function(data) {
+						//$.hideLoading();??
+						//$('li.li_plugin.active').click();??
+						
+					}
+				});
+			}			
+			}
+		});
+	 
+});	
 
 
 function attendre() {

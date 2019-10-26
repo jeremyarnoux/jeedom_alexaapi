@@ -462,10 +462,33 @@ self::scanAmazonAlexa();
 		sleep(2);
 	}
 
+	public static function forcerDefaultCmd($_id = null) {
+			// Si un logical_id est spécifié en paramètre
+			if (!is_null($_id)) {
+			
+			$device = alexaapi::byId($_id);
+					if (is_object($device)) {
+					//event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Rechargement des commandes de '.$device->getName(), __FILE__),));
+					$device->setStatus('forceUpdate',true);
+					$device->save();
+					}
+			}		
+	}
 
-
-
-	public static function scanAmazonAlexa($_logical_id = null, $_exclusion = 0) {
+	public static function forcerDefaultAllCmd() {
+		
+		$plugin = plugin::byId('alexaapi');
+		$eqLogics = eqLogic::byType($plugin->getId());
+			foreach ($eqLogics as $eqLogic)
+			{
+				$eqLogic->setStatus('forceUpdate',true);
+				$eqLogic->save();  
+			}		
+	event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Mise à jour terminée', __FILE__)));
+		
+	}
+	//public static function scanAmazonAlexa($_logical_id = null, $_exclusion = 0) -> $_logical_id et $_exclusion semblent non utilisés
+	public static function scanAmazonAlexa() {
 
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['launchable'] != "ok") {
@@ -486,6 +509,7 @@ self::scanAmazonAlexa();
 			// Skip the special device named "This Device"
 			if ($item['name'] == 'This Device') continue;
 			
+
 		
 						// On teste s'il faut créer un autre Device Player
 			if  ((config::byKey('utilisateurMultimedia', 'alexaapi')!="0") && (in_array("AUDIO_PLAYER",$item['capabilities']))) {
@@ -550,18 +574,24 @@ self::scanAmazonAlexa();
 	if (config::byKey('utilisateurSmarthome', 'alexaapi')!="0")
 	{			
 		
-		
+
+			
 // --- Mise à jour des SmartHome Devices
 		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeEntities");
 		$json = json_decode($json, true);
 		foreach ($json as $item) {
+			
+			
+		
+			
 			// Retireve the device (if already registered in Jeedom)
 			$device = alexaapi::byLogicalId($item['id'], 'alexaapi');
 			if (!is_object($device)) {
 				$device = self::createNewDevice($item['displayName'], $item['id']);
 				$numNewDevices++;
 			}
-//log::add('alexaapi', 'debug', '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'.json_encode($item['providerData']).'<<<<<<<<<<<<<<<<<<<');
+
+
 			// Update device configuration
 			$device->setConfiguration('device', $item['displayName']);
 			//$device->setConfiguration('type', $item['description']); a voir si on utilise ou pas descriotion
@@ -580,12 +610,7 @@ self::scanAmazonAlexa();
 
 
 	}
-
-
-
 		
-		// A voir s'il faut ou pas actualiser les routines ici apres le scan (cela se fera au premier refresh)
-
 		event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
 
 	}
@@ -878,7 +903,7 @@ if ($widgetPlayer) {
 		}		
 	}
 
-	public function updateCmd ($LogicalId, $Type, $SubType, $RunWhenRefresh, $Name, $IsVisible, $title_disable, $setDisplayicon, $setTemplate_version, $setTemplate_lien, $request, $infoName, $listValue, $Order, $Test) {
+	public function updateCmd ($forceUpdate, $LogicalId, $Type, $SubType, $RunWhenRefresh, $Name, $IsVisible, $title_disable, $setDisplayicon, $setTemplate_version, $setTemplate_lien, $request, $infoName, $listValue, $Order, $Test) {
 
 				
 		if ($Test) {
@@ -888,8 +913,8 @@ if ($widgetPlayer) {
 				if (empty($Name)) $Name=$LogicalId;
 					
 				$cmd = $this->getCmd(null, $LogicalId);
-				if (!is_object($cmd)) {
-					$cmd = new alexaapiCmd();
+				if ((!is_object($cmd)) || $forceUpdate) {
+					if (!is_object($cmd)) $cmd = new alexaapiCmd();
 					$cmd->setType($Type);
 					$cmd->setLogicalId($LogicalId);
 					$cmd->setSubType($SubType);
@@ -907,9 +932,12 @@ if ($widgetPlayer) {
 					$cmd->setDisplay('forceReturnLineBefore', true);
 					}
 					$cmd->setConfiguration('RunWhenRefresh', $RunWhenRefresh);				
-					$cmd->setOrder($Order);
 					$cmd->setDisplay('title_disable', $title_disable);
+					$cmd->setOrder($Order);
 				}
+				
+				
+				
 				$cmd->save();
 			
 			}
@@ -925,12 +953,20 @@ if ($widgetPlayer) {
 	}
 
 
-	public function postSave() {
 
+
+public function postSave() {
 
 log::add('alexaapi', 'debug', '**********************postSave '.$this->getName().'***********************************');
 
+log::add('alexaapi', 'debug', '>>>>>>>>>>>>>>>>>>>>>forcerDefaultCmd2>>>>>>>>'.$this->getStatus('forceUpdate').'>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<');
 
+
+
+// forceUpdate permet de recharger les commandes à valeur d'origine, mais sans supprimer/recréer les commandes
+$F=$this->getStatus('forceUpdate');
+
+			
 		/*       if ($this->getName() == 'Tous les appareils')
 			  {
 				  return;
@@ -948,7 +984,7 @@ if(!empty($capa)) {
 	
 		// Pas trouvé le capabilities qui correspond au PUSH
 		if (strstr($this->getName(), "Alexa Apps")) {
-			self::updateCmd ('push', 'action', 'message', false, 'Push', true, true, 'fa jeedomapp-audiospeak', null, null, 'push?text=#message#', null, null, 1, true);
+			self::updateCmd ($F, 'push', 'action', 'message', false, 'Push', true, true, 'fa jeedomapp-audiospeak', null, null, 'push?text=#message#', null, null, 1, true);
 			return;
 		}
 		
@@ -968,50 +1004,50 @@ $cas6=($cas5 && (!$this->hasCapaorFamilyorType("WHA")));
 $cas7=((!$this->hasCapaorFamilyorType("WHA")) && ($this->getConfiguration('devicetype') != "Player") &&(!$this->hasCapaorFamilyorType("FIRE_TV")) && (!$this->hasCapaorFamilyorType("AMAZONMOBILEMUSIC_ANDROID")));
 $cas8=(($this->hasCapaorFamilyorType("turnOff")) && $widgetSmarthome);
 
-self::updateCmd ('playlistName', 'info', 'string', false, null, true, true, null, null, null, null, null, null, 79, $widgetPlaylist);
-//self::updateCmd ('playlistName', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 2, $widgetPlayer);
-//self::updateCmd ('songName', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, ($widgetPlaylist || $widgetPlayer));
+self::updateCmd ($F, 'playlistName', 'info', 'string', false, null, true, true, null, null, null, null, null, null, 79, $widgetPlaylist);
+//self::updateCmd ($F, 'playlistName', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 2, $widgetPlayer);
+//self::updateCmd ($F, 'songName', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, ($widgetPlaylist || $widgetPlayer));
 
-self::updateCmd ('playlisthtml', 'info', 'string', false, null, true, true, null, null, null, null, null, null, 79, $widgetPlaylist);
+self::updateCmd ($F, 'playlisthtml', 'info', 'string', false, null, true, true, null, null, null, null, null, null, 79, $widgetPlaylist);
 
-self::updateCmd ('turnOn', 'action', 'message', false, 'turnOn', true, true, "fa jeedomapp-audiospeak", null, null, 'SmarthomeCommand?command=turnOn', null, null, 79, $cas8);			
-self::updateCmd ('turnOff', 'action', 'message', false, 'turnOff', true, true, "fa jeedomapp-audiospeak", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
+self::updateCmd ($F, 'turnOn', 'action', 'message', false, 'turnOn', true, true, "fa jeedomapp-audiospeak", null, null, 'SmarthomeCommand?command=turnOn', null, null, 79, $cas8);			
+self::updateCmd ($F, 'turnOff', 'action', 'message', false, 'turnOff', true, true, "fa jeedomapp-audiospeak", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
 
-self::updateCmd ('radio', 'action', 'message', false, 'Radio', false, true, "loisir-musical7", null, null, 'radio?station=#station#', null, null, 79, $cas1);		
-self::updateCmd ('command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#command#', null, null, 79, $cas1);		
-self::updateCmd ('speak', 'action', 'message', false, 'Speak', true, true, "fa jeedomapp-audiospeak", null, null, 'speak?text=#message#', null, null, 79, $cas1bis);
+self::updateCmd ($F, 'radio', 'action', 'message', false, 'Radio', false, true, "loisir-musical7", null, null, 'radio?station=#station#', null, null, 79, $cas1);		
+self::updateCmd ($F, 'command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#command#', null, null, 79, $cas1);		
+self::updateCmd ($F, 'speak', 'action', 'message', false, 'Speak', true, true, "fa jeedomapp-audiospeak", null, null, 'speak?text=#message#', null, null, 79, $cas1bis);
 
-self::updateCmd ('subText1', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::title', null, null, null, 4, $cas1);
-self::updateCmd ('subText2', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::subText2', null, null, null, 2, $cas1);
-self::updateCmd ('title', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::title', null, null, null, 9, $cas1);
-self::updateCmd ('url', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::image', null, null, null, 5, $cas1);
-self::updateCmd ('mediaLength', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
-self::updateCmd ('mediaProgress', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
-self::updateCmd ('state', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::state', null, null, null, 79, $cas1);
-//self::updateCmd ('playlistName', 'info', 'string', false, null, false, false, null, null, null, null, null, null, 2, $cas1);
-self::updateCmd ('nextState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
-self::updateCmd ('previousState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
-self::updateCmd ('playPauseState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
-self::updateCmd ('playList', 'action', 'select', false, 'Lancer une playlist :', true, false, null, 'dashboard', 'alexaapi::list', null, null, null, 20, $cas1);
-self::updateCmd ('playMusicTrack', 'action', 'message', false, 'Play Music Track', false, false, 'loisir-musical7', null, null, null, null, null, 79, $cas1);
-//self::updateCmd ('rwd', 'action', 'other', false, 'Rwd', true, true, 'fa fa-fast-backard', null, null, 'command?command=rwd', null, null, 15, $cas1);
-self::updateCmd ('previous', 'action', 'other', false, 'Previous', true, true, 'fa fa-step-backward', null, null, 'command?command=previous', null, null, 16, $cas1);
-self::updateCmd ('pause', 'action', 'other', false, 'Pause', true, true, 'fa fa-pause', null, null, 'command?command=pause', null, null, 17, $cas1);
-self::updateCmd ('play', 'action', 'other', false, 'Play', true, true, 'fa fa-play', null, null, 'command?command=play', null, null, 18, $cas1);
-self::updateCmd ('next', 'action', 'other', false, 'Next', true, true, 'fa fa-step-forward', null, null, 'command?command=next', null, null, 19, $cas1);
-//self::updateCmd ('fwd', 'action', 'other', false, 'Fwd', true, true, 'fa fa-step-forward', null, null, 'command?command=fwd', null, null, 20, $cas1);
-//self::updateCmd ('repeat', 'action', 'other', false, 'Repeat', true, true, 'fa fa-refresh', null, null, 'command?command=repeat', null, null, 25, $cas1);
-//self::updateCmd ('shuffle', 'action', 'other', false, 'Shuffle', true, true, 'fa fa-random', null, null, 'command?command=shuffle', null, null, 26, $cas1);
-//self::updateCmd ('loopMode', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, $cas1);
-//self::updateCmd ('playBackOrder', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, $cas1);
+self::updateCmd ($F, 'subText1', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::title', null, null, null, 4, $cas1);
+self::updateCmd ($F, 'subText2', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::subText2', null, null, null, 2, $cas1);
+self::updateCmd ($F, 'title', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::title', null, null, null, 9, $cas1);
+self::updateCmd ($F, 'url', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::image', null, null, null, 5, $cas1);
+self::updateCmd ($F, 'mediaLength', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
+self::updateCmd ($F, 'mediaProgress', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
+self::updateCmd ($F, 'state', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::state', null, null, null, 79, $cas1);
+//self::updateCmd ($F, 'playlistName', 'info', 'string', false, null, false, false, null, null, null, null, null, null, 2, $cas1);
+self::updateCmd ($F, 'nextState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
+self::updateCmd ($F, 'previousState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
+self::updateCmd ($F, 'playPauseState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
+self::updateCmd ($F, 'playList', 'action', 'select', false, 'Lancer une playlist :', true, false, null, 'dashboard', 'alexaapi::list', null, null, null, 20, $cas1);
+self::updateCmd ($F, 'playMusicTrack', 'action', 'message', false, 'Play Music Track', false, false, 'loisir-musical7', null, null, null, null, null, 79, $cas1);
+//self::updateCmd ($F, 'rwd', 'action', 'other', false, 'Rwd', true, true, 'fa fa-fast-backard', null, null, 'command?command=rwd', null, null, 15, $cas1);
+self::updateCmd ($F, 'previous', 'action', 'other', false, 'Previous', true, true, 'fa fa-step-backward', null, null, 'command?command=previous', null, null, 16, $cas1);
+self::updateCmd ($F, 'pause', 'action', 'other', false, 'Pause', true, true, 'fa fa-pause', null, null, 'command?command=pause', null, null, 17, $cas1);
+self::updateCmd ($F, 'play', 'action', 'other', false, 'Play', true, true, 'fa fa-play', null, null, 'command?command=play', null, null, 18, $cas1);
+self::updateCmd ($F, 'next', 'action', 'other', false, 'Next', true, true, 'fa fa-step-forward', null, null, 'command?command=next', null, null, 19, $cas1);
+//self::updateCmd ($F, 'fwd', 'action', 'other', false, 'Fwd', true, true, 'fa fa-step-forward', null, null, 'command?command=fwd', null, null, 20, $cas1);
+//self::updateCmd ($F, 'repeat', 'action', 'other', false, 'Repeat', true, true, 'fa fa-refresh', null, null, 'command?command=repeat', null, null, 25, $cas1);
+//self::updateCmd ($F, 'shuffle', 'action', 'other', false, 'Shuffle', true, true, 'fa fa-random', null, null, 'command?command=shuffle', null, null, 26, $cas1);
+//self::updateCmd ($F, 'loopMode', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, $cas1);
+//self::updateCmd ($F, 'playBackOrder', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, $cas1);
 
 	
-self::updateCmd ('alarm', 'action', 'message', false, 'Alarm', false, true, 'fa fa-bell', null, null, 'alarm?when=#when#&recurring=#recurring#', null, null, 79, $cas2);
-self::updateCmd ('deleteallalarms', 'action', 'message', false, 'Delete All Alarms', false, false, 'maison-poubelle', null, null, 'alarm?when=#when#&recurring=#recurring#', null, null, 79, $cas2);
-self::updateCmd ('whennextmusicalalarm', 'action', 'other', true, 'Next Musical Alarm When', false, false, 'fa-bell', null, null, 'whennextmusicalalarm?position=1', 'Next Musical Alarm Hour', null, 1, $cas2);
-self::updateCmd ('whennextmusicalalarminfo', 'info', 'string', false, 'Next Musical Alarm Hour', true, false, null, 'dashboard','alexaapi::alarmmusical', null, null, null, 26, $cas2);	
-self::updateCmd ('whennextalarm', 'action', 'other', true, 'Next Alarm When', false, false, 'fa-bell', null, null, 'whennextalarm?position=1', 'Next Alarm Hour', null, 2, $cas2);	
-self::updateCmd ('whennextalarminfo', 'info', 'string', false, 'Next Alarm Hour', true, false, null, 'dashboard','alexaapi::alarm', null, null, null, 25, $cas2);
+self::updateCmd ($F, 'alarm', 'action', 'message', false, 'Alarm', false, true, 'fa fa-bell', null, null, 'alarm?when=#when#&recurring=#recurring#', null, null, 79, $cas2);
+self::updateCmd ($F, 'deleteallalarms', 'action', 'message', false, 'Delete All Alarms', false, false, 'maison-poubelle', null, null, 'alarm?when=#when#&recurring=#recurring#', null, null, 79, $cas2);
+self::updateCmd ($F, 'whennextmusicalalarm', 'action', 'other', true, 'Next Musical Alarm When', false, false, 'fa-bell', null, null, 'whennextmusicalalarm?position=1', 'Next Musical Alarm Hour', null, 1, $cas2);
+self::updateCmd ($F, 'whennextmusicalalarminfo', 'info', 'string', false, 'Next Musical Alarm Hour', true, false, null, 'dashboard','alexaapi::alarmmusical', null, null, null, 26, $cas2);	
+self::updateCmd ($F, 'whennextalarm', 'action', 'other', true, 'Next Alarm When', false, false, 'fa-bell', null, null, 'whennextalarm?position=1', 'Next Alarm Hour', null, 2, $cas2);	
+self::updateCmd ($F, 'whennextalarminfo', 'info', 'string', false, 'Next Alarm Hour', true, false, null, 'dashboard','alexaapi::alarm', null, null, null, 25, $cas2);
 
 
 	if($type == "A15ERDAKK5HQQG") {
@@ -1019,19 +1055,19 @@ self::updateCmd ('whennextalarminfo', 'info', 'string', false, 'Next Alarm Hour'
 		log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus car bug!');
 	}
 
-self::updateCmd ('deleteReminder', 'action', 'message', false, 'DeleteReminder', false, false, 'maison-poubelle', null, null, 'deleteReminder?id=#id#', null, null, 2, $cas3);	
+self::updateCmd ($F, 'deleteReminder', 'action', 'message', false, 'DeleteReminder', false, false, 'maison-poubelle', null, null, 'deleteReminder?id=#id#', null, null, 2, $cas3);	
 
-self::updateCmd ('whennextreminderinfo', 'info', 'string', false, 'Next Reminder Hour', true, false, null, 'dashboard','alexaapi::reminder', null, null, null, 27, $cas3);
+self::updateCmd ($F, 'whennextreminderinfo', 'info', 'string', false, 'Next Reminder Hour', true, false, null, 'dashboard','alexaapi::reminder', null, null, null, 27, $cas3);
 
-self::updateCmd ('whennextreminder', 'action', 'other', true, 'Next Reminder When', false, false, null, null, null, 'whennextreminder?position=1', 'Next Reminder Hour', null, 27, $cas3);
+self::updateCmd ($F, 'whennextreminder', 'action', 'other', true, 'Next Reminder When', false, false, null, null, null, 'whennextreminder?position=1', 'Next Reminder Hour', null, 27, $cas3);
 		
 
-self::updateCmd ('reminder', 'action', 'message', false, 'Reminder', false, false, 'divers-circular114', null, null, 'reminder?text=#text#&when=#when#', null, null, 79, $cas3);	
-self::updateCmd ('routine', 'action', 'select', false, 'Lancer une routine :', true, false, 'divers-circular114', 'dashboard','alexaapi::list', 'routine?routine=#select#', null, 'Lancer Refresh|Lancer Refresh', 20, $cas3);
-self::updateCmd ('interactioninfo', 'info', 'string', false, 'Last Interaction', true, false, 'fa jeedomapp-audiospeak', 'dashboard','alexaapi::interaction', null, null, null, 2, $cas7);	
+self::updateCmd ($F, 'reminder', 'action', 'message', false, 'Reminder', false, false, 'divers-circular114', null, null, 'reminder?text=#text#&when=#when#', null, null, 79, $cas3);	
+self::updateCmd ($F, 'routine', 'action', 'select', false, 'Lancer une routine :', true, false, 'divers-circular114', 'dashboard','alexaapi::list', 'routine?routine=#select#', null, 'Lancer Refresh|Lancer Refresh', 20, $cas3);
+self::updateCmd ($F, 'interactioninfo', 'info', 'string', false, 'Last Interaction', true, false, 'fa jeedomapp-audiospeak', 'dashboard','alexaapi::interaction', null, null, null, 2, $cas7);	
 	
-self::updateCmd ('volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fa fa-volume-up', null, null, null, null, null, 22, $cas6);	
-self::updateCmd ('volume', 'action', 'slider', false, 'Volume', true, true, 'fa fa-volume-up', 'dashboard','alexaapi::volume', 'volume?value=#volume#', null, null, 21, $cas5);
+self::updateCmd ($F, 'volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fa fa-volume-up', null, null, null, null, null, 22, $cas6);	
+self::updateCmd ($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fa fa-volume-up', 'dashboard','alexaapi::volume', 'volume?value=#volume#', null, null, 21, $cas5);
 
 // Lien entre volume et volumeinfo
 $volinfo = $this->getCmd(null, 'volumeinfo');
@@ -1095,7 +1131,8 @@ $this->refresh(false); //false c'est pour ne pas lancer l'actualisation des rout
 	}
 
 
-
+//dans tous les cas, on repasse forceUpdate à false
+$this->setStatus('forceUpdate', false);
 
 	}
 
@@ -1348,9 +1385,6 @@ class alexaapiCmd extends cmd {
 		
 		}
 		
-		
-		
-
 		if (($this->getType() == 'action') && ($this->getConfiguration('infoName') != '')) {
 			// On enregistre la valeur de retour dans le champ info
 			foreach ($this->getEqLogic()->getCmd('info') as $cmd) {

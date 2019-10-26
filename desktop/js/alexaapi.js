@@ -15,6 +15,57 @@
 
 */
 
+
+$('#bt_forcerDefaultCmd').off('click').on('click', function () {
+  var dialog_title = '{{Recharge configuration par défaut}}';
+  var dialog_message = '<form class="form-horizontal onsubmit="return false;"> ';
+  dialog_title = '{{Recharger la configuration par défaut ?}}';
+  dialog_message += '<label class="lbl lbl-warning" for="name">{{Notez que cette fonction ne supprime pas votre équipoement ni ses commandes, cela évite d\'avoir à refaire les scénarios. Elle va supprimer toute personnalisation et toutes les commandes vont revenir à leur état initial.}}</label> ';
+  dialog_message += '</form>';
+  bootbox.dialog({
+    title: dialog_title,
+    message: dialog_message,
+    buttons: {
+      "{{Annuler}}": {
+        className: "btn-danger",
+        callback: function () {
+        }
+      },
+      success: {
+        label: "{{Démarrer}}",
+        className: "btn-success",
+        callback: function () {
+             $.ajax({
+              type: "POST",
+                  url: "plugins/alexaapi/core/ajax/alexaapi.ajax.php",
+              data: {
+                action: "forcerDefaultCmd",
+                id: $('.eqLogicAttr[data-l1key=id]').value(),
+                createcommand: 0,
+              },
+              dataType: 'json',
+              global: false,
+              error: function (request, status, error) {
+                handleAjaxError(request, status, error);
+              },
+              success: function (data) {
+                if (data.state != 'ok') {
+                  $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                  return;
+                }
+                $('#div_alert').showAlert({message: '{{Opération réalisée avec succès}}', level: 'success'});
+                $('.eqLogicDisplayCard[data-eqLogic_id=' + $('.eqLogicAttr[data-l1key=id]').value() + ']').click();
+              }
+            });
+          
+        }
+      },
+    }
+  });
+  
+});
+
+
 $('#bt_Lancer').off('click').on('click',function(){
 var tempo=0;
 if(requeteremotevidecache.checked) 

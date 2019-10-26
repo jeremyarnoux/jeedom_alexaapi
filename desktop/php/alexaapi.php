@@ -383,6 +383,12 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
           <div class="col-sm-5">
             <form class="form-horizontal">
               <fieldset>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">{{}}</label>
+					<div class="col-sm-8">
+						<a id="bt_forcerDefaultCmd" class="btn btn-warning"><i class="fas fa-search"></i> {{Recharger configuration par défaut}}</a>
+					</div>
+				</div>
                 <div class="form-group">
                   <label class="col-sm-2 control-label">{{ID}}</label>
                   <div class="col-sm-8">

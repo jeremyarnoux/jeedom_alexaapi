@@ -58,6 +58,18 @@ try {
             alexaapi::scanAmazonAlexa();
             ajax::success();
         break;
+        case 'forcerDefaultAllCmd':
+            alexaapi::forcerDefaultAllCmd();
+            ajax::success();
+        break;        
+		case 'forcerDefaultCmd':
+				$eqLogic = alexaapi::byId(init('id'));
+				if (!is_object($eqLogic)) {
+					throw new Exception(__('Alexaapi eqLogic non trouvé : ', __FILE__) . init('id'));
+				}
+            alexaapi::forcerDefaultCmd(init('id'));
+            ajax::success();
+        break;		
 		case 'VerifiePresenceCookie':
         $request = realpath(dirname(__FILE__) . '/../../resources/data/alexa-cookie.json');
         if (file_exists($request))
