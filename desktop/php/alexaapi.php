@@ -171,8 +171,6 @@ foreach($eqLogics as $eqLogic) {
 			</div>
 		</div>
     </div>
-	<?php echo config::byKey('plugin::branch'); ?>
-	
 	<?php	
 	if (config::byKey('utilisateurMultimedia', 'alexaapi')!="0")
 	{	

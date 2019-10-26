@@ -74,7 +74,7 @@ class AlexaWsMqtt extends EventEmitter {
         let initTimeout = null;
 
         this.websocket.on('open', () => {
-            this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Open: ' + url);
+            this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Open: ' + url,5);
             this.connectionActive = false;
 
             initTimeout = setTimeout(() => {
@@ -85,7 +85,7 @@ class AlexaWsMqtt extends EventEmitter {
             // tell Tuning Service that we support "A:H" protocol = AlphaPrococol
             const msg = new Buffer('0x99d4f71a 0x0000001d A:HTUNE');
             //console.log('SEND: ' + msg.toString('ascii'));
-            this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Initialization Msg 1 sent');
+            this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Initialization Msg 1 sent',5);
             this.websocket.send(msg);
         });
 
@@ -153,25 +153,25 @@ class AlexaWsMqtt extends EventEmitter {
                 msg = this.encodeGWHandshake();
                 //console.log('SEND: ' + msg.toString('ascii'));
                 this.websocket.send(msg);
-                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Initialization Msg 2+3 sent');
+                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Initialization Msg 2+3 sent',5);
             }
             else if (msgCounter === 1) {
                 //let msg = new Buffer('MSG 0x00000362 0x0e414e46 f 0x00000001 0xf904b9f5 0x00000109 GWM MSG 0x0000b479 0x0000003b urn:tcomm-endpoint:device:deviceType:0:deviceSerialNumber:0 0x00000041 urn:tcomm-endpoint:service:serviceName:DeeWebsiteMessagingService {"command":"REGISTER_CONNECTION"}FABE');
                 let msg = this.encodeGWRegister();
-                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Initialization Msg 4 (Register Connection) sent');
+                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Initialization Msg 4 (Register Connection) sent',5);
                 //console.log('SEND: ' + msg.toString('ascii'));
                 this.websocket.send(msg);
 
                 //msg = new Buffer('4D53472030783030303030303635203078306534313465343720662030783030303030303031203078626332666262356620307830303030303036322050494E00000000D1098D8CD1098D8C000000070052006500670075006C0061007246414245', 'hex'); // "MSG 0x00000065 0x0e414e47 f 0x00000001 0xbc2fbb5f 0x00000062 PIN" + 30 + "FABE"
                 msg = this.encodePing();
-                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Send First Ping');
+                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Send First Ping',5);
                 //console.log('SEND: ' + msg.toString('hex'));
                 this.websocket.send(msg);
 
                 this.pingPongInterval = setInterval(() => {
                     //let msg = new Buffer('4D53472030783030303030303635203078306534313465343720662030783030303030303031203078626332666262356620307830303030303036322050494E00000000D1098D8CD1098D8C000000070052006500670075006C0061007246414245', 'hex'); // "MSG 0x00000065 0x0e414e47 f 0x00000001 0xbc2fbb5f 0x00000062 PIN" + 30 + "FABE"
                     let msg = this.encodePing();
-                    this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Send Ping');
+                    this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Send Ping',5);
                     //console.log('SEND: ' + msg.toString('hex'));
                     this.websocket.send(msg);
 
@@ -188,11 +188,11 @@ class AlexaWsMqtt extends EventEmitter {
             const incomingMsg = data.toString('ascii');
             //if (incomingMsg.includes('PON') && incomingMsg.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
             if (message.service === 'FABE' && message.content && message.content.messageType === 'PON' && message.content.payloadData && message.content.payloadData.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
-                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Received Pong');
+                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Received Pong',5);
                 if (initTimeout) {
                     clearTimeout(initTimeout);
                     initTimeout = null;
-                    this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Initialization completed');
+                    this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Initialization completed',2);
                     this.emit('connect');
                 }
                 if (this.pongTimeout) {
@@ -206,7 +206,7 @@ class AlexaWsMqtt extends EventEmitter {
                 let command = message.content.payload.command;
                 let payload = message.content.payload.payload;
 
-                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Command --{' + command + '}-- : ' + JSON.stringify(payload, null, 4));
+                this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Command --{' + command + '}-- : ' + JSON.stringify(payload, null, 4),5);
                 //this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Command --{' + command + '}--  détail désactivé ');// + JSON.stringify(payload, null, 4));
                 this.emit('command', command, payload);
                 return;

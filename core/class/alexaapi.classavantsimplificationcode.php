@@ -486,7 +486,8 @@ self::scanAmazonAlexa();
 			// Skip the special device named "This Device"
 			if ($item['name'] == 'This Device') continue;
 			
-		
+			
+			
 						// On teste s'il faut créer un autre Device Player
 			if  ((config::byKey('utilisateurMultimedia', 'alexaapi')!="0") && (in_array("AUDIO_PLAYER",$item['capabilities']))) {
 				
@@ -505,9 +506,10 @@ self::scanAmazonAlexa();
 					$device->setIsVisible(0);
 					$device->setIsEnable(0);
 					$device->setConfiguration('capabilities', $item['capabilities']);
-					$device->save();
 					$device->setStatus('online', (($item['online'])?true:false));
-								
+					$device->save();
+					
+			
 					// Device PLAYER
 					$device = alexaapi::byLogicalId($item['serial']."_player", 'alexaapi');
 						if (!is_object($device)) {
@@ -522,16 +524,17 @@ self::scanAmazonAlexa();
 					$device->setConfiguration('family', $item['family']);
 					$device->setConfiguration('members', $item['members']);
 					$device->setConfiguration('capabilities', $item['capabilities']);
-					$device->save();
 					$device->setStatus('online', (($item['online'])?true:false));
+					$device->save();
 					$numDevices++;
 			}
+
+
 
 			// Retireve the device (if already registered in Jeedom)
 			$device = alexaapi::byLogicalId($item['serial'], 'alexaapi');
 			if (!is_object($device)) {
 				$device = self::createNewDevice($item['name'], $item['serial']);
-				//$device->save();
 				$numNewDevices++;
 			}
 
@@ -542,8 +545,10 @@ self::scanAmazonAlexa();
 			$device->setConfiguration('family', $item['family']);
 			$device->setConfiguration('members', $item['members']);
 			$device->setConfiguration('capabilities', $item['capabilities']);
+			$device->setStatus('online', (($item['online'])?true:false));
 			$device->save();
-			$device->setStatus('online', (($item['online'])?true:false)); //SetStatus doit être lancé après Save et Save après inutile
+
+
 			$numDevices++;
 		}
 		
@@ -572,8 +577,8 @@ self::scanAmazonAlexa();
 			$device->setConfiguration('capabilities', $item['supportedProperties']);
 			//On va mettre dispo, on traite plus tard.
 			//$device->setStatus('online', (($item['online'])?true:false));
-			$device->save();
 			$device->setStatus('online', 'true');
+			$device->save();
 
 			$numDevices++;
 		}
@@ -595,8 +600,6 @@ self::scanAmazonAlexa();
 		$defaultRoom = intval(config::byKey('defaultParentObject','alexaapi','',true));
 		//log::add('alexaapi', 'debug', '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>0>>>>>>>>>>>>>>>>>>>>>>>>>>defaultRoom:'.$defaultRoom);
 
-	event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Ajout de "'.$deviceName.'"', __FILE__),));
-
 		$newDevice = new alexaapi();
 		$newDevice->setName($deviceName);
 		$newDevice->setLogicalId($deviceSerial);
@@ -613,7 +616,8 @@ self::scanAmazonAlexa();
 		$newDevice->setConfiguration('device', $deviceName);
 		$newDevice->setConfiguration('serial', $deviceSerial);
 		$newDevice->setIsEnable(1);
-		//$newDevice->save(); non utile, sera sauvegardé un peu plus loin.
+		$newDevice->save();
+
 		return $newDevice;
 	}
 	
@@ -663,26 +667,16 @@ self::scanAmazonAlexa();
 
 
 	public function refresh($_routines=true) { //$_routines c'est pour éviter de charger les routines lors du scan
+
+//log::add('alexaapi', 'debug', '********************Lancement de la commande Refresh sur '.$this->getName().' / Lancement Routine ='.$_routines);
 	
 	$deamon_info = alexaapi::deamon_info();
 	if ($deamon_info['state'] != 'ok') return false;
-//log::add('alexaapi', 'debug', '********************Lancement de la commande Refresh sur '.$this->getName().' / Lancement Routine ='.$_routines);
-
-$widgetPlayer=($this->getConfiguration('devicetype') == "Player");
-$widgetSmarthome=($this->getConfiguration('devicetype') == "Smarthome");
-$widgetPlaylist=($this->getConfiguration('devicetype') == "PlayList");
-$widgetEcho=(!($widgetPlayer||$widgetSmarthome||$widgetPlaylist));
-
 
 $device=str_replace("_player", "", $this->getConfiguration('serial'));
 
-if ($widgetPlaylist) {
-	$_routines=false;
-}
-
-
 // Refresh d'un player
-if ($widgetPlayer) {
+if ($this->getConfiguration('devicetype') == "Player") {
 		$_routines=false;
 		//$envoicommandeHTTP=file_get_contents(network::getNetworkAccess('internal') . "/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey=".jeedom::getApiKey('alexaapi')."&nom=refreshPlayer");
 
@@ -799,8 +793,7 @@ if ($widgetPlayer) {
 			}
 	}
 
-	if ($widgetEcho)
-	{
+
 		
 		try {
 			foreach ($this->getCmd('action') as $cmd) {
@@ -812,8 +805,7 @@ if ($widgetPlayer) {
 			}
 		}
 		catch(Exception $exc) {log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());}
-
-		}
+		
 	}
 		
 	public function test2060() {
@@ -879,7 +871,7 @@ if ($widgetPlayer) {
 	}
 
 	public function updateCmd ($LogicalId, $Type, $SubType, $RunWhenRefresh, $Name, $IsVisible, $title_disable, $setDisplayicon, $setTemplate_version, $setTemplate_lien, $request, $infoName, $listValue, $Order, $Test) {
-
+				//log::add('alexaapi', 'debug', '>>>>>>>>>>'.$this->getId().'>>>>>>>'.$EqLogic_id.'>>>>>>>>>>>>>>>>>>>>>>>> lancement updateCmd de '.$LogicalId);
 				
 		if ($Test) {
 			try {
@@ -926,9 +918,11 @@ if ($widgetPlayer) {
 
 
 	public function postSave() {
+	
 
 
-log::add('alexaapi', 'debug', '**********************postSave '.$this->getName().'***********************************');
+				//log::add('alexaapi', 'debug', '**********************postSave DEBUT***********************************');
+
 
 
 		/*       if ($this->getName() == 'Tous les appareils')
@@ -942,44 +936,739 @@ log::add('alexaapi', 'debug', '**********************postSave '.$this->getName()
 		//  http://sigalou-domotique.fr/images/Sigalou/capabilites.jpg
 		$capa=$this->getConfiguration('capabilities','');
 		$type=$this->getConfiguration('type','');
-		
-		
 if(!empty($capa)) {
 	
 		// Pas trouvé le capabilities qui correspond au PUSH
 		if (strstr($this->getName(), "Alexa Apps")) {
-			self::updateCmd ('push', 'action', 'message', false, 'Push', true, true, 'fa jeedomapp-audiospeak', null, null, 'push?text=#message#', null, null, 1, true);
+			// Push command
+			$cmd = $this->getCmd(null, 'push');
+			if (!is_object($cmd)) {
+				$cmd = new alexaapiCmd();
+				$cmd->setType('action');
+				$cmd->setLogicalId('push');
+				$cmd->setSubType('message');
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setName('Push');
+				$cmd->setConfiguration('request', 'push?text=#message#');
+				$cmd->setDisplay('title_disable', 1);
+				$cmd->setIsVisible(1);
+			}
+			$cmd->save();
 			return;
 		}
+
+
+	log::add('alexaapi', 'debug', '********************** '.$this->getConfiguration('devicetype').'***********************************');
+
+		if (($this->getConfiguration('devicetype') == "PlayList") || ($this->getConfiguration('devicetype') == "Player")) { 
 		
-//log::add('alexaapi', 'debug', '->'.$this->getName().'**********avec CAPA*************');
+			// playlistName info
+			$cmd = $this->getCmd(null, 'playlistName');
+			if (!is_object($cmd)) {
+				$cmd = new alexaapiCmd();
+				$cmd->setType('info');
+				$cmd->setLogicalId('playlistName');
+				$cmd->setSubType('string');
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setName('playlistName');
+				$cmd->setIsVisible(1);
+				if ($this->getConfiguration('devicetype') == "Player") 	$cmd->setIsVisible(0);
+				//$cmd->setOrder(79);
+				//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+				$cmd->setDisplay('title_disable', 1);
+			
+			}
+			$cmd->save();	
+			
+			/*
+			// songName info
+			$cmd = $this->getCmd(null, 'songName');
+			if (!is_object($cmd)) {
+				$cmd = new alexaapiCmd();
+				$cmd->setType('info');
+				$cmd->setLogicalId('songName');
+				$cmd->setSubType('string');
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setName('songName');
+				$cmd->setIsVisible(1);
+				//$cmd->setOrder(79);
+				//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+				//$cmd->setDisplay('title_disable', 1);
+			}
+			$cmd->save();
+	*/
+		}	
+
+
+
+		if ($this->getConfiguration('devicetype') == "PlayList") { 
+		
+		
+			$cmd = $this->getCmd(null, 'playlisthtml');
+			if (!is_object($cmd)) {
+				$cmd = new alexaapiCmd();
+				$cmd->setType('info');
+				$cmd->setLogicalId('playlisthtml');
+				$cmd->setSubType('string');
+				$cmd->setEqLogic_id($this->getId());
+				$cmd->setName('playlisthtml');
+				$cmd->setDisplay('title_disable', 1);					
+				$cmd->setIsVisible(1);
+				//$cmd->setOrder(79);
+				//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+
+			}
+			$cmd->save();			
+		
+					return;
+		}
+
+
+
+
+	if (($this->hasCapaorFamilyorType("AUDIO_PLAYER")) && ($this->getConfiguration('devicetype') == "Player")) { 
+
+		// SmartHome
+	if ($this->hasCapaorFamilyorType("turnOff")) { 
+		$cmd = $this->getCmd(null, 'turnOff');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('turnOff');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('turnOff');
+			$cmd->setConfiguration('request', 'SmarthomeCommand?command=turnOff');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setDisplay('icon', '<i class="fa jeedomapp-audiospeak"></i>');
+			$cmd->setIsVisible(1);
+		}
+		$cmd->save();
+	} else {
+			$cmd = $this->getCmd(null, 'turnOff');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+		}
+		
+	if ($this->hasCapaorFamilyorType("turnOn")) { 
+		$cmd = $this->getCmd(null, 'turnOn');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('turnOn');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('turnOn');
+			$cmd->setConfiguration('request', 'SmarthomeCommand?command=turnOn');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setDisplay('icon', '<i class="fa jeedomapp-audiospeak"></i>');
+			$cmd->setIsVisible(1);
+		}
+		$cmd->save();
+	} else {
+			$cmd = $this->getCmd(null, 'turnOn');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+		}			
+}
+
+
+
+
+
+	//if((array_search("AUDIO_PLAYER",$capa)) || (empty($capa))) { // empty($capa) est utilisé car chez certains utilisateurs capabilities ne remonte pas
+	if (($this->hasCapaorFamilyorType("AUDIO_PLAYER")) && ($this->getConfiguration('devicetype') == "Player")) { 
+
+
+		// Radio command
+		$cmd = $this->getCmd(null, 'radio');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('radio');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Radio');
+			$cmd->setConfiguration('request', 'radio?station=#station#');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setIsVisible(0);
+			$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+		}
+		$cmd->save();
+		
+		
+		// Command command
+		$cmd = $this->getCmd(null, 'command');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('command');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Command');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setConfiguration('request', 'command?command=#command#');
+			$cmd->setDisplay('icon', '<i class="fa fa-play-circle"></i>');
+			$cmd->setIsVisible(0);
+		}
+		$cmd->save();
+	} else {
+		$cmd = $this->getCmd(null, 'radio');
+		if (is_object($cmd)) $cmd->remove();
+		
+	
+		$cmd = $this->getCmd(null, 'command');
+		if (is_object($cmd)) $cmd->remove();
+		
+	}
+
+
+
+	if (($this->hasCapaorFamilyorType("AUDIO_PLAYER")) && ($this->getConfiguration('devicetype') != "Player")) { 
+	
+					// Speak command
+		$cmd = $this->getCmd(null, 'speak');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('speak');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Speak');
+			$cmd->setConfiguration('request', 'speak?text=#message#');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setOrder(3);
+			$cmd->setDisplay('icon', '<i class="fa jeedomapp-audiospeak"></i>');
+			$cmd->setIsVisible(1);
+		}
+		$cmd->save();
+	} else {
+			$cmd = $this->getCmd(null, 'speak');
+			if (is_object($cmd)) {
+				$cmd->remove();
+			}
+		}
+	
+
+		
+	/*	if (($this->hasCapaorFamilyorType("AUDIO_PLAYER")) && ($this->getConfiguration('devicetype') == "Player")) { 
+	
+		// subText1 info
+	
+		$cmd = $this->getCmd(null, 'subText1');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('subText1');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('subText1');
+			$cmd->setIsVisible(1);
+			$cmd->setTemplate('dashboard','alexaapi::title');
+			$cmd->setOrder(4);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			//$cmd->setDisplay('title_disable', 1);
+
+			
+			
+			
+		}
+		$cmd->save();
+
+		
+			// subText2 info
+		$cmd = $this->getCmd(null, 'subText2');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('subText2');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('subText2');
+			$cmd->setIsVisible(1);
+			$cmd->setTemplate('dashboard','alexaapi::subText2');
+			$cmd->setOrder(2);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			//$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();			
+		
+		// title info
+		$cmd = $this->getCmd(null, 'title');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('title');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('title');
+			$cmd->setIsVisible(1);
+			$cmd->setTemplate('dashboard','alexaapi::title');
+			$cmd->setOrder(9);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			//$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();
+		
+			// url info
+		$cmd = $this->getCmd(null, 'url');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('url');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('url');
+			$cmd->setIsVisible(1);
+			$cmd->setTemplate('dashboard','alexaapi::image');					
+			$cmd->setOrder(5);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			//$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();	
+
+
+			// mediaLength info
+		$cmd = $this->getCmd(null, 'mediaLength');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('mediaLength');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('mediaLength');
+			$cmd->setIsVisible(0);
+			$cmd->setOrder(79);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			//$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();
+
+			// mediaProgress info
+		$cmd = $this->getCmd(null, 'mediaProgress');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('mediaProgress');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('mediaProgress');
+			$cmd->setIsVisible(0);
+			$cmd->setOrder(79);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			//$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();
+
+			// state info
+		$cmd = $this->getCmd(null, 'state');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('state');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('state');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder(79);
+			$cmd->setTemplate('dashboard','alexaapi::state');
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			//$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();
+
+			// playlistName info récupéré en MQTT (playlist)
+		$cmd = $this->getCmd(null, 'playlistName');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('playlistName');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('playlistName');
+			$cmd->setIsVisible(0);
+			//$cmd->setTemplate('dashboard','alexaapi::playlistname');
+
+			$cmd->setOrder(2);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			//$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();
+		
+			// nextstate 
+		$cmd = $this->getCmd(null, 'nextState');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('nextState');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('nextState');
+			$cmd->setIsVisible(0);
+			$cmd->setOrder(79);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();
+		
+			// previousState 
+		$cmd = $this->getCmd(null, 'previousState');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('previousState');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('previousState');
+			$cmd->setIsVisible(0);
+			$cmd->setOrder(79);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();
+		
+			// playPauseState 
+		$cmd = $this->getCmd(null, 'playPauseState');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('playPauseState');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('playPauseState');
+			$cmd->setIsVisible(0);
+			$cmd->setOrder(79);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();
+		
+		// Playlists
+		$cmd = $this->getCmd(null, 'playList');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('playList');
+			$cmd->setSubType('select');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Lancer une playlist :');
+			$cmd->setConfiguration('request', 'playlist?playlist=#select#');
+			$cmd->setConfiguration('listValue', 'Lancer Refresh|Lancer Refresh');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setOrder(20);
+			$cmd->setIsVisible(1);
+			$cmd->setTemplate('dashboard','alexaapi::list');
+			//$cmd->setDisplay('icon', '<i class="divers-viral"></i>');
+		}
+		$cmd->save();
+		
+		// playMusicTrack 
+		$cmd = $this->getCmd(null, 'playMusicTrack');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('playMusicTrack');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Play Music Track');
+			$cmd->setConfiguration('request', 'playmusictrack?trackId=#trackid#');
+			//$cmd->setDisplay('title_disable', 1);
+			$cmd->setIsVisible(0);
+			$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');setDisplayicon
+		}
+		$cmd->save();	
+
+		// RWD
+		$cmd = $this->getCmd(null, 'rwd');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('rwd');
+			$cmd->setSubType('other');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Rwd');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setConfiguration('request', 'command?command=rwd');
+			$cmd->setDisplay('icon', '<i class="fa fa-fast-backward"></i>');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder(15);
+		}
+		$cmd->save();	
+		
+		// PREVIOUS
+		$cmd = $this->getCmd(null, 'previous');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('previous');
+			$cmd->setSubType('other');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Previous');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setConfiguration('request', 'command?command=previous');
+			$cmd->setDisplay('icon', '<i class="fa fa-step-backward"></i>');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder(16);
+		}
+		$cmd->save();
+		
+		// PAUSE
+		$cmd = $this->getCmd(null, 'pause');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('pause');
+			$cmd->setSubType('other');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Pause');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setConfiguration('request', 'command?command=pause');
+			$cmd->setDisplay('icon', '<i class="fa fa-pause"></i>');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder(17);
+		}
+		$cmd->save();	
+		
+				// PLAY
+		$cmd = $this->getCmd(null, 'play');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('play');
+			$cmd->setSubType('other');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Play');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setConfiguration('request', 'command?command=play');
+			$cmd->setDisplay('icon', '<i class="fa fa-play"></i>');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder(18);
+		}
+		$cmd->save();	
+		
+			// NEXT
+		$cmd = $this->getCmd(null, 'next');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('next');
+			$cmd->setSubType('other');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Next');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setConfiguration('request', 'command?command=next');
+			$cmd->setDisplay('icon', '<i class="fa fa-step-forward"></i>');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder(19);
+		}
+		$cmd->save();
+		
+		 FWD
+		$cmd = $this->getCmd(null, 'fwd');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('fwd');
+			$cmd->setSubType('other');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Fwd');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setConfiguration('request', 'command?command=fwd');
+			$cmd->setDisplay('icon', '<i class="fa fa-fast-forward"></i>');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder(20);
+		}
+		$cmd->save();
+		
+			// §§§§§ ON REPRENDRA PLUS TARD REPEAT ET SHUFFLE CAR L ENVOI NECESSITE UNE OPTION ON OU OFF CONTRAIREMENT A PAUSE OU NEXT		
+		// REPEAT
+		$cmd = $this->getCmd(null, 'repeat');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('repeat');
+			$cmd->setSubType('other');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Repeat');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setConfiguration('request', 'command?command=repeat');
+			$cmd->setDisplay('icon', '<i class="fa fa-refresh"></i>');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder(25);
+		}
+		$cmd->save();	
+		
+		// loopMode info récupéré en MQTT
+		$cmd = $this->getCmd(null, 'loopMode');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('loopMode');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('loopMode');
+			$cmd->setIsVisible(1);
+			//$cmd->setOrder(79);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			//$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();	
+
+		// SHUFFLE
+		$cmd = $this->getCmd(null, 'shuffle');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('shuffle');
+			$cmd->setSubType('other');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Shuffle');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setConfiguration('request', 'command?command=shuffle');
+			$cmd->setDisplay('icon', '<i class="fa fa-random"></i>');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder(26);
+		}
+		$cmd->save();	
+		
+		// playBackOrder info récupéré en MQTT
+		$cmd = $this->getCmd(null, 'playBackOrder');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('playBackOrder');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('playBackOrder');
+			$cmd->setIsVisible(1);
+			//$cmd->setOrder(79);
+			//$cmd->setDisplay('icon', '<i class="loisir-musical7"></i>');
+			//$cmd->setDisplay('title_disable', 1);
+		}
+		$cmd->save();
+		
+		} 		
+
+	if (($this->hasCapaorFamilyorType("TIMERS_AND_ALARMS")) && !($this->getConfiguration('devicetype') == "Player")) { 
+	
+		// alarm command
+		$cmd = $this->getCmd(null, 'alarm');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('alarm');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Alarm');
+			$cmd->setConfiguration('request', 'alarm?when=#when#&recurring=#recurring#');
+			$cmd->setDisplay('title_disable', 1);
+			$cmd->setDisplay('icon', '<i class="fa fa-bell"></i>');
+			$cmd->setIsVisible(0);
+		}
+		$cmd->save();
+
+		// delete all alarms command
+		$cmd = $this->getCmd(null, 'deleteallalarms');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('deleteallalarms');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Delete All Alarms');
+			$cmd->setConfiguration('request', 'deleteallalarms?type=#type#&status=#status#');
+			$cmd->setIsVisible(0);
+			$cmd->setDisplay('icon', '<i class="maison-poubelle"></i>');
+		}
+		$cmd->save();
+		// whennextmusicalalarm command
+		$cmd = $this->getCmd(null, 'whennextmusicalalarminfo');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('whennextmusicalalarminfo');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Next Musical Alarm Hour');
+			$cmd->setOrder(26);
+			$cmd->setIsVisible(1);
+			//$cmd->setDisplay('icon', '<i class="fa fa-bell"></i>');
+			$cmd->setTemplate('dashboard','alexaapi::alarmmusical');
+		}
+		$cmd->save();
+		$cmd = $this->getCmd(null, 'whennextmusicalalarm');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setIsVisible(0);
+			$cmd->setLogicalId('whennextmusicalalarm');
+			$cmd->setSubType('other');
+			$cmd->setConfiguration('infoName', 'Next Musical Alarm Hour');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setOrder(1);
+			$cmd->setName('Next Musical Alarm When');
+			$cmd->setDisplay('icon', '<i class="fa fa-bell"></i>');
+			$cmd->setConfiguration('RunWhenRefresh', 1);
+			$cmd->setConfiguration('request', 'whennextmusicalalarm?position=1');
+		}
+		$cmd->save();	
+		
+
+		// whennextalarm command
+		$cmd = $this->getCmd(null, 'whennextalarminfo');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('whennextalarminfo');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Next Alarm Hour');
+			$cmd->setOrder(25);
+			$cmd->setIsVisible(1);
+			//$cmd->setDisplay('icon', '<i class="fa fa-bell"></i>');
+			$cmd->setTemplate('dashboard','alexaapi::alarm');
+		}
+		$cmd->save();
+	
+
+		$cmd = $this->getCmd(null, 'whennextalarm');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('whennextalarm');
+			$cmd->setSubType('other');
+			$cmd->setConfiguration('infoName', 'Next Alarm Hour');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Next Alarm When');
+			//$cmd->setOrder(2);
+			$cmd->setIsVisible(0);
+			$cmd->setDisplay('icon', '<i class="fa fa-bell"></i>');
+			$cmd->setConfiguration('RunWhenRefresh', 1);
+			$cmd->setConfiguration('request', 'whennextalarm?position=1');
+		}
+		$cmd->save();
+		
+
+	
+//($LogicalId, $Type, $SubType, $RunWhenRefresh, $Name, $IsVisible, $title_disable, $setDisplayicon, $setTemplate_version, $setTemplate_lien, $request, $Order, $Test)	
+		
+	} 
+*/
+
+
+
 
 $widgetPlayer=($this->getConfiguration('devicetype') == "Player");
 $widgetSmarthome=($this->getConfiguration('devicetype') == "Smarthome");
-$widgetPlaylist=($this->getConfiguration('devicetype') == "PlayList");
 
 $cas1=(($this->hasCapaorFamilyorType("AUDIO_PLAYER")) && $widgetPlayer);
-$cas1bis=(($this->hasCapaorFamilyorType("AUDIO_PLAYER")) && !$widgetPlayer);
 $cas2=(($this->hasCapaorFamilyorType("TIMERS_AND_ALARMS")) && !$widgetPlayer);
 $cas3=(($this->hasCapaorFamilyorType("REMINDERS")) && !$widgetPlayer);
 $cas4=(($this->hasCapaorFamilyorType("REMINDERS")) && !$widgetSmarthome);
 $cas5=($this->hasCapaorFamilyorType("VOLUME_SETTING"));
 $cas6=($cas5 && (!$this->hasCapaorFamilyorType("WHA")));
-$cas7=((!$this->hasCapaorFamilyorType("WHA")) && ($this->getConfiguration('devicetype') != "Player") &&(!$this->hasCapaorFamilyorType("FIRE_TV")) && (!$this->hasCapaorFamilyorType("AMAZONMOBILEMUSIC_ANDROID")));
-$cas8=(($this->hasCapaorFamilyorType("turnOff")) && $widgetSmarthome);
-
-self::updateCmd ('playlistName', 'info', 'string', false, null, true, true, null, null, null, null, null, null, 79, $widgetPlaylist);
-//self::updateCmd ('playlistName', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 2, $widgetPlayer);
-//self::updateCmd ('songName', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, ($widgetPlaylist || $widgetPlayer));
-
-self::updateCmd ('playlisthtml', 'info', 'string', false, null, true, true, null, null, null, null, null, null, 79, $widgetPlaylist);
-
-self::updateCmd ('turnOn', 'action', 'message', false, 'turnOn', true, true, "fa jeedomapp-audiospeak", null, null, 'SmarthomeCommand?command=turnOn', null, null, 79, $cas8);			
-self::updateCmd ('turnOff', 'action', 'message', false, 'turnOff', true, true, "fa jeedomapp-audiospeak", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
-
-self::updateCmd ('radio', 'action', 'message', false, 'Radio', false, true, "loisir-musical7", null, null, 'radio?station=#station#', null, null, 79, $cas1);		
-self::updateCmd ('command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#command#', null, null, 79, $cas1);		
-self::updateCmd ('speak', 'action', 'message', false, 'Speak', true, true, "fa jeedomapp-audiospeak", null, null, 'speak?text=#message#', null, null, 79, $cas1bis);
 
 self::updateCmd ('subText1', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::title', null, null, null, 4, $cas1);
 self::updateCmd ('subText2', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::subText2', null, null, null, 2, $cas1);
@@ -988,7 +1677,7 @@ self::updateCmd ('url', 'info', 'string', false, null, true, false, null, 'dashb
 self::updateCmd ('mediaLength', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 self::updateCmd ('mediaProgress', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 self::updateCmd ('state', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::state', null, null, null, 79, $cas1);
-//self::updateCmd ('playlistName', 'info', 'string', false, null, false, false, null, null, null, null, null, null, 2, $cas1);
+self::updateCmd ('playlistName', 'info', 'string', false, null, false, false, null, null, null, null, null, null, 2, $cas1);
 self::updateCmd ('nextState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
 self::updateCmd ('previousState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
 self::updateCmd ('playPauseState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
@@ -1012,6 +1701,7 @@ self::updateCmd ('whennextmusicalalarm', 'action', 'other', true, 'Next Musical 
 self::updateCmd ('whennextmusicalalarminfo', 'info', 'string', false, 'Next Musical Alarm Hour', true, false, null, 'dashboard','alexaapi::alarmmusical', null, null, null, 26, $cas2);	
 self::updateCmd ('whennextalarm', 'action', 'other', true, 'Next Alarm When', false, false, 'fa-bell', null, null, 'whennextalarm?position=1', 'Next Alarm Hour', null, 2, $cas2);	
 self::updateCmd ('whennextalarminfo', 'info', 'string', false, 'Next Alarm Hour', true, false, null, 'dashboard','alexaapi::alarm', null, null, null, 25, $cas2);
+	
 
 
 	if($type == "A15ERDAKK5HQQG") {
@@ -1024,14 +1714,51 @@ self::updateCmd ('deleteReminder', 'action', 'message', false, 'DeleteReminder',
 self::updateCmd ('whennextreminderinfo', 'info', 'string', false, 'Next Reminder Hour', true, false, null, 'dashboard','alexaapi::reminder', null, null, null, 27, $cas3);
 
 self::updateCmd ('whennextreminder', 'action', 'other', true, 'Next Reminder When', false, false, null, null, null, 'whennextreminder?position=1', 'Next Reminder Hour', null, 27, $cas3);
+/*
+		// whennextreminder command
+		$cmd = $this->getCmd(null, 'whennextreminderinfo');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('whennextreminderinfo');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Next Reminder Hour');
+			$cmd->setOrder(27);
+			$cmd->setIsVisible(1);
+			//$cmd->setDisplay('icon', '<i class="fa fa-bell"></i>');
+			$cmd->setTemplate('dashboard','alexaapi::reminder');
+		}
+		$cmd->save();	
+
+
+
+		$cmd = $this->getCmd(null, 'whennextreminder');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('whennextreminder');
+			$cmd->setIsVisible(0);
+			$cmd->setSubType('other');
+			$cmd->setConfiguration('infoName', 'Next Reminder Hour');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Next Reminder When');
+			$cmd->setConfiguration('RunWhenRefresh', 1);
+			$cmd->setOrder(27);
+			$cmd->setIsVisible(0);
+			//$cmd->setDisplay('icon', '<i class="fa divers-circular114"></i>');
+			$cmd->setConfiguration('request', 'whennextreminder?position=1');
+		}
+		$cmd->save();
 		
+*/
+			
 
 self::updateCmd ('reminder', 'action', 'message', false, 'Reminder', false, false, 'divers-circular114', null, null, 'reminder?text=#text#&when=#when#', null, null, 79, $cas3);	
 self::updateCmd ('routine', 'action', 'select', false, 'Lancer une routine :', true, false, 'divers-circular114', 'dashboard','alexaapi::list', 'routine?routine=#select#', null, 'Lancer Refresh|Lancer Refresh', 20, $cas3);
-self::updateCmd ('interactioninfo', 'info', 'string', false, 'Last Interaction', true, false, 'fa jeedomapp-audiospeak', 'dashboard','alexaapi::interaction', null, null, null, 2, $cas7);	
 	
-self::updateCmd ('volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fa fa-volume-up', null, null, null, null, null, 22, $cas6);	
-self::updateCmd ('volume', 'action', 'slider', false, 'Volume', true, true, 'fa fa-volume-up', 'dashboard','alexaapi::volume', 'volume?value=#volume#', null, null, 21, $cas5);
+self::updateCmd ('volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fa-volume-up', null, null, null, null, null, 22, $cas6);	
+self::updateCmd ('volume', 'action', 'slider', false, 'Volume', true, true, 'fa-volume-up', 'dashboard','alexaapi::volume', 'volume?value=#volume#', null, null, 21, $cas5);
 
 // Lien entre volume et volumeinfo
 $volinfo = $this->getCmd(null, 'volumeinfo');
@@ -1040,9 +1767,190 @@ $vol = $this->getCmd(null, 'volume');
 		$vol->setValue($volinfo->getId());
 		$vol->save();
 		}
+		
+		/*
+	if (($this->hasCapaorFamilyorType("REMINDERS")) && !($this->getConfiguration('devicetype') == "Player")) { 
+	
+	
+	
+	
+		// delete reminder
+		$cmd = $this->getCmd(null, 'deleteReminder');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('deleteReminder');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Delete Reminder');
+			$cmd->setConfiguration('request', 'deleteReminder?id=#id#');
+			$cmd->setIsVisible(0);
+			$cmd->setDisplay('icon', '<i class="maison-poubelle"></i>');
+		}
+		$cmd->save();
 
-// Pour la commande Refresh, on garde l'ancienne méthode
+	
+		// whennextreminder command
+		$cmd = $this->getCmd(null, 'whennextreminderinfo');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('whennextreminderinfo');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Next Reminder Hour');
+			$cmd->setOrder(27);
+			$cmd->setIsVisible(1);
+			//$cmd->setDisplay('icon', '<i class="fa fa-bell"></i>');
+			$cmd->setTemplate('dashboard','alexaapi::reminder');
+		}
+		$cmd->save();	
 
+
+
+		$cmd = $this->getCmd(null, 'whennextreminder');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('whennextreminder');
+			$cmd->setIsVisible(0);
+			$cmd->setSubType('other');
+			$cmd->setConfiguration('infoName', 'Next Reminder Hour');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Next Reminder When');
+			$cmd->setConfiguration('RunWhenRefresh', 1);
+			$cmd->setOrder(27);
+			$cmd->setIsVisible(0);
+			//$cmd->setDisplay('icon', '<i class="fa divers-circular114"></i>');
+			$cmd->setConfiguration('request', 'whennextreminder?position=1');
+		}
+		$cmd->save();
+		
+	
+		// Reminder command
+		$cmd = $this->getCmd(null, 'reminder');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('reminder');
+			$cmd->setSubType('message');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Reminder');
+			$cmd->setConfiguration('request', 'reminder?text=#text#&when=#when#');
+			$cmd->setDisplay('icon', '<i class="fa divers-circular114"></i>');
+			$cmd->setIsVisible(0);
+		}
+		$cmd->save();
+		
+		
+
+		
+		// Routine command (lié à Reminder car pas de capability pour Routine)
+		$cmd = $this->getCmd(null, 'routine');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('routine');
+			$cmd->setSubType('select');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Lancer une routine :');
+			$cmd->setConfiguration('request', 'routine?routine=#select#');
+			$cmd->setConfiguration('listValue', 'Lancer Refresh|Lancer Refresh'); //**Faut ajouter listValue !!!
+			//$cmd->setDisplay('title_disable', 1);
+			$cmd->setOrder(20);
+			$cmd->setTemplate('dashboard','alexaapi::list');
+			$cmd->setIsVisible(1);
+			//$cmd->setDisplay('icon', '<i class="divers-viral"></i>');
+		}
+		$cmd->save();
+	
+	} else {
+		$cmd = $this->getCmd(null, 'deleteReminder');
+		if (is_object($cmd)) {
+			$cmd->remove();
+		}
+		$cmd = $this->getCmd(null, 'whennextreminder');
+		if (is_object($cmd)) {
+			$cmd->remove();
+		}
+		$cmd = $this->getCmd(null, 'reminder');
+		if (is_object($cmd)) {
+			$cmd->remove();
+		}
+		$cmd = $this->getCmd(null, 'routine');
+		if (is_object($cmd)) {
+			$cmd->remove();
+		}
+	}
+
+
+
+
+	if (($this->hasCapaorFamilyorType("VOLUME_SETTING")) && (!$this->hasCapaorFamilyorType("WHA"))) { 
+//cas5
+
+
+		// Volume command
+		$vol = $this->getCmd(null, 'volumeinfo');
+		if (!is_object($vol)) {
+			$vol = new alexaapiCmd();
+			$vol->setType('info');
+			$vol->setLogicalId('volumeinfo');
+			$vol->setSubType('string');
+			$vol->setEqLogic_id($this->getId());
+			$vol->setName('Volume Info');
+			$vol->setConfiguration('minValue', '0');
+			$vol->setConfiguration('maxValue', '100');
+			$vol->setDisplay('forceReturnLineBefore', true);
+			$vol->setIsVisible(0);
+			$vol->setOrder(22);
+			$vol->setDisplay('icon', '<i class="fa fa-volume-up"></i>');
+			$vol->save();
+		}
+	} 
+	else {
+	$vol = $this->getCmd(null, 'volumeinfo');
+	if (is_object($vol)) {$vol->remove();}
+	}			
+	
+	
+//($LogicalId, $Type, $SubType, $RunWhenRefresh, $Name, $IsVisible, $title_disable, $setDisplayicon, $setTemplate_version, $setTemplate_lien, $request, $infoName, $listValue, $Order, $Test)
+
+
+
+
+	if ($this->hasCapaorFamilyorType("VOLUME_SETTING")) { 
+
+		// Volume command
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('action');
+			$cmd->setLogicalId('volume');
+			$cmd->setSubType('slider');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Volume');
+			$cmd->setConfiguration('request', 'volume?value=#volume#');
+			$cmd->setConfiguration('minValue', '0');
+			$cmd->setConfiguration('maxValue', '100');
+			$cmd->setTemplate('dashboard','alexaapi::volume');
+			$cmd->setIsVisible(1);
+			$cmd->setOrder(21);
+			$cmd->setDisplay('title_disable', true);
+			$cmd->setDisplay('icon', '<i class="fa fa-volume-up"></i>');
+		}
+		if(is_object($vol)) {
+			$cmd->setValue($vol->getId());
+		}
+		$cmd->save();
+	} else {
+		$cmd = $this->getCmd(null, 'volume');
+		if (is_object($cmd)) {
+			$cmd->remove();
+		}
+	}
+	
+*/	
+	
 	if (($this->hasCapaorFamilyorType("REMINDERS")) && !($this->getConfiguration('devicetype') == "Smarthome")) { 
 		
 		//Commande Refresh
@@ -1068,23 +1976,51 @@ $vol = $this->getCmd(null, 'volume');
 			$refresh->save();
 		}
 		
-	}
+	} else {
+		$cmd = $this->getCmd(null, 'refresh');
+		if (is_object($cmd)) {
+			$cmd->remove();
+		}
+	}	
+	
+	if ((!$this->hasCapaorFamilyorType("WHA")) && ($this->getConfiguration('devicetype') != "Player") &&(!$this->hasCapaorFamilyorType("FIRE_TV")) && (!$this->hasCapaorFamilyorType("AMAZONMOBILEMUSIC_ANDROID"))) { 
+		// Dernière Intéraction
+		$cmd = $this->getCmd(null, 'interactioninfo');
+		if (!is_object($cmd)) {
+			$cmd = new alexaapiCmd();
+			$cmd->setType('info');
+			$cmd->setLogicalId('interactioninfo');
+			$cmd->setSubType('string');
+			$cmd->setEqLogic_id($this->getId());
+			$cmd->setName('Last Interaction');
+			$cmd->setOrder(2);
+			$cmd->setIsVisible(1);
+			$cmd->setTemplate('dashboard','alexaapi::interaction');
+			$cmd->setDisplay('icon', '<i class="fa jeedomapp-audiospeak"></i>');
+			}
+		$cmd->save();
+	} else {
+		$cmd = $this->getCmd(null, 'interactioninfo');
+		if (is_object($cmd)) {
+			$cmd->remove();
+		}
+	}		
+
 		
 	
-} else {log::add('alexaapi', 'warning', 'Pas de capacité détectée sur '.$this->getName().' , assurez-vous que le démon est OK');}
+} else {
+	log::add('alexaapi', 'warning', 'Pas de capacité détectée sur , assurez-vous que le démon est OK');
+}
 
 
-		
-event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Mise à jour de "'.$this->getName().'"', __FILE__),));
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-$this->refresh(false); //false c'est pour ne pas lancer l'actualisation des routines au scan
+		$this->refresh(false); //false c'est pour ne pas lancer l'actualisation des routines au scan
 
 
 
-	if ($widgetPlayer)
-	{
-		$device_playlist=str_replace("_player", "", $this->getConfiguration('serial'))."_playlist"; //Nom du device de la playlist
-		// Si la case "Activer le widget Playlist" est cochée, on rend le device _playlist visible sinon on le passe invisible		
+
+
+$device_playlist=str_replace("_player", "", $this->getConfiguration('serial'))."_playlist"; //Nom du device de la playlist
+// Si la case "Activer le widget Playlist" est cochée, on rend le device _playlist visible sinon on le passe invisible		
 		$eq=eqLogic::byLogicalId($device_playlist,'alexaapi');
 				if(is_object($eq)) {
 					$eq->setIsVisible($this->getConfiguration('widgetPlayListEnable'));
@@ -1092,7 +2028,6 @@ $this->refresh(false); //false c'est pour ne pas lancer l'actualisation des rout
 					$eq->setObject_id($this->getObject_id()); // Attribue au widget Playlist la même pièce que son Player
 					$eq->save();
 				}
-	}
 
 
 
@@ -1380,7 +2315,7 @@ class alexaapiCmd extends cmd {
 
 		//log::add('alexaapi', 'debug', 'buildRequest : suite');
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
-		//log::add('alexaapi', 'debug', 'buildRequest : suite1:'.$command);
+		log::add('alexaapi', 'debug', 'buildRequest : suite1:'.$command);
 		switch ($command) {
 			case 'volume':
 				$request = $this->buildVolumeRequest($_options);
@@ -1448,7 +2383,7 @@ class alexaapiCmd extends cmd {
 	}
 
 	private function buildVolumeRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildVolumeRequest');
+		log::add('alexaapi', 'debug', 'buildVolumeRequest');
 		$request = $this->getConfiguration('request');
 		if (!isset($_options['slider'])) throw new Exception(__('Le slider ne peut pas être vide', __FILE__));
 
@@ -1458,19 +2393,19 @@ class alexaapiCmd extends cmd {
 	}
 	
 	private function buildRestartRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildRestartRequest');
+		log::add('alexaapi', 'debug', 'buildRestartRequest');
 		$request = $this->getConfiguration('request')."?truc=vide";
 		return str_replace('#volume#', $_options['slider'], $request);
 	}
 	
 	private function buildSmarthomeCommandRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildSmarthomeCommandRequest');
+		log::add('alexaapi', 'debug', 'buildSmarthomeCommandRequest');
 		$request = $this->getConfiguration('request');
 		return $request;
 	}	
 	
 	private function buildRadioRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildRadioRequest');
+		log::add('alexaapi', 'debug', 'buildRadioRequest');
 		$request = $this->getConfiguration('request');
 		//if (!isset($_options['station']))
 		//   throw new Exception(__('La station ne peut pas être vide', __FILE__));
@@ -1482,14 +2417,14 @@ class alexaapiCmd extends cmd {
 	}
 
 	private function buildSpeakRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildSpeakRequest');
+		log::add('alexaapi', 'debug', 'buildSpeakRequest');
 		$request = $this->getConfiguration('request');
 		if (!isset($_options['message']) || $_options['message'] == '') throw new Exception(__('Le message ne peut pas être vide', __FILE__));
 
 		return str_replace(array('#message#', '#volume#'), array(urlencode($_options['message']), isset($_options['volume']) ? $_options['volume'] : $_options['slider']), $request);
 	}
 	private function buildReminderRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildReminderRequest');
+		log::add('alexaapi', 'debug', 'buildReminderRequest');
 		$request = $this->getConfiguration('request');
 		//if (!isset($_options['text']) || $_options['text'] == '')
 		// throw new Exception(__('Le titre ne peut pas être vide', __FILE__));
@@ -1504,7 +2439,7 @@ class alexaapiCmd extends cmd {
 	}
 
 	private function buildAlarmRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildalarmRequest');
+		log::add('alexaapi', 'debug', 'buildalarmRequest');
 		$request = $this->getConfiguration('request');
 		//		        if (!isset($_options['message']) || $_options['message'] == '')
 		//            throw new Exception(__('Le message ne peut pas être vide', __FILE__));
@@ -1515,48 +2450,48 @@ class alexaapiCmd extends cmd {
 	}
 
 	private function buildPushRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildPushRequest');
+		log::add('alexaapi', 'debug', 'buildPushRequest');
 		$request = $this->getConfiguration('request');
 		if (!isset($_options['message']) || $_options['message'] == '') throw new Exception(__('Le message ne peut pas être vide', __FILE__));
 
 		return str_replace(array('#message#'), array(urlencode($_options['message'])), $request);
 	}
 	private function buildRoutineRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildRoutineRequest');
+		log::add('alexaapi', 'debug', 'buildRoutineRequest');
 		$request = $this->getConfiguration('request');
 		//if (!isset($_options['routine']) || $_options['routine'] == '')
 		//     throw new Exception(__('La routine ne peut pas être vide', __FILE__));
 		return str_replace(array('#select#'), array(urlencode($_options['select'])), $request);
 	}
 	private function buildPlayListRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildPlayListRequest');
+		log::add('alexaapi', 'debug', 'buildPlayListRequest');
 		$request = $this->getConfiguration('request');
 		//return str_replace(array('#select#'), array($_options['select'])), $request);
 		return str_replace(array('#select#', '#name#'), array(urlencode($_options['select']), urlencode($_options['name'])), $request);
 	}	
 	private function buildplayMusicTrackRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildplayMusicTrackRequest');
+		log::add('alexaapi', 'debug', 'buildplayMusicTrackRequest');
 		$request = $this->getConfiguration('request');
 		if ($_options['trackid'] == "") $_options['trackid'] = "53bfa26d-f24c-4b13-97a8-8c3debdf06f0";
 		//return str_replace(array('#select#'), array($_options['select'])), $request);
 		return str_replace(array('#trackid#'), array(urlencode($_options['trackid'])), $request);
 	}	
 	private function buildNextAlarmRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildNextAlarmRequest sur '.$this->getName());
+		log::add('alexaapi', 'debug', 'buildNextAlarmRequest sur '.$this->getName());
 		$request = $this->getConfiguration('request');
 
 		return str_replace(array('#position#'), array($_options['position']), $request);
 	}
 	
 	private function buildNextMusicalAlarmRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildNextMusicalAlarmRequest');
+		log::add('alexaapi', 'debug', 'buildNextMusicalAlarmRequest');
 		$request = $this->getConfiguration('request');
 
 		return str_replace(array('#position#'), array($_options['position']), $request);
 	}
 	
 	private function buildDeleteAllAlarmsRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildDeleteAllAlarmsRequest');
+		log::add('alexaapi', 'debug', 'buildDeleteAllAlarmsRequest');
 		$request = $this->getConfiguration('request');
 
 		if ($_options['type'] == "") $_options['type'] = "alarm";
@@ -1567,7 +2502,7 @@ class alexaapiCmd extends cmd {
 	}
 	
 	private function builddeleteReminderRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'builddeleteReminderRequest');
+		log::add('alexaapi', 'debug', 'builddeleteReminderRequest');
 		$request = $this->getConfiguration('request');
 
 		if ($_options['id'] == "") $_options['id'] = "coucou";
@@ -1578,7 +2513,7 @@ class alexaapiCmd extends cmd {
 	}	
 	
 	private function buildCommandRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildCommandRequest');
+		log::add('alexaapi', 'debug', 'buildCommandRequest');
 		$request = $this->getConfiguration('request');
 
 		if ($_options['command'] == "") $_options['command'] = "pause";
@@ -1586,7 +2521,7 @@ class alexaapiCmd extends cmd {
 		return str_replace(array('#command#'), array($_options['command']), $request);
 	}
 	private function buildNextReminderRequest($_options = array()) {
-		//log::add('alexaapi', 'debug', 'buildNextReminderRequest');
+		log::add('alexaapi', 'debug', 'buildNextReminderRequest');
 		$request = $this->getConfiguration('request');
 
 		return str_replace(array('#position#'), array($_options['position']), $request);

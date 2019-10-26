@@ -149,7 +149,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
             }
             else
             {
-                self._options.logger && self._options.logger('Alexa-Remote: cookie was provided');
+                self._options.logger && self._options.logger('Alexa-Remote: cookie was provided',5);
                 if (self._options.formerRegistrationData)
                 {
                     const tokensValidSince = Date.now() - self._options.formerRegistrationData.tokenDate;
@@ -231,7 +231,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                 if (err && authenticated === null) {
                     return callback && callback(new Error('Error while checking Authentication: ' + err));
                 }
-                this._options.logger && this._options.logger('Alexa-Remote: Authentication checked: ' + authenticated);
+                this._options.logger && this._options.logger('Alexa-Remote: Authentication checked: ' + authenticated,5);
                 if (! authenticated && !this._options.cookieJustCreated) {
                     this._options.logger && this._options.logger('Alexa-Remote: Cookie was set, but authentication invalid');
                     delete this._options.cookie;
@@ -796,7 +796,7 @@ this.httpPost() ;
         }
         // bypass check because set or last check done before less then 10 mins
         if (noCheck || (new Date().getTime() - this.lastAuthCheck) < 600000) {
-            this._options.logger && this._options.logger('Alexa-Remote: No authentication check needed (time elapsed ' + (new Date().getTime() - this.lastAuthCheck) + ')');
+            this._options.logger && this._options.logger('Alexa-Remote: No authentication check needed (time elapsed ' + (new Date().getTime() - this.lastAuthCheck) + ')',5);
             return this.httpsGetCall(path, callback, flags);
         }
 
@@ -921,7 +921,7 @@ if (methodQuery!= null) options.method=methodQuery;
 
         if (flags.headers) Object.keys(flags.headers).forEach(n => {
             options.headers [n] = flags.headers[n];
-	this._options.logger && this._options.logger("----------------->>>>>>>>>"+flags.headers[n]); 	
+	//this._options.logger && this._options.logger("----------------->>>>>>>>>"+flags.headers[n]); 	
 		
         });
 
@@ -944,7 +944,7 @@ this._options.logger && this._options.logger(obj.headers);
 	
 	
 	
-        this._options.logger && this._options.logger('Alexa-Remote: Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? ' and data=' + flags.data : ''));
+        this._options.logger && this._options.logger('Alexa-Remote: Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? ' and data=' + flags.data : ''),5);
 //	}	
 	    //this._options.logger && this._options.logger('Alexa-Remote: >>>>> ' + JSON.stringify(options)+"<<<<" );
 	    //this._options.logger && this._options.logger('Alexa-Remote: >>>>> ' + options+"<<<<" );
@@ -972,7 +972,7 @@ this._options.logger && this._options.logger(obj.headers);
 
 
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusCode: '+res.statusCode);
-			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusMessage: '+res.statusMessage);
+			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusMessage: '+res.statusMessage,5);
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.httpVersion: '+res.httpVersion);
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.headers: '+JSON.stringify(res.headers));
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.rawHeaders : '+res.rawHeaders);
@@ -989,7 +989,7 @@ this._options.logger && this._options.logger(obj.headers);
 
             res.on('end', () =>
             {
-				this._options.logger && this._options.logger('>>> DEBUG body: '+body);
+				this._options.logger && this._options.logger('>>> DEBUG body: '+body,4);
                 let ret;
                 if (typeof callback === 'function')
                 {
@@ -1007,21 +1007,21 @@ this._options.logger && this._options.logger(obj.headers);
                         ret = JSON.parse(body);
                     } catch(e)
                     {
-                        this._options.logger && this._options.logger('******************************************************');
-                        this._options.logger && this._options.logger('*********************DEBUG****************************');
-                        this._options.logger && this._options.logger('******************************************************');
-                        this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote: Response: No/Invalid JSON');
+                        this._options.logger && this._options.logger('******************************************************',2);
+                        this._options.logger && this._options.logger('*********************DEBUG****************************',2);
+                        this._options.logger && this._options.logger('******************************************************',2);
+                        this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote: Response: No/Invalid JSON',2);
                         this._options.logger && this._options.logger(body);
                         this._options.logger && this._options.logger('**DEBUG**DEBUG* Message Exception :'+e.message);
-                        this._options.logger && this._options.logger('******************************************************');
-                        this._options.logger && this._options.logger('******************************************************');
+                        this._options.logger && this._options.logger('******************************************************',2);
+                        this._options.logger && this._options.logger('******************************************************',2);
 						var ValeurdelErreur='no JSON';
 						//if (body.includes("authenticated"))
 						if (body.includes("Connection: close"))
                         {
-							this._options.logger && this._options.logger('******************************************************');
-							this._options.logger && this._options.logger('***************FIND**CONNEXION CLOSE *****************');
-							this._options.logger && this._options.logger('******************************************************');
+							this._options.logger && this._options.logger('******************************************************',2);
+							this._options.logger && this._options.logger('***************FIND**CONNEXION CLOSE *****************',2);
+							this._options.logger && this._options.logger('******************************************************',2);
 						ValeurdelErreur='Connexion Close';
 						}
                        return callback && callback(new Error(ValeurdelErreur), body);
@@ -1030,7 +1030,7 @@ this._options.logger && this._options.logger(obj.headers);
 					if (JSON.stringify(ret)=='{"error":null}')
 						this._options.logger && this._options.logger('Alexa-Remote: Response(2): OK');
 						else
-						this._options.logger && this._options.logger('Alexa-Remote: Response(1): ' + JSON.stringify(ret));
+						this._options.logger && this._options.logger('Alexa-Remote: Response(1): ' + JSON.stringify(ret),5);
                     return callback && callback (null, ret);
                 }
             });
@@ -1053,8 +1053,8 @@ httpPost(nom, jsonaenvoyer) {
 var url=IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey="+ClePlugin+"&nom="+nom;
  
 jsonaenvoyer=JSON.stringify(jsonaenvoyer);
-this._options.logger && this._options.logger('URL envoyée: '+url);
-this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer);
+this._options.logger && this._options.logger('URL envoyée: '+url,5);
+this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer,5);
 
 	request.post(url, {
 

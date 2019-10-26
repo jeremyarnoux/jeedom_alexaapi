@@ -61,11 +61,27 @@ function isEmpty(obj) {
 }
 
 
+	// arguments[0]	c'est le texte
+	// arguments[1]	c'est le niveau de log ou un array
+	
+	//niveaudeLog=5 c'est tout
+	//niveaudeLog=2 c'est reduit
+	
 
 function consoleSigalou() {
 	var today = new Date();
+	var niveaudeLogaAfficher=2;
+	var niveaudeLog=0;
 	try {
-		console.log("[" + today.toLocaleString() + "] " + arguments[0].concat(Array.prototype.slice.call(arguments, 1)));
+		if (!(isNaN(arguments[1]))) {niveaudeLog=arguments[1];}
+		niveaudeLog++; niveaudeLog--;
+	} catch (e) {
+		niveaudeLog=2;
+	}
+	
+	try {
+		if (niveaudeLog<=niveaudeLogaAfficher)
+		console.log(arguments[1]+"[" + today.toLocaleString() + "] " + arguments[0].concat(Array.prototype.slice.call(arguments, 2)));
 	} catch (e) {
 		console.log(arguments[0]);
 	}
@@ -1776,7 +1792,7 @@ function startServer() {
 		dernierStartServeur=Date.now();
 		alexa = null;
 		alexa = new Alexa();
-		config.logger('Alexa-API:    ******************** Lancement Serveur ***********************');
+		config.logger('Alexa-API:    ******************** Lancement Serveur ***********************',2);
 		
 		alexa.init({
 				cookie: config.cookie,
@@ -1799,18 +1815,18 @@ function startServer() {
 							config.logger('Alexa-API:    Error while saving the cookie to: ' + config.cookieLocation);
 							config.logger('Alexa-API:    ' + err);
 						}
-						config.logger('Alexa-API:    New cookie saved to:' + config.cookieLocation);
+						config.logger('Alexa-API:    New cookie saved to:' + config.cookieLocation,5);
 
 						// Start the server
 						if (server) {
-							config.logger('Alexa-API:    *******************************************');
-							config.logger('Alexa-API:    *Server is already listening on port ' + server.address().port + ' *');
-							config.logger('Alexa-API:    *******************************************');
+							config.logger('Alexa-API:    *******************************************',2);
+							config.logger('Alexa-API:    *Server is already listening on port ' + server.address().port + ' *',2);
+							config.logger('Alexa-API:    *******************************************',2);
 						} else {
 							server = app.listen(config.listeningPort, () => {
-								config.logger('Alexa-API:    **************************************************************');
-								config.logger('Alexa-API:    ************** Server OK listening on port ' + server.address().port + ' **************');
-								config.logger('Alexa-API:    **************************************************************');
+								config.logger('Alexa-API:    **************************************************************',2);
+								config.logger('Alexa-API:    ************** Server OK listening on port ' + server.address().port + ' **************',2);
+								config.logger('Alexa-API:    **************************************************************',2);
 
 							});
 						}
@@ -1870,7 +1886,7 @@ var url=IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey="+ClePlugin+
 config.logger && config.logger('URL envoyée: '+url);
  
 jsonaenvoyer=JSON.stringify(jsonaenvoyer);
-config.logger && config.logger('DATA envoyé:'+jsonaenvoyer);
+config.logger && config.logger('DATA envoyé:'+jsonaenvoyer,5);
 
 	request.post(url, {
 
