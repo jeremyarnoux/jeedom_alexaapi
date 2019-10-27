@@ -1862,6 +1862,95 @@ app.get('/whennextreminder', (req, res) => {
 	});
 });
 
+/***** WhenNextReminderLabel *****
+  URL: /whennextreminderlabel
+
+  Return le texte du prochain rappel
+  [{
+    position => 1= prochaine 2=suivante ...
+	status => Filtre sur le status (active=ON, désactive=OFF, Tous =ALL)
+  }]
+
+*/
+app.get('/whennextreminderlabel', (req, res) => {
+	config.logger('Alexa-API: WhenNextReminderLabel');
+	res.type('json');
+
+
+	alexa.getNotifications2(function(notifications) {
+
+		if (isEmpty(notifications))
+			return res.status(500).json(error(500, req.route.path, 'Alexa.whennextreminder', 'Retour vide'));
+
+		// Filtre et ne garde que les enregistrements du device selctionné
+		const notificationsfiltrees = notifications.filter(tmp => tmp.deviceSerialNumber == req.query.device);
+		notifications = notificationsfiltrees;
+
+		// Filtre et ne garde que les enregistrements qui ont le type ALARM
+		const notificationsfiltrees1 = notifications.filter(tmp => tmp.type == "Reminder");
+		notifications = notificationsfiltrees1;
+
+
+		// Filtre et ne garde que les enregistrements qui sont supérieure à l'heure du jour
+		//Maintenant :
+		var d = new Date();
+		var date_format_str = d.getFullYear().toString() + "-" + ((d.getMonth() + 1).toString().length == 2 ? (d.getMonth() + 1).toString() : "0" + (d.getMonth() + 1).toString()) + "-" + (d.getDate().toString().length == 2 ? d.getDate().toString() : "0" + d.getDate().toString()) + " " + (d.getHours().toString().length == 2 ? d.getHours().toString() : "0" + d.getHours().toString()) + ":" + ((parseInt(d.getMinutes() / 5) * 5).toString().length == 2 ? (parseInt(d.getMinutes() / 5) * 5).toString() : "0" + (parseInt(d.getMinutes() / 5) * 5).toString()) + ":00";
+		const notificationsfiltrees4 = notifications.filter(tmp => (tmp.originalDate + ' ' + tmp.originalTime > date_format_str));
+		notifications = notificationsfiltrees4;
+
+		// Filtre et ne garde que les enregistrements qui ont un status qui correspond à req.query.status
+		if ((req.query.status != 'all') && (req.query.status != 'ALL')) {
+			var FiltreSurStatus = 'ON';
+			if ((req.query.status == 'off') || (req.query.status == 'OFF')) FiltreSurStatus = 'OFF';
+			const notificationsfiltrees2 = notifications.filter(tmp => tmp.status == FiltreSurStatus);
+			notifications = notificationsfiltrees2;
+		}
+
+		// Trie par Date/Heure
+		const notificationsfiltrees3 = notifications.sort(function(a, b) {
+			var x = a.originalDate + a.originalTime;
+			var y = b.originalDate + b.originalTime;
+			return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+		});
+		notifications = notificationsfiltrees3;
+
+
+		var compteurdePosition = 1;
+		var compteurdePositionaTrouver = 1;
+		var stringarenvoyer = 'none';
+		if (req.query.position > 1) {
+			compteurdePositionaTrouver = req.query.position;
+		}
+
+		for (var serial in notifications) {
+			if (notifications.hasOwnProperty(serial)) {
+				if (compteurdePositionaTrouver == compteurdePosition) {
+					var device = notifications[serial];
+					stringarenvoyer=device.reminderLabel;
+					//C'est bon, on est sur la bonne position, on renvoie le résultat
+/*
+					switch (req.query.format) {
+						case 'hour':
+						case 'HOUR':
+							stringarenvoyer = device.originalTime.substring(0, 5);
+							break;
+						case 'full':
+						case 'FULL':
+							stringarenvoyer = device.originalDate + " " + device.originalTime;
+							break;
+						default: //ou HHMM
+							stringarenvoyer = device.originalTime.substring(0, 5).replace(':', ''); // Utilisation du format HH:MM
+					}*/
+				}
+				compteurdePosition++;
+			}
+		}
+		res.status(200).json({
+			value: stringarenvoyer
+		});
+
+	});
+});
 
 /***** Stop the server *****/
 app.get('/stop', (req, res) => {

@@ -79,7 +79,7 @@ class alexaapi extends eqLogic {
 			);	
 			
 	
-log::add('alexaapi_widget','debug','*****subText1*******templateWidget :'.json_encode($return));  
+//log::add('alexaapi_widget','debug','*****subText1*******templateWidget :'.json_encode($return));  
 
 		return $return;
 	}	
@@ -1062,6 +1062,8 @@ self::updateCmd ($F, 'deleteReminder', 'action', 'message', false, 'DeleteRemind
 self::updateCmd ($F, 'whennextreminderinfo', 'info', 'string', false, 'Next Reminder Hour', true, false, null, 'dashboard','alexaapi::reminder', null, null, null, 28, $cas3);
 
 self::updateCmd ($F, 'whennextreminder', 'action', 'other', true, 'Next Reminder When', false, false, null, null, null, 'whennextreminder?position=1', 'Next Reminder Hour', null, 28, $cas3);
+self::updateCmd ($F, 'whennextreminderlabel', 'action', 'other', true, 'whennextreminderlabel', false, false, null, null, null, 'whennextreminderlabel?position=1', 'Reminder Label', null, 29, $cas3);
+self::updateCmd ($F, 'whennextreminderlabelinfo', 'info', 'string', false, 'Reminder Label', true, false, 'loisir-musical7', 'dashboard','alexaapi::alarmmusicalmusic', null, null, null, 29, $cas2);
 		
 
 self::updateCmd ($F, 'reminder', 'action', 'message', false, 'Reminder', false, false, 'divers-circular114', null, null, 'reminder?text=#text#&when=#when#', null, null, 79, $cas3);	
@@ -1459,6 +1461,9 @@ class alexaapiCmd extends cmd {
 			case 'musicalalarmmusicentity':
 				$request = $this->buildMusicalAlarmMusicEntity($_options);
 			break;				
+			case 'whennextreminderlabel':
+				$request = $this->buildMhenNextReminderLabel($_options);
+			break;			
 			case 'whennextreminder':
 				$request = $this->buildNextReminderRequest($_options);
 			break;
@@ -1596,6 +1601,11 @@ class alexaapiCmd extends cmd {
 		$request = $this->getConfiguration('request');
 		return str_replace(array('#position#'), array($_options['position']), $request);
 	}	
+	private function buildMhenNextReminderLabel($_options = array()) {
+		//log::add('alexaapi', 'debug', 'buildMhenNextReminderLabel');
+		$request = $this->getConfiguration('request');
+		return str_replace(array('#position#'), array($_options['position']), $request);
+	}		
 	private function buildDeleteAllAlarmsRequest($_options = array()) {
 		//log::add('alexaapi', 'debug', 'buildDeleteAllAlarmsRequest');
 		$request = $this->getConfiguration('request');

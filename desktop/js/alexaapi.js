@@ -262,7 +262,7 @@ function addCmdToTable(_cmd)
 					if (init(_cmd.logicalId)=="")
 					DefinitionDivPourCommandesPredefinies="";
 								
-  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == 'whennextalarm') || (init(_cmd.logicalId) == 'musicalalarmmusicentity') || (init(_cmd.logicalId) == 'whennextmusicalalarm')) {
+  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == 'whennextalarm') || (init(_cmd.logicalId) == 'whennextreminderlabel') || (init(_cmd.logicalId) == 'musicalalarmmusicentity') || (init(_cmd.logicalId) == 'whennextmusicalalarm')) {
     return;
   }
   

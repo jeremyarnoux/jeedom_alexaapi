@@ -83,7 +83,7 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
            <input type="checkbox" class="configKey" data-l1key="utilisateurExperimente" />
        </div>
 	</div>
-      <div class="form-group">
+      <div class="form-group ">
         <label class="col-lg-4 control-label">{{Activer les fonctions Domotique des Amazon SmartHome}}</label>
         <div class="col-lg-3">
            <input type="checkbox"  <?php if ($versionJeedom=="stable") echo 'disabled="disabled"';?> class="configKey" data-l1key="utilisateurSmarthome" /><em>(activable uniquement en Béta pour l'instant)</em>
@@ -151,6 +151,7 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 
 
 <script>
+
     var compteVerifCookie=0;
     var CookiePresent=0;
 	
