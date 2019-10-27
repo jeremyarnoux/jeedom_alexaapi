@@ -104,7 +104,9 @@ log::add('alexaapi_mqtt', 'debug',  'nom:'.$nom);
 				metAJour("playlistName", $result['domainAttributes']['nBestList']['playlistName'], 'playlistName', false , $alexaapi3);
 				
 				metAJourPlayer($logical_id, $result['audioPlayerState'], $alexaapi);
-				
+				metAJourPlayList($logical_id, $result['audioPlayerState'], $alexaapi3);
+				metAJourPlayer($logical_id, $result['audioPlayerState'], $alexaapi); //par sécurité
+
 				//metAJour("songName", $result['domainAttributes']['nBestList']['songName'], 'songName', true , $alexaapi);
 				
 			break;			
@@ -113,7 +115,7 @@ log::add('alexaapi_mqtt', 'debug',  'nom:'.$nom);
 				metAJour("Audio Player State", $result['audioPlayerState'], 'audioPlayerState', true , $alexaapi);
 			case 'refreshPlayer':
 				metAJourPlayer($logical_id, $result['audioPlayerState'], $alexaapi);
-
+				metAJourPlayList($logical_id, $result['audioPlayerState'], $alexaapi3);
 			break;
 			
 			default:
@@ -310,15 +312,23 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $alexaapi) {
 		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
 
 	try {
+		if ($audioPlayerState!="FINISHED") 	{		
+		
+		//Pour avoir la piste en cours, on va aller chercher la valeur de playerinfo/mainArt/url pour pouvoir la comparer aux images de la playlist
+		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/playerinfo?device=".str_replace ("_player", "", $serialdevice));
+		$result = json_decode($json,true);		
+		$imageURLenCoursdeLecture=$result['playerInfo']['miniArt']['url'];
+		$etatPlayer=$result['playerInfo']['state'];
 		
 		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzzzz metAJourPlayer:'.$audioPlayerState);
 		//if (($audioPlayerState=="PLAYING") || ($audioPlayerState=="REFRESH") || ($audioPlayerState=="PAUSED"))	{
-		if ($audioPlayerState!="FINISHED") 	{
+
 		//log::add('alexaapi_mqtt', 'debug',  ' metAJourPlayer:'.$serialdevice);
 		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/media?device=".str_replace ("_player", "", $serialdevice));
 		$result = json_decode($json,true);		
-		log::add('alexaapi_mqtt', 'debug',  '++++++++++++++++++++++++++++++++++ JSON:'.$json);
-		
+		//log::add('alexaapi_mqtt', 'debug',  '++++++++++++++++++++++++++++++++++ JSON:'.$json);
+		//$imageURLenCoursdeLecture=$result['imageURL'];
+	
 		}
 		else {
 	//metAJour("state", $audioPlayerState, 'state', false , $alexaapi);		
@@ -327,19 +337,26 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $alexaapi) {
 		}
 
 
-//$image=$result['queue']['0']['imageURL'];
-//log::add('alexaapi_mqtt', 'debug',  '++++++>+++++++++>+++++++++>++++++++++ $image:'.$image);
-log::add('alexaapi_mqtt', 'debug', '-->'.json_encode($result));
-$html="<table style='border-collapse: separate; border-spacing : 10px; ' border='0' width='100%'>";
-        foreach ($result['queue'] as $key => $value) {
+			//$image=$result['queue']['0']['imageURL'];
+			//log::add('alexaapi_mqtt', 'debug',  '++++++>+++++++++>+++++++++>++++++++++ $image:'.$image);
+			//log::add('alexaapi_mqtt', 'debug', '-->'.json_encode($result));
+			$html="<table style='border-collapse: separate; border-spacing : 10px; ' border='0' width='100%'>";
+			$compteurQueue=1;		
+	foreach ($result['queue'] as $key => $value) {
 				log::add('alexaapi_mqtt', 'debug', '-----------------album:'.$value['album']);
 				log::add('alexaapi_mqtt', 'debug', '-----------------artist:'.$value['artist']);
 				log::add('alexaapi_mqtt', 'debug', '-----------------imageURL:'.$value['imageURL']);			
 				log::add('alexaapi_mqtt', 'debug', '-----------------title:'.$value['title']);			
 				log::add('alexaapi_mqtt', 'debug', '-----------------durationSeconds:'.$value['durationSeconds']);			
+	
+	if (($value['imageURL']==$imageURLenCoursdeLecture) && $compteurQueue>3){
+			$html="<table style='border-collapse: separate; border-spacing : 10px; ' border='0' width='100%'>";
+		}
 
-$html.="    <tr>
-        <td style='padding: 8px;'  rowspan='2' width='50'><img style='height: 50px;width: 50px;border-radius: 30%;' src='".$value['imageURL']."' /></td>
+	$html.="<tr><td style='padding: 8px;'  rowspan='2' width='50'>";
+	//log::add('alexaapi_mqtt', 'debug',  '++++++++++++++++++++++++++++++++++ '.$value['imageURL']."//".$imageURLenCoursdeLecture);
+	if (($value['imageURL']==$imageURLenCoursdeLecture) && $etatPlayer=="PLAYING") $html.="<img style='position:absolute' src='plugins/alexaapi/core/img/playing_petit.gif' />";
+	$html.="<img style='height: 60px;width: 60px;border-radius: 30%;' src='".$value['imageURL']."'/></td>
         <td width='100%'>".$value['title']."</td>
     </tr>
     <tr>
@@ -348,15 +365,13 @@ $html.="    <tr>
 	
 	";
 
-
-//$html.=" <p align=left> <img width=50 height=50 src='".$value['imageURL']."' /> ".$value['title']."<br><small>".$value['artist']."</small> ".$value['durationSeconds']."s</p>";		
-}	
+	$compteurQueue++;
+	}	
 $html.="</table>";
 
 metAJour("playlisthtml", $html, 'playlisthtml', true , $alexaapi);
 
 $alexaapi->refreshWidget(); //refresh Tuile Playlist
-
 
 
 	} catch (Exception $e) {
