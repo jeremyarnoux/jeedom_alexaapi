@@ -1028,7 +1028,7 @@ self::updateCmd ($F, 'nextState', 'info', 'string', false, null, false, true, nu
 self::updateCmd ($F, 'previousState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
 self::updateCmd ($F, 'playPauseState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
 self::updateCmd ($F, 'playList', 'action', 'select', false, 'Lancer une playlist', true, false, null, 'dashboard', 'alexaapi::list', null, null, null, 20, $cas1);
-self::updateCmd ($F, 'playMusicTrack', 'action', 'message', false, 'Play Music Track', false, false, 'loisir-musical7', null, null, null, null, null, 79, $cas1);
+self::updateCmd ($F, 'playMusicTrack', 'action', 'message', false, 'Play Music Track', false, false, 'loisir-musical7', null, null, 'playmusictrack?trackId=#trackId#', null, null, 79, $cas1);
 //self::updateCmd ($F, 'rwd', 'action', 'other', false, 'Rwd', true, true, 'fa fa-fast-backard', null, null, 'command?command=rwd', null, null, 15, $cas1);
 self::updateCmd ($F, 'previous', 'action', 'other', false, 'Previous', true, true, 'fa fa-step-backward', null, null, 'command?command=previous', null, null, 16, $cas1);
 self::updateCmd ($F, 'pause', 'action', 'other', false, 'Pause', true, true, 'fa fa-pause', null, null, 'command?command=pause', null, null, 17, $cas1);
@@ -1580,9 +1580,9 @@ class alexaapiCmd extends cmd {
 	private function buildplayMusicTrackRequest($_options = array()) {
 		//log::add('alexaapi', 'debug', 'buildplayMusicTrackRequest');
 		$request = $this->getConfiguration('request');
-		if ($_options['trackid'] == "") $_options['trackid'] = "53bfa26d-f24c-4b13-97a8-8c3debdf06f0";
+		if ($_options['trackId'] == "") $_options['trackId'] = "53bfa26d-f24c-4b13-97a8-8c3debdf06f0";
 		//return str_replace(array('#select#'), array($_options['select'])), $request);
-		return str_replace(array('#trackid#'), array(urlencode($_options['trackid'])), $request);
+		return str_replace(array('#trackId#'), array(urlencode($_options['trackId'])), $request);
 	}	
 	private function buildNextAlarmRequest($_options = array()) {
 		//log::add('alexaapi', 'debug', 'buildNextAlarmRequest sur '.$this->getName());
@@ -1649,7 +1649,7 @@ class alexaapiCmd extends cmd {
 
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
 
-		//log::add('alexaapi', 'debug', '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>' . $arguments);
+		log::add('alexaapi_widget', 'debug', '>>>>getWidgetTemplateCode>>>>>>>>>>>>>>>>>>>>$command:'.$command.' >>>>>>>>>>>>>>>>>>>>>>>>>' . $arguments);
 
 		if ($command == 'speak' && strpos($arguments, '#volume#') !== false) 
 			return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
