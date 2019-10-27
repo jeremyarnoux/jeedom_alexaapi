@@ -197,9 +197,12 @@ foreach($eqLogics as $eqLogic) {
 
 		if (($eqLogic->getStatus('online') != 'true'))
 			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
-		else
-			echo '<i class="fas loisir-musical7" style="color: #2c8af6;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>'; // Dire que c'est un Player
-		
+		else {
+				if (($eqLogic->getStatus('Playing') == 'true'))
+					echo '<i class="fa fa-play" style="color: green;text-shadow: 4px 4px 4px #ccc;float:right" title="Playing"></i>';
+				else
+					echo '<i class="fas loisir-musical7" style="color: #2c8af6;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>'; // Dire que c'est un Player
+		}
 
 		$alternateImg = $eqLogic->getConfiguration('type');
 		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))

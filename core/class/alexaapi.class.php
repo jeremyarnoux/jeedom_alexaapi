@@ -344,7 +344,24 @@ self::scanAmazonAlexa();
 	*/
 	//public static function cron15($_eqlogic_id = null) {
 
-	public static function cron($_eqlogic_id = null) {		
+	public static function cron($_eqlogic_id = null) {
+
+		
+		// Toutes les minutes, on cherche les players en lecture et on les actualise
+		$dd= new Cron\CronExpression('* * * * *', new Cron\FieldFactory);
+		$deamon_info = self::deamon_info();
+		if ($dd->isDue() && $deamon_info['state'] == 'ok') {
+			$plugin = plugin::byId('alexaapi');
+			$eqLogics = eqLogic::byType($plugin->getId());
+			foreach($eqLogics as $eqLogic) {
+				if ($eqLogic->getStatus('Playing')) {// On va chercher un Device en "Playing"
+						log::add('alexaapi', 'debug', 'Refresh automatique (CRON) de '.$eqLogic->getName());
+						$eqLogic->refresh();
+				}
+			}
+		}
+
+		
 		$autorefresh = '*/15 * * * *';
 		//$autorefresh = '* * * * *';
 		
@@ -423,8 +440,8 @@ self::scanAmazonAlexa();
 		/* boucle qui relance la connexion au serveur*/
 		$autorefreshRR = config::byKey('autorefresh', 'alexaapi', '33 3 * * *');
 
-		$c = new Cron\CronExpression($autorefreshRR, new Cron\FieldFactory);
-		if ($c->isDue() && $deamon_info['state'] == 'ok') {
+		$cc = new Cron\CronExpression($autorefreshRR, new Cron\FieldFactory);
+		if ($cc->isDue() && $deamon_info['state'] == 'ok') {
 		self::restartServeurPHP();		
 		}
 		
@@ -1649,7 +1666,7 @@ class alexaapiCmd extends cmd {
 
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
 
-		log::add('alexaapi_widget', 'debug', '>>>>getWidgetTemplateCode>>>>>>>>>>>>>>>>>>>>$command:'.$command.' >>>>>>>>>>>>>>>>>>>>>>>>>' . $arguments);
+		//log::add('alexaapi_widget', 'debug', '>>>>getWidgetTemplateCode>>>>>>>>>>>>>>>>>>>>$command:'.$command.' >>>>>>>>>>>>>>>>>>>>>>>>>' . $arguments);
 
 		if ($command == 'speak' && strpos($arguments, '#volume#') !== false) 
 			return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');

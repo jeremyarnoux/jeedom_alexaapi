@@ -261,7 +261,12 @@ metAJourImage("url", $result['playerInfo']['mainArt']['url'], 'url', true , $ale
 metAJour("mediaLength", $result['playerInfo']['progress']['mediaLength'], 'mediaLength', true , $alexaapi);
 metAJour("mediaProgress", $result['playerInfo']['progress']['mediaProgress'], 'mediaProgress', true , $alexaapi);
 
+
 metAJour("state", $result['playerInfo']['state'], 'state', false , $alexaapi);
+
+// Affecte le statut Playing du device Player
+$alexaapi->setStatus('Playing', ($result['playerInfo']['state']=="PLAYING"));
+
 
 
 
