@@ -29,6 +29,11 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 
         //log::add('alexaapi', 'debug', 'Test de config::byKey dans config: ' . config::byKey('amazonserver','alexaapi'));
 
+// code trouvé dans core\ajax\plugin.ajax.php
+		$update = update::byLogicalId('alexaapi');
+		$return = utils::o2a($update);
+		$versionJeedom = $return['configuration']['version'];
+
 ?>
 
 	<legend><i class="icon divers-triangular42"></i> {{Génération manuelle du cookie Amazon}}</legend>
@@ -46,6 +51,9 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 	<center>
 		<a class="btn btn-danger btn-sm" id="bt_reinstallNodeJS"><i class="fa fa-recycle"></i> {{Réparation de NodeJS}} </a>
 	</center>
+
+
+
 
 <form class="form-horizontal">
     <fieldset>
@@ -75,11 +83,75 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
            <input type="checkbox" class="configKey" data-l1key="utilisateurExperimente" />
        </div>
 	</div>
+      <div class="form-group ">
+        <label class="col-lg-4 control-label">{{Activer les fonctions Domotique des Amazon SmartHome}}</label>
+        <div class="col-lg-3">
+           <input type="checkbox"  <?php if ($versionJeedom=="stable") echo 'disabled="disabled"';?> class="configKey" data-l1key="utilisateurSmarthome" /><em>(activable uniquement en Béta pour l'instant)</em>
+       </div> 
+	</div>      
+	<div class="form-group">
+        <label class="col-lg-4 control-label">{{Activer les fonctions Multimedia (Player/Playlist)}}</label>
+        <div class="col-lg-3">
+           <input type="checkbox" <?php if ($versionJeedom=="stable") echo 'disabled="disabled"';?> class="configKey" data-l1key="utilisateurMultimedia" /><em>(activable uniquement en Béta pour l'instant)</em>
+       </div> 
+	</div>	
+	<!--<div class="form-group">
+        <label class="col-lg-4 control-label">{{Activer le client MQTT Amazon (conseillé pour les fonctions multimédia)}}</label>
+        <div class="col-lg-3">
+           <input type="checkbox" class="configKey" data-l1key="utilisateurMQTT" /><em>(activable uniquement en Béta pour l'instant)</em>
+       </div> 
+	</div>	-->	
+	<div class="form-group">
+		  <label class="col-lg-4 control-label" >{{Ajouter automatiquement les équipements détectés dans :}}</label>
+		  <div class="col-lg-3">
+			<select id="sel_object" class="configKey form-control" data-l1key="defaultParentObject">
+			  <option value="">{{Aucune}}</option>
+			  <?php
+				foreach (object::all() as $object) {
+				  echo '<option value="' . $object->getId() . '">' . $object->getName() . '</option>';
+				}
+			  ?>
+			</select>
+		  </div>
+	</div>
+	<div class="form-group">
+		<label class="col-lg-4 col-md-3 col-sm-4 col-xs-6 control-label">{{Recharger la configuration par défaut de toutes les commandes}}</label>
+		<div class="col-lg-3 col-md-4 col-sm-5 col-xs-6">
+			<a class="btn btn-warning bt_forcerDefaultAllCmd"><i class="fas fa-search"></i> {{Lancer}}</a>
+		</div>
+	</div>	
+	<div class="form-group">
+		<label class="col-lg-4 col-md-3 col-sm-4 col-xs-6 control-label">{{Supprimer tous les devices !! et relancer un Scan}}</label>
+		<div class="col-lg-3 col-md-4 col-sm-5 col-xs-6">
+			<a class="btn btn-danger bt_supprimeTouslesDevices"><i class="fas fa-exclamation-triangle"></i> {{Lancer}}</a>
+		</div>
+	</div>
    </fieldset>
 </form>
 
 
+<form class="form-horizontal">
+    <fieldset>
+    <legend><i class="icon nature-planet5"></i> {{Option Lien serveur}}</legend>
+
+	<div class="form-group">
+			<label class="col-sm-4 control-label">{{Relance de l'identification au serveur}}</label>
+				<div class="col-lg-2">
+					<div class="input-group">
+					<input type="text" class="configKey form-control" data-l1key="autorefresh" placeholder="33 3 * * *"/>
+					<span class="input-group-btn">
+					<a class="btn btn-success btn-sm " id="bt_cronGenerator" ><i class="fas fa-question-circle"></i></a>
+					</span>
+					</div>
+				</div>
+			</div>
+</div>
+</fieldset>
+</form>
+
+
 <script>
+
     var compteVerifCookie=0;
     var CookiePresent=0;
 	
@@ -187,6 +259,105 @@ if(nouvellefenetre)
 }
     });
   });
+  
+  
+ $('.bt_supprimeTouslesDevices').off('click').on('click', function() {
+	$('#md_modal').dialog('close'); 
+	
+		bootbox.confirm({
+			message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API ? Il faudra refaire les scénarios.",
+			buttons: {
+				confirm: {
+					label: 'Oui',
+					className: 'btn-danger'
+				},
+				cancel: {
+					label: 'Non',
+					className: 'btn-success'
+				}
+			},
+			callback: function (result) {
+						/*$('#div_alert').showAlert({
+							message : "{{Suppression en cours ...}}",
+							level : 'success'
+						});*/
+			if (result) {
+				//$.showLoading(); ??
+				$.ajax({
+					type : 'POST',
+					url : 'plugins/alexaapi/core/ajax/alexaapi.ajax.php',
+					data : {
+						action : 'supprimeTouslesDevices',
+					},
+					dataType : 'json',
+					global : false,
+					error : function(request, status, error) {
+						//$.hideLoading(); ??
+						$('#div_alert').showAlert({
+							message : error.message,
+							level : 'danger'
+						});
+					},
+					success : function(data) {
+						//$.hideLoading();??
+						//$('li.li_plugin.active').click();??
+						
+					}
+				});
+			}			
+			}
+		});
+	 
+});	
+
+ $('.bt_forcerDefaultAllCmd').off('click').on('click', function() {
+	$('#md_modal').dialog('close'); 
+	
+		bootbox.confirm({
+			message: "Voulez-vous recharger la configuration par défaut de toutes les commandes du plugin Alexa-API ?",
+			buttons: {
+				confirm: {
+					label: 'Oui',
+					className: 'btn-danger'
+				},
+				cancel: {
+					label: 'Non',
+					className: 'btn-success'
+				}
+			},
+			callback: function (result) {
+						/*$('#div_alert').showAlert({
+							message : "{{Suppression en cours ...}}",
+							level : 'success'
+						});*/
+			if (result) {
+				//$.showLoading(); ??
+				$.ajax({
+					type : 'POST',
+					url : 'plugins/alexaapi/core/ajax/alexaapi.ajax.php',
+					data : {
+						action : 'forcerDefaultAllCmd',
+					},
+					dataType : 'json',
+					global : false,
+					error : function(request, status, error) {
+						//$.hideLoading(); ??
+						$('#div_alert').showAlert({
+							message : error.message,
+							level : 'danger'
+						});
+					},
+					success : function(data) {
+						//$.hideLoading();??
+						//$('li.li_plugin.active').click();??
+						
+					}
+				});
+			}			
+			}
+		});
+	 
+});	
 
 
 function attendre() {

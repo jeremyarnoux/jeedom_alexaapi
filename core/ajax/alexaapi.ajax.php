@@ -26,7 +26,7 @@ try {
         throw new \Exception('401 Unauthorized');
     }
 //            $('.deamonCookieState').empty().append('<span class="label label-success" style="font-size:1em;">00012300</span>');
-    log::add('alexaapi', 'info', 'Lancement Serveur pour Cookie - action='.init('action'));
+    //log::add('alexaapi', 'info', 'Lancement Serveur pour Cookie - action='.init('action'));
     switch (init('action')) {
         case 'createCookie':
             //log::add('alexaapi', 'info', 'Debut');
@@ -58,6 +58,18 @@ try {
             alexaapi::scanAmazonAlexa();
             ajax::success();
         break;
+        case 'forcerDefaultAllCmd':
+            alexaapi::forcerDefaultAllCmd();
+            ajax::success();
+        break;        
+		case 'forcerDefaultCmd':
+				$eqLogic = alexaapi::byId(init('id'));
+				if (!is_object($eqLogic)) {
+					throw new Exception(__('Alexaapi eqLogic non trouvé : ', __FILE__) . init('id'));
+				}
+            alexaapi::forcerDefaultCmd(init('id'));
+            ajax::success();
+        break;		
 		case 'VerifiePresenceCookie':
         $request = realpath(dirname(__FILE__) . '/../../resources/data/alexa-cookie.json');
         if (file_exists($request))
@@ -103,7 +115,10 @@ try {
 		$ret=alexaapi::reinstallNodeJS();
 		ajax::success($ret);
 	break;
-    }
+	case 'supprimeTouslesDevices':
+		$ret=alexaapi::supprimeTouslesDevices();
+		ajax::success($ret);
+	break;    }
     throw new \Exception('Aucune methode correspondante');
 }
 catch(\Exception $e) {

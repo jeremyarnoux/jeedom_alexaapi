@@ -1,0 +1,28 @@
+<div class="cmd cmd-widget #history#" data-type="info" data-subtype="string" data-template="default" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
+	<div class="content-xs">
+		<span class="cmdName #hide_name#">#name_display# </span> <strong class="state"></strong>
+	</div>
+
+</div>
+<script>
+		// Appellé lors d'un changement de valeur
+		jeedom.cmd.update['#id#'] = function(_options) {
+		var cmd = $('.cmd[data-cmd_id=#id#]');
+		var inforecuperee=_options.display_value;
+			if (inforecuperee == "none")
+					_options.display_value="Aucune";
+					else
+					_options.display_value=inforecuperee.substr(0, 2)+":"+inforecuperee.substr(2, 2);
+			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate);
+			cmd.find('.state').empty().append(_options.display_value);
+				}
+		
+		// Appellé au premier affichage
+		jeedom.cmd.update['#id#']({
+									display_value:'#state#',
+									valueDate:'#valueDate#',
+									collectDate:'#collectDate#',
+									alertLevel:'#alertLevel#'
+		})
+
+</script>

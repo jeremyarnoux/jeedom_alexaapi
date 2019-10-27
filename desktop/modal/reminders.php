@@ -22,6 +22,8 @@ if (!isConnect('admin')) {
 $json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/reminders");
 $json = json_decode($json,true);
 
+//log::add('alexaapi', 'warning', '**********************************************'."http://" . config::byKey('internalAddr') . ":3456/reminders");
+
 
 function sortBy($field, &$array, $direction = 'asc')
 {

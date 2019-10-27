@@ -7,7 +7,7 @@ var fs = require('fs');
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
 
-
+  
 alexa.init({
   proxyOnly: true,
   proxyOwnIp: process.argv[2],
