@@ -1365,10 +1365,10 @@ app.get('/reminders', (req, res) => {
 	config.logger('Alexa-API: Reminders');
 	res.type('json');
 
-	config.logger('Alexa-API: (reminders) Lancement');
+	config.logger('Alexa-API: (reminders) Lancement',5);
 
 	alexa.getNotifications2(function(notifications) {
-		config.logger('Alexa-API: (reminders) function');
+		config.logger('Alexa-API: (reminders) function',5);
 		var toReturn = [];
 
 		for (var serial in notifications) {
@@ -1412,22 +1412,31 @@ app.get('/deleteallalarms', (req, res) => {
 
 	alexa.getNotifications2(function(notifications) {
 		//var toReturn = [];
-
+		//config.logger('Alexa-API - prepa boucle 1:'+JSON.stringify(notifications),2);
+		//config.logger('Alexa-API - prepa boucle 1 nb:'+Object.keys(notifications).length,2);
 		// Filtre et ne garde que les enregistrements du device selctionné
 		const notificationsfiltrees = notifications.filter(tmp => tmp.deviceSerialNumber == req.query.device);
+		
+		
 		notifications = notificationsfiltrees;
+		//config.logger('Alexa-API - on filtre sur req.query.device:'+req.query.device,2);
+		//config.logger('Alexa-API - prepa boucle 2:'+JSON.stringify(notifications),2);
+		//config.logger('Alexa-API - prepa boucle 2 nb:'+Object.keys(notifications).length,2);
 
-		config.logger('Alexa-API - deleteallalarms req.query.type: ' + req.query.type);
+		//config.logger('Alexa-API - deleteallalarms req.query.type: ' + req.query.type,5);
+		//config.logger('Alexa-API - on filtre sur req.query.type:'+req.query.type,2);
 
 		if ((req.query.type != 'all') && (req.query.type != 'ALL')) {
 			var notificationsfiltrees1;
-			if ((req.query.type == 'reminders') || (req.query.type == 'REMINDERS'))
+			if ((req.query.type.toUpperCase() == 'reminder'.toUpperCase()) || (req.query.type.toUpperCase() == 'reminders'.toUpperCase()))
 				notificationsfiltrees1 = notifications.filter(tmp => tmp.type == "Reminder");
 			else
 				notificationsfiltrees1 = notifications.filter(tmp => tmp.type == "Alarm"); //Par défaut donc
 			notifications = notificationsfiltrees1;
 		}
 
+		//config.logger('Alexa-API - prepa boucle 3:'+JSON.stringify(notifications),2);
+		//config.logger('Alexa-API - prepa boucle 3 nb:'+Object.keys(notifications).length,2);
 
 		// Filtre et ne garde que les enregistrements qui ont un status qui correspond à req.query.status
 		if ((req.query.status != 'all') && (req.query.status != 'ALL')) {
@@ -1437,8 +1446,12 @@ app.get('/deleteallalarms', (req, res) => {
 			notifications = notificationsfiltrees2;
 		}
 
+		//config.logger('Alexa-API - prepa boucle 5:'+JSON.stringify(notifications),2);
+		config.logger('Alexa-API - prepa boucle 5 nb:'+Object.keys(notifications).length,2);
+
 
 		for (var serial in notifications) {
+			//config.logger('Alexa-API - boucle ',2);			
 			if (notifications.hasOwnProperty(serial)) {
 				// On va parcourir les résultats et supprimer chaque enregistrement
 
@@ -1448,7 +1461,12 @@ app.get('/deleteallalarms', (req, res) => {
 				const notification = {
 					'id': device.id
 				};
+				//config.logger('Alexa-API - AVANT deleteallalarms device.id: ' + device.id,2);
+				
 				alexa.deleteNotification(notification, function(err) {});
+	
+
+				
 			}
 		}
 	});
@@ -1457,6 +1475,10 @@ app.get('/deleteallalarms', (req, res) => {
 		value: "Fini"
 	});
 });
+
+
+
+
 
 
 /***** WhenNextAlarm *****
@@ -1615,6 +1637,7 @@ app.get('/whennextmusicalalarm', (req, res) => {
 		var compteurdePosition = 1;
 		var compteurdePositionaTrouver = 1;
 		var stringarenvoyer = 'none';
+		var stringMusicarenvoyer = 'none';
 
 		if (req.query.position > 1) {
 			compteurdePositionaTrouver = req.query.position;
@@ -1626,7 +1649,7 @@ app.get('/whennextmusicalalarm', (req, res) => {
 
 				if (compteurdePositionaTrouver == compteurdePosition) {
 					var device = notifications[serial];
-
+					stringMusicarenvoyer = device.musicEntity;
 					switch (req.query.format) {
 						case 'hour':
 						case 'HOUR':
@@ -1645,13 +1668,108 @@ app.get('/whennextmusicalalarm', (req, res) => {
 			}
 		}
 		res.status(200).json({
-			value: stringarenvoyer
+			value: stringarenvoyer,
+			music: stringMusicarenvoyer
 		});
 
 	});
 });
 
 
+/***** musicalalarmmusicentity *****
+
+
+  Return la  musique de la prochaine alarme musicale
+  [{
+    position => 1= prochaine 2=suivante ...
+	status => Filtre sur le status (active=ON, désactive=OFF, Tous =ALL)
+  }]
+
+*/
+app.get('/musicalalarmmusicentity', (req, res) => {
+	config.logger('Alexa-API: musicalalarmmusicentity');
+	res.type('json');
+
+	alexa.getNotifications2(function(notifications) {
+
+
+		if (isEmpty(notifications))
+			return res.status(500).json(error(500, req.route.path, 'Alexa.whennextalarm', 'Retour vide'));
+
+
+		// Filtre et ne garde que les enregistrements du device selctionné
+		const notificationsfiltrees = notifications.filter(tmp => tmp.deviceSerialNumber == req.query.device);
+		notifications = notificationsfiltrees;
+
+		// Filtre et ne garde que les enregistrements qui ont le type ALARM
+		const notificationsfiltrees1 = notifications.filter(tmp => tmp.type == "MusicAlarm");
+		notifications = notificationsfiltrees1;
+
+
+		// Filtre et ne garde que les enregistrements qui sont supérieure à l'heure du jour
+		//Maintenant :
+		var d = new Date();
+		var date_format_str = d.getFullYear().toString() + "-" + ((d.getMonth() + 1).toString().length == 2 ? (d.getMonth() + 1).toString() : "0" + (d.getMonth() + 1).toString()) + "-" + (d.getDate().toString().length == 2 ? d.getDate().toString() : "0" + d.getDate().toString()) + " " + (d.getHours().toString().length == 2 ? d.getHours().toString() : "0" + d.getHours().toString()) + ":" + ((parseInt(d.getMinutes() / 5) * 5).toString().length == 2 ? (parseInt(d.getMinutes() / 5) * 5).toString() : "0" + (parseInt(d.getMinutes() / 5) * 5).toString()) + ":00";
+		const notificationsfiltrees4 = notifications.filter(tmp => (tmp.originalDate + ' ' + tmp.originalTime > date_format_str));
+		notifications = notificationsfiltrees4;
+
+		// Filtre et ne garde que les enregistrements qui ont un status qui correspond à req.query.status
+		if ((req.query.status != 'all') && (req.query.status != 'ALL')) {
+			var FiltreSurStatus = 'ON';
+			if ((req.query.status == 'off') || (req.query.status == 'OFF')) FiltreSurStatus = 'OFF';
+			const notificationsfiltrees2 = notifications.filter(tmp => tmp.status == FiltreSurStatus);
+			notifications = notificationsfiltrees2;
+		}
+
+		// Trie par Date/Heure
+		const notificationsfiltrees3 = notifications.sort(function(a, b) {
+			var x = a.originalDate + a.originalTime;
+			var y = b.originalDate + b.originalTime;
+			return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+		});
+		notifications = notificationsfiltrees3;
+
+
+		var compteurdePosition = 1;
+		var compteurdePositionaTrouver = 1;
+		//var stringarenvoyer = 'none';
+		var stringMusicarenvoyer = 'none';
+
+		if (req.query.position > 1) {
+			compteurdePositionaTrouver = req.query.position;
+		}
+
+		for (var serial in notifications) {
+			if (notifications.hasOwnProperty(serial)) {
+				// On va parcourir les résultats en allant à la position demandée.
+
+				if (compteurdePositionaTrouver == compteurdePosition) {
+					var device = notifications[serial];
+					stringMusicarenvoyer = device.musicEntity;
+					/*
+					switch (req.query.format) {
+						case 'hour':
+						case 'HOUR':
+							stringarenvoyer = device.originalTime.substring(0, 5);
+							break;
+						case 'full':
+						case 'FULL':
+							stringarenvoyer = device.originalDate + " " + device.originalTime;
+							break;
+						default: //ou HHMM
+							stringarenvoyer = device.originalTime.substring(0, 5).replace(':', ''); // Utilisation du format HH:MM
+					}*/
+
+				}
+				compteurdePosition++;
+			}
+		}
+		res.status(200).json({
+			value: stringMusicarenvoyer
+		});
+
+	});
+});
 
 /***** WhenNextReminder *****
   URL: /whennextreminder

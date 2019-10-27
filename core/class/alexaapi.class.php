@@ -14,7 +14,7 @@ class alexaapi extends eqLogic {
 		
 	//	$return['info']['string']['subText1'] = array('template' => 'title' );
 		$return['info']['string']['subText2'] = array('template' => 'album' );
-		//$return['info']['string']['alarm'] = array('template' => 'alarm' );
+		$return['info']['string']['alarmmusicalmusic'] = array('template' => 'alarmmusicalmusic', 'replace' => array("#hide_name#" => "hidden"));
 		$return['info']['string']['title'] =    array('template' => 'title');
 		$return['info']['string']['url'] =    array('template' => 'image');
 		$return['info']['string']['interaction'] =    array('template' => 'table');
@@ -28,19 +28,20 @@ class alexaapi extends eqLogic {
 				'template' => 'bouton',
 				'replace' => array("#hide_name#" => "hidden", "#step#" => "20")
 		);
+		
 		$return['info']['string']['state'] = array(
-				'template' => 'tmplmultistate',
-				'replace' => array("#_desktop_width_#" => "100","#_mobile_width_#" => "50", "#hide_name#" => "hidden"),
+				'template' => 'tmplmultistate_alexaapi',
+				'replace' => array("#hide_name#" => "hidden", "#hide_state#" => "hidden", "#marge_gauche#" => "5px", "#marge_haut#" => "-15px"),
 				'test' => array(
-					array('operation' => "#value# == 'PLAYING'", 'state_light' => "<img src='plugins/alexaapi/core/img/playing.png' title ='" . __('Playing', __FILE__) . "'>",
+					array('operation' => "#value# == 'PLAYING'", 'state_light' => "<img src='plugins/alexaapi/core/img/playing.png'  title ='" . __('Playing', __FILE__) . "'>",
 							'state_dark' => "<img src='plugins/alexaapi/core/img/playing.png' title ='" . __('En charge', __FILE__) . "'>"),
-					array('operation' => "#value# == 'PAUSED' || #value# == 'hmUsrDock'",'state_light' => "<img src='plugins/alexaapi/core/img/paused.png' title ='" . __('En Pause', __FILE__) . "'>")
+					array('operation' => "#value# != 'PLAYING'",'state_light' => "<img src='plugins/alexaapi/core/img/paused.png' title ='" . __('En Pause', __FILE__) . "'>")
 				)
 			);
 			
 		$return['info']['string']['alarm'] = array(
 				'template' => 'alarm',
-				'replace' => array("#hide_name#" => "hidden"),
+				'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "15px"),
 				'test' => array(
 					array('operation' => "#value# == ''", 
 					'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Clock-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
@@ -50,9 +51,23 @@ class alexaapi extends eqLogic {
 					'state_dark' =>  "<img src='plugins/alexaapi/core/img/Alarm-Clock-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>")
 				)
 			);
+			
+		$return['info']['string']['alarmmusical'] = array(
+				'template' => 'alarm',
+				'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "15px"),
+				'test' => array(
+					array('operation' => "#value# == ''", 
+					'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
+					'state_dark'  => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-Off_dark.png' title ='" . __('En charge', __FILE__) . "'>"),
+					array('operation' => "#value# != ''",
+					'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-On.png' title ='" . __('En Pause', __FILE__) . "'>",
+					'state_dark' =>  "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>")
+				)
+			);				
+		
 		$return['info']['string']['reminder'] = array(
 				'template' => 'alarm',
-				'replace' => array("#hide_name#" => "hidden"),
+				'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "4px"),
 				'test' => array(
 					array('operation' => "#value# == ''", 
 					'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Reminder-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
@@ -63,18 +78,7 @@ class alexaapi extends eqLogic {
 				)
 			);	
 			
-		$return['info']['string']['alarmmusical'] = array(
-				'template' => 'alarm',
-				'replace' => array("#hide_name#" => "hidden"),
-				'test' => array(
-					array('operation' => "#value# == ''", 
-					'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
-					'state_dark'  => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-Off_dark.png' title ='" . __('En charge', __FILE__) . "'>"),
-					array('operation' => "#value# != ''",
-					'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-On.png' title ='" . __('En Pause', __FILE__) . "'>",
-					'state_dark' =>  "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>")
-				)
-			);			
+	
 log::add('alexaapi_widget','debug','*****subText1*******templateWidget :'.json_encode($return));  
 
 		return $return;
@@ -308,6 +312,8 @@ log::add('alexaapi_widget','debug','*****subText1*******templateWidget :'.json_e
 	}
 	
 	public static function supprimeTouslesDevices() {
+
+	event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Suppression en cours ...', __FILE__)));
 	
 $plugin = plugin::byId('alexaapi');
 // Charger le javascript
@@ -432,10 +438,9 @@ self::scanAmazonAlexa();
 		if ($r->isDue() && $deamon_info['state'] == 'ok') {
 			$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
 
-			$premierdelaboucle=true; // premierdelaboucle cest pour ne pas lancer autant de fois le test sur routines que de devices, ne sera lancé qu'une fois.
+
 			foreach ($eqLogics as $alexaapi) {
-				$alexaapi->refresh($premierdelaboucle); 				
-				if ($premierdelaboucle) $premierdelaboucle=false;
+				$alexaapi->refresh(); 				
 				sleep(2);
 			}	
 		}
@@ -468,7 +473,6 @@ self::scanAmazonAlexa();
 			
 			$device = alexaapi::byId($_id);
 					if (is_object($device)) {
-					//event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Rechargement des commandes de '.$device->getName(), __FILE__),));
 					$device->setStatus('forceUpdate',true);
 					$device->save();
 					}
@@ -569,6 +573,9 @@ self::scanAmazonAlexa();
 			$device->save();
 			$device->setStatus('online', (($item['online'])?true:false)); //SetStatus doit être lancé après Save et Save après inutile
 			$numDevices++;
+			
+	
+			
 		}
 		
 	if (config::byKey('utilisateurSmarthome', 'alexaapi')!="0")
@@ -687,10 +694,11 @@ self::scanAmazonAlexa();
 
 
 
-	public function refresh($_routines=true) { //$_routines c'est pour éviter de charger les routines lors du scan
+	public function refresh() { //$_routines c'est pour éviter de charger les routines lors du scan
 	
 	$deamon_info = alexaapi::deamon_info();
 	if ($deamon_info['state'] != 'ok') return false;
+	
 //log::add('alexaapi', 'debug', '********************Lancement de la commande Refresh sur '.$this->getName().' / Lancement Routine ='.$_routines);
 
 $widgetPlayer=($this->getConfiguration('devicetype') == "Player");
@@ -701,14 +709,11 @@ $widgetEcho=(!($widgetPlayer||$widgetSmarthome||$widgetPlaylist));
 
 $device=str_replace("_player", "", $this->getConfiguration('serial'));
 
-if ($widgetPlaylist) {
-	$_routines=false;
-}
+
 
 
 // Refresh d'un player
 if ($widgetPlayer) {
-		$_routines=false;
 		//$envoicommandeHTTP=file_get_contents(network::getNetworkAccess('internal') . "/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey=".jeedom::getApiKey('alexaapi')."&nom=refreshPlayer");
 
 		// Envoyer la commande Refresh via jeeAlexaapi
@@ -794,11 +799,10 @@ if ($widgetPlayer) {
 
 
 
-	if ($_routines)
+	if ($widgetEcho)
 	{
 
-
-			//	log::add('alexaapi', 'debug', 'execute : refresh');
+				log::add('alexaapi', 'debug', 'execute : refresh routines');
 			// Met à jour la liste des routines des commandes action "routine"
 			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
 			$json = json_decode($json, true);
@@ -822,10 +826,9 @@ if ($widgetPlayer) {
 				$cmd->setConfiguration('listValue', join(';',$ListeDesRoutines));
 				$cmd->save();
 			}
-	}
 
-	if ($widgetEcho)
-	{
+
+
 		
 		try {
 			foreach ($this->getCmd('action') as $cmd) {
@@ -959,10 +962,6 @@ public function postSave() {
 
 log::add('alexaapi', 'debug', '**********************postSave '.$this->getName().'***********************************');
 
-log::add('alexaapi', 'debug', '>>>>>>>>>>>>>>>>>>>>>forcerDefaultCmd2>>>>>>>>'.$this->getStatus('forceUpdate').'>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<');
-
-
-
 // forceUpdate permet de recharger les commandes à valeur d'origine, mais sans supprimer/recréer les commandes
 $F=$this->getStatus('forceUpdate');
 
@@ -1028,7 +1027,7 @@ self::updateCmd ($F, 'state', 'info', 'string', false, null, true, false, null, 
 self::updateCmd ($F, 'nextState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
 self::updateCmd ($F, 'previousState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
 self::updateCmd ($F, 'playPauseState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
-self::updateCmd ($F, 'playList', 'action', 'select', false, 'Lancer une playlist :', true, false, null, 'dashboard', 'alexaapi::list', null, null, null, 20, $cas1);
+self::updateCmd ($F, 'playList', 'action', 'select', false, 'Lancer une playlist', true, false, null, 'dashboard', 'alexaapi::list', null, null, null, 20, $cas1);
 self::updateCmd ($F, 'playMusicTrack', 'action', 'message', false, 'Play Music Track', false, false, 'loisir-musical7', null, null, null, null, null, 79, $cas1);
 //self::updateCmd ($F, 'rwd', 'action', 'other', false, 'Rwd', true, true, 'fa fa-fast-backard', null, null, 'command?command=rwd', null, null, 15, $cas1);
 self::updateCmd ($F, 'previous', 'action', 'other', false, 'Previous', true, true, 'fa fa-step-backward', null, null, 'command?command=previous', null, null, 16, $cas1);
@@ -1043,9 +1042,12 @@ self::updateCmd ($F, 'next', 'action', 'other', false, 'Next', true, true, 'fa f
 
 	
 self::updateCmd ($F, 'alarm', 'action', 'message', false, 'Alarm', false, true, 'fa fa-bell', null, null, 'alarm?when=#when#&recurring=#recurring#', null, null, 79, $cas2);
-self::updateCmd ($F, 'deleteallalarms', 'action', 'message', false, 'Delete All Alarms', false, false, 'maison-poubelle', null, null, 'alarm?when=#when#&recurring=#recurring#', null, null, 79, $cas2);
+self::updateCmd ($F, 'deleteallalarms', 'action', 'message', false, 'Delete All Alarms', false, false, 'maison-poubelle', null, null, 'deleteallalarms?type=alarm&status=all', null, null, 79, $cas2);
 self::updateCmd ($F, 'whennextmusicalalarm', 'action', 'other', true, 'Next Musical Alarm When', false, false, 'fa-bell', null, null, 'whennextmusicalalarm?position=1', 'Next Musical Alarm Hour', null, 1, $cas2);
 self::updateCmd ($F, 'whennextmusicalalarminfo', 'info', 'string', false, 'Next Musical Alarm Hour', true, false, null, 'dashboard','alexaapi::alarmmusical', null, null, null, 26, $cas2);	
+self::updateCmd ($F, 'musicalalarmmusicentity', 'action', 'other', true, 'musicalalarmmusicentity', false, false, null, null, null, 'musicalalarmmusicentity?position=1', 'Musical Alarm Music', null, 1, $cas2);
+self::updateCmd ($F, 'musicalalarmmusicentityinfo', 'info', 'string', false, 'Musical Alarm Music', true, false, 'loisir-musical7', 'dashboard','alexaapi::alarmmusicalmusic', null, null, null, 27, $cas2);
+
 self::updateCmd ($F, 'whennextalarm', 'action', 'other', true, 'Next Alarm When', false, false, 'fa-bell', null, null, 'whennextalarm?position=1', 'Next Alarm Hour', null, 2, $cas2);	
 self::updateCmd ($F, 'whennextalarminfo', 'info', 'string', false, 'Next Alarm Hour', true, false, null, 'dashboard','alexaapi::alarm', null, null, null, 25, $cas2);
 
@@ -1057,13 +1059,13 @@ self::updateCmd ($F, 'whennextalarminfo', 'info', 'string', false, 'Next Alarm H
 
 self::updateCmd ($F, 'deleteReminder', 'action', 'message', false, 'DeleteReminder', false, false, 'maison-poubelle', null, null, 'deleteReminder?id=#id#', null, null, 2, $cas3);	
 
-self::updateCmd ($F, 'whennextreminderinfo', 'info', 'string', false, 'Next Reminder Hour', true, false, null, 'dashboard','alexaapi::reminder', null, null, null, 27, $cas3);
+self::updateCmd ($F, 'whennextreminderinfo', 'info', 'string', false, 'Next Reminder Hour', true, false, null, 'dashboard','alexaapi::reminder', null, null, null, 28, $cas3);
 
-self::updateCmd ($F, 'whennextreminder', 'action', 'other', true, 'Next Reminder When', false, false, null, null, null, 'whennextreminder?position=1', 'Next Reminder Hour', null, 27, $cas3);
+self::updateCmd ($F, 'whennextreminder', 'action', 'other', true, 'Next Reminder When', false, false, null, null, null, 'whennextreminder?position=1', 'Next Reminder Hour', null, 28, $cas3);
 		
 
 self::updateCmd ($F, 'reminder', 'action', 'message', false, 'Reminder', false, false, 'divers-circular114', null, null, 'reminder?text=#text#&when=#when#', null, null, 79, $cas3);	
-self::updateCmd ($F, 'routine', 'action', 'select', false, 'Lancer une routine :', true, false, 'divers-circular114', 'dashboard','alexaapi::list', 'routine?routine=#select#', null, 'Lancer Refresh|Lancer Refresh', 20, $cas3);
+self::updateCmd ($F, 'routine', 'action', 'select', false, 'Lancer une routine', true, false, null, 'dashboard','alexaapi::list', 'routine?routine=#select#', null, 'Lancer Refresh|Lancer Refresh', 20, $cas3);
 self::updateCmd ($F, 'interactioninfo', 'info', 'string', false, 'Last Interaction', true, false, 'fa jeedomapp-audiospeak', 'dashboard','alexaapi::interaction', null, null, null, 2, $cas7);	
 	
 self::updateCmd ($F, 'volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fa fa-volume-up', null, null, null, null, null, 22, $cas6);	
@@ -1112,8 +1114,7 @@ $vol = $this->getCmd(null, 'volume');
 
 		
 event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Mise à jour de "'.$this->getName().'"', __FILE__),));
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-$this->refresh(false); //false c'est pour ne pas lancer l'actualisation des routines au scan
+$this->refresh(); 
 
 
 
@@ -1455,6 +1456,9 @@ class alexaapiCmd extends cmd {
 			case 'whennextmusicalalarm':
 				$request = $this->buildNextMusicalAlarmRequest($_options);
 			break;			
+			case 'musicalalarmmusicentity':
+				$request = $this->buildMusicalAlarmMusicEntity($_options);
+			break;				
 			case 'whennextreminder':
 				$request = $this->buildNextReminderRequest($_options);
 			break;
@@ -1585,10 +1589,13 @@ class alexaapiCmd extends cmd {
 	private function buildNextMusicalAlarmRequest($_options = array()) {
 		//log::add('alexaapi', 'debug', 'buildNextMusicalAlarmRequest');
 		$request = $this->getConfiguration('request');
-
 		return str_replace(array('#position#'), array($_options['position']), $request);
 	}
-	
+	private function buildMusicalAlarmMusicEntity($_options = array()) {
+		//log::add('alexaapi', 'debug', 'buildMusicalAlarmMusicEntity');
+		$request = $this->getConfiguration('request');
+		return str_replace(array('#position#'), array($_options['position']), $request);
+	}	
 	private function buildDeleteAllAlarmsRequest($_options = array()) {
 		//log::add('alexaapi', 'debug', 'buildDeleteAllAlarmsRequest');
 		$request = $this->getConfiguration('request');

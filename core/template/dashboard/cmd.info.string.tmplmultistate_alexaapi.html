@@ -1,29 +1,16 @@
 <div class="cmd cmd-widget #history#" data-type="info" data-subtype="numeric" data-template="tmplmultistate" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#" style="display: block;margin-left: #marge_gauche#;margin-top: #marge_haut#;">
-
 	<div class="title #hide_name#">
 		<div  class="cmdName">#name_display#</div>
 	</div>
 	<div class="content-sm">
 		<span class="iconCmd"></span>
 	</div>
-		<div class="content-xs" >
-		<span class="cmdName #hide_name#">#name_display# </span><br><p><strong class="state #hide_state#"></strong></p>
-	</div>
 	<div class="value">
 		<span class="timeCmd#uid# timeCmd label label-default value"></span>
 	</div>
-
 	<script>
 		jeedom.cmd.update['#id#'] = function(_options){
 			var cmd = $('.cmd[data-cmd_id=#id#]');
-			var inforecuperee=_options.display_value;
-			if (inforecuperee == "none")
-					_options.display_value="";
-					else
-					_options.display_value=inforecuperee.substr(0, 2)+":"+inforecuperee.substr(2, 2);
-			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate);
-			cmd.find('.state').empty().append(_options.display_value);			
-		
 			if('#_time_widget_#' == '1'){
 				jeedom.cmd.displayDuration(_options.valueDate,  cmd.find('.timeCmd'));
 			}else{

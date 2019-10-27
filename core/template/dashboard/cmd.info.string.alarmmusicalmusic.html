@@ -1,26 +1,13 @@
-<div class="cmd" data-type="info" data-version="#version#" data-eqLogic_id="#eqLogic_id#" data-subtype="string" data-cmd_id="#id#" data-cmd_uid="#uid#">
-<br>
-<table  border="0"  width="202">
-    <tr>
-        <td style="padding: 15px;" ><center><i  class="fa jeedomapp-audiospeak"></i></center></td>
-        <td width="90%">
-		<center><font size="2"><strong class="state"></strong></font></center></td>
-
-    </tr>
-</table>
-<!--
-<p>id : <strong>#id#</strong><br>
-uid : <strong>#uid#</strong><br>
-name : <strong>#name#</strong><br>
-state : <strong>#state#</strong><br>
-name_display : <strong>#name_display#</strong><br>
-logicalId : <strong>#logicalId#</strong><br>
-version : <strong>#version#</strong><br>
-</p>
--->
+<div class="cmd cmd-widget #history#" data-type="info" data-subtype="string" data-template="default" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
+	<div class="content-xs">
+		<span class="cmdName #hide_name#">#name_display#</span> <strong class="state"></strong>
+	</div>
 	<script>
 		jeedom.cmd.update['#id#'] = function(_options) {
 			var cmd = $('.cmd[data-cmd_id=#id#]')
+			var inforecuperee=_options.display_value;
+			if (inforecuperee == "none")
+					_options.display_value="";
 			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate)
 			cmd.find('.state').empty().append(_options.display_value)
 			if(_options.alertLevel){
@@ -38,6 +25,4 @@ version : <strong>#version#</strong><br>
 		}
 		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'})
 	</script>
-
-
 </div>
