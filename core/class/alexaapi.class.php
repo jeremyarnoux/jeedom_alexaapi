@@ -940,7 +940,7 @@ if ($widgetPlayer) {
 					$cmd->setSubType($SubType);
 					$cmd->setEqLogic_id($this->getId());
 					$cmd->setName($Name);
-					$cmd->setIsVisible($IsVisible);
+					$cmd->setIsVisible((($IsVisible)?1:0));
 					if (!empty($setTemplate_version)) $cmd->setTemplate($setTemplate_version,$setTemplate_lien);
 					if (!empty($setDisplayicon)) $cmd->setDisplay('icon', '<i class="'.$setDisplayicon.'"></i>');
 					if (!empty($request)) $cmd->setConfiguration('request', $request);
