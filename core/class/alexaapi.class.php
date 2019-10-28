@@ -940,7 +940,7 @@ if ($widgetPlayer) {
 					$cmd->setSubType($SubType);
 					$cmd->setEqLogic_id($this->getId());
 					$cmd->setName($Name);
-					$cmd->setIsVisible($IsVisible);
+					$cmd->setIsVisible((($IsVisible)?1:0));
 					if (!empty($setTemplate_version)) $cmd->setTemplate($setTemplate_version,$setTemplate_lien);
 					if (!empty($setDisplayicon)) $cmd->setDisplay('icon', '<i class="'.$setDisplayicon.'"></i>');
 					if (!empty($request)) $cmd->setConfiguration('request', $request);
@@ -1143,8 +1143,8 @@ $this->refresh();
 		// Si la case "Activer le widget Playlist" est cochée, on rend le device _playlist visible sinon on le passe invisible		
 		$eq=eqLogic::byLogicalId($device_playlist,'alexaapi');
 				if(is_object($eq)) {
-					$eq->setIsVisible($this->getConfiguration('widgetPlayListEnable'));
-					$eq->setIsEnable($this->getConfiguration('widgetPlayListEnable'));
+					$eq->setIsVisible((($this->getConfiguration('widgetPlayListEnable'))?1:0));
+					$eq->setIsEnable((($this->getConfiguration('widgetPlayListEnable'))?1:0));
 					$eq->setObject_id($this->getObject_id()); // Attribue au widget Playlist la même pièce que son Player
 					$eq->save();
 				}
