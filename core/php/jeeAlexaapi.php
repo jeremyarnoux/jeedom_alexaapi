@@ -130,7 +130,7 @@ log::add('alexaapi_mqtt', 'debug',  'nom:'.$nom);
 		
 	}
 	log::add('alexaapi_mqtt', 'info',  " -------------------------------------------------------------------------------------------------------------------------------------------------" );
-$alexaapi->refreshWidget();
+	if (is_object($alexaapi)) $alexaapi->refreshWidget();
 	/*
 // ----------------- VOLUME ------------------
 			
@@ -303,7 +303,7 @@ metAJourBoutonPlayer("playPauseState", $etatdePlay, 'playPauseState', 'play' , $
 
 	}
 log::add('alexaapi_mqtt', 'info',  " ************************************************************************" );
-$alexaapi->refreshWidget(); //refresh Tuile Player
+if (is_object($alexaapi)) $alexaapi->refreshWidget(); //refresh Tuile Player
 log::add('alexaapi_mqtt', 'debug',  '** Mise à jour Tuile du Player **');
 
 }
