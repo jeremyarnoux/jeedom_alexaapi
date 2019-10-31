@@ -20,7 +20,7 @@ $('#bt_forcerDefaultCmd').off('click').on('click', function () {
   var dialog_title = '{{Recharge configuration par défaut}}';
   var dialog_message = '<form class="form-horizontal onsubmit="return false;"> ';
   dialog_title = '{{Recharger la configuration par défaut ?}}';
-  dialog_message += '<label class="lbl lbl-warning" for="name">{{Notez que cette fonction ne supprime pas votre équipoement ni ses commandes, cela évite d\'avoir à refaire les scénarios. Elle va supprimer toute personnalisation et toutes les commandes vont revenir à leur état initial.}}</label> ';
+  dialog_message += '<label class="lbl lbl-warning" for="name">{{Notez que cette fonction ne supprime pas votre équipement ni ses commandes, cela évite d\'avoir à refaire les scénarios. Elle va supprimer toute personnalisation et toutes les commandes vont revenir à leur état initial.}}</label> ';
   dialog_message += '</form>';
   bootbox.dialog({
     title: dialog_title,
