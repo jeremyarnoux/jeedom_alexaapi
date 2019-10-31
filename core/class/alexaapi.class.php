@@ -533,7 +533,7 @@ self::scanAmazonAlexa();
 
 		
 						// On teste s'il faut créer un autre Device Player
-			if  ((config::byKey('utilisateurMultimedia', 'alexaapi')!="0") && (in_array("AUDIO_PLAYER",$item['capabilities']))) {
+			if  ((config::byKey('utilisateurMultimedia', 'alexaapi',0)!="0") && (in_array("AUDIO_PLAYER",$item['capabilities']))) {
 				
 					// Device PLAYLIST
 					$device = alexaapi::byLogicalId($item['serial']."_playlist", 'alexaapi');
@@ -595,7 +595,7 @@ self::scanAmazonAlexa();
 			
 		}
 		
-	if (config::byKey('utilisateurSmarthome', 'alexaapi')!="0")
+	if (config::byKey('utilisateurSmarthome', 'alexaapi',0)!="0")
 	{			
 		
 

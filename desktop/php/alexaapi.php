@@ -172,7 +172,7 @@ foreach($eqLogics as $eqLogic) {
 		</div>
     </div>
 	<?php	
-	if (config::byKey('utilisateurMultimedia', 'alexaapi')!="0")
+	if (config::byKey('utilisateurMultimedia', 'alexaapi',0)!="0")
 	{	
 ?>
 	
@@ -227,7 +227,7 @@ foreach($eqLogics as $eqLogic) {
 	
 <?php	
 	}
-	if (config::byKey('utilisateurSmarthome', 'alexaapi')!="0")
+	if (config::byKey('utilisateurSmarthome', 'alexaapi',0)!="0")
 	{	
 ?>
     <!-- Début de la liste des objets -->
