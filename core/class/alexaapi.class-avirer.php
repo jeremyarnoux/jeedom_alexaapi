@@ -369,17 +369,8 @@ class alexaapi extends eqLogic {
 		foreach ($json as $item) {
 			// Skip the special device named "This Device"
 			if ($item['name'] == 'This Device') continue;
-<<<<<<< HEAD
 			// On teste s'il faut créer un autre Device Player
 			if  ((config::byKey('utilisateurMultimedia', 'alexaapi',0)!="0") && (in_array("AUDIO_PLAYER",$item['capabilities']))) {
-=======
-			
-
-		
-						// On teste s'il faut créer un autre Device Player
-			if  ((config::byKey('utilisateurMultimedia', 'alexaapi',0)!="0") && (in_array("AUDIO_PLAYER",$item['capabilities']))) {
-				
->>>>>>> 6f4a95e5b02e6ea240ece922887d2bd817e2fc77
 					// Device PLAYLIST
 					$device = alexaapi::byLogicalId($item['serial']."_playlist", 'alexaapi');
 					if (!is_object($device)) {
@@ -434,7 +425,6 @@ class alexaapi extends eqLogic {
 			$numDevices++;
 		}
 		
-<<<<<<< HEAD
 		if (config::byKey('utilisateurSmarthome', 'alexaapi',0)!="0") {			
 			// --- Mise à jour des SmartHome Devices
 			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeEntities");
@@ -459,26 +449,6 @@ class alexaapi extends eqLogic {
 				$device->save();
 				$device->setStatus('online', 'true');
 				$numDevices++;
-=======
-	if (config::byKey('utilisateurSmarthome', 'alexaapi',0)!="0")
-	{			
-		
-
-			
-// --- Mise à jour des SmartHome Devices
-		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeEntities");
-		$json = json_decode($json, true);
-		foreach ($json as $item) {
-			
-			
-		
-			
-			// Retireve the device (if already registered in Jeedom)
-			$device = alexaapi::byLogicalId($item['id'], 'alexaapi');
-			if (!is_object($device)) {
-				$device = self::createNewDevice($item['displayName'], $item['id']);
-				$numNewDevices++;
->>>>>>> 6f4a95e5b02e6ea240ece922887d2bd817e2fc77
 			}
 		}
 	event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
