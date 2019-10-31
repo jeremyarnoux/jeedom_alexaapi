@@ -712,7 +712,7 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'nextState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'previousState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'playPauseState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
-			self::updateCmd ($F, 'playList', 'action', 'select', false, 'Lancer une playlist', true, false, null, 'dashboard', 'alexaapi::list', null, null, null, 20, $cas1);
+			self::updateCmd ($F, 'playList', 'action', 'select', false, 'Lancer une playlist', true, false, null, 'dashboard', 'alexaapi::list', 'playlist?playlist=#select#', null, 'Lancer Refresh|Lancer Refresh', 20, $cas1);
 			self::updateCmd ($F, 'playMusicTrack', 'action', 'message', false, 'Play Music Track', false, false, 'loisir-musical7', null, null, 'playmusictrack?trackId=#trackId#', null, null, 79, $cas1);
 			//self::updateCmd ($F, 'rwd', 'action', 'other', false, 'Rwd', true, true, 'fa fa-fast-backard', null, null, 'command?command=rwd', null, null, 15, $cas1);
 			self::updateCmd ($F, 'previous', 'action', 'other', false, 'Previous', true, true, 'fa fa-step-backward', null, null, 'command?command=previous', null, null, 16, $cas1);
