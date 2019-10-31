@@ -112,7 +112,7 @@ var str=data.logicalId
 			<span>{{Historique}}</span>
 		</div>
 <?php
-if (((config::byKey('utilisateurExperimente', 'alexaapi')!="0")) && (log::getLogLevel('alexaapi')<200)) :
+if (((config::byKey('utilisateurExperimente', 'alexaapi',0)!="0")) && (log::getLogLevel('alexaapi')<200)) :
 ?>
 		<div class="cursor logoSecondary" id="bt_req">
 			<i class="fas fa-key"></i>
@@ -172,7 +172,7 @@ foreach($eqLogics as $eqLogic) {
 		</div>
     </div>
 	<?php	
-	if (config::byKey('utilisateurMultimedia', 'alexaapi')!="0")
+	if (config::byKey('utilisateurMultimedia', 'alexaapi',0)!="0")
 	{	
 ?>
 	
@@ -227,7 +227,7 @@ foreach($eqLogics as $eqLogic) {
 	
 <?php	
 	}
-	if (config::byKey('utilisateurSmarthome', 'alexaapi')!="0")
+	if (config::byKey('utilisateurSmarthome', 'alexaapi',0)!="0")
 	{	
 ?>
     <!-- Début de la liste des objets -->
@@ -462,7 +462,7 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
 		
     <?php
 	
-	if (config::byKey('utilisateurExperimente', 'alexaapi')!="0")
+	if (config::byKey('utilisateurExperimente', 'alexaapi',0)!="0")
 	{	
 	?>
 		
