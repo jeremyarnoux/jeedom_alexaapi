@@ -1802,6 +1802,7 @@ this.deleteNotification(notification, callback);
             default:
                 return;
         }
+        //this._options.logger && this._options.logger('Alexa-REMOTTTTTTTTTTTTTTTE (alexa-remote.js): ' + `/api/np/command?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}`);
 
         this.httpsGet (`/api/np/command?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}`,
             callback,

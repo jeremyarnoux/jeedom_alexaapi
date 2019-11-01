@@ -198,9 +198,19 @@ CommandAlexa.Radio = function(req,res){
 	
 	config.logger('Alexa-API:    Lancement /Radio avec paramètres -> device: ' + req.query.device+' & station: ' + req.query.station);
 
-	boucleSurSerials_setTunein(req);
-	
-	res.status(200).json({value: "Send"});	//ne teste pas le résultat
+	// Suppression de la boucle des serial, en effet, si on envoi sur un groupe, la radio fonctionne en multiroom
+	//boucleSurSerials_setTunein(req);
+
+			alexa.setTunein(req.query.device, req.query.station, 
+				function(testErreur){
+						if (testErreur) 
+						{traiteErreur(testErreur);
+						res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Radio', testErreur.message));
+						}
+						else
+						res.status(200).json({value: "OK"});	//ne teste pas le résultat
+					}
+			);
 
 }
 
@@ -306,7 +316,21 @@ CommandAlexa.Command = function(req,res){
 	if ('device' in req.query === false)  return res.status(500).json(error(500, req.route.path, 'Alexa.Command', 'Missing parameter "device"'));
 	if ('command' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Command', 'Missing parameter "command"'));
 	
-	boucleSurSerials_sendCommand(req);
+	// suppression de la boucle des serial
+	//boucleSurSerials_sendCommand(req);
+
+			alexa.sendCommand(req.query.device, req.query.command, 
+				function(testErreur){
+						if (testErreur) 
+						{traiteErreur(testErreur);
+						res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Command', testErreur.message));
+						}
+						else
+						res.status(200).json({value: "OK"});	//ne teste pas le résultat
+					}
+			);
+
+
 	
 
 	
@@ -396,6 +420,7 @@ function boucleSurSerials_sendCommand (req, callback) {
 		});
 }*/
 function boucleSurSerials_sendCommand (req, callback) {
+	//pas sur qu'on l'utilise encore !!!!!!!!!!!!
 		resultatEnvoi=  forEachDevices(req.query.device, (serial) => {
 			
 			 alexa.sendCommand(serial, req.query.command, 
