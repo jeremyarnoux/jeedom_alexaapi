@@ -735,6 +735,7 @@ class alexaapi extends eqLogic {
 
 			self::updateCmd ($F, 'command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);		
 			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Speak', true, true, "fa jeedomapp-audiospeak", null, null, 'speak?text=#message#', null, null, 79, $cas1bis);
+			self::updateCmd ($F, 'announcement', 'action', 'message', false, 'Announcement', false, true, "fa jeedomapp-audiospeak", null, null, 'announcement?text=#message#', null, null, 79, $cas1bis);			
 			self::updateCmd ($F, 'mediaLength', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'mediaProgress', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'state', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::state', null, null, null, 79, $cas1);
@@ -981,6 +982,7 @@ class alexaapiCmd extends cmd {
 				$request = $this->build_ControledeSelect("53bfa26d-f24c-4b13-97a8-8c3debdf06f0", $_options);
 			break;				
 			case 'speak':
+			case 'announcement':
 			case 'push':
 				$request = $this->build_ControledeMessage("Message vide pour faire un essai.", $_options);
 			break;
@@ -1017,7 +1019,7 @@ class alexaapiCmd extends cmd {
 				$request = '';
 			break;
 		}
-		log::add('alexaapi_debug', 'debug', '----RequestFinale:'.$request);
+		//log::add('alexaapi_debug', 'debug', '----RequestFinale:'.$request);
 		$request = scenarioExpression::setTags($request);
 		if (trim($request) == '') throw new Exception(__('Commande inconnue ou requête vide : ', __FILE__) . print_r($this, true));
 		$device=str_replace("_player", "", $this->getEqLogic()->getConfiguration('serial'));
@@ -1088,17 +1090,11 @@ class alexaapiCmd extends cmd {
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
 		if ($command == 'speak' && strpos($arguments, '#volume#') !== false) 
 			return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
-		//if ($command == 'radio' && (strpos($arguments, '#volume#') || strpos($arguments, 'volume')) !== false) 
-		//	return getTemplate('core', 'scenario', 'cmd.radio.volume', 'alexaapi');
-		//if ($command == 'radio' && (!strpos($arguments, '#volume#'))) 
-		//	return getTemplate('core', 'scenario', 'cmd.radio', 'alexaapi');
-		//if ($command == 'playmusictrack') 
-		//	return getTemplate('core', 'scenario', 'cmd.playmusictrack', 'alexaapi');		
 		if ($command == 'reminder') 
 			return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');
 		if ($command == 'deleteallalarms') 
 			return getTemplate('core', 'scenario', 'cmd.deleteallalarms', 'alexaapi');
-		if ($command == 'command') 
+		if ($command == 'command' && strpos($arguments, '#select#')) 
 			return getTemplate('core', 'scenario', 'cmd.command', 'alexaapi');
 		if ($command == 'alarm') 
 			return getTemplate('core', 'scenario', 'cmd.alarm', 'alexaapi');

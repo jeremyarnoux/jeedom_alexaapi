@@ -183,6 +183,39 @@ CommandAlexa.Speak = function(req,res){
 	res.status(200).json({value: "Send"});	//ne teste pas le résultat
 }
 
+/**** Alexa.Announcement *****
+  URL: /announcement?device=?&text=?
+    device - String - name of the device
+    text - String - Text to speech
+*/
+CommandAlexa.Announcement = function(req,res){
+	
+	res.type('json');
+	
+	config.logger('Alexa-API:    Lancement /Announcement avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text);
+
+	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Announcement', 'Missing parameter "device"'));
+	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Announcement', 'Missing parameter "text"'));
+	
+	boucleSurSerials_sendSequenceCommand(req, 'announcement');
+		
+		// pour ne pas boucler mais ne fonctionne pas sur les groupes
+		/*
+		alexa.sendSequenceCommand(req.query.device, 'announcement', req.query.text,
+		//alexa.sendCommand('G0911W079304113M', 'announcement', 'coucou',
+				function(testErreur){
+						if (testErreur) 
+						{traiteErreur(testErreur);
+						res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Announcement', testErreur.message));
+						}
+						else
+						res.status(200).json({value: "OK"});	//ne teste pas le résultat
+					}
+			);
+	*/
+	
+	res.status(200).json({value: "Send2"});	//ne teste pas le résultat
+}
 
 /**** Alexa.Radio *****
   URL: /radio?device=?&text=?
@@ -556,6 +589,7 @@ app.get('/command', CommandAlexa.Command);
 app.get('/SmarthomeCommand', CommandAlexa.SmarthomeCommand);
 app.get('/volume', CommandAlexa.Volume);
 app.get('/speak', CommandAlexa.Speak);
+app.get('/announcement', CommandAlexa.Announcement);
 app.get('/radio', CommandAlexa.Radio);
 app.get('/push', CommandAlexa.Push);
 app.get('/deletereminder', CommandAlexa.deleteReminder);
