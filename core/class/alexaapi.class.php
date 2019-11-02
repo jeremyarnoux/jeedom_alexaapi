@@ -689,7 +689,7 @@ class alexaapi extends eqLogic {
 			$cas4=(($this->hasCapaorFamilyorType("REMINDERS")) && !$widgetSmarthome);
 			$cas5=($this->hasCapaorFamilyorType("VOLUME_SETTING"));
 			$cas6=($cas5 && (!$this->hasCapaorFamilyorType("WHA")));
-			$cas7=((!$this->hasCapaorFamilyorType("WHA")) && ($this->getConfiguration('devicetype') != "Player") &&(!$this->hasCapaorFamilyorType("FIRE_TV")) && (!$this->hasCapaorFamilyorType("AMAZONMOBILEMUSIC_ANDROID")));
+			$cas7=((!$this->hasCapaorFamilyorType("WHA")) && ($this->getConfiguration('devicetype') != "Player") &&(!$this->hasCapaorFamilyorType("FIRE_TV")) && !$widgetSmarthome && (!$this->hasCapaorFamilyorType("AMAZONMOBILEMUSIC_ANDROID")));
 			$cas8=(($this->hasCapaorFamilyorType("turnOff")) && $widgetSmarthome);
 
 
@@ -711,7 +711,7 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'routine', 'action', 'select', false, 'Lancer une routine', true, false, null, 'dashboard','alexaapi::list', 'routine?routine=#select#', null, 'Lancer Refresh|Lancer Refresh', 21, $cas3);			self::updateCmd ($F, 'playList', 'action', 'select', false, 'Ecouter une playlist', true, false, null, 'dashboard', 'alexaapi::list', 'playlist?playlist=#select#', null, 'Lancer Refresh|Lancer Refresh', 24, $cas1);
 			self::updateCmd ($F, 'radio', 'action', 'select', false, 'Ecouter une radio', true, false, null, 'dashboard', 'alexaapi::list', 'radio?station=#select#', null, 's2960|Nostalgie;s6617|RTL;s6566|Europe1', 25, $cas1);	
 			self::updateCmd ($F, 'playMusicTrack', 'action', 'select', false, 'Ecouter une piste musicale', true, false, null, 'dashboard', 'alexaapi::list', 'playmusictrack?trackId=#select#', null, '53bfa26d-f24c-4b13-97a8-8c3debdf06f0|Piste1;7b12ee4f-5a69-4390-ad07-00618f32f110|Piste2', 26, $cas1);
-			self::updateCmd ($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fa fa-volume-up', 'dashboard','alexaapi::volume', 'volume?value=#volume#', null, null, 27, $cas5);			
+			self::updateCmd ($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fa fa-volume-up', 'dashboard','alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas5);			
 			self::updateCmd ($F, 'volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fa fa-volume-up', null, null, null, null, null, 28, $cas6);	
 			self::updateCmd ($F, 'whennextalarminfo', 'info', 'string', false, 'Next Alarm Hour', true, false, null, 'dashboard','alexaapi::alarm', null, null, null, 29, $cas2);			
 			self::updateCmd ($F, 'whennextmusicalalarminfo', 'info', 'string', false, 'Next Musical Alarm Hour', true, false, null, 'dashboard','alexaapi::alarmmusical', null, null, null, 30, $cas2);	
@@ -733,7 +733,7 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'turnOn', 'action', 'message', false, 'turnOn', true, true, "fa jeedomapp-audiospeak", null, null, 'SmarthomeCommand?command=turnOn', null, null, 79, $cas8);			
 			self::updateCmd ($F, 'turnOff', 'action', 'message', false, 'turnOff', true, true, "fa jeedomapp-audiospeak", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
 
-			self::updateCmd ($F, 'command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#command#', null, null, 79, $cas1);		
+			self::updateCmd ($F, 'command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);		
 			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Speak', true, true, "fa jeedomapp-audiospeak", null, null, 'speak?text=#message#', null, null, 79, $cas1bis);
 			self::updateCmd ($F, 'mediaLength', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'mediaProgress', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
@@ -750,7 +750,7 @@ class alexaapi extends eqLogic {
 					log::add('alexaapi', 'warning', '****Rencontre du type A15ERDAKK5HQQG = Sonos Première Génération sur : '.$this->getName());
 					log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus car bug!');
 				}
-			self::updateCmd ($F, 'reminder', 'action', 'message', false, 'Reminder', false, false, 'divers-circular114', null, null, 'reminder?text=#text#&when=#when#', null, null, 79, $cas3);	
+			self::updateCmd ($F, 'reminder', 'action', 'message', false, 'Reminder', false, false, 'divers-circular114', null, null, 'reminder?text=#text#&when=#when#&recurring=#recurring#', null, null, 79, $cas3);	
 
 
 			$volinfo = $this->getCmd(null, 'volumeinfo');
@@ -971,53 +971,39 @@ class alexaapiCmd extends cmd {
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
 		switch ($command) {
 			case 'volume':
-				$request = $this->buildVolumeRequest($_options);
+				$request = $this->build_ControledeSlider('50', $_options);
 			break;
 			case 'playlist':
-				$request = $this->buildPlayListRequest($_options);
+			case 'routine':
+				$request = $this->build_ControledeSelect("", $_options);
 			break;			
 			case 'playmusictrack':
-				$request = $this->buildplayMusicTrackRequest($_options);
+				$request = $this->build_ControledeSelect("53bfa26d-f24c-4b13-97a8-8c3debdf06f0", $_options);
 			break;				
 			case 'speak':
-				$request = $this->buildSpeakRequest($_options);
-			break;
-			case 'routine':
-				$request = $this->buildRoutineRequest($_options);
-			break;
 			case 'push':
-				$request = $this->buildPushRequest($_options);
+				$request = $this->build_ControledeMessage("Message vide pour faire un essai.", $_options);
 			break;
 			case 'reminder':
-				$request = $this->buildReminderRequest($_options);
-			break;
+			case 'alarm':
+				$request = $this->build_ControleWhenTextRecurring("2023-01-01 10:00:00", $_options);
+			break;			
 			case 'radio':
-				$request = $this->buildRadioRequest($_options);
+				$request = $this->build_ControledeSelect('s2960', $_options);
 			break;
 			case 'SmarthomeCommand':
-				$request = $this->buildSmarthomeCommandRequest($_options);
+				$request = $this->built_RienaFaire();
 			break;			
 			case 'command':
-				$request = $this->buildCommandRequest($_options);
-			break;
-			case 'alarm':
-				$request = $this->buildAlarmRequest($_options);
+				$request = $this->build_ControledeSelect('pause', $_options);
 			break;
 			case 'whennextalarm':
-				$request = $this->buildNextAlarmRequest($_options);
-			break;
 			case 'whennextmusicalalarm':
-				$request = $this->buildNextMusicalAlarmRequest($_options);
-			break;			
 			case 'musicalalarmmusicentity':
-				$request = $this->buildMusicalAlarmMusicEntity($_options);
-			break;				
 			case 'whennextreminderlabel':
-				$request = $this->buildMhenNextReminderLabel($_options);
-			break;			
 			case 'whennextreminder':
-				$request = $this->buildNextReminderRequest($_options);
-			break;
+				$request = $this->build_ControlePosition($_options);
+			break;			
 			case 'deleteallalarms':
 				$request = $this->buildDeleteAllAlarmsRequest($_options);
 			break;
@@ -1026,91 +1012,57 @@ class alexaapiCmd extends cmd {
 			break;			
 			case 'restart':
 				$request = $this->buildRestartRequest($_options);
-			break;				default:
+			break;				
+			default:
 				$request = '';
 			break;
 		}
+		log::add('alexaapi_debug', 'debug', '----RequestFinale:'.$request);
 		$request = scenarioExpression::setTags($request);
 		if (trim($request) == '') throw new Exception(__('Commande inconnue ou requête vide : ', __FILE__) . print_r($this, true));
 		$device=str_replace("_player", "", $this->getEqLogic()->getConfiguration('serial'));
 		return 'http://' . config::byKey('internalAddr') . ':3456/' . $request . '&device=' . $device;
 	}
 
-	private function buildVolumeRequest($_options = array()) {
-		$request = $this->getConfiguration('request');
-		if (!isset($_options['slider'])) throw new Exception(__('Le slider ne peut pas être vide', __FILE__));
-		if ($_options['volume'] == "" && $_options['slider'] == "") $_options['volume'] = "50";
-		return str_replace('#volume#', $_options['slider'], $request);
-	}
-	
-	private function buildRestartRequest($_options = array()) {
-		$request = $this->getConfiguration('request')."?truc=vide";
-		return str_replace('#volume#', $_options['slider'], $request);
-	}
-	
-	private function buildSmarthomeCommandRequest($_options = array()) {
+	private function built_RienaFaire() {
 		$request = $this->getConfiguration('request');
 		return $request;
 	}	
 	
-	private function buildRadioRequest($_options = array()) {
+	private function build_ControledeSlider($default, $_options = array()) {
 		$request = $this->getConfiguration('request');
-		if ($_options['select'] == "") $_options['select'] = "s2960";
-	return str_replace(array('#select#', '#volume#'), array(urlencode($_options['select']), isset($_options['volume']) ? $_options['volume'] : $_options['slider']), $request);
-	}
-
-	private function buildSpeakRequest($_options = array()) {
-		$request = $this->getConfiguration('request');
-		if (!isset($_options['message']) || $_options['message'] == '') throw new Exception(__('Le message ne peut pas être vide', __FILE__));
-		return str_replace(array('#message#', '#volume#'), array(urlencode($_options['message']), isset($_options['volume']) ? $_options['volume'] : $_options['slider']), $request);
-	}
-	private function buildReminderRequest($_options = array()) {
-		$request = $this->getConfiguration('request');
-		if ($_options['when'] == "") $_options['when'] = "2023-01-01 10:00:00";
-		return str_replace(array('#when#', '#text#'), array(urlencode($_options['when']), urlencode($_options['text'])), $request);
-	}
-
-	private function buildAlarmRequest($_options = array()) {
-		$request = $this->getConfiguration('request');
-		if ($_options['when'] == "") $_options['when'] = "2023-01-01 10:00:00";
-		return str_replace(array('#when#', '#recurring#'), array(urlencode($_options['when']), urlencode($_options['select']),), $request);
-	}
-
-	private function buildPushRequest($_options = array()) {
-		$request = $this->getConfiguration('request');
-		if (!isset($_options['message']) || $_options['message'] == '') throw new Exception(__('Le message ne peut pas être vide', __FILE__));
-		return str_replace(array('#message#'), array(urlencode($_options['message'])), $request);
-	}
-	private function buildRoutineRequest($_options = array()) {
-		$request = $this->getConfiguration('request');
-		return str_replace(array('#select#'), array(urlencode($_options['select'])), $request);
-	}
-	private function buildPlayListRequest($_options = array()) {
-		$request = $this->getConfiguration('request');
-		return str_replace(array('#select#', '#name#'), array(urlencode($_options['select']), urlencode($_options['name'])), $request);
-	}	
-	private function buildplayMusicTrackRequest($_options = array()) {
-		$request = $this->getConfiguration('request');
-		if ($_options['select'] == "") $_options['select'] = "53bfa26d-f24c-4b13-97a8-8c3debdf06f0";
-		return str_replace(array('#select#'), array(urlencode($_options['select'])), $request);
-	}	
-	private function buildNextAlarmRequest($_options = array()) {
-		$request = $this->getConfiguration('request');
-		return str_replace(array('#position#'), array($_options['position']), $request);
+		if ($_options['slider'] == "") $_options['slider'] = $default;
+		$request = str_replace('#slider#', $_options['slider'], $request);
+		return $request;
 	}
 	
-	private function buildNextMusicalAlarmRequest($_options = array()) {
+	private function build_ControledeSelect($default, $_options = array()) {
 		$request = $this->getConfiguration('request');
-		return str_replace(array('#position#'), array($_options['position']), $request);
+		if ($_options['select'] == "") $_options['select'] = $default;
+		$request = str_replace('#select#', $_options['select'], $request);
+		return $request;
 	}
-	private function buildMusicalAlarmMusicEntity($_options = array()) {
+	
+	private function build_ControledeMessage($default, $_options = array()) {
 		$request = $this->getConfiguration('request');
-		return str_replace(array('#position#'), array($_options['position']), $request);
-	}	
-	private function buildMhenNextReminderLabel($_options = array()) {
+		if ($_options['message'] == "") $_options['message'] = $default;
+		$request = str_replace('#message#', urlencode($_options['message']), $request);
+		return $request;
+	}
+	
+	private function build_ControleWhenTextRecurring($defaultWhen, $_options = array()) {
 		$request = $this->getConfiguration('request');
-		return str_replace(array('#position#'), array($_options['position']), $request);
-	}		
+		if ($_options['when'] == "") $_options['when'] = $defaultWhen;		
+		$request = str_replace(array('#when#', '#text#', '#recurring#'), array(urlencode($_options['when']), urlencode($_options['text']), urlencode($_options['select'])), $request);
+		return $request;
+	}
+	
+	private function build_ControlePosition($_options = array()) {
+		$request = $this->getConfiguration('request');
+		$request = str_replace('#position#', urlencode($_options['position']), $request);
+		return $request;
+	}
+
 	private function buildDeleteAllAlarmsRequest($_options = array()) {
 		$request = $this->getConfiguration('request');
 		if ($_options['type'] == "") $_options['type'] = "alarm";
@@ -1124,28 +1076,24 @@ class alexaapiCmd extends cmd {
 		if ($_options['status'] == "") $_options['status'] = "ON";
 		return str_replace(array('#id#', '#status#'), array($_options['id'], $_options['status']), $request);
 	}	
+		
+	private function buildRestartRequest($_options = array()) {
+		log::add('alexaapi_debug', 'debug', '------buildRestartRequest---UTILISE QUAND ???--A simplifier--------------------------------------');
+		$request = $this->getConfiguration('request')."?truc=vide";
+		return str_replace('#volume#', $_options['slider'], $request);
+	}
 	
-	private function buildCommandRequest($_options = array()) {
-		$request = $this->getConfiguration('request');
-		if ($_options['command'] == "") $_options['command'] = "pause";
-		return str_replace(array('#command#'), array($_options['command']), $request);
-	}
-	private function buildNextReminderRequest($_options = array()) {
-		$request = $this->getConfiguration('request');
-		return str_replace(array('#position#'), array($_options['position']), $request);
-	}
-
 	public function getWidgetTemplateCode($_version = 'dashboard', $_noCustom = false) {
 		if ($_version != 'scenario') return parent::getWidgetTemplateCode($_version, $_noCustom);
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
 		if ($command == 'speak' && strpos($arguments, '#volume#') !== false) 
 			return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
-		if ($command == 'radio' && (strpos($arguments, '#volume#') || strpos($arguments, 'volume')) !== false) 
-			return getTemplate('core', 'scenario', 'cmd.radio.volume', 'alexaapi');
-		if ($command == 'radio' && (!strpos($arguments, '#volume#'))) 
-			return getTemplate('core', 'scenario', 'cmd.radio', 'alexaapi');
-		if ($command == 'playmusictrack') 
-			return getTemplate('core', 'scenario', 'cmd.playmusictrack', 'alexaapi');		
+		//if ($command == 'radio' && (strpos($arguments, '#volume#') || strpos($arguments, 'volume')) !== false) 
+		//	return getTemplate('core', 'scenario', 'cmd.radio.volume', 'alexaapi');
+		//if ($command == 'radio' && (!strpos($arguments, '#volume#'))) 
+		//	return getTemplate('core', 'scenario', 'cmd.radio', 'alexaapi');
+		//if ($command == 'playmusictrack') 
+		//	return getTemplate('core', 'scenario', 'cmd.playmusictrack', 'alexaapi');		
 		if ($command == 'reminder') 
 			return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');
 		if ($command == 'deleteallalarms') 
