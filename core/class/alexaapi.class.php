@@ -967,6 +967,8 @@ class alexaapiCmd extends cmd {
 		return true;
 	}
 
+
+
 	private function buildRequest($_options = array()) {
 		if ($this->getType() != 'action') return $this->getConfiguration('request');
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
