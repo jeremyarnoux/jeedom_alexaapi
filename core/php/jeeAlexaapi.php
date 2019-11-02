@@ -69,6 +69,7 @@ $alexaapi3->emptyCacheWidget();
 
 clearCacheWidget();
 */
+
 log::add('alexaapi_mqtt', 'debug',  'nom:'.$nom);
 	switch ($nom) {
 		
@@ -85,7 +86,7 @@ log::add('alexaapi_mqtt', 'debug',  'nom:'.$nom);
 				metAJour("loopMode", $result['loopMode'], 'loopMode', false , $alexaapi);
 				metAJour("playBackOrder", $result['playBackOrder'], 'playBackOrder', false , $alexaapi);
 				
-				metAJourPlayList($logical_id, $result['audioPlayerState'], $alexaapi3);
+				metAJourPlayList($logical_id, $result['audioPlayerState'], $alexaapi3, $alexaapi);
 
 			//break; // il ne faut pas s'arrêter mais aller tout mettre à jour.	
 			
@@ -104,7 +105,7 @@ log::add('alexaapi_mqtt', 'debug',  'nom:'.$nom);
 				metAJour("playlistName", $result['domainAttributes']['nBestList']['playlistName'], 'playlistName', false , $alexaapi3);
 				
 				metAJourPlayer($logical_id, $result['audioPlayerState'], $alexaapi);
-				metAJourPlayList($logical_id, $result['audioPlayerState'], $alexaapi3);
+				metAJourPlayList($logical_id, $result['audioPlayerState'], $alexaapi3, $alexaapi);
 				metAJourPlayer($logical_id, $result['audioPlayerState'], $alexaapi); //par sécurité
 
 				//metAJour("songName", $result['domainAttributes']['nBestList']['songName'], 'songName', true , $alexaapi);
@@ -115,7 +116,7 @@ log::add('alexaapi_mqtt', 'debug',  'nom:'.$nom);
 				metAJour("Audio Player State", $result['audioPlayerState'], 'audioPlayerState', true , $alexaapi);
 			case 'refreshPlayer':
 				metAJourPlayer($logical_id, $result['audioPlayerState'], $alexaapi);
-				metAJourPlayList($logical_id, $result['audioPlayerState'], $alexaapi3);
+				metAJourPlayList($logical_id, $result['audioPlayerState'], $alexaapi3, $alexaapi);
 			break;
 			
 			default:
@@ -262,9 +263,15 @@ metAJour("title", $result['playerInfo']['infoText']['title'], 'title', true , $a
 metAJourImage("url", $result['playerInfo']['mainArt']['url'], 'url', true , $alexaapi);
 metAJour("mediaLength", $result['playerInfo']['progress']['mediaLength'], 'mediaLength', true , $alexaapi);
 metAJour("mediaProgress", $result['playerInfo']['progress']['mediaProgress'], 'mediaProgress', true , $alexaapi);
-
-
+metAJour("providerName", $result['playerInfo']['provider']['providerName'], 'providerName', true , $alexaapi);
 metAJour("state", $result['playerInfo']['state'], 'state', false , $alexaapi);
+
+
+
+
+//log::add('alexaapi_mqtt', 'debug',  '5>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> resultplayerInfo:'.json_encode($result['playerInfo']['provider']['providerName']));
+
+
 
 // Affecte le statut Playing du device Player
 $alexaapi->setStatus('Playing', ($result['playerInfo']['state']=="PLAYING"));
@@ -308,7 +315,7 @@ log::add('alexaapi_mqtt', 'debug',  '** Mise à jour Tuile du Player **');
 
 }
 
-function metAJourPlaylist($serialdevice, $audioPlayerState, $alexaapi) {
+function metAJourPlaylist($serialdevice, $audioPlayerState, $alexaapi3, $alexaapi) {
 		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
 
 	try {
@@ -335,6 +342,11 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $alexaapi) {
 	// Pour supprimer les éléments MQTT qui étaient arrivés précédemment
 		//metAJour("playlistName", "", 'playlistName', true , $alexaapi);
 		}
+
+//ON RECUPERE CE QUIE ST AU D2BUT DE MEDIA
+metAJour("contentId", $result['contentId'], 'contentId', true , $alexaapi);
+//log::add('alexaapi_mqtt', 'debug',  '++++++>+++++++++>+++++++++>++++++++++ $contentId:'.$result['contentId']);
+
 
 
 			//$image=$result['queue']['0']['imageURL'];
@@ -369,9 +381,9 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $alexaapi) {
 	}	
 $html.="</table>";
 
-metAJour("playlisthtml", $html, 'playlisthtml', true , $alexaapi);
+metAJour("playlisthtml", $html, 'playlisthtml', true , $alexaapi3);
 
-$alexaapi->refreshWidget(); //refresh Tuile Playlist
+$alexaapi3->refreshWidget(); //refresh Tuile Playlist
 
 
 	} catch (Exception $e) {
