@@ -958,8 +958,6 @@ this._options.logger && this._options.logger(obj.headers);
 	
 	*/	
 		
-		
-		
 		let req = https.request(options, (res) => {
         //console.log(JSON.stringify(res)+"FIN de RES");
             let body  = '';
@@ -1155,6 +1153,29 @@ this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer,5);
 
         this.httpsGet (`/api/np/player?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
     }
+	
+    getNotificationSounds(serialOrName, callback) {
+        let dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+
+        this.httpsGet (`/api/notification/sounds?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&softwareVersion=${dev.softwareVersion}&screenWidth=1392&_=%t`, callback);
+    }
+
+
+getNotificationSounds2(serialOrName, idSound, callback) {
+  this.getNotificationSounds(serialOrName, (err, res) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+	callback(res.notificationSounds.filter(index => index.id == idSound));
+    /*res.notificationSounds.forEach(function (item, index) {
+      if (item['id'] == idSound) {
+        callback(item);
+      }
+    });*/
+  });
+}
 
 
     getList(serialOrName, listType, options, callback) {
@@ -1220,6 +1241,7 @@ this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer,5);
     getWakeWords(callback) {
         this.httpsGet (`/api/wake-word?_=%t`, callback);
     }
+	
 
 
     createNotificationObject(serialOrName, type, label, value, status, sound) { // type = Reminder, Alarm
@@ -1269,11 +1291,17 @@ this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer,5);
             notification.originalTime = null;
             notification.alarmTime = 0;
         }*/
+		
+				console.log('-->-->--notificationReminder: ' + JSON.stringify(notification) + '-----------------');
+
+		
         return this.parseValue4Notification(notification, value);
     }
 
+
     createNotificationAlarmObject(serialOrName, recurring, label, value, status, sound) { // type = Reminder, Alarm
-                 //console.log('-->-->--recurring: ' + recurring + '-----------------');
+                 
+			 
       const type="Alarm";
 
 		if (status && typeof status === 'object') {
@@ -1283,23 +1311,25 @@ this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer,5);
         if (value === null || value === undefined) {
             value = new Date().getTime() + 5000;
         }
+                // console.log('-->-->--sound: ' + sound + '-----------------');
 
 		var recurringtruefalse='true';
         if (recurring === null || recurring === undefined || recurring === "") {
             recurringtruefalse='false';
         }
-
         let dev = this.find(serialOrName);
         if (!dev) return null;
-		const now = new Date();
+
+		//const now = new Date();
 		const notification = {
-            'alarmTime': now.getTime(), // will be overwritten
-            'createdDate': now.getTime(),
+            'alarmTime': value.getTime(), // will be overwritten
+            'createdDate': value.getTime(),
             'type': type, // Alarm ...
             'deviceSerialNumber': dev.serialNumber,
             'deviceType': dev.deviceType,
             'reminderLabel': label || null,
-            'sound': sound || null,
+//            'sound': sound || null,
+            'sound': JSON.parse(JSON.stringify (sound)) || null,
             /*{
                 'displayName': 'Countertop',
                 'folder': null,
@@ -1307,8 +1337,8 @@ this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer,5);
                 'providerId': 'ECHO',
                 'sampleUrl': 'https://s3.amazonaws.com/deeappservice.prod.notificationtones/system_alerts_repetitive_04.mp3'
             }*/
-            'originalDate': `${now.getFullYear()}-${_00(now.getMonth() + 1)}-${_00(now.getDate())}`,
-            'originalTime': `${_00(now.getHours())}:${_00(now.getMinutes())}:${_00(now.getSeconds())}.000`,
+            'originalDate': `${value.getFullYear()}-${_00(value.getMonth() + 1)}-${_00(value.getDate())}`,
+            'originalTime': `${_00(value.getHours())}:${_00(value.getMinutes())}:${_00(value.getSeconds())}.000`,
             'id': 'create' + type,
 
             'isRecurring' : recurringtruefalse,
@@ -1326,6 +1356,10 @@ this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer,5);
             notification.originalTime = null;
             notification.alarmTime = 0;
         }*/
+		
+		
+		console.log('-->-->--notificationAlarm: ' + JSON.stringify(notification) + '-----------------');
+		
 return this.parseValue4Notification(notification, value);    }
 
     parseValue4Notification(notification, value) {
@@ -1413,6 +1447,13 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     createNotification(notification, callback) {
+console.log('-->-->--notification>finaleex: ' + JSON.stringify(notification) + '-----------------');
+
+notification.alarmTime = 0;
+
+
+console.log('-->-->--notification>finale  : ' + JSON.stringify(notification) + '-----------------');
+		
         let flags = {
             data: JSON.stringify(notification),
             method: 'PUT'
@@ -2251,11 +2292,25 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
         const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(Number(timestamp)));
         this.createNotification(notification, callback);
     }
-    setAlarm(serialOrName, timestamp, recurring, callback) {        // **Modif Sigalou 2019.02.28
+    setAlarm2(serialOrName, timestamp, recurring, sound, callback) {        // **Modif Sigalou 2019.02.28
 
-        const notification = this.createNotificationAlarmObject(serialOrName, recurring, '', new Date(Number(timestamp)));
+        const notification = this.createNotificationAlarmObject(serialOrName, recurring, '', new Date(Number(timestamp)), '', sound);
+								//createNotificationAlarmObject(serialOrName, recurring, label, value, status, sound)
         this.createNotification(notification, callback);
     }
+
+    setAlarm(serialOrName, timestamp, recurring, sound, callback) { 
+		this.getNotificationSounds2(serialOrName, sound, (result) => {   
+			const notification = this.createNotificationAlarmObject(serialOrName, recurring, '', new Date(Number(timestamp)), '', result.shift());
+			this.createNotification(notification, callback);
+		});
+	}
+
+vide(serialOrName, sound,callback) {
+        console.log("vide");
+		return callback('resultatvide');
+    }
+
 
     getHomeGroup(callback) {
         this.httpsGet (`https://alexa-comms-mobile-service.amazon.com/users/${this.commsId}/identities?includeUserName=true`, callback);

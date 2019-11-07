@@ -27,7 +27,9 @@ if (!isConnect('admin')) {
 		$eqLogics = alexaapi::byType('alexaapi');
 		foreach ($eqLogics as $eqLogic)
 		{  
-			echo '<option value="'.$eqLogic->getConfiguration('serial').'">'.$eqLogic->getName().'</option>';
+			if (($eqLogic->getConfiguration('devicetype') != "Player") && ($eqLogic->getConfiguration('devicetype') != "PlayList")){
+				echo '<option value="'.$eqLogic->getConfiguration('serial').'">'.$eqLogic->getName().'</option>';
+			}
 		}
 	?>
 	</select>

@@ -92,6 +92,7 @@ foreach($json as $item)
 foreach($json as $item)
 {
 
+log::add('alexaapi_debug', 'info', json_encode($item));
 
 switch ($item['type']) {
     case "Alarm":
@@ -176,6 +177,9 @@ $repetition="";
             // Retireve the device (if already registered in Jeedom)
             $device = alexaapi::byLogicalId($item['deviceSerialNumber'], 'alexaapi');
             if (is_object($device))
+				
+			
+			
 	echo '<tr><td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'.$device->getName().'</span></td>';
 			else
 	echo '<tr><td><span class="label label-danger" style="font-size : 1em; cursor : default;">?????</span></td>';
@@ -184,7 +188,7 @@ $repetition="";
 
 
 	echo '<td>' . $type . '</td>';
-	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $item['musicEntity']. $item['reminderLabel'] . '</span></td>';
+	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $item['soundDisplayName']. $item['musicEntity']. $item['reminderLabel'] . '</span></td>';
 
             if ($item['type'] =="Timer")
 			{

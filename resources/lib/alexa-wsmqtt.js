@@ -137,7 +137,7 @@ class AlexaWsMqtt extends EventEmitter {
 
         this.websocket.on('message', (data) => {
             let message = this.parseIncomingMessage(data);
-            if (msgCounter === 0) { // initialization
+				if (msgCounter === 0) { // initialization
                 if (message.content.protocolName) {
                     if (message.content.protocolName !== 'A:H') {
                         this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Server requests unknown protocol: ' + message.content.protocolName);
@@ -348,6 +348,8 @@ class AlexaWsMqtt extends EventEmitter {
     }
 
     parseIncomingMessage(data) {
+						this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: ENTER------------------------------------: ' );
+
         function readHex(index, length) {
             let str = data.toString('ascii', index, index + length);
             if (str.startsWith('0x')) str = str.substr(2);

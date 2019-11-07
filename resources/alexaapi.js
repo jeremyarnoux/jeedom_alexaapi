@@ -319,15 +319,15 @@ CommandAlexa.playMusicTrack = function(req,res){
 
 	config.logger('Alexa-API:    Lancement /playMusicTrack avec paramètres -> device: ' + req.query.device+' & trackId: ' + req.query.trackId);
 
-	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.playList', 'Missing parameter "device"'));
-	if ('trackId' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.playList', 'Missing parameter "trackId"'));
+	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.playMusicTrack', 'Missing parameter "device"'));
+	if ('trackId' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.playMusicTrack', 'Missing parameter "trackId"'));
 
 			
 			alexa.playMusicTrack(req.query.device, req.query.trackId, 
 				function(testErreur){
 						if (testErreur) 
 						{traiteErreur(testErreur);
-						res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.trackId', testErreur.message));
+						res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.playMusicTrack', testErreur.message));
 						}
 						else
 						res.status(200).json({value: "OK"});	//ne teste pas le résultat
@@ -712,6 +712,7 @@ app.get('/alarm', (req, res) => {
 	if ('recurring' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Missing parameter "recurring"'));
 	config.logger('Alexa-API: recurring: ' + req.query.recurring);
+	config.logger('Alexa-API: sound: ' + req.query.sound);
 
 
 	// when: YYYY-MM-DD HH:MI:SS
@@ -721,7 +722,7 @@ app.get('/alarm', (req, res) => {
 	let when = new Date(dateValues[1], dateValues[2] - 1, dateValues[3], dateValues[4], dateValues[5], dateValues[6]);
 	config.logger('Alexa-API: when: ' + when);
 
-	alexa.setAlarm(req.query.device, when.getTime(), req.query.recurring, function(err) {
+	alexa.setAlarm(req.query.device, when.getTime(), req.query.recurring, req.query.sound, function(err) {
 		if (err)
 			return res.status(500).json(error(500, req.route.path, 'createReminder', err));
 		res.status(200).json({});
@@ -793,6 +794,8 @@ CommandAlexa.wakeWords = function(req, res) {
 		res.status(200).json(retourAmazon);
 	});
 }
+
+
 
 CommandAlexa.musicProviders = function(req, res) {
 	commandeEnvoyee = req.path.replace("/", "");
@@ -997,6 +1000,21 @@ CommandAlexa.playerInfo = function(req, res) {
 	});
 }
 
+CommandAlexa.notificationSounds = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: **************/'+commandeEnvoyee);
+	res.type('json');
+
+	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
+	config.logger('Alexa-API: device: ' + req.query.device);
+
+	Appel_getNotificationSounds(req.query.device, function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
 
 CommandAlexa.Playlists = function(req, res) {
 	commandeEnvoyee = req.path.replace("/", "");
@@ -1069,6 +1087,8 @@ function Appel_getWakeWords(callback)
 	alexa.getWakeWords((err, res) => {if (err || !res || !res.wakeWords || !Array.isArray(res.wakeWords)) return callback && callback();
 	callback && callback(res);});
 	}
+	
+
 	
 function Appel_getDevicePreferences(callback) 
 	{
@@ -1170,6 +1190,13 @@ function Appel_getPlayerInfo(serialOrName,callback)
 	alexa.getPlayerInfo(serialOrName,(err, res) => {if (err || !res ) return callback && callback();
 	callback && callback(res);});
 	}
+
+function Appel_getNotificationSounds(serialOrName, callback) 
+	{
+	alexa.getNotificationSounds(serialOrName,(err, res) => {if (err || !res ) return callback && callback();
+	callback && callback(res);});
+	}	
+
 	
 function Appel_getActivities(serialOrName,callback) 
 	{
@@ -1187,6 +1214,7 @@ function Appel_getLists(serialOrName,callback)
 app.get('/wakeWords', CommandAlexa.wakeWords);
 app.get('/media', CommandAlexa.media);
 app.get('/playerInfo', CommandAlexa.playerInfo);
+app.get('/notificationSounds', CommandAlexa.notificationSounds);
 app.get('/activities', CommandAlexa.activities);
 app.get('/devicePreferences', CommandAlexa.devicePreferences);
 app.get('/homeGroup', CommandAlexa.homeGroup);
@@ -1439,6 +1467,7 @@ app.get('/reminders', (req, res) => {
 					'type': device.type,
 					'originalTime': device.originalTime,
 					'musicEntity': device.musicEntity,
+					'soundDisplayName': device.sound.displayName,
 					'originalDate': device.originalDate,
 					'remainingTime': device.remainingTime,
 					'status': device.status,

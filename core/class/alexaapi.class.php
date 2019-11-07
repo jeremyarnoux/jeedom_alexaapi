@@ -17,7 +17,7 @@ class alexaapi extends eqLogic {
 		);
 		$return['action']['slider']['volume'] =    array(
 				'template' => 'bouton',
-				'replace' => array("#hide_name#" => "hidden", "#step#" => "20")
+				'replace' => array("#hide_name#" => "hidden", "#step#" => "10")
 		);
 		$return['info']['string']['state'] = array(
 				'template' => 'tmplmultistate_alexaapi',
@@ -730,8 +730,8 @@ class alexaapi extends eqLogic {
 			//self::updateCmd ($F, 'playlistName', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 2, $widgetPlayer);
 			//self::updateCmd ($F, 'songName', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, ($widgetPlaylist || $widgetPlayer));
 			self::updateCmd ($F, 'playlisthtml', 'info', 'string', false, null, true, true, null, null, null, null, null, null, 79, $widgetPlaylist);
-			self::updateCmd ($F, 'turnOn', 'action', 'message', false, 'turnOn', true, true, "fa jeedomapp-audiospeak", null, null, 'SmarthomeCommand?command=turnOn', null, null, 79, $cas8);			
-			self::updateCmd ($F, 'turnOff', 'action', 'message', false, 'turnOff', true, true, "fa jeedomapp-audiospeak", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
+			self::updateCmd ($F, 'turnOn', 'action', 'other', false, 'turnOn', true, true, "fas fa-circle", null, null, 'SmarthomeCommand?command=turnOn', null, null, 79, $cas8);			
+			self::updateCmd ($F, 'turnOff', 'action', 'other', false, 'turnOff', true, true, "far fa-circle", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
 
 			self::updateCmd ($F, 'command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);		
 			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Speak', true, true, "fa jeedomapp-audiospeak", null, null, 'speak?text=#message#', null, null, 79, $cas1bis);
@@ -745,7 +745,7 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'playPauseState', 'info', 'string', false, null, false, true, null, null, null, null, null, null, 79, $cas1);
 			//self::updateCmd ($F, 'loopMode', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, $cas1);
 			//self::updateCmd ($F, 'playBackOrder', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, $cas1);
-			self::updateCmd ($F, 'alarm', 'action', 'message', false, 'Alarm', false, true, 'fa fa-bell', null, null, 'alarm?when=#when#&recurring=#recurring#', null, null, 79, $cas2);
+			self::updateCmd ($F, 'alarm', 'action', 'message', false, 'Alarm', false, true, 'fa fa-bell', null, null, 'alarm?when=#when#&recurring=#recurring#&sound=#sound#', null, null, 79, $cas2);
 			self::updateCmd ($F, 'deleteallalarms', 'action', 'message', false, 'Delete All Alarms', false, false, 'maison-poubelle', null, null, 'deleteallalarms?type=alarm&status=all', null, null, 79, $cas2);
 				if($type == "A15ERDAKK5HQQG") {
 					log::add('alexaapi', 'warning', '****Rencontre du type A15ERDAKK5HQQG = Sonos Première Génération sur : '.$this->getName());
@@ -937,9 +937,10 @@ class alexaapiCmd extends cmd {
 		// On traite la valeur de resultat (dans le cas de whennextalarm par exemple)
 		$resultjson = json_decode($result, true);
 		$value = $resultjson['value'];
+		$detail = $resultjson['detail'];
 		// Ici, on va traiter une commande qui n'a pas été executée correctement (erreur type "Connexion Close")
-		if ($value =="Connexion Close"){
-			log::add('alexaapi', 'debug', '**On traite Connexion Close** dans la Class');
+		if (($value =="Connexion Close") || ($detail =="Unauthorized")){
+			log::add('alexaapi', 'debug', '**On traite '.$value.$detail.' Connexion Close** dans la Class');
 			sleep(6);
 				if (ob_get_length()) {
 				ob_end_flush();
@@ -974,32 +975,33 @@ class alexaapiCmd extends cmd {
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
 		switch ($command) {
 			case 'volume':
-				$request = $this->build_ControledeSlider('50', $_options);
+				$request = $this->build_ControledeSliderSelectMessage($_options, '50');
 			break;
 			case 'playlist':
 			case 'routine':
-				$request = $this->build_ControledeSelect("", $_options);
+				$request = $this->build_ControledeSliderSelectMessage($_options, "");
 			break;			
 			case 'playmusictrack':
-				$request = $this->build_ControledeSelect("53bfa26d-f24c-4b13-97a8-8c3debdf06f0", $_options);
+				$request = $this->build_ControledeSliderSelectMessage($_options, "53bfa26d-f24c-4b13-97a8-8c3debdf06f0");
 			break;				
 			case 'speak':
 			case 'announcement':
 			case 'push':
-				$request = $this->build_ControledeMessage("Message vide pour faire un essai.", $_options);
+				$request = $this->build_ControledeSliderSelectMessage($_options);
 			break;
 			case 'reminder':
 			case 'alarm':
-				$request = $this->build_ControleWhenTextRecurring("2023-01-01 10:00:00", $_options);
+				$now=date("Y-m-d H:i:s", strtotime('+3 second'));
+				$request = $this->build_ControleWhenTextRecurring($now, "Ceci est un essai", $_options);
 			break;			
 			case 'radio':
-				$request = $this->build_ControledeSelect('s2960', $_options);
+				$request = $this->build_ControledeSliderSelectMessage($_options, 's2960');
 			break;
 			case 'SmarthomeCommand':
-				$request = $this->built_RienaFaire();
+				$request = $this->build_ControledeSliderSelectMessage();
 			break;			
 			case 'command':
-				$request = $this->build_ControledeSelect('pause', $_options);
+				$request = $this->build_ControledeSliderSelectMessage($_options, 'pause');
 			break;
 			case 'whennextalarm':
 			case 'whennextmusicalalarm':
@@ -1028,36 +1030,23 @@ class alexaapiCmd extends cmd {
 		return 'http://' . config::byKey('internalAddr') . ':3456/' . $request . '&device=' . $device;
 	}
 
-	private function built_RienaFaire() {
+	
+	private function build_ControledeSliderSelectMessage($_options = array(), $default = "0123 Ceci est un message de test") {
 		$request = $this->getConfiguration('request');
+		if ((isset($_options['slider'])) && ($_options['slider'] == "")) $_options['slider'] = $default;
+		if ((isset($_options['select'])) && ($_options['select'] == "")) $_options['select'] = $default;
+		if ((isset($_options['message'])) && ($_options['message'] == "")) $_options['message'] = $default;
+		$request = str_replace(array('#slider#', '#select#', '#message#'), array($_options['slider'], $_options['select'], urlencode($_options['message'])), $request);
 		return $request;
 	}	
-	
-	private function build_ControledeSlider($default, $_options = array()) {
+
+	private function build_ControleWhenTextRecurring($defaultWhen, $defaultText, $_options = array()) {
 		$request = $this->getConfiguration('request');
-		if ($_options['slider'] == "") $_options['slider'] = $default;
-		$request = str_replace('#slider#', $_options['slider'], $request);
-		return $request;
-	}
-	
-	private function build_ControledeSelect($default, $_options = array()) {
-		$request = $this->getConfiguration('request');
-		if ($_options['select'] == "") $_options['select'] = $default;
-		$request = str_replace('#select#', $_options['select'], $request);
-		return $request;
-	}
-	
-	private function build_ControledeMessage($default, $_options = array()) {
-		$request = $this->getConfiguration('request');
-		if ($_options['message'] == "") $_options['message'] = $default;
-		$request = str_replace('#message#', urlencode($_options['message']), $request);
-		return $request;
-	}
-	
-	private function build_ControleWhenTextRecurring($defaultWhen, $_options = array()) {
-		$request = $this->getConfiguration('request');
+		//log::add('alexaapi_debug', 'debug', '----build_ControledeSliderSelectMessage RequestFinale:'.$request);
+		//log::add('alexaapi_debug', 'debug', '----build_ControledeSliderSelectMessage _options:'.json_encode($_options));
 		if ($_options['when'] == "") $_options['when'] = $defaultWhen;		
-		$request = str_replace(array('#when#', '#text#', '#recurring#'), array(urlencode($_options['when']), urlencode($_options['text']), urlencode($_options['select'])), $request);
+		if ($_options['text'] == "") $_options['text'] = $defaultText;		
+		$request = str_replace(array('#when#', '#text#', '#recurring#', '#sound#'), array(urlencode($_options['when']), urlencode($_options['text']), urlencode($_options['select']), $_options['sound']), $request);
 		return $request;
 	}
 	
