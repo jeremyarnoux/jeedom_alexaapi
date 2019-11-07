@@ -348,7 +348,7 @@ class AlexaWsMqtt extends EventEmitter {
     }
 
     parseIncomingMessage(data) {
-						this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: ENTER------------------------------------: ' );
+						//this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: ENTER------------------------------------: ' );
 
         function readHex(index, length) {
             let str = data.toString('ascii', index, index + length);
