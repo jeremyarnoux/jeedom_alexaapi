@@ -284,9 +284,11 @@ foreach($eqLogics as $eqLogic) {
     <a class="btn btn-success eqLogicAction pull-right" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}</a>
     <!-- Bouton Supprimer -->
     <a class="btn btn-danger eqLogicAction pull-right" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}</a>
+     <!-- Bouton configuration par défaut -->
+	<a id="bt_forcerDefaultCmd" class="btn btn-warning pull-right"><i class="fas fa-search"></i> {{Recharger configuration par défaut}}</a>
     <!-- Bouton configuration avancée -->
     <a class="btn btn-default eqLogicAction pull-right" data-action="configure"><i class="fas fa-cogs"></i> {{Configuration avancée}}</a>
-    <!-- Liste des onglets -->
+   <!-- Liste des onglets -->
     <ul class="nav nav-tabs" role="tablist">
       <!-- Bouton de retour -->
       <li role="presentation"><a class="eqLogicAction cursor" aria-controls="home" role="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
@@ -386,12 +388,6 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
           <div class="col-sm-5">
             <form class="form-horizontal">
               <fieldset>
-				<div class="form-group">
-					<label class="col-sm-2 control-label">{{}}</label>
-					<div class="col-sm-8">
-						<a id="bt_forcerDefaultCmd" class="btn btn-warning"><i class="fas fa-search"></i> {{Recharger configuration par défaut}}</a>
-					</div>
-				</div>
                 <div class="form-group">
                   <label class="col-sm-2 control-label">{{ID}}</label>
                   <div class="col-sm-8">

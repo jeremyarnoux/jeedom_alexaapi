@@ -10,11 +10,15 @@ class alexaapi extends eqLogic {
 		$return['info']['string']['alarmmusicalmusic'] = array('template' => 'alarmmusicalmusic', 'replace' => array("#hide_name#" => "hidden"));
 		$return['info']['string']['title'] =    array('template' => 'title');
 		$return['info']['string']['url'] =    array('template' => 'image');
-		$return['info']['string']['interaction'] =    array('template' => 'table');
-		$return['action']['select']['list'] =    array(
-		'template' => 'table',
-				'replace' => array("#_desktop_width_#" => "100","#_mobile_width_#" => "50", "#hide_name#" => "whidden")
+		$return['info']['string']['interaction'] =    array('template' => 'cadre');
+		$return['action']['message']['message'] =    array(
+				'template' => 'message',
+				'replace' => array("#_desktop_width_#" => "100","#_mobile_width_#" => "50", "#title_disable#" => "1", "#message_disable#" => "0")
 		);
+		$return['action']['select']['list'] =    array(
+				'template' => 'table',
+				'replace' => array("#_desktop_width_#" => "100","#_mobile_width_#" => "50", "#hide_name#" => "whidden")
+		);		
 		$return['action']['slider']['volume'] =    array(
 				'template' => 'bouton',
 				'replace' => array("#hide_name#" => "hidden", "#step#" => "10")
@@ -695,7 +699,7 @@ class alexaapi extends eqLogic {
 
 			self::updateCmd ($F, 'musicalalarmmusicentity', 'action', 'other', true, 'musicalalarmmusicentity', false, false, null, null, null, 'musicalalarmmusicentity?position=1', 'Musical Alarm Music', null, 1, $cas2);
 			self::updateCmd ($F, 'whennextmusicalalarm', 'action', 'other', true, 'Next Musical Alarm When', false, false, 'fa-bell', null, null, 'whennextmusicalalarm?position=1', 'Next Musical Alarm Hour', null, 1, $cas2);
-			self::updateCmd ($F, 'interactioninfo', 'info', 'string', false, 'Last Interaction', true, false, 'fa jeedomapp-audiospeak', 'dashboard','alexaapi::interaction', null, null, null, 2, $cas7);	
+			self::updateCmd ($F, 'interactioninfo', 'info', 'string', false, 'Dernier dialogue avec Alexa', true, false, null, 'dashboard','alexaapi::interaction', null, null, null, 2, $cas7);	
 			self::updateCmd ($F, 'whennextalarm', 'action', 'other', true, 'Next Alarm When', false, false, 'fa-bell', null, null, 'whennextalarm?position=1', 'Next Alarm Hour', null, 2, $cas2);				
 			self::updateCmd ($F, 'deleteReminder', 'action', 'message', false, 'DeleteReminder', false, false, 'maison-poubelle', null, null, 'deleteReminder?id=#id#', null, null, 2, $cas3);			
 			self::updateCmd ($F, 'subText2', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::subText2', null, null, null, 2, $cas1);
@@ -708,7 +712,8 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'next', 'action', 'other', false, 'Next', true, true, 'fa fa-step-forward', null, null, 'command?command=next', null, null, 19, $cas1);			
 			self::updateCmd ($F, 'providerName', 'info', 'string', false, 'Fournisseur de musique :', true, true, 'loisir-musical7', null, null , null, null, null, 20, $cas1);
 			self::updateCmd ($F, 'contentId', 'info', 'string', false, 'Amazon Music Id', false, true, 'loisir-musical7', null, null , null, null, null, 21, $cas1);			
-			self::updateCmd ($F, 'routine', 'action', 'select', false, 'Lancer une routine', true, false, null, 'dashboard','alexaapi::list', 'routine?routine=#select#', null, 'Lancer Refresh|Lancer Refresh', 21, $cas3);			self::updateCmd ($F, 'playList', 'action', 'select', false, 'Ecouter une playlist', true, false, null, 'dashboard', 'alexaapi::list', 'playlist?playlist=#select#', null, 'Lancer Refresh|Lancer Refresh', 24, $cas1);
+			self::updateCmd ($F, 'routine', 'action', 'select', false, 'Lancer une routine', true, false, null, 'dashboard','alexaapi::list', 'routine?routine=#select#', null, 'Lancer Refresh|Lancer Refresh', 21, $cas3);			
+			self::updateCmd ($F, 'playList', 'action', 'select', false, 'Ecouter une playlist', true, false, null, 'dashboard', 'alexaapi::list', 'playlist?playlist=#select#', null, 'Lancer Refresh|Lancer Refresh', 24, $cas1);
 			self::updateCmd ($F, 'radio', 'action', 'select', false, 'Ecouter une radio', true, false, null, 'dashboard', 'alexaapi::list', 'radio?station=#select#', null, 's2960|Nostalgie;s6617|RTL;s6566|Europe1', 25, $cas1);	
 			self::updateCmd ($F, 'playMusicTrack', 'action', 'select', false, 'Ecouter une piste musicale', true, false, null, 'dashboard', 'alexaapi::list', 'playmusictrack?trackId=#select#', null, '53bfa26d-f24c-4b13-97a8-8c3debdf06f0|Piste1;7b12ee4f-5a69-4390-ad07-00618f32f110|Piste2', 26, $cas1);
 			self::updateCmd ($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fa fa-volume-up', 'dashboard','alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas5);			
@@ -720,7 +725,11 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'whennextreminder', 'action', 'other', true, 'Next Reminder When', false, false, null, null, null, 'whennextreminder?position=1', 'Next Reminder Hour', null, 33, $cas3);
 			self::updateCmd ($F, 'whennextreminderlabel', 'action', 'other', true, 'whennextreminderlabel', false, false, null, null, null, 'whennextreminderlabel?position=1', 'Reminder Label', null, 34, $cas3);
 			self::updateCmd ($F, 'whennextreminderlabelinfo', 'info', 'string', false, 'Reminder Label', true, false, 'loisir-musical7', 'dashboard','alexaapi::alarmmusicalmusic', null, null, null, 35, $cas2);
-
+	
+			
+			
+			
+			self::updateCmd ($F, 'alarmdirect', 'action', 'select', false, 'Lancer une alarme', true, false, null, 'dashboard', 'alexaapi::list', 'alarm?when=#when#&recurring=#recurring#&sound=#sound#', null, 'system_alerts_melodic_01|Alarme simple;system_alerts_melodic_01|Timer simple;system_alerts_melodic_02|A la dérive;system_alerts_atonal_02|Métallique;system_alerts_melodic_05|Clarté;system_alerts_repetitive_04|Comptoir;system_alerts_melodic_03|Focus;system_alerts_melodic_06|Lueur;system_alerts_repetitive_01|Table de chevet;system_alerts_melodic_07|Vif;system_alerts_soothing_05|Orque;system_alerts_atonal_03|Lumière du porche;system_alerts_rhythmic_02|Pulsar;system_alerts_musical_02|Pluvieux;system_alerts_alarming_03|Ondes carrées', 36, $cas3);
 			//self::updateCmd ($F, 'rwd', 'action', 'other', false, 'Rwd', true, true, 'fa fa-fast-backard', null, null, 'command?command=rwd', null, null, 15, $cas1);
 			//self::updateCmd ($F, 'fwd', 'action', 'other', false, 'Fwd', true, true, 'fa fa-step-forward', null, null, 'command?command=fwd', null, null, 20, $cas1);
 			//self::updateCmd ($F, 'repeat', 'action', 'other', false, 'Repeat', true, true, 'fa fa-refresh', null, null, 'command?command=repeat', null, null, 25, $cas1);
@@ -734,8 +743,8 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'turnOff', 'action', 'other', false, 'turnOff', true, true, "far fa-circle", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
 
 			self::updateCmd ($F, 'command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);		
-			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Speak', true, true, "fa jeedomapp-audiospeak", null, null, 'speak?text=#message#', null, null, 79, $cas1bis);
-			self::updateCmd ($F, 'announcement', 'action', 'message', false, 'Announcement', false, true, "fa jeedomapp-audiospeak", null, null, 'announcement?text=#message#', null, null, 79, $cas1bis);			
+			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#', null, null, 79, $cas1bis);
+			self::updateCmd ($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', false, true, null, 'dashboard', 'alexaapi::message', 'announcement?text=#message#', null, null, 79, $cas1bis);			
 			self::updateCmd ($F, 'mediaLength', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'mediaProgress', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'state', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::state', null, null, null, 79, $cas1);
@@ -751,7 +760,7 @@ class alexaapi extends eqLogic {
 					log::add('alexaapi', 'warning', '****Rencontre du type A15ERDAKK5HQQG = Sonos Première Génération sur : '.$this->getName());
 					log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus car bug!');
 				}
-			self::updateCmd ($F, 'reminder', 'action', 'message', false, 'Reminder', false, false, 'divers-circular114', null, null, 'reminder?text=#text#&when=#when#&recurring=#recurring#', null, null, 79, $cas3);	
+			self::updateCmd ($F, 'reminder', 'action', 'message', false, 'Envoyer un rappel', true, false, null, 'dashboard', 'alexaapi::message', 'reminder?text=#message#&when=#when#&recurring=#recurring#', null, null, 79, $cas3);	
 
 
 			$volinfo = $this->getCmd(null, 'volumeinfo');
@@ -1042,11 +1051,17 @@ class alexaapiCmd extends cmd {
 
 	private function build_ControleWhenTextRecurring($defaultWhen, $defaultText, $_options = array()) {
 		$request = $this->getConfiguration('request');
-		//log::add('alexaapi_debug', 'debug', '----build_ControledeSliderSelectMessage RequestFinale:'.$request);
-		//log::add('alexaapi_debug', 'debug', '----build_ControledeSliderSelectMessage _options:'.json_encode($_options));
+		log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage RequestFinale:'.$request);
+		log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage _optionsAVANT:'.json_encode($_options));
+		if ((!isset($_options['sound'])) && (!isset($_options['message'])) && (!isset($_options['when']))) {
+			if (isset($_options['select'])) { // On est dans le cas d'un son d'alarme envoyé depuis le widget
+				$_options['sound']=urlencode($_options['select']);
+				$_options['select']="";
+			}
+		}
 		if ($_options['when'] == "") $_options['when'] = $defaultWhen;		
-		if ($_options['text'] == "") $_options['text'] = $defaultText;		
-		$request = str_replace(array('#when#', '#text#', '#recurring#', '#sound#'), array(urlencode($_options['when']), urlencode($_options['text']), urlencode($_options['select']), $_options['sound']), $request);
+		if ($_options['message'] == "") $_options['message'] = $defaultText;	
+		$request = str_replace(array('#when#', '#message#', '#recurring#', '#sound#'), array(urlencode($_options['when']), urlencode($_options['message']), urlencode($_options['select']), $_options['sound']), $request);
 		return $request;
 	}
 	

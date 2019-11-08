@@ -1,0 +1,37 @@
+<div class="cmd cmd-widget #history#" data-type="info" data-subtype="string" data-template="default" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
+<br>
+<table border="0" cellpadding="0" width="202">
+    <tr>
+        <td style="padding: 0px;" width="100%">  
+			<div class="cmdName"> #name_display#</div>
+		</td>
+    </tr>
+    <tr>
+        <td style="padding: 5px;" width="100%">
+			<div class="content-xs">
+			<center><font size="2"><strong class="state"></strong></font></center>
+			</div>
+  </td>
+    </tr>
+</table>
+	<script>
+		jeedom.cmd.update['#id#'] = function(_options) {
+			var cmd = $('.cmd[data-cmd_id=#id#]')
+			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate)
+			cmd.find('.state').empty().append(_options.display_value)
+			if(_options.alertLevel){
+				if(_options.alertLevel == 'warning'){
+					cmd.addClass('label label-warning')
+					cmd.attr('data-alertlevel','warning');
+				}else if(_options.alertLevel == 'danger'){
+					cmd.addClass('label label-danger')
+					cmd.attr('data-alertlevel','danger');
+				}else{
+					cmd.removeClass('label label-warning label-danger')
+					cmd.attr('data-alertlevel','none');
+				}
+			}
+		}
+		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'})
+	</script>
+</div>
