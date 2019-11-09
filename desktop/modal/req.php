@@ -73,8 +73,8 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 <option value="smarthomeDevices" <?php if ($_GET['json']=="smarthomeDevices") echo "selected"?>>Smarthome Devices</option>
 <option value="smarthomeentities" <?php if ($_GET['json']=="smarthomeentities") echo "selected"?>>Smarthome Entities</option>
 <option value="smarthomebehaviouractiondefinitions" <?php if ($_GET['json']=="smarthomebehaviouractiondefinitions") echo "selected"?>>Smarthome Behaviour Action Definitions Devices</option>
-<option value="media" <?php if ($_GET['json']=="media") echo "selected"?>>Media</option>
-<option value="musicProviders" <?php if ($_GET['json']=="musicProviders") echo "selected"?>>Music Providers</option>
+<option value="bluetooth" <?php if ($_GET['json']=="bluetooth") echo "selected"?>>Bluetooth</option>
+<option value="media" <?php if ($_GET['json']=="media") echo "selected"?>>Media</option><option value="musicProviders" <?php if ($_GET['json']=="musicProviders") echo "selected"?>>Music Providers</option>
 <option value="playerInfo" <?php if ($_GET['json']=="playerInfo") echo "selected"?>>Player Info</option>?>
 <option value="notificationSounds" <?php if ($_GET['json']=="notificationSounds") echo "selected"?>>Notification Sounds</option>?>
 <option value="playlists" <?php if ($_GET['json']=="playlists") echo "selected"?>>Playlists</option>?>

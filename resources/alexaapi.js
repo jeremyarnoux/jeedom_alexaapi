@@ -1000,6 +1000,19 @@ CommandAlexa.playerInfo = function(req, res) {
 	});
 }
 
+CommandAlexa.Bluetooth = function(req, res) {
+	commandeEnvoyee = req.path.replace("/", "");
+	config.logger('Alexa-API: **************/'+commandeEnvoyee);
+	res.type('json');
+
+	Appel_getBluetooth(false, function(retourAmazon) {
+		fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500)});
+		res.status(200).json(retourAmazon);
+	});
+}
+
 CommandAlexa.notificationSounds = function(req, res) {
 	commandeEnvoyee = req.path.replace("/", "");
 	config.logger('Alexa-API: **************/'+commandeEnvoyee);
@@ -1190,7 +1203,13 @@ function Appel_getPlayerInfo(serialOrName,callback)
 	alexa.getPlayerInfo(serialOrName,(err, res) => {if (err || !res ) return callback && callback();
 	callback && callback(res);});
 	}
-
+	
+function Appel_getBluetooth(cached,callback) 
+	{
+	alexa.getBluetooth(cached,(err, res) => {if (err || !res ) return callback && callback();
+	callback && callback(res);});
+	}
+	
 function Appel_getNotificationSounds(serialOrName, callback) 
 	{
 	alexa.getNotificationSounds(serialOrName,(err, res) => {if (err || !res ) return callback && callback();
@@ -1214,6 +1233,7 @@ function Appel_getLists(serialOrName,callback)
 app.get('/wakeWords', CommandAlexa.wakeWords);
 app.get('/media', CommandAlexa.media);
 app.get('/playerInfo', CommandAlexa.playerInfo);
+app.get('/bluetooth', CommandAlexa.Bluetooth);
 app.get('/notificationSounds', CommandAlexa.notificationSounds);
 app.get('/activities', CommandAlexa.activities);
 app.get('/devicePreferences', CommandAlexa.devicePreferences);

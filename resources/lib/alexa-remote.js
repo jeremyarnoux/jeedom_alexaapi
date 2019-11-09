@@ -1578,6 +1578,9 @@ this.deleteNotification(notification, callback);
         this.httpsGet (`/api/device-notification-state/${dev.deviceType}/${dev.softwareVersion}/${dev.serialNumber}&_=%t`, callback);
     }
 
+
+
+
     getBluetooth(cached, callback) {
         if (typeof cached === 'function') {
             callback = cached;
