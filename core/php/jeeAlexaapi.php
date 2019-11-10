@@ -73,10 +73,16 @@ clearCacheWidget();
 log::add('alexaapi_mqtt', 'debug',  'nom:'.$nom);
 	switch ($nom) {
 		
+			case 'ws-bluetooth-state-change':
+			if ($result['bluetoothEvent'] == 'DEVICE_CONNECTED') metAJour("bluetoothDevice", "Connexion en cours", 'bluetoothDevice', false , $alexaapi2);
+			if ($result['bluetoothEvent'] == 'DEVICE_DISCONNECTED') metAJour("bluetoothDevice", "Déconnexion en cours", 'bluetoothDevice', false , $alexaapi2);				
+				metAJourBluetooth($result['deviceSerialNumber'], $result['audioPlayerState'], $alexaapi2, $alexaapi);
+			break;
+			
 			case 'ws-volume-change':
 				metAJour("Volume", $result['volume'], 'volumeinfo', false , $alexaapi);
 				metAJour("Volume", $result['volume'], 'volumeinfo', false , $alexaapi2);
-			break;
+			break;	
 			
 			case 'ws-notification-change': //changement d'une alarme/rappel
 				$alexaapi2->refresh();	// Lance un refresh du device principal
@@ -384,6 +390,69 @@ $html.="</table>";
 metAJour("playlisthtml", $html, 'playlisthtml', true , $alexaapi3);
 
 $alexaapi3->refreshWidget(); //refresh Tuile Playlist
+
+
+	} catch (Exception $e) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+				
+	} catch (Error $e) {
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+
+	}	
+	
+}	
+
+
+function metAJourBluetooth($serialdevice, $audioPlayerState, $alexaapi2, $alexaapi) {
+		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
+
+	try {
+		
+		//Pour avoir la piste en cours, on va aller chercher la valeur de playerinfo/mainArt/url pour pouvoir la comparer aux images de la playlist
+		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/bluetooth");
+		$result = json_decode($json,true);		
+
+//log::add('alexaapi_mqtt', 'debug', '-->--->--->--->--deviceSerialNumber:'.$result['bluetoothStates']['0']['deviceSerialNumber']);		
+		
+		
+		//$result=array_filter($result, "odd");
+		
+		//$imageURLenCoursdeLecture=$result['playerInfo']['miniArt']['url'];
+		//$etatPlayer=$result['playerInfo']['state'];
+
+		//log::add('alexaapi_mqtt', 'debug',  '------------->'.json_encode($result));
+		
+		//if (($audioPlayerState=="PLAYING") || ($audioPlayerState=="REFRESH") || ($audioPlayerState=="PAUSED"))	{
+	
+		foreach ($result['bluetoothStates'] as $key => $value) {
+				//log::add('alexaapi_mqtt', 'debug', '-------------------------------------------------------------------------------');
+				//log::add('alexaapi_mqtt', 'debug', '-----------------deviceType:'.$value['deviceType']);
+				//log::add('alexaapi_mqtt', 'debug', '-----------------friendlyName:'.$value['friendlyName']);			
+				//log::add('alexaapi_mqtt', 'debug', '-----------------online:'.$value['online']);			
+				//log::add('alexaapi_mqtt', 'debug', '-----------------pairedDeviceList:'.$value['pairedDeviceList']);			
+				if (is_array($value['pairedDeviceList'])) {
+					foreach ($value['pairedDeviceList'] as $key2 => $value2) {
+						if ($value['deviceSerialNumber'] == $serialdevice) {
+						//log::add('alexaapi_mqtt', 'debug', '-----------------$serialdevice:'.$serialdevice);
+						//log::add('alexaapi_mqtt', 'debug', '-----------------deviceSerialNumber:'.$value['deviceSerialNumber']);
+						//log::add('alexaapi_mqtt', 'debug', '********** friendlyName:'.$value2['friendlyName']);
+						//log::add('alexaapi_mqtt', 'debug', '********** connected:'.$value2['connected']);
+							if (isset($value2['connected']) && (($value2['connected']) == '1')) {
+								metAJour("bluetoothDevice", $value2['friendlyName'], 'bluetoothDevice', false , $alexaapi2);
+								}
+								else {
+								metAJour("bluetoothDevice", "", 'bluetoothDevice', false , $alexaapi2);
+								}
+						}
+					}
+
+	
+				}
+
+		}	
+
+
+
 
 
 	} catch (Exception $e) {
