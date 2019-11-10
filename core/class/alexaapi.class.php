@@ -744,8 +744,8 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'turnOff', 'action', 'other', false, 'turnOff', true, true, "far fa-circle", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
 
 			self::updateCmd ($F, 'command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);		
-			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#', null, null, 79, $cas1bis);
-			self::updateCmd ($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', false, true, null, 'dashboard', 'alexaapi::message', 'announcement?text=#message#', null, null, 79, $cas1bis);			
+			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#', null, null, 79, $cas1bis);
+			self::updateCmd ($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', false, true, null, 'dashboard', 'alexaapi::message', 'announcement?text=#message#&volume=#volume#', null, null, 79, $cas1bis);			
 			self::updateCmd ($F, 'mediaLength', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'mediaProgress', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'state', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::state', null, null, null, 79, $cas1);
@@ -1041,14 +1041,31 @@ class alexaapiCmd extends cmd {
 	}
 
 	
-	private function build_ControledeSliderSelectMessage($_options = array(), $default = "0123 Ceci est un message de test") {
+	private function build_ControledeSliderSelectMessage($_options = array(), $default = "Ceci est un message de test") {
 		$request = $this->getConfiguration('request');
+		//log::add('alexaapi_node', 'debug', '---->RequestFinale:'.$request);
+		//log::add('alexaapi_node', 'debug', '---->getName:'.$this->getEqLogic()->getCmd(null, 'volumeinfo')->execCmd());
 		if ((isset($_options['slider'])) && ($_options['slider'] == "")) $_options['slider'] = $default;
 		if ((isset($_options['select'])) && ($_options['select'] == "")) $_options['select'] = $default;
 		if ((isset($_options['message'])) && ($_options['message'] == "")) $_options['message'] = $default;
-		$request = str_replace(array('#slider#', '#select#', '#message#'), array($_options['slider'], $_options['select'], urlencode($_options['message'])), $request);
+		// Si on est sur une commande qui utilise volume, on va remettre après execution le volume courant
+		if (strstr($request, '&volume=')) $request = $request.'&lastvolume='.$this->getEqLogic()->getCmd(null, 'volumeinfo')->execCmd();
+		
+		$request = str_replace(array('#slider#', '#select#', '#message#', '#volume#'), array($_options['slider'], $_options['select'], urlencode($_options['message']), $_options['volume']), $request);
 		return $request;
 	}	
+
+	//private function trouveVolumeDevice() {
+	//	$logical_id = $this->getEqLogic()->getCmd(null, 'volumeinfo')->getValue();
+	//	$alexaapi=alexaapi::byLogicalId($logical_id, 'alexaapi');getValue
+	//}
+
+
+
+
+
+
+
 
 	private function build_ControleWhenTextRecurring($defaultWhen, $defaultText, $_options = array()) {
 		$request = $this->getConfiguration('request');
@@ -1096,7 +1113,7 @@ class alexaapiCmd extends cmd {
 	public function getWidgetTemplateCode($_version = 'dashboard', $_noCustom = false) {
 		if ($_version != 'scenario') return parent::getWidgetTemplateCode($_version, $_noCustom);
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
-		if ($command == 'speak' && strpos($arguments, '#volume#') !== false) 
+		if (($command == 'speak') || ($command == 'announcement'))
 			return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
 		if ($command == 'reminder') 
 			return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');

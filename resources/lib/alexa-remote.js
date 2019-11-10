@@ -2072,6 +2072,7 @@ this.deleteNotification(notification, callback);
 
         let nodes = [];
         for (let command of commands) {
+			this._options.logger && this._options.logger("----MultiSequenceCommand------>"+JSON.stringify(command));
             //const commandNode = this.createSequenceNode(command.command, command.value, callback);
 			const commandNode = this.createSequenceNode(command.command, command.value, command.device ? command.device : serialOrName, callback);
             if (commandNode) nodes.push(commandNode);
@@ -2094,7 +2095,7 @@ this.deleteNotification(notification, callback);
     sendSequenceCommand(serialOrName, command, value, callback)
     {
        
-//this._options.logger && this._options.logger('Alexa-sendSequenceCommand: 1 '+command);
+//this._options.logger && this._options.logger('>>>>>>>SEQUENCE>>>>>>>>>>>>>>>>>> Alexa-sendSequenceCommand: 1 '+JSON.stringify(command));
 
 		let dev = this.find(Array.isArray(serialOrName) ? serialOrName[0] : serialOrName);
 	   //let dev = this.find(serialOrName); modif juin 2019

@@ -173,12 +173,18 @@ CommandAlexa.Speak = function(req,res){
 	
 	res.type('json');
 	
-	config.logger('Alexa-API:    Lancement /Speak avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text);
+	config.logger('Alexa-API:    Lancement /Speak avec paramètres -> device:' + req.query.device+'/text:' + req.query.text +'/volume:' + req.query.volume +'/lastvolume:' + req.query.lastvolume);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
+
+	let Commands = [];
+	var test = ('volume' in req.query === true) && (req.query.volume != "");
+	if (test) 											Commands.push({command: 'volume', value: req.query.volume});
+														Commands.push({command: 'speak', value: req.query.text});
+	if (('lastvolume' in req.query === true) && test) 	Commands.push({command: 'volume', value: req.query.lastvolume});
 	
-	boucleSurSerials_sendSequenceCommand(req, 'speak');
+	boucleSurSerials_sendMultiSequenceCommand(req, Commands);
 	
 	res.status(200).json({value: "Send"});	//ne teste pas le résultat
 }
@@ -192,12 +198,22 @@ CommandAlexa.Announcement = function(req,res){
 	
 	res.type('json');
 	
-	config.logger('Alexa-API:    Lancement /Announcement avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text);
+	config.logger('Alexa-API:    Lancement /Announcement avec paramètres -> device:' + req.query.device+'/text:' + req.query.text +'/volume:' + req.query.volume +'/lastvolume:' + req.query.lastvolume);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Announcement', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Announcement', 'Missing parameter "text"'));
+
+
+	let Commands = [];
+	var test = ('volume' in req.query === true) && (req.query.volume != "");
+	if (test) 											Commands.push({command: 'volume', value: req.query.volume});
+														Commands.push({command: 'announcement', value: req.query.text});
+	if (('lastvolume' in req.query === true) && test) 	Commands.push({command: 'volume', value: req.query.lastvolume});
 	
-	boucleSurSerials_sendSequenceCommand(req, 'announcement');
+	boucleSurSerials_sendMultiSequenceCommand(req, Commands);
+	
+
+	//boucleSurSerials_sendMultiSequenceCommand(req, 'announcement');
 		
 		// pour ne pas boucler mais ne fonctionne pas sur les groupes
 		/*
@@ -266,9 +282,10 @@ CommandAlexa.Volume = function(req,res){
 	if ('value' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "value"'));
 	
 	// Suppression de la boucle des serial, en effet, si on envoi sur un groupe, le volume est bien changé sur tous les équipements du groupe
-	//boucleSurSerials_sendSequenceCommand(req, 'volume');
+	//boucleSurSerials_sendMultiSequenceCommand(req, 'volume');
 	//resultatEnvoi=  forEachDevices(req.query.device, (serial) => {
 			
+
 			alexa.sendSequenceCommand(req.query.device, 'volume', req.query.value, 
 				function(testErreur){
 						if (testErreur) 
@@ -429,11 +446,12 @@ function boucleSurSerials_setTunein (req, callback) {
 			);
 		});
 }
-function boucleSurSerials_sendSequenceCommand (req, action, callback) {
+function boucleSurSerials_sendMultiSequenceCommand (req, actions, callback) {
 		
 		if (!!req.query.text) req.query.value=req.query.text; // dans l'hypothèse où la valeur est dans un champ text
 		resultatEnvoi=  forEachDevices(req.query.device, (serial) => {
-			alexa.sendSequenceCommand(serial, action, req.query.value, 
+			alexa.sendMultiSequenceCommand(serial, actions, "SerialNode",
+			//alexa.sendSequenceCommand(serial, action, req.query.value, 
 				function(testErreur){
 					if (testErreur) traiteErreur(testErreur);
 				}
@@ -502,7 +520,13 @@ CommandAlexa.Push = function(req,res){
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Push', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Push', 'Missing parameter "text"'));
 
-	boucleSurSerials_sendSequenceCommand(req, 'notification');
+	let Commands = [];
+	
+	//Commands.push({command: 'volume', value: '60'});
+	Commands.push({command: 'notification', value: req.query.text});
+	//Commands.push({command: 'volume', value: '10'});
+
+	boucleSurSerials_sendMultiSequenceCommand(req, Commands);
 	
 	res.status(200).json({value: "Send"});	//ne teste pas le résultat
 }
