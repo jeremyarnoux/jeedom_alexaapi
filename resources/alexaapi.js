@@ -173,13 +173,14 @@ CommandAlexa.Speak = function(req,res){
 	
 	res.type('json');
 	
-	config.logger('Alexa-API:    Lancement /Speak avec paramètres -> device:' + req.query.device+'/text:' + req.query.text +'/volume:' + req.query.volume +'/lastvolume:' + req.query.lastvolume);
+	config.logger('Alexa-API:    Lancement /Speak avec paramètres -> device:' + req.query.device+'/text:' + req.query.text +'/ssml:' + req.query.ssml  +'/jingle:' + req.query.jingle +'/volume:'+ req.query.volume +'/lastvolume:' + req.query.lastvolume);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
 	
 	var SpeakouAnnouncement = 'speak';
 	if (('jingle' in req.query === true) && (req.query.jingle == true)) SpeakouAnnouncement = 'announcement';
+	if (('ssml' in req.query === true) && (req.query.ssml == true)) SpeakouAnnouncement = 'ssml';
 
 
 	let Commands = [];
@@ -450,6 +451,7 @@ function boucleSurSerials_setTunein (req, callback) {
 			);
 		});
 }
+
 function boucleSurSerials_sendMultiSequenceCommand (req, actions, callback) {
 		
 		if (!!req.query.text) req.query.value=req.query.text; // dans l'hypothèse où la valeur est dans un champ text

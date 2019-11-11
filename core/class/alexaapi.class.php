@@ -652,10 +652,10 @@ class alexaapi extends eqLogic {
 					$cmd->setDisplay('title_disable', $title_disable);
 					$cmd->setOrder($Order);
 					//cas particulier
-						/*if (($LogicalId == 'speak') || ($LogicalId == 'announcement')){
-						$cmd->setDisplay('title_placeholder', 'Options');
-						$cmd->setDisplay('message_placeholder', 'Phrase');
-						}*/
+						if (($LogicalId == 'speak') || ($LogicalId == 'announcement')){
+						//$cmd->setDisplay('title_placeholder', 'Options');
+						$cmd->setDisplay('message_placeholder', 'Phrase à faire lire par Alexa');
+						}
 						if (($LogicalId=='volumeinfo') || ($LogicalId=='volume')) {
 						$cmd->setConfiguration('minValue', '0');
 						$cmd->setConfiguration('maxValue', '100');
@@ -750,8 +750,9 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'turnOff', 'action', 'other', false, 'turnOff', true, true, "far fa-circle", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
 
 			self::updateCmd ($F, 'command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);		
-			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, false, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=false', null, null, 79, $cas1bis);
-			self::updateCmd ($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', false, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=true', null, null, 79, $cas1bis);			
+			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, false, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=0', null, null, 79, $cas1bis);
+			self::updateCmd ($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', true, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=1', null, null, 79, $cas1bis);			
+			self::updateCmd ($F, 'speakssml', 'action', 'message', false, 'Tester Speak avec SSML', true, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&ssml=1', null, null, 79, $cas1bis);			
 			self::updateCmd ($F, 'mediaLength', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'mediaProgress', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'state', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::state', null, null, null, 79, $cas1);
