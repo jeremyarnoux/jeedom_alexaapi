@@ -177,11 +177,15 @@ CommandAlexa.Speak = function(req,res){
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
+	
+	var SpeakouAnnouncement = 'speak';
+	if (('jingle' in req.query === true) && (req.query.jingle == true)) SpeakouAnnouncement = 'announcement';
+
 
 	let Commands = [];
 	var test = ('volume' in req.query === true) && (req.query.volume != "");
 	if (test) 											Commands.push({command: 'volume', value: req.query.volume});
-														Commands.push({command: 'speak', value: req.query.text});
+														Commands.push({command: SpeakouAnnouncement, value: req.query.text});
 	if (('lastvolume' in req.query === true) && test) 	Commands.push({command: 'volume', value: req.query.lastvolume});
 	
 	boucleSurSerials_sendMultiSequenceCommand(req, Commands);
