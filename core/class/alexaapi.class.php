@@ -647,14 +647,20 @@ class alexaapi extends eqLogic {
 					if (!empty($request)) $cmd->setConfiguration('request', $request);
 					if (!empty($infoName)) $cmd->setConfiguration('infoName', $infoName);
 					if (!empty($listValue)) $cmd->setConfiguration('listValue', $listValue);
-					if (($LogicalId=='volumeinfo') || ($LogicalId=='volume')) {
-						$cmd->setConfiguration('minValue', '0');
-						$cmd->setConfiguration('maxValue', '100');
-						$cmd->setDisplay('forceReturnLineBefore', true);
-						}
+
 					$cmd->setConfiguration('RunWhenRefresh', $RunWhenRefresh);				
 					$cmd->setDisplay('title_disable', $title_disable);
 					$cmd->setOrder($Order);
+					//cas particulier
+						/*if (($LogicalId == 'speak') || ($LogicalId == 'announcement')){
+						$cmd->setDisplay('title_placeholder', 'Options');
+						$cmd->setDisplay('message_placeholder', 'Phrase');
+						}*/
+						if (($LogicalId=='volumeinfo') || ($LogicalId=='volume')) {
+						$cmd->setConfiguration('minValue', '0');
+						$cmd->setConfiguration('maxValue', '100');
+						$cmd->setDisplay('forceReturnLineBefore', true);
+						}					
 				}
 				$cmd->save();
 			}
@@ -744,8 +750,8 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'turnOff', 'action', 'other', false, 'turnOff', true, true, "far fa-circle", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
 
 			self::updateCmd ($F, 'command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);		
-			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#', null, null, 79, $cas1bis);
-			self::updateCmd ($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', false, true, null, 'dashboard', 'alexaapi::message', 'announcement?text=#message#&volume=#volume#', null, null, 79, $cas1bis);			
+			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, false, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=false', null, null, 79, $cas1bis);
+			self::updateCmd ($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', false, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=true', null, null, 79, $cas1bis);			
 			self::updateCmd ($F, 'mediaLength', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'mediaProgress', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'state', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::state', null, null, null, 79, $cas1);
@@ -1065,16 +1071,25 @@ class alexaapiCmd extends cmd {
 	//}
 
 
-	public function decodeTexteAleatoire($_texte) {
-		if ((strpos($_texte, '|') !== false && strpos($_texte, '[') !== false && strpos($_texte, ']') !== false)) {
-			$replies = interactDef::generateTextVariant($_texte);
+	public static function decodeTexteAleatoire($_text) {
+		$return = $_text;
+		if (strpos($_text, '|') !== false && strpos($_text, '[') !== false && strpos($_text, ']') !== false) {
+			$replies = interactDef::generateTextVariant($_text);
 			$random = rand(0, count($replies) - 1);
-			$_texte = $replies[$random];
+			$return = $replies[$random];
 		}
-		return $_texte;
+		preg_match_all('/{\((.*?)\) \?(.*?):(.*?)}/', $return, $matches, PREG_SET_ORDER, 0);
+		$replace = array();
+		if (is_array($matches) && count($matches) > 0) {
+			foreach ($matches as $match) {
+				if (count($match) != 4) {
+					continue;
+				}
+				$replace[$match[0]] = (jeedom::evaluateExpression($match[1])) ? trim($match[2]) : trim($match[3]);
+			}
+		}
+		return str_replace(array_keys($replace), $replace, $return);
 	}
-
-
 
 
 
