@@ -900,6 +900,9 @@ class alexaapiCmd extends cmd {
 
 	}
 	
+	
+	
+	
 	public function preSave() {
 		if ($this->getLogicalId() == 'refresh') {
 			return;
@@ -1051,7 +1054,8 @@ class alexaapiCmd extends cmd {
 		// Si on est sur une commande qui utilise volume, on va remettre après execution le volume courant
 		if (strstr($request, '&volume=')) $request = $request.'&lastvolume='.$this->getEqLogic()->getCmd(null, 'volumeinfo')->execCmd();
 		
-		$request = str_replace(array('#slider#', '#select#', '#message#', '#volume#'), array($_options['slider'], $_options['select'], urlencode($_options['message']), $_options['volume']), $request);
+		$request = str_replace(array('#slider#', '#select#', '#message#', '#volume#'), 
+		array($_options['slider'], $_options['select'], urlencode(self::decodeTexteAleatoire($_options['message'])), $_options['volume']), $request);
 		return $request;
 	}	
 
@@ -1061,6 +1065,14 @@ class alexaapiCmd extends cmd {
 	//}
 
 
+	public function decodeTexteAleatoire($_texte) {
+		if ((strpos($_texte, '|') !== false && strpos($_texte, '[') !== false && strpos($_texte, ']') !== false)) {
+			$replies = interactDef::generateTextVariant($_texte);
+			$random = rand(0, count($replies) - 1);
+			$_texte = $replies[$random];
+		}
+		return $_texte;
+	}
 
 
 
