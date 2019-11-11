@@ -11,4 +11,16 @@
 	<textarea class="message expressionAttr form-control ta_autosize" data-l1key="options" data-l2key="volume" rows="1" style="resize:vertical;" data-cmd_id="#id#" data-uid="#uid#">#volume#</textarea>
 </div>
 
-
+<script>
+$('.listEquipementInfo[data-uid=#uid#]').on('click', function() {
+  if('#message_cmd_subtype#' != ''){
+    jeedom.cmd.getSelectModal({cmd: {type: '#message_cmd_type#',subType : '#message_cmd_subtype#'}}, function(result) {
+      $('.expressionAttr[data-l1key=options][data-l2key=message][data-uid=#uid#]').atCaret('insert', result.human);
+    });
+  }else{
+    jeedom.cmd.getSelectModal({cmd: {type: '#message_cmd_type#'}}, function(result) {
+      $('.expressionAttr[data-l1key=options][data-l2key=message][data-uid=#uid#]').atCaret('insert', result.human);
+    });
+  }
+});
+</script>
