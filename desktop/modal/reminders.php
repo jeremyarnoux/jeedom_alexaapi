@@ -92,7 +92,7 @@ foreach($json as $item)
 foreach($json as $item)
 {
 
-log::add('alexaapi_debug', 'info', json_encode($item));
+//log::add('alexaapi_debug', 'info', json_encode($item));
 
 switch ($item['type']) {
     case "Alarm":

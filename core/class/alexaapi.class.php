@@ -111,7 +111,7 @@ class alexaapi extends eqLogic {
 		$url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/alexaapi/core/api/jeealexaapi.php?apikey=' . jeedom::getApiKey('alexaapi');
 		$log = $_debug ? '1' : '0';
 		$sensor_path = realpath(dirname(__FILE__) . '/../../resources');
-		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ' . network::getNetworkAccess('internal') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr').' '.jeedom::getApiKey('alexaapi');
+		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ' . network::getNetworkAccess('internal') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr').' '.jeedom::getApiKey('alexaapi').' '.log::getLogLevel('alexaapi'). ' '.config::byKey('utilisateurMQTT', 'alexaapi',0);
 		log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
 		$result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
 		//$cmdStart='nohup ' . $cmd . ' | tee >(grep "WS-MQTT">>'.log::getPathToLog('alexaapi_mqtt').') >(grep -v "WS-MQTT">>'. log::getPathToLog('alexaapi_node') . ')';
@@ -656,6 +656,10 @@ class alexaapi extends eqLogic {
 						//$cmd->setDisplay('title_placeholder', 'Options');
 						$cmd->setDisplay('message_placeholder', 'Phrase à faire lire par Alexa');
 						}
+						if (($LogicalId == 'reminder')){
+						//$cmd->setDisplay('title_placeholder', 'Options');
+						$cmd->setDisplay('message_placeholder', 'Texte du rappel');
+						}						
 						if (($LogicalId=='volumeinfo') || ($LogicalId=='volume')) {
 						$cmd->setConfiguration('minValue', '0');
 						$cmd->setConfiguration('maxValue', '100');
@@ -750,9 +754,9 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'turnOff', 'action', 'other', false, 'turnOff', true, true, "far fa-circle", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
 
 			self::updateCmd ($F, 'command', 'action', 'message', false, 'Command', false, true, "fa fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);		
-			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, false, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=0', null, null, 79, $cas1bis);
-			self::updateCmd ($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', true, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=1', null, null, 79, $cas1bis);			
-			self::updateCmd ($F, 'speakssml', 'action', 'message', false, 'Tester Speak avec SSML', true, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&ssml=1', null, null, 79, $cas1bis);			
+			self::updateCmd ($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, false, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#', null, null, 40, $cas1bis);
+			self::updateCmd ($F, 'speaklegacy', 'action', 'message', false, 'Faire parler Alexa (legacy)', false, false, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&legacy=1', null, null, 43, $cas1bis);			self::updateCmd ($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', true, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=1', null, null, 44, $cas1bis);			
+			self::updateCmd ($F, 'speakssml', 'action', 'message', false, 'Faire parler Alexa en SSML', false, true, null, 'dashboard', 'alexaapi::message', 'speak?text=#message#&volume=#volume#&ssml=1', null, null, 42, $cas1bis);			
 			self::updateCmd ($F, 'mediaLength', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'mediaProgress', 'info', 'string', false, null, false, false, null, null, null , null, null, null, 79, $cas1);
 			self::updateCmd ($F, 'state', 'info', 'string', false, null, true, false, null, 'dashboard', 'alexaapi::state', null, null, null, 79, $cas1);
@@ -857,12 +861,12 @@ class alexaapi extends eqLogic {
 
   public function toHtml($_version = 'dashboard') {
 	$replace = $this->preToHtml($_version);
-	log::add('alexaapi_widget','debug','************Début génération Widget de '.$replace['#logicalId#']);  
+	//log::add('alexaapi_widget','debug','************Début génération Widget de '.$replace['#logicalId#']);  
 	$typeWidget="alexaapi";	
 	if ((substr($replace['#logicalId#'], -7))=="_player") $typeWidget="alexaapi_player";
 	if ((substr($replace['#logicalId#'], -9))=="_playlist") $typeWidget="alexaapi_playlist";
     if ($typeWidget!="alexaapi_playlist") return parent::toHtml($_version);
-	log::add('alexaapi_widget','debug',$typeWidget.'************Début génération Widget de '.$replace['#name#']);        
+	//log::add('alexaapi_widget','debug',$typeWidget.'************Début génération Widget de '.$replace['#name#']);        
 	if (!is_array($replace)) {
 		return $replace;
 	}
@@ -871,7 +875,7 @@ class alexaapi extends eqLogic {
 		return '';
 	}
 	foreach ($this->getCmd('info') as $cmd) {
-		 	log::add('alexaapi_widget','debug',$typeWidget.'dans boucle génération Widget');        
+		 	//log::add('alexaapi_widget','debug',$typeWidget.'dans boucle génération Widget');        
             $replace['#' . $cmd->getLogicalId() . '_history#'] = '';
             $replace['#' . $cmd->getLogicalId() . '_id#'] = $cmd->getId();
             $replace['#' . $cmd->getLogicalId() . '#'] = $cmd->execCmd();
@@ -889,7 +893,7 @@ class alexaapi extends eqLogic {
 				$replace['#name_display#']='#playlistName#';
 			}
 		}
-	log::add('alexaapi_widget','debug',$typeWidget.'***************************************************************************Fin génération Widget');        
+	//log::add('alexaapi_widget','debug',$typeWidget.'***************************************************************************Fin génération Widget');        
 	return $this->postToHtml($_version, template_replace($replace, getTemplate('core', $version, $typeWidget, 'alexaapi')));
 	}
 }

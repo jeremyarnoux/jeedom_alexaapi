@@ -10,8 +10,10 @@ const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
 const IPJeedom = process.argv[2];
 const ClePlugin = process.argv[5];
-//const debug=1; //mettre 1 pour debug
+const logLevel = process.argv[6];
+if (process.argv[7] == 1) useWsMqtt=true; else useWsMqtt=false;
 
+//const debug=1; //mettre 1 pour debug
 // Références :
 // https://openclassrooms.com/fr/courses/1173401-les-closures-en-javascript
 
@@ -21,10 +23,10 @@ const config = {
 	cookieRefreshInterval: 7 * 24 * 60 * 1000,
 	logger: consoleSigalou,
 	alexaServiceHost: alexaserver,
-    useWsMqtt: true, // optional, true to use the Websocket/MQTT direct push connection
+    useWsMqtt: useWsMqtt, 
 	listeningPort: 3456
 };
-
+config.logger('Alexa-Config: *********************useWsMqtt*********************'+useWsMqtt);
 
 var dernierStartServeur=0;
 
@@ -68,23 +70,41 @@ function isEmpty(obj) {
 	//niveaudeLog=2 c'est reduit
 	
 
-function consoleSigalou() {
+function consoleSigalou(text, level='') {
 	var today = new Date();
-	var niveaudeLogaAfficher=2;
-	var niveaudeLog=0;
-	try {
-		if (!(isNaN(arguments[1]))) {niveaudeLog=arguments[1];}
-		niveaudeLog++; niveaudeLog--;
-	} catch (e) {
-		niveaudeLog=2;
-	}
+
+	// 100=DEBUG
+	// 200=INFO
+	// 300=WARNING
+	// 400=ERROR
+	//1000=AUCUN
 	
 	try {
-		if (niveaudeLog<=niveaudeLogaAfficher)
-		console.log(arguments[1]+"[" + today.toLocaleString() + "] " + arguments[0].concat(Array.prototype.slice.call(arguments, 2)));
+	switch (level) {
+	  case "ERROR":	
+			niveauLevel=400;
+			break;
+	  case "WARNING":	
+			niveauLevel=300;
+			break;		
+	  case "INFO":	
+			niveauLevel=200;
+			break;		
+	  case "DEBUG":	
+			niveauLevel=100;
+			break;	
+	  default:
+			niveauLevel=400; //pour trouver ce qui n'a pas été affecté à un niveau
+			break;
+	  
+	}
+		if (logLevel<=niveauLevel)
+			console.log(logLevel+"[" + today.toLocaleString() + "]["+ level+"] : " + arguments[0].concat(Array.prototype.slice.call(arguments, 2)));
 	} catch (e) {
 		console.log(arguments[0]);
 	}
+	
+
 }
 
 
@@ -1502,10 +1522,10 @@ app.get('/reminders', (req, res) => {
 	config.logger('Alexa-API: Reminders');
 	res.type('json');
 
-	config.logger('Alexa-API: (reminders) Lancement',5);
+	config.logger('Alexa-API: (reminders) Lancement','DEBUG');
 
 	alexa.getNotifications2(function(notifications) {
-		config.logger('Alexa-API: (reminders) function',5);
+		config.logger('Alexa-API: (reminders) function','DEBUG');
 		var toReturn = [];
 
 		for (var serial in notifications) {
@@ -1550,19 +1570,19 @@ app.get('/deleteallalarms', (req, res) => {
 
 	alexa.getNotifications2(function(notifications) {
 		//var toReturn = [];
-		//config.logger('Alexa-API - prepa boucle 1:'+JSON.stringify(notifications),2);
-		//config.logger('Alexa-API - prepa boucle 1 nb:'+Object.keys(notifications).length,2);
+		//config.logger('Alexa-API - prepa boucle 1:'+JSON.stringify(notifications),'INFO');
+		//config.logger('Alexa-API - prepa boucle 1 nb:'+Object.keys(notifications).length,'INFO');
 		// Filtre et ne garde que les enregistrements du device selctionné
 		const notificationsfiltrees = notifications.filter(tmp => tmp.deviceSerialNumber == req.query.device);
 		
 		
 		notifications = notificationsfiltrees;
-		//config.logger('Alexa-API - on filtre sur req.query.device:'+req.query.device,2);
-		//config.logger('Alexa-API - prepa boucle 2:'+JSON.stringify(notifications),2);
-		//config.logger('Alexa-API - prepa boucle 2 nb:'+Object.keys(notifications).length,2);
+		//config.logger('Alexa-API - on filtre sur req.query.device:'+req.query.device,'INFO');
+		//config.logger('Alexa-API - prepa boucle 2:'+JSON.stringify(notifications),'INFO');
+		//config.logger('Alexa-API - prepa boucle 2 nb:'+Object.keys(notifications).length,'INFO');
 
-		//config.logger('Alexa-API - deleteallalarms req.query.type: ' + req.query.type,5);
-		//config.logger('Alexa-API - on filtre sur req.query.type:'+req.query.type,2);
+		//config.logger('Alexa-API - deleteallalarms req.query.type: ' + req.query.type,'DEBUG');
+		//config.logger('Alexa-API - on filtre sur req.query.type:'+req.query.type,'INFO');
 
 		if ((req.query.type != 'all') && (req.query.type != 'ALL')) {
 			var notificationsfiltrees1;
@@ -1573,8 +1593,8 @@ app.get('/deleteallalarms', (req, res) => {
 			notifications = notificationsfiltrees1;
 		}
 
-		//config.logger('Alexa-API - prepa boucle 3:'+JSON.stringify(notifications),2);
-		//config.logger('Alexa-API - prepa boucle 3 nb:'+Object.keys(notifications).length,2);
+		//config.logger('Alexa-API - prepa boucle 3:'+JSON.stringify(notifications),'INFO');
+		//config.logger('Alexa-API - prepa boucle 3 nb:'+Object.keys(notifications).length,'INFO');
 
 		// Filtre et ne garde que les enregistrements qui ont un status qui correspond à req.query.status
 		if ((req.query.status != 'all') && (req.query.status != 'ALL')) {
@@ -1584,12 +1604,12 @@ app.get('/deleteallalarms', (req, res) => {
 			notifications = notificationsfiltrees2;
 		}
 
-		//config.logger('Alexa-API - prepa boucle 5:'+JSON.stringify(notifications),2);
-		config.logger('Alexa-API - prepa boucle 5 nb:'+Object.keys(notifications).length,2);
+		//config.logger('Alexa-API - prepa boucle 5:'+JSON.stringify(notifications),'INFO');
+		config.logger('Alexa-API - prepa boucle 5 nb:'+Object.keys(notifications).length,'INFO');
 
 
 		for (var serial in notifications) {
-			//config.logger('Alexa-API - boucle ',2);			
+			//config.logger('Alexa-API - boucle ','INFO');			
 			if (notifications.hasOwnProperty(serial)) {
 				// On va parcourir les résultats et supprimer chaque enregistrement
 
@@ -1599,7 +1619,7 @@ app.get('/deleteallalarms', (req, res) => {
 				const notification = {
 					'id': device.id
 				};
-				//config.logger('Alexa-API - AVANT deleteallalarms device.id: ' + device.id,2);
+				//config.logger('Alexa-API - AVANT deleteallalarms device.id: ' + device.id,'INFO');
 				
 				alexa.deleteNotification(notification, function(err) {});
 	
@@ -2137,7 +2157,7 @@ function startServer() {
 		dernierStartServeur=Date.now();
 		alexa = null;
 		alexa = new Alexa();
-		config.logger('Alexa-API:    ******************** Lancement Serveur ***********************',2);
+		config.logger('Alexa-API:    ******************** Lancement Serveur ***********************','INFO');
 		
 		alexa.init({
 				cookie: config.cookie,
@@ -2160,18 +2180,18 @@ function startServer() {
 							config.logger('Alexa-API:    Error while saving the cookie to: ' + config.cookieLocation);
 							config.logger('Alexa-API:    ' + err);
 						}
-						config.logger('Alexa-API:    New cookie saved to:' + config.cookieLocation,5);
+						config.logger('Alexa-API:    New cookie saved to:' + config.cookieLocation,'DEBUG');
 
 						// Start the server
 						if (server) {
-							config.logger('Alexa-API:    *******************************************',2);
-							config.logger('Alexa-API:    *Server is already listening on port ' + server.address().port + ' *',2);
-							config.logger('Alexa-API:    *******************************************',2);
+							config.logger('Alexa-API:    *******************************************','INFO');
+							config.logger('Alexa-API:    *Server is already listening on port ' + server.address().port + ' *','INFO');
+							config.logger('Alexa-API:    *******************************************','INFO');
 						} else {
 							server = app.listen(config.listeningPort, () => {
-								config.logger('Alexa-API:    **************************************************************',2);
-								config.logger('Alexa-API:    ************** Server OK listening on port ' + server.address().port + ' **************',2);
-								config.logger('Alexa-API:    **************************************************************',2);
+								config.logger('Alexa-API:    **************************************************************','INFO');
+								config.logger('Alexa-API:    ************** Server OK listening on port ' + server.address().port + ' **************','INFO');
+								config.logger('Alexa-API:    **************************************************************','INFO');
 
 							});
 						}
@@ -2231,7 +2251,7 @@ var url=IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey="+ClePlugin+
 config.logger && config.logger('URL envoyée: '+url);
  
 jsonaenvoyer=JSON.stringify(jsonaenvoyer);
-config.logger && config.logger('DATA envoyé:'+jsonaenvoyer,5);
+config.logger && config.logger('DATA envoyé:'+jsonaenvoyer,'DEBUG');
 
 	request.post(url, {
 

@@ -149,7 +149,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
             }
             else
             {
-                self._options.logger && self._options.logger('Alexa-Remote: cookie was provided',5);
+                self._options.logger && self._options.logger('Alexa-Remote: cookie was provided','DEBUG');
                 if (self._options.formerRegistrationData)
                 {
                     const tokensValidSince = Date.now() - self._options.formerRegistrationData.tokenDate;
@@ -231,7 +231,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                 if (err && authenticated === null) {
                     return callback && callback(new Error('Error while checking Authentication: ' + err));
                 }
-                this._options.logger && this._options.logger('Alexa-Remote: Authentication checked: ' + authenticated,5);
+                this._options.logger && this._options.logger('Alexa-Remote: Authentication checked: ' + authenticated,'DEBUG');
                 if (! authenticated && !this._options.cookieJustCreated) {
                     this._options.logger && this._options.logger('Alexa-Remote: Cookie was set, but authentication invalid');
                     delete this._options.cookie;
@@ -796,7 +796,7 @@ this.httpPost() ;
         }
         // bypass check because set or last check done before less then 10 mins
         if (noCheck || (new Date().getTime() - this.lastAuthCheck) < 600000) {
-            this._options.logger && this._options.logger('Alexa-Remote: No authentication check needed (time elapsed ' + (new Date().getTime() - this.lastAuthCheck) + ')',5);
+            this._options.logger && this._options.logger('Alexa-Remote: No authentication check needed (time elapsed ' + (new Date().getTime() - this.lastAuthCheck) + ')','DEBUG');
             return this.httpsGetCall(path, callback, flags);
         }
 
@@ -944,7 +944,7 @@ this._options.logger && this._options.logger(obj.headers);
 	
 	
 	
-        this._options.logger && this._options.logger('Alexa-Remote: Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? ' and data=' + flags.data : ''),5);
+        this._options.logger && this._options.logger('Alexa-Remote: Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? ' and data=' + flags.data : ''),'DEBUG');
 //	}	
 	    //this._options.logger && this._options.logger('Alexa-Remote: >>>>> ' + JSON.stringify(options)+"<<<<" );
 	    //this._options.logger && this._options.logger('Alexa-Remote: >>>>> ' + options+"<<<<" );
@@ -970,7 +970,7 @@ this._options.logger && this._options.logger(obj.headers);
 
 
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusCode: '+res.statusCode);
-			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusMessage: '+res.statusMessage,5);
+			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusMessage: '+res.statusMessage,'DEBUG');
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.httpVersion: '+res.httpVersion);
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.headers: '+JSON.stringify(res.headers));
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.rawHeaders : '+res.rawHeaders);
@@ -987,7 +987,7 @@ this._options.logger && this._options.logger(obj.headers);
 
             res.on('end', () =>
             {
-				this._options.logger && this._options.logger('>>> DEBUG body: '+body,4);
+				this._options.logger && this._options.logger('>>> DEBUG body: '+body,'DEBUG');
                 let ret;
                 if (typeof callback === 'function')
                 {
@@ -1005,21 +1005,21 @@ this._options.logger && this._options.logger(obj.headers);
                         ret = JSON.parse(body);
                     } catch(e)
                     {
-                        this._options.logger && this._options.logger('******************************************************',2);
-                        this._options.logger && this._options.logger('*********************DEBUG****************************',2);
-                        this._options.logger && this._options.logger('******************************************************',2);
-                        this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote: Response: No/Invalid JSON',2);
+                        this._options.logger && this._options.logger('******************************************************','INFO');
+                        this._options.logger && this._options.logger('*********************DEBUG****************************','INFO');
+                        this._options.logger && this._options.logger('******************************************************','INFO');
+                        this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote: Response: No/Invalid JSON','INFO');
                         this._options.logger && this._options.logger(body);
                         this._options.logger && this._options.logger('**DEBUG**DEBUG* Message Exception :'+e.message);
-                        this._options.logger && this._options.logger('******************************************************',2);
-                        this._options.logger && this._options.logger('******************************************************',2);
+                        this._options.logger && this._options.logger('******************************************************','INFO');
+                        this._options.logger && this._options.logger('******************************************************','INFO');
 						var ValeurdelErreur='no JSON';
 						//if (body.includes("authenticated"))
 						if (body.includes("Connection: close"))
                         {
-							this._options.logger && this._options.logger('******************************************************',2);
-							this._options.logger && this._options.logger('***************FIND**CONNEXION CLOSE *****************',2);
-							this._options.logger && this._options.logger('******************************************************',2);
+							this._options.logger && this._options.logger('******************************************************','INFO');
+							this._options.logger && this._options.logger('***************FIND**CONNEXION CLOSE *****************','INFO');
+							this._options.logger && this._options.logger('******************************************************','INFO');
 						ValeurdelErreur='Connexion Close';
 						}
                        return callback && callback(new Error(ValeurdelErreur), body);
@@ -1028,7 +1028,7 @@ this._options.logger && this._options.logger(obj.headers);
 					if (JSON.stringify(ret)=='{"error":null}')
 						this._options.logger && this._options.logger('Alexa-Remote: Response(2): OK');
 						else
-						this._options.logger && this._options.logger('Alexa-Remote: Response(1): ' + JSON.stringify(ret),5);
+						this._options.logger && this._options.logger('Alexa-Remote: Response(1): ' + JSON.stringify(ret),'DEBUG');
                     return callback && callback (null, ret);
                 }
             });
@@ -1051,8 +1051,8 @@ httpPost(nom, jsonaenvoyer) {
 var url=IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey="+ClePlugin+"&nom="+nom;
  
 jsonaenvoyer=JSON.stringify(jsonaenvoyer);
-this._options.logger && this._options.logger('URL envoyée: '+url,5);
-this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer,5);
+this._options.logger && this._options.logger('URL envoyée: '+url,'DEBUG');
+this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer,'DEBUG');
 
 	request.post(url, {
 
@@ -2009,7 +2009,7 @@ this.deleteNotification(notification, callback);
                 }
                 else if (command === 'ssml') {
                     if (!value.startsWith('<speak>')) {
-                        return callback && callback(new Error('Vlue needs to be a valid SSML XML string', null));
+                        return callback && callback(new Error('Votre texte doit être une chaîne XML SSML valide', null));
                     }
                 }
                 seqNode.operationPayload.expireAfter = 'PT5S';
