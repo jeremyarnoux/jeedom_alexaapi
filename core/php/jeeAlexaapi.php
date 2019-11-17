@@ -38,19 +38,22 @@ $nom=$_GET["nom"];
 log::add('alexaapi', 'debug',  'Réception données sur jeeAlexaapi ['.$nom.']');
 log::add('alexaapi_mqtt', 'info',  " -------------------------------------------------------------------------------------------------------------" );
 
+log::add('alexaapi_mqtt', 'debug',  "chaineRecuperee: ".$chaineRecuperee);
 
 $debut=strpos($chaineRecuperee, "{");
 $fin=strrpos($chaineRecuperee, "}");
 $longeur=1+intval($fin)-intval($debut);
 $chaineRecupereeCorrigee=substr($chaineRecuperee, $debut, $longeur);
 
-$chaineRecupereeCorrigee=str_replace ("[", "", $chaineRecupereeCorrigee);
-$chaineRecupereeCorrigee=str_replace ("]", "", $chaineRecupereeCorrigee);
+	if ($nom !="commandesEnErreur") {
+		$chaineRecupereeCorrigee=str_replace ("[", "", $chaineRecupereeCorrigee);
+		$chaineRecupereeCorrigee=str_replace ("]", "", $chaineRecupereeCorrigee);
+	}
 
 log::add('alexaapi_mqtt', 'debug',  "chaineRecupereeCorrigee: ".$chaineRecupereeCorrigee);
+log::add('alexaapi_mqtt', 'debug',  "nom: ".$nom);
 
 $result = json_decode($chaineRecupereeCorrigee, true);
-
 
 
 if (!is_array($result)) {
@@ -70,14 +73,36 @@ $alexaapi3->emptyCacheWidget();
 clearCacheWidget();
 */
 
-log::add('alexaapi_mqtt', 'debug',  'nom:'.$nom);
+//log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
+
 	switch ($nom) {
 		
+			case 'commandesEnErreur':
+			log::add('alexaapi_node', 'warning',  "Alexa-jee: Il va falloir relancer: ".$chaineRecupereeCorrigee." Pause 8s");
+			sleep(8);
+				$commandeaRelancer = json_decode($chaineRecupereeCorrigee, true);
+				$queryEnErreur = $commandeaRelancer['queryEnErreur'];
+				$listeCommandesEnErreur = $commandeaRelancer['listeCommandesEnErreur'];
+				$listeCommandesEnErreur=str_replace ("[", "", $listeCommandesEnErreur);
+				$listeCommandesEnErreur=str_replace ("]", "", $listeCommandesEnErreur);
+				
+				if (is_array($listeCommandesEnErreur)) { // s'il y a un groupe de commandes à relancer
+					foreach ($listeCommandesEnErreur as $CommandesEnErreur){
+						$url="http://" . config::byKey('internalAddr') . ":3456/".$CommandesEnErreur['command']."?replay=1&".http_build_query($queryEnErreur);		
+						$json=file_get_contents($url);
+					}
+				} else {								// s'il n'y a qu'une commande à relancer
+					//faudra surement ajouter un test ici pour voir si c'ets pas vide
+						$url="http://" . config::byKey('internalAddr') . ":3456/".$listeCommandesEnErreur."?replay=1&".http_build_query($queryEnErreur);		
+						$json=file_get_contents($url);	
+				}
+			break;
+			
 			case 'ws-bluetooth-state-change':
 			if ($result['bluetoothEvent'] == 'DEVICE_CONNECTED') metAJour("bluetoothDevice", "Connexion en cours", 'bluetoothDevice', false , $alexaapi2);
 			if ($result['bluetoothEvent'] == 'DEVICE_DISCONNECTED') metAJour("bluetoothDevice", "Déconnexion en cours", 'bluetoothDevice', false , $alexaapi2);				
 				metAJourBluetooth($result['deviceSerialNumber'], $result['audioPlayerState'], $alexaapi2, $alexaapi);
-			break;
+			break;	
 			
 			case 'ws-volume-change':
 				metAJour("Volume", $result['volume'], 'volumeinfo', false , $alexaapi);
@@ -242,7 +267,7 @@ function metAJourImage($nom, $variable, $commandejeedom, $effaceSiNull, $_alexaa
 
 function metAJourPlayer($serialdevice, $audioPlayerState, $alexaapi) {
 		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
-log::add('alexaapi_mqtt', 'info',  " ***********************[metAJourPlayer]*********************************" );
+//log::add('alexaapi_node', 'info',  " ***********************[metAJourPlayer]*********************************" );
 
 	try {
 		
@@ -315,7 +340,7 @@ metAJourBoutonPlayer("playPauseState", $etatdePlay, 'playPauseState', 'play' , $
 			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
 
 	}
-log::add('alexaapi_mqtt', 'info',  " ************************************************************************" );
+//log::add('alexaapi_node', 'info',  " ************************************************************************" );
 if (is_object($alexaapi)) $alexaapi->refreshWidget(); //refresh Tuile Player
 log::add('alexaapi_mqtt', 'debug',  '** Mise à jour Tuile du Player **');
 

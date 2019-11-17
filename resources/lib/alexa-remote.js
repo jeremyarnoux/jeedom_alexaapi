@@ -959,7 +959,7 @@ this._options.logger && this._options.logger(obj.headers);
 	*/	
 		
 		let req = https.request(options, (res) => {
-        //console.log(JSON.stringify(res)+"FIN de RES");
+        //console.log(res);
             let body  = '';
         //this._options.logger && this._options.logger('DEBUG1');
 		
@@ -970,7 +970,8 @@ this._options.logger && this._options.logger(obj.headers);
 
 
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusCode: '+res.statusCode);
-			this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusMessage: '+res.statusMessage,'DEBUG');
+			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  '+JSON.stringify(res));
+			this._options.logger && this._options.logger('Alexa-Remote (Réponse Serveur):  res.statusMessage: '+res.statusMessage,'DEBUG');
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.httpVersion: '+res.httpVersion);
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.headers: '+JSON.stringify(res.headers));
 			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.rawHeaders : '+res.rawHeaders);
@@ -987,13 +988,13 @@ this._options.logger && this._options.logger(obj.headers);
 
             res.on('end', () =>
             {
-				this._options.logger && this._options.logger('>>> DEBUG body: '+body,'DEBUG');
+				this._options.logger && this._options.logger('Alexa-Remote (Réponse Valeur): '+body,'DEBUG');
                 let ret;
                 if (typeof callback === 'function')
                 {
                     if (!body)
                     {
-						this._options.logger && this._options.logger('Alexa-Remote: Response(3): '+resstatusMessage);
+						this._options.logger && this._options.logger('Alexa-Remote: Response(3): '+resstatusMessage, "INFO");
                         
 						if (resstatusCode=="200") // C'est OK
                         return callback && callback(null, null);
@@ -1005,21 +1006,22 @@ this._options.logger && this._options.logger(obj.headers);
                         ret = JSON.parse(body);
                     } catch(e)
                     {
-                        this._options.logger && this._options.logger('******************************************************','INFO');
-                        this._options.logger && this._options.logger('*********************DEBUG****************************','INFO');
-                        this._options.logger && this._options.logger('******************************************************','INFO');
-                        this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote: Response: No/Invalid JSON','INFO');
-                        this._options.logger && this._options.logger(body);
-                        this._options.logger && this._options.logger('**DEBUG**DEBUG* Message Exception :'+e.message);
-                        this._options.logger && this._options.logger('******************************************************','INFO');
-                        this._options.logger && this._options.logger('******************************************************','INFO');
-						var ValeurdelErreur='no JSON';
+                        //this._options.logger && this._options.logger('******************************************************','ERROR');
+                        //this._options.logger && this._options.logger('*********************DEBUG****************************','ERROR');
+                        //this._options.logger && this._options.logger('******************************************************','ERROR');
+                        //this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote: Response: No/Invalid JSON','ERROR');
+                        this._options.logger && this._options.logger("Alexa-Remote: "+body, 'ERROR');
+                        //this._options.logger && this._options.logger('**DEBUG**DEBUG* Message Exception :'+e.message);
+                        //this._options.logger && this._options.logger('******************************************************','ERROR');
+                        //this._options.logger && this._options.logger('******************************************************','ERROR');
+						//var ValeurdelErreur='no JSON';
+						var ValeurdelErreur=body;
 						//if (body.includes("authenticated"))
 						if (body.includes("Connection: close"))
                         {
-							this._options.logger && this._options.logger('******************************************************','INFO');
-							this._options.logger && this._options.logger('***************FIND**CONNEXION CLOSE *****************','INFO');
-							this._options.logger && this._options.logger('******************************************************','INFO');
+							this._options.logger && this._options.logger('******************************************************','ERROR');
+							this._options.logger && this._options.logger('***************FIND**CONNEXION CLOSE *****************','ERROR');
+							this._options.logger && this._options.logger('******************************************************','ERROR');
 						ValeurdelErreur='Connexion Close';
 						}
                        return callback && callback(new Error(ValeurdelErreur), body);
@@ -2072,7 +2074,7 @@ this.deleteNotification(notification, callback);
 
         let nodes = [];
         for (let command of commands) {
-			this._options.logger && this._options.logger("----MultiSequenceCommand------>"+JSON.stringify(command));
+			this._options.logger && this._options.logger("----MultiSequenceCommand------>"+JSON.stringify(command), 'DEBUG');
             //const commandNode = this.createSequenceNode(command.command, command.value, callback);
 			const commandNode = this.createSequenceNode(command.command, command.value, command.device ? command.device : serialOrName, callback);
             if (commandNode) nodes.push(commandNode);

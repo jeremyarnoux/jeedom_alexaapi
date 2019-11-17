@@ -241,7 +241,7 @@ class alexaapi extends eqLogic {
 		$d = new Cron\CronExpression('*/15 * * * *', new Cron\FieldFactory);
 		$deamon_info = self::deamon_info();
 		if ($d->isDue() && $deamon_info['state'] == 'ok') {
-			log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON-'.$autorefresh.'-----------------------');
+			//log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON-'.$autorefresh.'-----------------------');
 			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
 			$json = json_decode($json, true);
 			$status=[];
@@ -308,9 +308,11 @@ class alexaapi extends eqLogic {
 		}
 		
 		$r = new Cron\CronExpression('*/15 * * * *', new Cron\FieldFactory);// boucle refresh
+//		$r = new Cron\CronExpression('* * * * *', new Cron\FieldFactory);// boucle refresh
 		if ($r->isDue() && $deamon_info['state'] == 'ok') {
 			$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
 			foreach ($eqLogics as $alexaapi) {
+				log::add('alexaapi_node', 'debug', 'CRON Refresh:'.$alexaapi->getName());
 				$alexaapi->refresh(); 				
 				sleep(2);
 			}	
@@ -995,6 +997,7 @@ class alexaapiCmd extends cmd {
 
 
 	private function buildRequest($_options = array()) {
+	//log::add('alexaapi', 'info', '----Request:'.json_encode($_options));
 		if ($this->getType() != 'action') return $this->getConfiguration('request');
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
 		switch ($command) {
