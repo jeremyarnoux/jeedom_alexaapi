@@ -20,7 +20,7 @@
 			if (inforecuperee == "none")
 					_options.display_value="";
 					else
-					_options.display_value=inforecuperee.substr(0, 2)+":"+inforecuperee.substr(2, 2);
+					_options.display_value=inforecuperee.substr(3, 2)+":"+inforecuperee.substr(0, 2);
 			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate);
 			cmd.find('.state').empty().append(_options.display_value);			
 		

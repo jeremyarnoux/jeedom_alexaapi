@@ -23,6 +23,9 @@ function alexaapi_update() {
 	foreach (eqLogic::byType('alexaapi') as $alexaapi) {
 		$alexaapi->save();
     	}
+	//message::removeAll('Téléinfo');
+    message::add('alexaapi', 'Mise à jour du plugin Alexa-API terminée.', null, null);
+
 }
 
 ?>

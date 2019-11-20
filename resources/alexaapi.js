@@ -2,6 +2,7 @@
 const express = require('express');
 const fs = require('fs');
 const Alexa = require('./lib/alexa-remote.js');
+
 let alexa;
 //var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest  ;
 const request = require('request');
@@ -1381,7 +1382,7 @@ app.get('/history', (req, res) => {
 
 */
 app.get('/routines', (req, res) => {
-	config.logger('Alexa-API: Lancement de '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('Alexa-API: Lancement de '+req.path, 'INFO');
 	res.type('json');
 
 	//config.logger('Alexa-API: type of devices : '+typeof devices);
@@ -1744,6 +1745,140 @@ app.get('/whennextalarm', (req, res) => {
 		});
 
 	});
+});
+
+
+/***** updateallalarms *****
+  URL: /updateallalarms
+
+*/
+app.get('/updateallalarms', (req, res) => {
+	config.logger('Alexa-API: Lancement de '+req.path+' sur '+req.query.device, 'INFO');
+	res.type('json');
+
+	// c'était pour générer la liste des devices
+	/*alexa.getDevices(function(devices) {
+		var lesDevices = [];
+		for (var serial in devices) {lesDevices.push(serial);}
+		config.logger('Alexa-API: DEVICES '+JSON.stringify(lesDevices), 'INFO');
+	*/
+
+
+
+
+
+	alexa.getNotifications2(function(notifications) {
+		//config.logger('Alexa-API: (WhenNextAlarm) function' );
+		//var toReturn = [];
+
+		if (isEmpty(notifications))
+			return res.status(500).json(error(500, req.route.path, 'Alexa.updateallalarms', 'Retour vide'));
+
+		// Filtre et ne garde que les enregistrements du device selctionné
+		const notificationsfiltrees = notifications.filter(tmp => tmp.deviceSerialNumber == req.query.device);
+		notifications = notificationsfiltrees;
+
+
+		// Filtre et ne garde que les enregistrements qui sont supérieure à l'heure du jour
+		//Maintenant :
+		var d = new Date();
+		var date_format_str = d.getFullYear().toString() + "-" + ((d.getMonth() + 1).toString().length == 2 ? (d.getMonth() + 1).toString() : "0" + (d.getMonth() + 1).toString()) + "-" + (d.getDate().toString().length == 2 ? d.getDate().toString() : "0" + d.getDate().toString()) + " " + (d.getHours().toString().length == 2 ? d.getHours().toString() : "0" + d.getHours().toString()) + ":" + ((parseInt(d.getMinutes() / 5) * 5).toString().length == 2 ? (parseInt(d.getMinutes() / 5) * 5).toString() : "0" + (parseInt(d.getMinutes() / 5) * 5).toString()) + ":00";
+		const notificationsfiltrees4 = notifications.filter(tmp => (tmp.originalDate + ' ' + tmp.originalTime > date_format_str));
+		notifications = notificationsfiltrees4;
+
+		// Filtre et ne garde que les enregistrements qui ont un status qui correspond à req.query.status
+		//if ((req.query.status != 'all') && (req.query.status != 'ALL')) {
+			var FiltreSurStatus = 'ON';
+			//if ((req.query.status == 'off') || (req.query.status == 'OFF')) FiltreSurStatus = 'OFF';
+			const notificationsfiltrees2 = notifications.filter(tmp => tmp.status == FiltreSurStatus);
+			notifications = notificationsfiltrees2;
+		//}
+
+		// Trie par Date/Heure
+		const notificationsfiltrees3 = notifications.sort(function(a, b) {
+			var x = a.originalDate + a.originalTime;
+			var y = b.originalDate + b.originalTime;
+			return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+		});
+		notifications = notificationsfiltrees3;
+
+		whennextmusicalalarminfo='none';
+		musicalalarmmusicentityinfo='';
+		whennextreminderinfo='none';
+		whennextreminderlabelinfo='';
+		whennextalarminfo='none';
+		whennextmusicalalarminfo='none';
+		whennextreminderinfo='none';
+		whennexttimerinfo='none';
+		
+		var toReturn = [];		
+
+		// Filtre et ne garde que les enregistrements qui ont le type ALARM
+		const quelesAlarmes = notifications.filter(tmp => tmp.type == "Alarm");
+		let device=quelesAlarmes.shift();
+		if (device) { 
+			var h=device.originalTime; 
+			var d=device.originalDate; 
+			var dh=new Date(device.originalDate + ' ' + device.originalTime);
+			whennextalarminfo=h.substring(3, 5)+" "+h.substring(0, 2)+" "+d.substring(8,10)+" "+d.substring(5,7)+" "+dh.getDay()+" "+d.substring(0,4);
+		} 
+		
+		const quelesMinuteurs = notifications.filter(tmp => tmp.type == "Timer");
+		device=quelesMinuteurs.shift();
+		if (device) { 
+			let A = new Date();
+			A.setSeconds(device.remainingTime/1000);
+			var minutes = A.getMinutes();
+				if(minutes < 10)
+					  minutes = "0" + minutes;
+			var month = new Array();
+				month[0] = "01";
+				month[1] = "02";
+				month[2] = "03";
+				month[3] = "04";
+				month[4] = "05";
+				month[5] = "06";
+				month[6] = "07";
+				month[7] = "08";
+				month[8] = "09";
+				month[9] = "10";
+				month[10] = "11";
+				month[11] = "12";
+			whennexttimerinfo=minutes+" "+A.getHours()+" "+A.getDate()+ " "+month[A.getMonth()]+ " "+A.getDay()+ " "+A.getFullYear();
+		} 
+		
+		const quelesAlarmesMusicales = notifications.filter(tmp => tmp.type == "MusicAlarm");
+		device=quelesAlarmesMusicales.shift();
+		if (device) { 
+			var h=device.originalTime; 
+			var d=device.originalDate; 
+			var dh=new Date(device.originalDate + ' ' + device.originalTime);
+			whennextmusicalalarminfo=h.substring(3, 5)+" "+h.substring(0, 2)+" "+d.substring(8,10)+" "+d.substring(5,7)+" "+dh.getDay()+" "+d.substring(0,4);
+			musicalalarmmusicentityinfo=device.musicEntity;
+		} 
+
+		const quelesRappels = notifications.filter(tmp => tmp.type == "Reminder");
+		device=quelesRappels.shift();
+		if (device) { 
+			var h=device.originalTime; 
+			var d=device.originalDate; 
+			var dh=new Date(device.originalDate + ' ' + device.originalTime);
+			whennextreminderinfo=h.substring(3, 5)+" "+h.substring(0, 2)+" "+d.substring(8,10)+" "+d.substring(5,7)+" "+dh.getDay()+" "+d.substring(0,4);
+			whennextreminderlabelinfo=device.reminderLabel;
+		} 
+
+		toReturn.push({
+					'musicalalarmmusicentityinfo': musicalalarmmusicentityinfo,
+					'whennextalarminfo': whennextalarminfo,
+					'whennextmusicalalarminfo': whennextmusicalalarminfo,
+					'whennextreminderinfo': whennextreminderinfo,
+					'whennexttimerinfo': whennexttimerinfo,
+					'whennextreminderlabelinfo': whennextreminderlabelinfo
+				});
+		res.status(200).json(toReturn);
+	});
+
+	//});// retour de alexa.getDevices
 });
 
 
@@ -2310,6 +2445,7 @@ config.logger && config.logger('DATA envoyé:'+jsonaenvoyer,'DEBUG');
 			});
  /**/
     }
+		//  config.logger(JSON.stringify(devices));
 
 
 function error(status, source, title, detail) {

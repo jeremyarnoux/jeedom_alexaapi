@@ -261,8 +261,9 @@ function addCmdToTable(_cmd)
 					var DefinitionDivPourCommandesPredefinies='style="display: none;"';
 					if (init(_cmd.logicalId)=="")
 					DefinitionDivPourCommandesPredefinies="";
+//  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == '00whennextalarm') || (init(_cmd.logicalId) == 'whennextreminderlabel') || (init(_cmd.logicalId) == 'musicalalarmmusicentity') || (init(_cmd.logicalId) == 'whennextmusicalalarm')) {
 								
-  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == 'whennextalarm') || (init(_cmd.logicalId) == 'whennextreminderlabel') || (init(_cmd.logicalId) == 'musicalalarmmusicentity') || (init(_cmd.logicalId) == 'whennextmusicalalarm')) {
+  if ((init(_cmd.logicalId) == 'updateallalarms')) {
     return;
   }
   
