@@ -56,7 +56,19 @@ class alexaapi extends eqLogic {
 					'state_dark' =>  "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>")
 				)
 			);				
-		$return['info']['string']['reminder'] = array(
+		$return['info']['string']['timer'] = array(
+				'template' => 'alarm',
+				'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "15px"),
+				'test' => array(
+					array('operation' => "#value# == ''", 
+					'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
+					'state_dark'  => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-Off_dark.png' title ='" . __('En charge', __FILE__) . "'>"),
+					array('operation' => "#value# != ''",
+					'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-On.png' title ='" . __('En Pause', __FILE__) . "'>",
+					'state_dark' =>  "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>")
+				)
+			);			
+			$return['info']['string']['reminder'] = array(
 				'template' => 'alarm',
 				'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "4px"),
 				'test' => array(
@@ -111,7 +123,7 @@ class alexaapi extends eqLogic {
 		$url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/alexaapi/core/api/jeealexaapi.php?apikey=' . jeedom::getApiKey('alexaapi');
 		$log = $_debug ? '1' : '0';
 		$sensor_path = realpath(dirname(__FILE__) . '/../../resources');
-		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ' . network::getNetworkAccess('internal') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr').' '.jeedom::getApiKey('alexaapi').' '.log::getLogLevel('alexaapi'). ' '.config::byKey('utilisateurMQTT', 'alexaapi',0);
+		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ' . network::getNetworkAccess('internal') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr').' '.jeedom::getApiKey('alexaapi').' '.log::getLogLevel('alexaapi');
 		log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
 		$result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
 		//$cmdStart='nohup ' . $cmd . ' | tee >(grep "WS-MQTT">>'.log::getPathToLog('alexaapi_mqtt').') >(grep -v "WS-MQTT">>'. log::getPathToLog('alexaapi_node') . ')';
@@ -508,6 +520,7 @@ class alexaapi extends eqLogic {
 	}
 
 	public function refresh() { //$_routines c'est pour éviter de charger les routines lors du scan
+		log::add('alexaapi', 'info', 'Refresh du device '.$this->getName());
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') return false;
 		$widgetPlayer=($this->getConfiguration('devicetype') == "Player");
@@ -573,9 +586,12 @@ class alexaapi extends eqLogic {
 
 			try {
 				foreach ($this->getCmd('action') as $cmd) {
+							log::add('alexaapi', 'info', 'Test refresh du device '.$cmd->getName());
+
 					if ($cmd->getConfiguration('RunWhenRefresh', 0) != '1') {
 						continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
 					}
+							log::add('alexaapi', 'info', 'OUI pour '.$cmd->getName());
 					$value = $cmd->execute();
 				}
 			}

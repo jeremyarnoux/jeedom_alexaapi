@@ -96,12 +96,6 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
        </div> 
 	</div>	
 	<div class="form-group">
-        <label class="col-lg-4 control-label">{{Activer le client MQTT Amazon (conseillé pour les fonctions multimédia)}}</label>
-        <div class="col-lg-3">
-           <input type="checkbox" class="configKey" data-l1key="utilisateurMQTT" /><em>(activable uniquement en Béta pour l'instant)</em>
-       </div> 
-	</div>	
-	<div class="form-group">
 		  <label class="col-lg-4 control-label" >{{Ajouter automatiquement les équipements détectés dans :}}</label>
 		  <div class="col-lg-3">
 			<select id="sel_object" class="configKey form-control" data-l1key="defaultParentObject">

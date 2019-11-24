@@ -148,7 +148,7 @@ foreach($eqLogics as $eqLogic) {
 		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
 		echo '<div class="eqLogicDisplayCard cursor prem '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'" >';
 
-		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")))
+		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")) && (!strstr($eqLogic->getName(), "Ultimate Alexa")))
 			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
 
 		$alternateImg = $eqLogic->getConfiguration('type');

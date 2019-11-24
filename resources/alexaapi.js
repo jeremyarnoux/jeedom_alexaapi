@@ -12,8 +12,8 @@ const alexaserver = process.argv[4];
 const IPJeedom = process.argv[2];
 const ClePlugin = process.argv[5];
 const logLevel = process.argv[6];
-if (process.argv[7] == 1) useWsMqtt=true; else useWsMqtt=false;
-
+//if (process.argv[7] == 1) useWsMqtt=true; else useWsMqtt=false; abandonné
+useWsMqtt=true;
 //const debug=1; //mettre 1 pour debug
 // Références :
 // https://openclassrooms.com/fr/courses/1173401-les-closures-en-javascript
@@ -390,6 +390,7 @@ CommandAlexa.Command = function(req,res){
 	
 	// suppression de la boucle des serial
 	//boucleSurSerials_sendCommand(req);
+	config.logger('Alexa-API:    *******************************************');
 
 			alexa.sendCommand(req.query.device, req.query.command, 
 				function(testErreur){
@@ -397,15 +398,9 @@ CommandAlexa.Command = function(req,res){
 						traiteErreur(testErreur, 'command', req.query);;
 						res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Command', testErreur.message));
 						}
-						else
-						res.status(200).json({value: "OK"});	//ne teste pas le résultat
 					}
 			);
-
-
-	
-	//res.status(200).json({value: "Send"});	//ne teste pas le résultat
-
+res.status(200).json({value: "Send"});	//ne teste pas le résultat
 setTimeout(refreshPlayer.bind(null, req.query.device), 3000); // Dans 3s, actualiser le player
 	
 }
@@ -2367,15 +2362,15 @@ if (err)
 		//config.logger('Alexa-API: ******************************************************************');
 
 		if (err.message == "Connexion Close") {
-			config.logger("Alexa-API: Connexion Close détectée dans la détection d'erreur et donc relance de l'initialisation", 'WARNING');
+			config.logger("Alexa-API: Connexion Close détectée et donc relance du lien au serveur Amazon", 'WARNING');
 			startServer();
 		}
 		else if (err.message == "Unauthorized") {
-			config.logger("Alexa-API: Unauthorized détecté dans la détection d'erreur et donc relance de l'initialisation", 'WARNING');
+			config.logger("Alexa-API: Unauthorized détecté et donc relance du lien au serveur Amazon", 'WARNING');
 			startServer();
 		}		
-		else
-		{
+		//else
+		//{
 		if (Array.isArray(commandesEnErreur)) {
 		config.logger("Alexa-API: "+err+" Commands: "+JSON.stringify(commandesEnErreur)+" Query: "+JSON.stringify(queryEnErreur), 'ERROR');
 			if (!(queryEnErreur['replay'])) { // si c'est pas défini c'est que c'est le premier essai, donc on rejoue
@@ -2400,7 +2395,7 @@ if (err)
 		}	
 		//config.logger('Alexa-API: ******************************************************************');
 		//config.logger('Alexa-API: ******************************************************************');
-		}
+		//}
 		
 		
 		
