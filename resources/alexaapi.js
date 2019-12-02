@@ -494,7 +494,6 @@ Version initiale qui donne le résultat
 				}
 			);
 		});	
-
 }
 
 
@@ -1826,6 +1825,9 @@ app.get('/updateallalarms', (req, res) => {
 			var minutes = A.getMinutes();
 				if(minutes < 10)
 					  minutes = "0" + minutes;
+			var jours = A.getDate();
+				if(jours < 10)
+					  jours = "0" + jours;			
 			var month = new Array();
 				month[0] = "01";
 				month[1] = "02";
@@ -1839,7 +1841,7 @@ app.get('/updateallalarms', (req, res) => {
 				month[9] = "10";
 				month[10] = "11";
 				month[11] = "12";
-			whennexttimerinfo=minutes+" "+A.getHours()+" "+A.getDate()+ " "+month[A.getMonth()]+ " "+A.getDay()+ " "+A.getFullYear();
+			whennexttimerinfo=minutes+" "+A.getHours()+" "+jours+ " "+month[A.getMonth()]+ " "+A.getDay()+ " "+A.getFullYear();
 		} 
 		
 		const quelesAlarmesMusicales = notifications.filter(tmp => tmp.type == "MusicAlarm");

@@ -73,7 +73,7 @@ $alexaapi3->emptyCacheWidget();
 clearCacheWidget();
 */
 
-//log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
+log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 
 	switch ($nom) {
 		
@@ -110,6 +110,8 @@ clearCacheWidget();
 			break;	
 			
 			case 'ws-notification-change': //changement d'une alarme/rappel
+			log::add('alexaapi_node', 'info',  'Alexa-jee: notificationVersion: '.$result['notificationVersion']);
+
 				$alexaapi2->refresh();	// Lance un refresh du device principal
 			break;	
 			

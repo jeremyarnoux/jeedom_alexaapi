@@ -584,18 +584,53 @@ class alexaapi extends eqLogic {
 				$cmd->save();
 			}
 
+		
+		// On va sauvegarder la valeur de chaque ANCIENNE prochaine Alarme/Rappel/Minuteur ...
+		$maintenant = date("i H d m w Y");//40 18 20 11 3 2019
+
+		$cmd = $this->getCmd(null, 'whennextalarminfo'); if (is_object($cmd)) $whennextalarminfo_derniereValeur=$cmd->execCmd();
+		$cmd = $this->getCmd(null, 'whennextmusicalalarminfo'); if (is_object($cmd)) $whennextmusicalalarminfo_derniereValeur=$cmd->execCmd();
+		$cmd = $this->getCmd(null, 'whennextreminderinfo'); if (is_object($cmd)) $whennextreminderinfo_derniereValeur=$cmd->execCmd();
+		$cmd = $this->getCmd(null, 'whennexttimerinfo'); if (is_object($cmd)) $whennexttimerinfo_derniereValeur=$cmd->execCmd();
+		log::add('alexaapi_node', 'debug', '--------------------------------------------->maintenant:'.$maintenant);
+		log::add('alexaapi_node', 'debug', '---->whennextalarminfo:'.$whennextalarminfo_derniereValeur);
+		log::add('alexaapi_node', 'debug', '---->whennexttimerinfo:'.$whennexttimerinfo_derniereValeur);
+
 			try {
 				foreach ($this->getCmd('action') as $cmd) {
-							log::add('alexaapi', 'info', 'Test refresh du device '.$cmd->getName());
+							//log::add('alexaapi', 'info', 'Test refresh de la commande '.$cmd->getName());
 
 					if ($cmd->getConfiguration('RunWhenRefresh', 0) != '1') {
 						continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
 					}
-							log::add('alexaapi', 'info', 'OUI pour '.$cmd->getName());
+							//log::add('alexaapi', 'info', 'OUI pour '.$cmd->getName());
 					$value = $cmd->execute();
 				}
 			}
 			catch(Exception $exc) {log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());}
+			
+		// On va sauvegarder la valeur de chaque NOUVELLE prochaine Alarme/Rappel/Minuteur ...
+		$cmd = $this->getCmd(null, 'whennextalarminfo'); if (is_object($cmd)) $whennextalarminfo_actuelleValeur=$cmd->execCmd();
+		$cmd = $this->getCmd(null, 'whennextmusicalalarminfo'); if (is_object($cmd)) $whennextmusicalalarminfo_actuelleValeur=$cmd->execCmd();
+		$cmd = $this->getCmd(null, 'whennextreminderinfo'); if (is_object($cmd)) $whennextreminderinfo_actuelleValeur=$cmd->execCmd();
+		$cmd = $this->getCmd(null, 'whennexttimerinfo'); if (is_object($cmd)) $whennexttimerinfo_actuelleValeur=$cmd->execCmd();
+		log::add('alexaapi_node', 'debug', '---->whennextalarminfo2:'.$whennextalarminfo_actuelleValeur);
+		log::add('alexaapi_node', 'debug', '---->whennexttimerinfo2:'.$whennexttimerinfo_actuelleValeur);
+
+if (($whennextalarminfo_derniereValeur != $whennextalarminfo_actuelleValeur) && ($whennextalarminfo_derniereValeur==$maintenant))
+{
+		log::add('alexaapi_node', 'debug', '-------------------------------->today:ALLLLLAAARRRRMMMMMMEEEE'.$today);
+	
+}
+
+if (($whennexttimerinfo_derniereValeur != $whennexttimerinfo_actuelleValeur) && ($whennexttimerinfo_derniereValeur==$maintenant))
+{
+		log::add('alexaapi_node', 'debug', '-------------------------------->today:TTTIIIIMMMMMEEEERRRR'.$today);
+	
+}	
+
+
+			
 		}
 	}
 		
@@ -1022,9 +1057,9 @@ class alexaapiCmd extends cmd {
 
 
 	private function buildRequest($_options = array()) {
-	//log::add('alexaapi', 'info', '----Request:'.json_encode($_options));
 		if ($this->getType() != 'action') return $this->getConfiguration('request');
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
+	log::add('alexaapi', 'info', '----Command:*'.$command.'* Request:'.json_encode($_options));
 		switch ($command) {
 			case 'volume':
 				$request = $this->build_ControledeSliderSelectMessage($_options, '50');
@@ -1087,17 +1122,21 @@ class alexaapiCmd extends cmd {
 
 	
 	private function build_ControledeSliderSelectMessage($_options = array(), $default = "Ceci est un message de test") {
+		$cmd=$this->getEqLogic()->getCmd(null, 'volumeinfo');
+		if (is_object($cmd))
+			$lastvolume=$cmd->execCmd();
+		
 		$request = $this->getConfiguration('request');
-		//log::add('alexaapi_node', 'debug', '---->RequestFinale:'.$request);
+		//log::add('alexaapi_node', 'info', '---->Request2:'.$request);
 		//log::add('alexaapi_node', 'debug', '---->getName:'.$this->getEqLogic()->getCmd(null, 'volumeinfo')->execCmd());
 		if ((isset($_options['slider'])) && ($_options['slider'] == "")) $_options['slider'] = $default;
 		if ((isset($_options['select'])) && ($_options['select'] == "")) $_options['select'] = $default;
 		if ((isset($_options['message'])) && ($_options['message'] == "")) $_options['message'] = $default;
 		// Si on est sur une commande qui utilise volume, on va remettre après execution le volume courant
-		if (strstr($request, '&volume=')) $request = $request.'&lastvolume='.$this->getEqLogic()->getCmd(null, 'volumeinfo')->execCmd();
-		
+		if (strstr($request, '&volume=')) $request = $request.'&lastvolume='.$lastvolume;
 		$request = str_replace(array('#slider#', '#select#', '#message#', '#volume#'), 
 		array($_options['slider'], $_options['select'], urlencode(self::decodeTexteAleatoire($_options['message'])), $_options['volume']), $request);
+		//log::add('alexaapi_node', 'info', '---->RequestFinale:'.$request);
 		return $request;
 	}	
 
