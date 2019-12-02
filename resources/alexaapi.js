@@ -1758,7 +1758,12 @@ app.get('/updateallalarms', (req, res) => {
 	*/
 
 
-
+function ajouteZero(n){
+  if(n <= 9){
+    return "0" + n;
+  }
+  return n
+}
 
 
 	alexa.getNotifications2(function(notifications) {
@@ -1811,20 +1816,26 @@ app.get('/updateallalarms', (req, res) => {
 		const quelesAlarmes = notifications.filter(tmp => tmp.type == "Alarm");
 		let device=quelesAlarmes.shift();
 		if (device) { 
-			var h=device.originalTime; 
-			var d=device.originalDate; 
-			var dh=new Date(device.originalDate + ' ' + device.originalTime);
-			whennextalarminfo=h.substring(3, 5)+" "+h.substring(0, 2)+" "+d.substring(8,10)+" "+d.substring(5,7)+" "+dh.getDay()+" "+d.substring(0,4);
+			//var h=device.originalTime; 
+			//var d=device.originalDate; 
+			var original=new Date(device.originalDate + ' ' + device.originalTime);
+			let formatted_date = original.getFullYear() + "-" + ajouteZero(original.getMonth() + 1) + "-" + ajouteZero(original.getDate()) + " " + ajouteZero(original.getHours()) + ":" + ajouteZero(original.getMinutes()) + ":" + ajouteZero(original.getSeconds())
+			whennextalarminfo=formatted_date;
 		} 
 		
 		const quelesMinuteurs = notifications.filter(tmp => tmp.type == "Timer");
 		device=quelesMinuteurs.shift();
+//		config.logger('Alexa-API: (---) :'+JSON.stringify(device));
+		//config.logger('Alexa-API: (---) :'+device.remainingTime);
 		if (device) { 
 			let A = new Date();
 			A.setSeconds(device.remainingTime/1000);
+			var secondes = A.getSeconds();
+				if(secondes < 10)
+					  secondes = "0" + secondes;
 			var minutes = A.getMinutes();
 				if(minutes < 10)
-					  minutes = "0" + minutes;
+					  minutes = "0" + minutes;			
 			var jours = A.getDate();
 				if(jours < 10)
 					  jours = "0" + jours;			
@@ -1841,26 +1852,26 @@ app.get('/updateallalarms', (req, res) => {
 				month[9] = "10";
 				month[10] = "11";
 				month[11] = "12";
-			whennexttimerinfo=minutes+" "+A.getHours()+" "+jours+ " "+month[A.getMonth()]+ " "+A.getDay()+ " "+A.getFullYear();
+			//whennexttimerinfo=minutes+" "+A.getHours()+" "+jours+ " "+month[A.getMonth()]+ " "+A.getDay()+ " "+A.getFullYear();
+			whennexttimerinfo=A.getFullYear()+"-"+month[A.getMonth()]+"-"+jours+ " "+A.getHours()+":"+minutes+":"+secondes;
+			//2019-12-02 19:04:01
 		} 
 		
 		const quelesAlarmesMusicales = notifications.filter(tmp => tmp.type == "MusicAlarm");
 		device=quelesAlarmesMusicales.shift();
 		if (device) { 
-			var h=device.originalTime; 
-			var d=device.originalDate; 
-			var dh=new Date(device.originalDate + ' ' + device.originalTime);
-			whennextmusicalalarminfo=h.substring(3, 5)+" "+h.substring(0, 2)+" "+d.substring(8,10)+" "+d.substring(5,7)+" "+dh.getDay()+" "+d.substring(0,4);
+			var original=new Date(device.originalDate + ' ' + device.originalTime);
+			let formatted_date = original.getFullYear() + "-" + ajouteZero(original.getMonth() + 1) + "-" + ajouteZero(original.getDate()) + " " + ajouteZero(original.getHours()) + ":" + ajouteZero(original.getMinutes()) + ":" + ajouteZero(original.getSeconds())
+			whennextmusicalalarminfo=formatted_date;
 			musicalalarmmusicentityinfo=device.musicEntity;
 		} 
 
 		const quelesRappels = notifications.filter(tmp => tmp.type == "Reminder");
 		device=quelesRappels.shift();
 		if (device) { 
-			var h=device.originalTime; 
-			var d=device.originalDate; 
-			var dh=new Date(device.originalDate + ' ' + device.originalTime);
-			whennextreminderinfo=h.substring(3, 5)+" "+h.substring(0, 2)+" "+d.substring(8,10)+" "+d.substring(5,7)+" "+dh.getDay()+" "+d.substring(0,4);
+			var original=new Date(device.originalDate + ' ' + device.originalTime);
+			let formatted_date = original.getFullYear() + "-" + ajouteZero(original.getMonth() + 1) + "-" + ajouteZero(original.getDate()) + " " + ajouteZero(original.getHours()) + ":" + ajouteZero(original.getMinutes()) + ":" + ajouteZero(original.getSeconds())
+			whennextreminderinfo=formatted_date;
 			whennextreminderlabelinfo=device.reminderLabel;
 		} 
 
