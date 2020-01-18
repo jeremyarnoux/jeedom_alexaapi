@@ -544,11 +544,14 @@ class alexaapi extends eqLogic {
 			curl_close($ch);
 			$_playlists=true;
 		}
+		else {
+			$_playlists=false;			
+		}
 
 		if ($_playlists) {
 			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/playlists?device=".$device);
 			$json = json_decode($json, true);	
-			$ListeDesRoutines = [];
+			$ListeDesPlaylists = [];
 			foreach ($json as $key => $value) {
 				foreach ($value as $key2 => $playlist) {
 					foreach ($playlist as $key3 => $value2) {

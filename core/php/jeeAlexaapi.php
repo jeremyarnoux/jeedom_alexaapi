@@ -37,6 +37,7 @@ $chaineRecuperee=file_get_contents("php://input");
 $nom=$_GET["nom"];
 log::add('alexaapi', 'debug',  'Réception données sur jeeAlexaapi ['.$nom.']');
 log::add('alexaapi_mqtt', 'info',  " -------------------------------------------------------------------------------------------------------------" );
+log::add('alexaapi_widget', 'info',  " -------------------------------------------------------------------------------------------------------------" );
 
 log::add('alexaapi_mqtt', 'debug',  "chaineRecuperee: ".$chaineRecuperee);
 
@@ -163,8 +164,8 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 				}
 		
 	}
-	log::add('alexaapi_mqtt', 'info',  " -------------------------------------------------------------------------------------------------------------------------------------------------" );
-	if (is_object($alexaapi)) $alexaapi->refreshWidget();
+	log::add('alexaapi_mqtt', 'info',  " ----------------------------------------------------------------------------------------------------------------------------------------------" );
+	log::add('alexaapi_widget', 'info',  " ----------------------------------------------------------------------------------------------------------------------------------------------" );	if (is_object($alexaapi)) $alexaapi->refreshWidget();
 	/*
 // ----------------- VOLUME ------------------
 			
@@ -199,21 +200,21 @@ log::add('alexaapi_mqtt', 'debug',  'Changement état Audio Player: '.$result['a
 function metAJour($nom, $variable, $commandejeedom, $effaceSiNull, $_alexaapi) {
 	try {
 		if (isset($variable)) {
-			log::add('alexaapi_mqtt', 'info',  '   ['.$nom.':'.$commandejeedom.'] find: '.json_encode($variable). " sur {".$_alexaapi->getName()."}");
+			log::add('alexaapi_widget', 'info',  '   ['.$nom.':'.$commandejeedom.'] find: '.json_encode($variable). " sur {".$_alexaapi->getName()."}");
 			$_alexaapi->checkAndUpdateCmd($commandejeedom, $variable);
 			}
 			else {
-			log::add('alexaapi_mqtt', 'info',  '   ['.$nom.':'.$commandejeedom.'] non trouvé: '.$variable);
+			log::add('alexaapi_widget', 'info',  '   ['.$nom.':'.$commandejeedom.'] non trouvé: '.$variable);
 				if ($effaceSiNull) {
 					$_alexaapi->checkAndUpdateCmd($commandejeedom, null);
-					log::add('alexaapi_mqtt', 'info',  '   ['.$nom.':'.$commandejeedom.'] non trouvé et vidé');
+					log::add('alexaapi_widget', 'info',  '   ['.$nom.':'.$commandejeedom.'] non trouvé et vidé');
 				}
 			}	
 	} catch (Exception $e) {
-			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
 				
 		} catch (Error $e) {
-				log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+				log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
 
 			}	
 }
@@ -221,21 +222,21 @@ function metAJour($nom, $variable, $commandejeedom, $effaceSiNull, $_alexaapi) {
 function metAJourBoutonPlayer($nom, $variable, $commandejeedom, $nomBouton, $_alexaapi) {
 	try {
 		if (isset($variable)) {
-			log::add('alexaapi_mqtt', 'info',  '   ['.$nom.':'.$commandejeedom.':'.$nomBouton.'] find: '.json_encode($variable));
+			log::add('alexaapi_widget', 'info',  '   ['.$nom.':'.$commandejeedom.':'.$nomBouton.'] find: '.json_encode($variable));
 			$_alexaapi->checkAndUpdateCmd($commandejeedom, $variable);
 			if ($variable=='ENABLED') $visible=1; else $visible=0;
 				$cmd = $_alexaapi->getCmd(null, $nomBouton);
 				if (is_object($cmd)) {
-				//log::add('alexaapi_mqtt', 'info',  ' ok invisible');
+				//log::add('alexaapi_widget', 'info',  ' ok invisible');
 				$cmd->setIsVisible($visible);
 				$cmd->save();
 				}
 			}
 	} catch (Exception $e) {
-			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
 				
 		} catch (Error $e) {
-				log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+				log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
 
 			}	
 }
@@ -247,7 +248,7 @@ function metAJourImage($nom, $variable, $commandejeedom, $effaceSiNull, $_alexaa
 		
 		//if ($variable!=null)
 		if (isset($variable)) {
-			log::add('alexaapi_mqtt', 'info',  '   ['.$nom.':'.$commandejeedom.'] find: '.json_encode($variable));
+			log::add('alexaapi_widget', 'info',  '   ['.$nom.':'.$commandejeedom.'] find: '.json_encode($variable));
 			//$_alexaapi->checkAndUpdateCmd($commandejeedom, $variable);
 			//$_alexaapi->checkAndUpdateCmd($commandejeedom, "<img width='150' height='150' src='".$variable."' />");
 			$_alexaapi->checkAndUpdateCmd($commandejeedom, $variable);
@@ -255,32 +256,32 @@ function metAJourImage($nom, $variable, $commandejeedom, $effaceSiNull, $_alexaa
 			}
 			else
 			{
-			log::add('alexaapi_mqtt', 'debug',  '['.$nom.':'.$commandejeedom.'] non trouvé');
+			log::add('alexaapi_widget', 'debug',  '['.$nom.':'.$commandejeedom.'] non trouvé');
 			$_alexaapi->checkAndUpdateCmd($commandejeedom, "plugins/alexaapi/core/img/vide.gif");
 			}	
 	} catch (Exception $e) {
-			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
 				
 	} catch (Error $e) {
-			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
 
 	}	
 }	
 
 function metAJourPlayer($serialdevice, $audioPlayerState, $alexaapi) {
-		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
+		//log::add('alexaapi_widget', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
 //log::add('alexaapi_node', 'info',  " ***********************[metAJourPlayer]*********************************" );
 
 	try {
 		
-		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzzzz metAJourPlayer:'.$audioPlayerState);
+		//log::add('alexaapi_widget', 'debug',  'zzzzzzzzzzzzzzzzzzz metAJourPlayer:'.$audioPlayerState);
 		//if (($audioPlayerState=="PLAYING") || ($audioPlayerState=="REFRESH") || ($audioPlayerState=="PAUSED"))	{
 		//if ($audioPlayerState!="FINISHED") 	{
-		//log::add('alexaapi_mqtt', 'debug',  ' metAJourPlayer:'.$serialdevice);
+		//log::add('alexaapi_widget', 'debug',  ' metAJourPlayer:'.$serialdevice);
 
 		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/playerInfo?device=".str_replace ("_player", "", $serialdevice));
 		$result = json_decode($json,true);		
-		log::add('alexaapi_mqtt', 'debug',  ' JSON:'.$json);
+		log::add('alexaapi_widget', 'debug',  ' JSON:'.$json);
 	
 		
 		//}
@@ -302,7 +303,7 @@ metAJour("state", $result['playerInfo']['state'], 'state', false , $alexaapi);
 
 
 
-//log::add('alexaapi_mqtt', 'debug',  '5>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> resultplayerInfo:'.json_encode($result['playerInfo']['provider']['providerName']));
+//log::add('alexaapi_widget', 'debug',  '5>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> resultplayerInfo:'.json_encode($result['playerInfo']['provider']['providerName']));
 
 
 
@@ -336,20 +337,20 @@ metAJourBoutonPlayer("playPauseState", $etatdePlay, 'playPauseState', 'play' , $
 	*/
 
 	} catch (Exception $e) {
-			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
 				
 	} catch (Error $e) {
-			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
 
 	}
 //log::add('alexaapi_node', 'info',  " ************************************************************************" );
 if (is_object($alexaapi)) $alexaapi->refreshWidget(); //refresh Tuile Player
-log::add('alexaapi_mqtt', 'debug',  '** Mise à jour Tuile du Player **');
+log::add('alexaapi_widget', 'debug',  '** Mise à jour Tuile du Player **');
 
 }
 
 function metAJourPlaylist($serialdevice, $audioPlayerState, $alexaapi3, $alexaapi) {
-		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
+		//log::add('alexaapi_widget', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
 
 	try {
 		if ($audioPlayerState!="FINISHED") 	{		
@@ -357,16 +358,16 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $alexaapi3, $alexaap
 		//Pour avoir la piste en cours, on va aller chercher la valeur de playerinfo/mainArt/url pour pouvoir la comparer aux images de la playlist
 		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/playerinfo?device=".str_replace ("_player", "", $serialdevice));
 		$result = json_decode($json,true);		
-		$imageURLenCoursdeLecture=$result['playerInfo']['miniArt']['url'];
+		$imageURLenCoursdeLecture=$result['playerInfo']['miniArt']['url']; //Modif 09/12/2019 proposée par Aidom, annulée 10/12/2019
 		$etatPlayer=$result['playerInfo']['state'];
 		
-		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzzzz metAJourPlayer:'.$audioPlayerState);
+		//log::add('alexaapi_widget', 'debug',  'zzzzzzzzzzzzzzzzzzz metAJourPlayer:'.$audioPlayerState);
 		//if (($audioPlayerState=="PLAYING") || ($audioPlayerState=="REFRESH") || ($audioPlayerState=="PAUSED"))	{
 
-		//log::add('alexaapi_mqtt', 'debug',  ' metAJourPlayer:'.$serialdevice);
+		//log::add('alexaapi_widget', 'debug',  ' metAJourPlayer:'.$serialdevice);
 		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/media?device=".str_replace ("_player", "", $serialdevice));
 		$result = json_decode($json,true);		
-		//log::add('alexaapi_mqtt', 'debug',  '++++++++++++++++++++++++++++++++++ JSON:'.$json);
+		//log::add('alexaapi_widget', 'debug',  '++++++++++++++++++++++++++++++++++ JSON:'.$json);
 		//$imageURLenCoursdeLecture=$result['imageURL'];
 	
 		}
@@ -378,28 +379,28 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $alexaapi3, $alexaap
 
 //ON RECUPERE CE QUIE ST AU D2BUT DE MEDIA
 metAJour("contentId", $result['contentId'], 'contentId', true , $alexaapi);
-//log::add('alexaapi_mqtt', 'debug',  '++++++>+++++++++>+++++++++>++++++++++ $contentId:'.$result['contentId']);
+//log::add('alexaapi_widget', 'debug',  '++++++>+++++++++>+++++++++>++++++++++ $contentId:'.$result['contentId']);
 
 
 
 			//$image=$result['queue']['0']['imageURL'];
-			//log::add('alexaapi_mqtt', 'debug',  '++++++>+++++++++>+++++++++>++++++++++ $image:'.$image);
-			//log::add('alexaapi_mqtt', 'debug', '-->'.json_encode($result));
+			//log::add('alexaapi_widget', 'debug',  '++++++>+++++++++>+++++++++>++++++++++ $image:'.$image);
+			//log::add('alexaapi_widget', 'debug', '-->'.json_encode($result));
 			$html="<table style='border-collapse: separate; border-spacing : 10px; ' border='0' width='100%'>";
 			$compteurQueue=1;		
 	foreach ($result['queue'] as $key => $value) {
-				log::add('alexaapi_mqtt', 'debug', '-----------------album:'.$value['album']);
-				log::add('alexaapi_mqtt', 'debug', '-----------------artist:'.$value['artist']);
-				log::add('alexaapi_mqtt', 'debug', '-----------------imageURL:'.$value['imageURL']);			
-				log::add('alexaapi_mqtt', 'debug', '-----------------title:'.$value['title']);			
-				log::add('alexaapi_mqtt', 'debug', '-----------------durationSeconds:'.$value['durationSeconds']);			
+				log::add('alexaapi_widget', 'debug', '-----------------album:'.$value['album']);
+				log::add('alexaapi_widget', 'debug', '-----------------artist:'.$value['artist']);
+				log::add('alexaapi_widget', 'debug', '-----------------imageURL:'.$value['imageURL']);			
+				log::add('alexaapi_widget', 'debug', '-----------------title:'.$value['title']);			
+				log::add('alexaapi_widget', 'debug', '-----------------durationSeconds:'.$value['durationSeconds']);			
 	
 	if (($value['imageURL']==$imageURLenCoursdeLecture) && $compteurQueue>3){
 			$html="<table style='border-collapse: separate; border-spacing : 10px; ' border='0' width='100%'>";
 		}
 
 	$html.="<tr><td style='padding: 8px;'  rowspan='2' width='50'>";
-	//log::add('alexaapi_mqtt', 'debug',  '++++++++++++++++++++++++++++++++++ '.$value['imageURL']."//".$imageURLenCoursdeLecture);
+	//log::add('alexaapi_widget', 'debug',  '++++++++++++++++++++++++++++++++++ '.$value['imageURL']."//".$imageURLenCoursdeLecture);
 	if (($value['imageURL']==$imageURLenCoursdeLecture) && $etatPlayer=="PLAYING") $html.="<img style='position:absolute' src='plugins/alexaapi/core/img/playing_petit.gif' />";
 	$html.="<img style='height: 60px;width: 60px;border-radius: 30%;' src='".$value['imageURL']."'/></td>
         <td width='100%'>".$value['title']."</td>
@@ -420,10 +421,10 @@ $alexaapi3->refreshWidget(); //refresh Tuile Playlist
 
 
 	} catch (Exception $e) {
-			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
 				
 	} catch (Error $e) {
-			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
 
 	}	
 	
@@ -431,7 +432,7 @@ $alexaapi3->refreshWidget(); //refresh Tuile Playlist
 
 
 function metAJourBluetooth($serialdevice, $audioPlayerState, $alexaapi2, $alexaapi) {
-		//log::add('alexaapi_mqtt', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
+		//log::add('alexaapi_widget', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
 
 	try {
 		
@@ -439,7 +440,7 @@ function metAJourBluetooth($serialdevice, $audioPlayerState, $alexaapi2, $alexaa
 		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/bluetooth");
 		$result = json_decode($json,true);		
 
-//log::add('alexaapi_mqtt', 'debug', '-->--->--->--->--deviceSerialNumber:'.$result['bluetoothStates']['0']['deviceSerialNumber']);		
+//log::add('alexaapi_widget', 'debug', '-->--->--->--->--deviceSerialNumber:'.$result['bluetoothStates']['0']['deviceSerialNumber']);		
 		
 		
 		//$result=array_filter($result, "odd");
@@ -447,23 +448,23 @@ function metAJourBluetooth($serialdevice, $audioPlayerState, $alexaapi2, $alexaa
 		//$imageURLenCoursdeLecture=$result['playerInfo']['miniArt']['url'];
 		//$etatPlayer=$result['playerInfo']['state'];
 
-		//log::add('alexaapi_mqtt', 'debug',  '------------->'.json_encode($result));
+		//log::add('alexaapi_widget', 'debug',  '------------->'.json_encode($result));
 		
 		//if (($audioPlayerState=="PLAYING") || ($audioPlayerState=="REFRESH") || ($audioPlayerState=="PAUSED"))	{
 	
 		foreach ($result['bluetoothStates'] as $key => $value) {
-				//log::add('alexaapi_mqtt', 'debug', '-------------------------------------------------------------------------------');
-				//log::add('alexaapi_mqtt', 'debug', '-----------------deviceType:'.$value['deviceType']);
-				//log::add('alexaapi_mqtt', 'debug', '-----------------friendlyName:'.$value['friendlyName']);			
-				//log::add('alexaapi_mqtt', 'debug', '-----------------online:'.$value['online']);			
-				//log::add('alexaapi_mqtt', 'debug', '-----------------pairedDeviceList:'.$value['pairedDeviceList']);			
+				//log::add('alexaapi_widget', 'debug', '-------------------------------------------------------------------------------');
+				//log::add('alexaapi_widget', 'debug', '-----------------deviceType:'.$value['deviceType']);
+				//log::add('alexaapi_widget', 'debug', '-----------------friendlyName:'.$value['friendlyName']);			
+				//log::add('alexaapi_widget', 'debug', '-----------------online:'.$value['online']);			
+				//log::add('alexaapi_widget', 'debug', '-----------------pairedDeviceList:'.$value['pairedDeviceList']);			
 				if (is_array($value['pairedDeviceList'])) {
 					foreach ($value['pairedDeviceList'] as $key2 => $value2) {
 						if ($value['deviceSerialNumber'] == $serialdevice) {
-						//log::add('alexaapi_mqtt', 'debug', '-----------------$serialdevice:'.$serialdevice);
-						//log::add('alexaapi_mqtt', 'debug', '-----------------deviceSerialNumber:'.$value['deviceSerialNumber']);
-						//log::add('alexaapi_mqtt', 'debug', '********** friendlyName:'.$value2['friendlyName']);
-						//log::add('alexaapi_mqtt', 'debug', '********** connected:'.$value2['connected']);
+						//log::add('alexaapi_widget', 'debug', '-----------------$serialdevice:'.$serialdevice);
+						//log::add('alexaapi_widget', 'debug', '-----------------deviceSerialNumber:'.$value['deviceSerialNumber']);
+						//log::add('alexaapi_widget', 'debug', '********** friendlyName:'.$value2['friendlyName']);
+						//log::add('alexaapi_widget', 'debug', '********** connected:'.$value2['connected']);
 							if (isset($value2['connected']) && (($value2['connected']) == '1')) {
 								metAJour("bluetoothDevice", $value2['friendlyName'], 'bluetoothDevice', false , $alexaapi2);
 								}
@@ -483,10 +484,10 @@ function metAJourBluetooth($serialdevice, $audioPlayerState, $alexaapi2, $alexaa
 
 
 	} catch (Exception $e) {
-			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
 				
 	} catch (Error $e) {
-			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
 
 	}	
 	
