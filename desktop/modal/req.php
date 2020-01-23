@@ -80,6 +80,7 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 <option value="playlists" <?php if ($_GET['json']=="playlists") echo "selected"?>>Playlists</option>?>
 <option value="remindersFull" <?php if ($_GET['json']=="remindersFull") echo "selected"?>>Notifications</option>?>
 <option value="lists" <?php if ($_GET['json']=="lists") echo "selected"?>>Lists</option>?>
+<option value="routines" <?php if ($_GET['json']=="routines") echo "selected"?>>Routines</option>?>
 <option value="carts" <?php if ($_GET['json']=="carts") echo "selected"?>>Carts</option>?>
 <option value="alexa-cookie" <?php if ($_GET['json']=="alexa-cookie") echo "selected"?>>Cookie Amazon</option>?>
 <option value="deviceNotificationState" <?php if ($_GET['json']=="deviceNotificationState") echo "selected"?>>Device Notification State</option>?>

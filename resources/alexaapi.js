@@ -1396,7 +1396,8 @@ app.get('/routines', (req, res) => {
 		var resultatrecurrence;
 		//config.logger('Alexa-API: routines3b2');
 		var toReturn = [];
-		//config.logger('************DEBUG DE ROUTINES*******************');
+		config.logger('************DEBUG DE ROUTINES*******************');
+		config.logger('************Résultat de la requète Routines : '+JSON.stringify(niveau0));
 		for (var serial in niveau0) {
 			if (niveau0.hasOwnProperty(serial)) {
 				//config.logger('************************************************');
@@ -1875,6 +1876,7 @@ function ajouteZero(n){
 			whennextreminderlabelinfo=device.reminderLabel;
 		} 
 
+  
 		toReturn.push({
 					'musicalalarmmusicentityinfo': musicalalarmmusicentityinfo,
 					'whennextalarminfo': whennextalarminfo,

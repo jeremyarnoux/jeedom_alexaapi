@@ -520,12 +520,13 @@ class alexaapi extends eqLogic {
 	}
 
 	public function refresh() { //$_routines c'est pour éviter de charger les routines lors du scan
-		log::add('alexaapi', 'info', 'Refresh du device '.$this->getName());
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') return false;
-		$widgetPlayer=($this->getConfiguration('devicetype') == "Player");
-		$widgetSmarthome=($this->getConfiguration('devicetype') == "Smarthome");
-		$widgetPlaylist=($this->getConfiguration('devicetype') == "PlayList");
+		$devicetype=$this->getConfiguration('devicetype');
+		log::add('alexaapi', 'info', 'Refresh du device '.$this->getName().' ('.$devicetype.')');
+		$widgetPlayer=($devicetype == "Player");
+		$widgetSmarthome=($devicetype == "Smarthome");
+		$widgetPlaylist=($devicetype == "PlayList");
 		$widgetEcho=(!($widgetPlayer||$widgetSmarthome||$widgetPlaylist));
 		$device=str_replace("_player", "", $this->getConfiguration('serial'));
 
@@ -560,7 +561,7 @@ class alexaapi extends eqLogic {
 				}
 			}		
 			$cmd = $this->getCmd(null, 'playList');
-			if (is_object($cmd)) { //routine existe on  met à jour la liste des routines
+			if (is_object($cmd)) { //Playlists existe on  met à jour la liste des Playlists
 				$cmd->setConfiguration('listValue', join(';',$ListeDesPlaylists));
 				$cmd->save();
 				log::add('alexaapi', 'debug', 'Mise à jour de la liste des Playlists de '.$this->getName());
@@ -568,7 +569,7 @@ class alexaapi extends eqLogic {
 		}
 
 		if ($widgetEcho)	{
-			log::add('alexaapi', 'debug', 'execute : refresh routines');
+			log::add('alexaapi', 'debug', 'execute : refresh routines (WidgetEcho) avec la requète http://' . config::byKey('internalAddr') . ':3456/routines');
 			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
 			$json = json_decode($json, true);	// Met à jour la liste des routines des commandes action "routine"
 			self::sortBy('utterance', $json, 'asc');
@@ -577,8 +578,10 @@ class alexaapi extends eqLogic {
 				if ($item['utterance'] != '') 
 					$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
 				else {
-					if ($item['triggerTime'] != '') $resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
-					$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
+					if ($item['triggerTime'] != '') {
+						$resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
+						$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
+					}
 				}
 			}
 			$cmd = $this->getCmd(null, 'routine');
@@ -588,20 +591,21 @@ class alexaapi extends eqLogic {
 			}
 
 		
-		// On va sauvegarder la valeur de chaque ANCIENNE prochaine Alarme/Rappel/Minuteur ...
-		$maintenant = date("i H d m w Y");//40 18 20 11 3 2019
+			// On va sauvegarder la valeur de chaque ANCIENNE prochaine Alarme/Rappel/Minuteur ...
+			$maintenant = date("i H d m w Y");//40 18 20 11 3 2019
 
-		$cmd = $this->getCmd(null, 'whennextalarminfo'); if (is_object($cmd)) $whennextalarminfo_derniereValeur=$cmd->execCmd();
-		$cmd = $this->getCmd(null, 'whennextmusicalalarminfo'); if (is_object($cmd)) $whennextmusicalalarminfo_derniereValeur=$cmd->execCmd();
-		$cmd = $this->getCmd(null, 'whennextreminderinfo'); if (is_object($cmd)) $whennextreminderinfo_derniereValeur=$cmd->execCmd();
-		$cmd = $this->getCmd(null, 'whennexttimerinfo'); if (is_object($cmd)) $whennexttimerinfo_derniereValeur=$cmd->execCmd();
-		log::add('alexaapi_node', 'debug', '--------------------------------------------->maintenant:'.$maintenant);
-		log::add('alexaapi_node', 'debug', '---->whennextalarminfo:'.$whennextalarminfo_derniereValeur);
-		log::add('alexaapi_node', 'debug', '---->whennexttimerinfo:'.$whennexttimerinfo_derniereValeur);
+			$cmd = $this->getCmd(null, 'whennextalarminfo'); if (is_object($cmd)) $whennextalarminfo_derniereValeur=$cmd->execCmd();
+			$cmd = $this->getCmd(null, 'whennextmusicalalarminfo'); if (is_object($cmd)) $whennextmusicalalarminfo_derniereValeur=$cmd->execCmd();
+			$cmd = $this->getCmd(null, 'whennextreminderinfo'); if (is_object($cmd)) $whennextreminderinfo_derniereValeur=$cmd->execCmd();
+			$cmd = $this->getCmd(null, 'whennexttimerinfo'); if (is_object($cmd)) $whennexttimerinfo_derniereValeur=$cmd->execCmd();
+			log::add('alexaapi_node', 'debug', '--------------------------------------------->>maintenant:'.$maintenant);
+			log::add('alexaapi_node', 'debug', '---->whennextalarminfo:'.$whennextalarminfo_derniereValeur);
+			log::add('alexaapi_node', 'debug', '---->whennexttimerinfo:'.$whennexttimerinfo_derniereValeur);
 
 			try {
+							log::add('alexaapi', 'info', 'coucou');
 				foreach ($this->getCmd('action') as $cmd) {
-							//log::add('alexaapi', 'info', 'Test refresh de la commande '.$cmd->getName());
+							log::add('alexaapi', 'info', 'Test refresh de la commande '.$cmd->getName().' valeur -> '.$cmd->getConfiguration('RunWhenRefresh', 0));
 
 					if ($cmd->getConfiguration('RunWhenRefresh', 0) != '1') {
 						continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
@@ -612,25 +616,25 @@ class alexaapi extends eqLogic {
 			}
 			catch(Exception $exc) {log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());}
 			
-		// On va sauvegarder la valeur de chaque NOUVELLE prochaine Alarme/Rappel/Minuteur ...
-		$cmd = $this->getCmd(null, 'whennextalarminfo'); if (is_object($cmd)) $whennextalarminfo_actuelleValeur=$cmd->execCmd();
-		$cmd = $this->getCmd(null, 'whennextmusicalalarminfo'); if (is_object($cmd)) $whennextmusicalalarminfo_actuelleValeur=$cmd->execCmd();
-		$cmd = $this->getCmd(null, 'whennextreminderinfo'); if (is_object($cmd)) $whennextreminderinfo_actuelleValeur=$cmd->execCmd();
-		$cmd = $this->getCmd(null, 'whennexttimerinfo'); if (is_object($cmd)) $whennexttimerinfo_actuelleValeur=$cmd->execCmd();
-		log::add('alexaapi_node', 'debug', '---->whennextalarminfo2:'.$whennextalarminfo_actuelleValeur);
-		log::add('alexaapi_node', 'debug', '---->whennexttimerinfo2:'.$whennexttimerinfo_actuelleValeur);
+			// On va sauvegarder la valeur de chaque NOUVELLE prochaine Alarme/Rappel/Minuteur ...
+			$cmd = $this->getCmd(null, 'whennextalarminfo'); if (is_object($cmd)) $whennextalarminfo_actuelleValeur=$cmd->execCmd();
+			$cmd = $this->getCmd(null, 'whennextmusicalalarminfo'); if (is_object($cmd)) $whennextmusicalalarminfo_actuelleValeur=$cmd->execCmd();
+			$cmd = $this->getCmd(null, 'whennextreminderinfo'); if (is_object($cmd)) $whennextreminderinfo_actuelleValeur=$cmd->execCmd();
+			$cmd = $this->getCmd(null, 'whennexttimerinfo'); if (is_object($cmd)) $whennexttimerinfo_actuelleValeur=$cmd->execCmd();
+			log::add('alexaapi_node', 'debug', '---->whennextalarminfo2:'.$whennextalarminfo_actuelleValeur);
+			log::add('alexaapi_node', 'debug', '---->whennexttimerinfo2:'.$whennexttimerinfo_actuelleValeur);
 
-if (($whennextalarminfo_derniereValeur != $whennextalarminfo_actuelleValeur) && ($whennextalarminfo_derniereValeur==$maintenant))
-{
-		log::add('alexaapi_node', 'debug', '-------------------------------->today:ALLLLLAAARRRRMMMMMMEEEE'.$today);
-	
-}
+				if (($whennextalarminfo_derniereValeur != $whennextalarminfo_actuelleValeur) && ($whennextalarminfo_derniereValeur==$maintenant))
+				{
+						log::add('alexaapi_node', 'debug', '-------------------------------->today:ALLLLLAAARRRRMMMMMMEEEE'.$today);
+					
+				}
 
-if (($whennexttimerinfo_derniereValeur != $whennexttimerinfo_actuelleValeur) && ($whennexttimerinfo_derniereValeur==$maintenant))
-{
-		log::add('alexaapi_node', 'debug', '-------------------------------->today:TTTIIIIMMMMMEEEERRRR'.$today);
-	
-}	
+				if (($whennexttimerinfo_derniereValeur != $whennexttimerinfo_actuelleValeur) && ($whennexttimerinfo_derniereValeur==$maintenant))
+				{
+						log::add('alexaapi_node', 'debug', '-------------------------------->today:TTTIIIIMMMMMEEEERRRR'.$today);
+					
+				}	
 
 
 			
@@ -727,6 +731,8 @@ if (($whennexttimerinfo_derniereValeur != $whennexttimerinfo_actuelleValeur) && 
 				log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . ' : ' . $exc->getMessage());
 			}
 		} else {
+							//log::add('alexaapi', 'debug', 'PAS de **'.$LogicalId.'*********************************');
+
 		$cmd = $this->getCmd(null, $LogicalId);
 			if (is_object($cmd)) {
 				$cmd->remove();
