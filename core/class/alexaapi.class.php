@@ -364,7 +364,7 @@ class alexaapi extends eqLogic {
 			foreach (self::listePluginsAlexa() as $pluginAlexaUnparUn)
 			{
 				if  (in_array("AUDIO_PLAYER",$item['capabilities'])) {
-							message::add('alexaapi', '////////////////////////////// On est dans :'.$pluginAlexaUnparUn);
+							//message::add('alexaapi', '////////////////////////////// On est dans :'.$pluginAlexaUnparUn);
 						// Device PLAYLIST
 						$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_playlist", $pluginAlexaUnparUn);
 						if (!is_object($device)) {
