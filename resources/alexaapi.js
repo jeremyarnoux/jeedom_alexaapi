@@ -257,6 +257,10 @@ CommandAlexa.Announcement = function(req,res){
 	res.status(200).json({value: "Send2"});	//ne teste pas le résultat//supprimé 16/11/2019
 }
 
+
+
+
+
 /**** Alexa.Radio *****
   URL: /radio?device=?&text=?
     device - String - name of the device
@@ -400,6 +404,8 @@ CommandAlexa.Command = function(req,res){
 						}
 					}
 			);
+		
+			
 res.status(200).json({value: "Send"});	//ne teste pas le résultat
 setTimeout(refreshPlayer.bind(null, req.query.device), 3000); // Dans 3s, actualiser le player
 	
@@ -432,6 +438,7 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 	if ('command' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.SmarthomeCommand', 'Missing parameter "command"'));
 
 						parameters = {};
+					
 						parameters.action = 'turnOn'; // Même opération mais d'une autre manière
 						parameters.action = 'turnOff'; // Même opération mais d'une autre manière
 						parameters.action = req.query.command; 
@@ -445,7 +452,19 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 					if (testErreur) traiteErreur(testErreur);
 				}
 			);
-	res.status(200).json({value: "Send"});	//ne teste pas le résultat
+		var etat="0";
+		if (parameters.action == 'turnOn') etat="1";
+			
+	  	var toReturn = [];		
+		toReturn.push({
+					'device': req.query.device,
+					'command': parameters.action,
+					'state': etat
+				});
+		res.status(200).json(toReturn);		
+
+			
+	//res.status(200).json({value: "Send"});	//ne teste pas le résultat
 
 }
 
@@ -557,8 +576,33 @@ CommandAlexa.Push = function(req,res){
 	
 	res.status(200).json({value: "Send"});	//ne teste pas le résultat//supprimé 16/11/2019
 }
+/*
+CommandAlexa.MultipleNext = function(req,res){
+	
+	res.type('json');
+	
+	config.logger('Alexa-API:    Lancement /MultipleNext avec paramètres -> device: ' + req.query.device+' & nb: ' + req.query.text);
+
+	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.MultipleNext', 'Missing parameter "device"'));
+	//if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.MultipleNext', 'Missing parameter "text"'));
+req.query.command="next";
+			
+			alexa.sendCommand(req.query.device, req.query.command,
+			function(){
+				alexa.sendCommand(req.query.device, req.query.command,
+			function(){
+					alexa.sendCommand(req.query.device, req.query.command,
+				function(){
+					});
+				});
+			});
+			
 
 
+	
+	res.status(200).json({value: "Send"});	//ne teste pas le résultat//supprimé 16/11/2019
+}
+*/
 /***** DeleteReminder *****
   URL: /deletereminder
 
@@ -643,6 +687,7 @@ app.get('/speak', CommandAlexa.Speak);
 app.get('/announcement', CommandAlexa.Announcement);
 app.get('/radio', CommandAlexa.Radio);
 app.get('/push', CommandAlexa.Push);
+//app.get('/multiplenext', CommandAlexa.MultipleNext);
 app.get('/deletereminder', CommandAlexa.deleteReminder);
 //app.get('/enablereminder', CommandAlexa.enableReminder);
 //app.get('/disablereminder', CommandAlexa.disableReminder);
@@ -1876,7 +1921,7 @@ function ajouteZero(n){
 			whennextreminderlabelinfo=device.reminderLabel;
 		} 
 
-  
+
 		toReturn.push({
 					'musicalalarmmusicentityinfo': musicalalarmmusicentityinfo,
 					'whennextalarminfo': whennextalarminfo,

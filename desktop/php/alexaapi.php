@@ -143,7 +143,7 @@ endif;
 <?php
 foreach($eqLogics as $eqLogic) {
 
-	if (($eqLogic->getConfiguration('devicetype') != "Smarthome") && ($eqLogic->getConfiguration('devicetype') != "Player") && ($eqLogic->getConfiguration('devicetype') != "PlayList")) {
+//	if (($eqLogic->getConfiguration('devicetype') != "Smarthome") && ($eqLogic->getConfiguration('devicetype') != "Player") && ($eqLogic->getConfiguration('devicetype') != "PlayList")) {
 
 		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
 		echo '<div class="eqLogicDisplayCard cursor prem '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'" >';
@@ -165,116 +165,13 @@ foreach($eqLogics as $eqLogic) {
 		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
 
 		echo '</div>';
-	}
-}
-?>
-			</div>
-		</div>
-    </div>
-	<?php	
-	if (config::byKey('utilisateurMultimedia', 'alexaapi',0)!="0")
-	{	
-?>
-	
-	<legend><i class="fas fa-table"></i> {{Mes Amazon Player}}</legend>
-	<div class="input-group" style="margin-bottom:5px;">
-		<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic2" />
-		<div class="input-group-btn">
-			<a id="bt_resetEqlogicSearch2" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
-		</div>
-	</div>	
-    <!-- Container de la liste -->
-	<div class="panel">
-		<div class="panel-body">
-			<div class="eqLogicThumbnailContainer second">
-<?php
-foreach($eqLogics as $eqLogic) {
-
-	if ($eqLogic->getConfiguration('devicetype') == "Player") {
-
-		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
-		echo '<div class="eqLogicDisplayCard cursor second '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'" >';
-
-		if (($eqLogic->getStatus('online') != 'true'))
-			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
-		else {
-				if (($eqLogic->getStatus('Playing') == 'true'))
-					echo '<i class="fa fa-play" style="color: green;text-shadow: 4px 4px 4px #ccc;float:right" title="Playing"></i>';
-				else
-					echo '<i class="fas loisir-musical7" style="color: #2c8af6;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>'; // Dire que c'est un Player
-		}
-
-		$alternateImg = $eqLogic->getConfiguration('type');
-		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" style="min-height:75px !important;" />';
-		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" style="min-height:75px !important;" />';
-		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" style="min-height:75px !important;" />';
-		else
-			echo '<img class="lazy" src="'.$plugin->getPathImgIcon().'" style="min-height:75px !important;" />';
-
-		echo '<br />';
-		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
-
-		echo '</div>';
-	}
+	//}
 }
 ?>
 			</div>
 		</div>
     </div>
 	
-<?php	
-	}
-	if (config::byKey('utilisateurSmarthome', 'alexaapi',0)!="0")
-	{	
-?>
-    <!-- Début de la liste des objets -->
-    <legend><i class="fas fa-table"></i> {{Mes Amazon Smarthome}}</legend>
-	<div class="input-group" style="margin-bottom:5px;">
-		<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic3" />
-		<div class="input-group-btn">
-			<a id="bt_resetEqlogicSearch3" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
-		</div>
-	</div>	
-    <!-- Container de la liste -->
-	<div class="panel">
-		<div class="panel-body">
-			<div class="eqLogicThumbnailContainer third">
-<?php
-foreach($eqLogics as $eqLogic) {
-	if ($eqLogic->getConfiguration('devicetype') == "Smarthome") {
-
-		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
-		echo '<div class="eqLogicDisplayCard cursor third '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'">';
-
-		if (($eqLogic->getStatus('online') != 'true'))
-			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
-
-		$alternateImg = $eqLogic->getConfiguration('type');
-		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" style="min-height:75px !important;" />';
-		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" style="min-height:75px !important;" />';
-		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" style="min-height:75px !important;" />';
-		else
-			echo '<img class="lazy" src="'.$plugin->getPathImgIcon().'" style="min-height:75px !important;" />';
-
-		echo '<br />';
-		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
-		echo '</div>';
-	}
-}
-?>
-			</div>
-		</div>
-    </div>  
-
-<?php	
-	}	
-?>
 
 	
   </div>
