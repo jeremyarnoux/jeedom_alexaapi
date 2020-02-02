@@ -3,13 +3,15 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 class alexaapi extends eqLogic {
 	
-    public static function listePluginsAlexa($withAPI=false){
+    public static function listePluginsAlexa($withAPI=false, $withSmartHome=false){
 		$liste = array();
 		if ($withAPI) array_push($liste, "alexaapi");
 		try {$test = plugin::byId('alexaamazonmusic');  if ($test->isActive()) array_push($liste, "alexaamazonmusic");}  catch(Exception $e) {}
 		try {$test = plugin::byId('alexadeezer');       if ($test->isActive()) array_push($liste, "alexadeezer");}       catch(Exception $e) {}
 		try {$test = plugin::byId('alexaspotify');      if ($test->isActive()) array_push($liste, "alexaspotify");}      catch(Exception $e) {}
+		if ($withSmartHome) {
 		try {$test = plugin::byId('alexasmarthome');    if ($test->isActive()) array_push($liste, "alexasmarthome");}      catch(Exception $e) {}
+		}
 		return $liste;
 	}
 	
@@ -238,7 +240,7 @@ class alexaapi extends eqLogic {
 	public static function supprimeTouslesDevices() {
 		
 		event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Suppression en cours ...', __FILE__)));
-		foreach (self::listePluginsAlexa(true) as $pluginAlexaUnparUn)
+		foreach (self::listePluginsAlexa(true, true) as $pluginAlexaUnparUn)
 		{
 			foreach (eqLogic::byType(plugin::byId($pluginAlexaUnparUn)->getId()) as $eqLogic) {$eqLogic->remove();}
 		}
@@ -361,7 +363,7 @@ class alexaapi extends eqLogic {
 
 			foreach (self::listePluginsAlexa() as $pluginAlexaUnparUn)
 			{
-				if  ((in_array("AUDIO_PLAYER",$item['capabilities'])) && ($pluginAlexaUnparUn!="alexasmarthome")) {
+				if  (in_array("AUDIO_PLAYER",$item['capabilities'])) {
 							message::add('alexaapi', '////////////////////////////// On est dans :'.$pluginAlexaUnparUn);
 						// Device PLAYLIST
 						$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_playlist", $pluginAlexaUnparUn);
@@ -420,7 +422,7 @@ class alexaapi extends eqLogic {
 			$numDevices++;
 		}
 		
-		if (in_array("alexasmarthome", self::listePluginsAlexa())) {	
+		if (in_array("alexasmarthome", self::listePluginsAlexa(false, true))) {	
 			// --- Mise à jour des SmartHome Devices
 			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeEntities");
 			$json = json_decode($json, true);
@@ -540,12 +542,12 @@ class alexaapi extends eqLogic {
 			$cmd = $this->getCmd(null, 'whennextmusicalalarminfo'); if (is_object($cmd)) $whennextmusicalalarminfo_derniereValeur=$cmd->execCmd();
 			$cmd = $this->getCmd(null, 'whennextreminderinfo'); if (is_object($cmd)) $whennextreminderinfo_derniereValeur=$cmd->execCmd();
 			$cmd = $this->getCmd(null, 'whennexttimerinfo'); if (is_object($cmd)) $whennexttimerinfo_derniereValeur=$cmd->execCmd();
-			log::add('alexaapi_node', 'debug', '--------------------------------------------->>maintenant:'.$maintenant);
-			log::add('alexaapi_node', 'debug', '---->whennextalarminfo:'.$whennextalarminfo_derniereValeur);
-			log::add('alexaapi_node', 'debug', '---->whennexttimerinfo:'.$whennexttimerinfo_derniereValeur);
+			//log::add('alexaapi_node', 'debug', '--------------------------------------------->>maintenant:'.$maintenant);
+			//log::add('alexaapi_node', 'debug', '---->whennextalarminfo:'.$whennextalarminfo_derniereValeur);
+			//log::add('alexaapi_node', 'debug', '---->whennexttimerinfo:'.$whennexttimerinfo_derniereValeur);
 
 			try {
-							log::add('alexaapi', 'info', 'coucou');
+							//log::add('alexaapi', 'info', 'coucou');
 				foreach ($this->getCmd('action') as $cmd) {
 							//log::add('alexaapi', 'info', 'Test refresh de la commande '.$cmd->getName().' valeur -> '.$cmd->getConfiguration('RunWhenRefresh', 0));
 
@@ -563,8 +565,8 @@ class alexaapi extends eqLogic {
 			$cmd = $this->getCmd(null, 'whennextmusicalalarminfo'); if (is_object($cmd)) $whennextmusicalalarminfo_actuelleValeur=$cmd->execCmd();
 			$cmd = $this->getCmd(null, 'whennextreminderinfo'); if (is_object($cmd)) $whennextreminderinfo_actuelleValeur=$cmd->execCmd();
 			$cmd = $this->getCmd(null, 'whennexttimerinfo'); if (is_object($cmd)) $whennexttimerinfo_actuelleValeur=$cmd->execCmd();
-			log::add('alexaapi_node', 'debug', '---->whennextalarminfo2:'.$whennextalarminfo_actuelleValeur);
-			log::add('alexaapi_node', 'debug', '---->whennexttimerinfo2:'.$whennexttimerinfo_actuelleValeur);
+			//log::add('alexaapi_node', 'debug', '---->whennextalarminfo2:'.$whennextalarminfo_actuelleValeur);
+			//log::add('alexaapi_node', 'debug', '---->whennexttimerinfo2:'.$whennexttimerinfo_actuelleValeur);
 
 				if (($whennextalarminfo_derniereValeur != $whennextalarminfo_actuelleValeur) && ($whennextalarminfo_derniereValeur==$maintenant))
 				{
@@ -905,7 +907,7 @@ class alexaapiCmd extends cmd {
 		}
 
 		$request = $this->buildRequest($_options);
-		log::add('alexaapi', 'info', 'Request : ' . $request);//Request : http://192.168.0.21:3456/volume?value=50&device=G090LF118173117U
+		log::add('alexaapi', 'info', 'Envoi de ' . $request);//Request : http://192.168.0.21:3456/volume?value=50&device=G090LF118173117U
 		$request_http = new com_http($request);
 		$request_http->setAllowEmptyReponse(true);//Autorise les réponses vides
 		if ($this->getConfiguration('noSslCheck') == 1) $request_http->setNoSslCheck(true);
@@ -969,7 +971,7 @@ class alexaapiCmd extends cmd {
 	private function buildRequest($_options = array()) {
 		if ($this->getType() != 'action') return $this->getConfiguration('request');
 		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
-	log::add('alexaapi', 'info', '----Command:*'.$command.'* Request:'.json_encode($_options));
+	//log::add('alexaapi', 'info', '----Command:*'.$command.'* Request:'.json_encode($_options));
 		switch ($command) {
 			case 'volume':
 				$request = $this->build_ControledeSliderSelectMessage($_options, '50');

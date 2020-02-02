@@ -127,7 +127,7 @@ if (((config::byKey('utilisateurExperimente', 'alexaapi',0)!="0")) && (log::getL
 		</div><?php
 endif;
 
-		foreach (alexaapi::listePluginsAlexa(false) as $pluginAlexaUnparUn)
+		foreach (alexaapi::listePluginsAlexa(false, true) as $pluginAlexaUnparUn)
 		{
 			//echo $pluginAlexaUnparUn;
 			$nomPlugin="inconnu";

@@ -59,7 +59,7 @@ if (!is_array($result)) {
 	log::add('alexaapi_mqtt', 'debug', 'Format Invalide');
 	die();
 }
-log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialNumber']);
+//log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialNumber']);
 $logical_id = $result['deviceSerialNumber']."_player";
 
 $alexaapi=alexaamazonmusic::byLogicalId($logical_id, 'alexaamazonmusic'); // PLAYER
@@ -170,7 +170,7 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 				}
 		
 	}
-	log::add('alexaapi_mqtt', 'info',  " ------------------------------------------------------------------------------------------------" );
+	//log::add('alexaapi_mqtt', 'info',  " ------------------------------------------------------------------------------------------------" );
 	log::add('alexaapi_widget', 'info',  " -------------------------------------------------------------------------------------------------" );	
 	
 	if (is_object($alexaapi)) $alexaapi->refreshWidget();
@@ -180,14 +180,14 @@ function metAJour($nom, $variable, $commandejeedom, $effaceSiNull, $_typeDevice,
 
 	if ($_typeDevice=="ECHO") {
 			$alexaapi2=alexaapi::byLogicalId($_deviceSerialNumber, 'alexaapi'); // ECHO
-			metAJour2($nom, $variable, $commandejeedom, $effaceSiNull, $alexaapi2);
+			if (is_object($alexaapi2)) metAJour2($nom, $variable, $commandejeedom, $effaceSiNull, $alexaapi2);
 	}
 
 	if ($_typeDevice=="PLAYER") {
 			foreach (alexaapi::listePluginsAlexa() as $pluginAlexaUnparUn)
 			{
 			$alexaapi=$pluginAlexaUnparUn::byLogicalId($_deviceSerialNumber."_player", $pluginAlexaUnparUn); // PLAYER
-			metAJour2($nom, $variable, $commandejeedom, $effaceSiNull, $alexaapi);
+			if (is_object($alexaapi)) metAJour2($nom, $variable, $commandejeedom, $effaceSiNull, $alexaapi);
 			}
 	}
 
@@ -195,7 +195,7 @@ function metAJour($nom, $variable, $commandejeedom, $effaceSiNull, $_typeDevice,
 			foreach (alexaapi::listePluginsAlexa() as $pluginAlexaUnparUn)
 			{
 			$alexaapi3=$pluginAlexaUnparUn::byLogicalId($_deviceSerialNumber."_playlist", $pluginAlexaUnparUn); // PLAYLIST
-			metAJour2($nom, $variable, $commandejeedom, $effaceSiNull, $alexaapi3);
+			if (is_object($alexaapi3)) metAJour2($nom, $variable, $commandejeedom, $effaceSiNull, $alexaapi3);
 			}
 	}
 }
@@ -220,7 +220,7 @@ function metAJour2($nom, $variable, $commandejeedom, $effaceSiNull, $_alexaapi) 
 			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
 				
 		} catch (Error $e) {
-				log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+				log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur22: '.$e);
 
 			}	
 }
@@ -252,7 +252,7 @@ function metAJourImage2($nom, $variable, $commandejeedom, $effaceSiNull, $_alexa
 			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
 				
 	} catch (Error $e) {
-			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+			log::add('alexaapi_mqtt', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur21: '.$e);
 	}	
 }	
 
@@ -277,7 +277,7 @@ function metAJourPlayer($serialdevice, $audioPlayerState, $alexaapi) {
 	} catch (Exception $e) {
 			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
 	} catch (Error $e) {
-			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur25: '.$e);
 	}
 if (is_object($alexaapi)) $alexaapi->refreshWidget(); //refresh Tuile Player
 log::add('alexaapi_widget', 'debug',  '** Mise à jour Tuile du Player **');
@@ -351,7 +351,7 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='perso
 		}
 	} 
 	catch (Exception $e) {log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);} 
-	catch (Error $e) {log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);}	
+	catch (Error $e) {log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur26: '.$e);}	
 	
 }	
 
@@ -408,7 +408,7 @@ function metAJourBluetooth($serialdevice, $audioPlayerState, $alexaapi2, $alexaa
 			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
 				
 	} catch (Error $e) {
-			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur2: '.$e);
+			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur27: '.$e);
 
 	}	
 	
