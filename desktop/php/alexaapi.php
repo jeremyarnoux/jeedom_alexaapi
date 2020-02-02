@@ -80,52 +80,76 @@ var str=data.logicalId
 
 		<!-- Bouton d accès à la configuration -->
 		<div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
-			<i class="fas fa-wrench"></i>
+			<i class="fas fa-wrench" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Configuration}}</span>
+			<span style="color:#42d4eb">{{Configuration}}</span>
 		</div>
 
 		<div class="cursor logoSecondary" id="bt_sante">
-			<i class="fas fa-medkit"></i>
+			<i class="fas fa-medkit" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Santé}}</span>
+			<span  style="color:#42d4eb">{{Santé}}</span>
 		</div>
 
 
 		<div class="cursor logoSecondary" id="bt_routines">
-			<i class="fas divers-viral"></i>
+			<i class="fas divers-viral" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Routines}}</span>
+			<span style="color:#42d4eb">{{Routines}}</span>
 		</div>
 
 
 		<div class="cursor logoSecondary" id="bt_reminders">
-			<i class="fas fa-clock"></i>
+			<i class="fas fa-clock" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Rappels/Alarmes}}</span>
+			<span style="color:#42d4eb">{{Rappels/Alarmes}}</span>
 		</div>
 
 
 		<div class="cursor logoSecondary" id="bt_history">
-			<i class="fas fa-list-alt"></i>
+			<i class="fas fa-list-alt" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Historique}}</span>
+			<span style="color:#42d4eb">{{Historique}}</span>
 		</div>
 <?php
 if (((config::byKey('utilisateurExperimente', 'alexaapi',0)!="0")) && (log::getLogLevel('alexaapi')<200)) :
 ?>
 		<div class="cursor logoSecondary" id="bt_req">
-			<i class="fas fa-key"></i>
+			<i class="fas fa-key" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Requêteur Infos}}</span>
+			<span style="color:#42d4eb">{{Requêteur Infos}}</span>
 		</div>
 
 		<div class="cursor logoSecondary" id="bt_req2">
-			<i class="fas fa-key"></i>
+			<i class="fas fa-key" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Requêteur Actions}}</span>
+			<span style="color:#42d4eb">{{Requêteur Actions}}</span>
 		</div><?php
 endif;
+
+		foreach (alexaapi::listePluginsAlexa(false) as $pluginAlexaUnparUn)
+		{
+			//echo $pluginAlexaUnparUn;
+			$nomPlugin="inconnu";
+			if ($pluginAlexaUnparUn=='alexaamazonmusic') $nomPlugin='Amazon Music';
+			if ($pluginAlexaUnparUn=='alexadeezer') $nomPlugin='Deezer';
+			if ($pluginAlexaUnparUn=='alexaspotify') $nomPlugin='Spotify';
+			if ($pluginAlexaUnparUn=='alexasmarthome') $nomPlugin='SmartHome';
+			
+			echo' <div class="cursor eqLogicAction logoSecondary">
+			<a href="index.php?v=d&m='.$pluginAlexaUnparUn.'&p='.$pluginAlexaUnparUn.'"><img  style="margin-top:-32px;" src="plugins/'.$pluginAlexaUnparUn.'/plugin_info/'.$pluginAlexaUnparUn.'_icon.png" width="75" height="75" style="min-height:75px !important;" />
+			<br />
+			<span style="color:#42d4eb">{{'.$nomPlugin.'}}</span></a>
+		</div>';
+			
+			
+			
+		}
+
+
+
+
+
 ?>	  
     </div>
     <!-- Début de la liste des objets -->
