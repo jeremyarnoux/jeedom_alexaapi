@@ -396,7 +396,7 @@ CommandAlexa.Command = function(req,res){
 	//boucleSurSerials_sendCommand(req);
 	config.logger('Alexa-API:    *******************************************');
 
-			alexa.sendCommand(req.query.device, req.query.command, 
+			alexa.sendCommand(req.query.device, req.query.command, req.query.value,
 				function(testErreur){
 						if (testErreur) {
 						traiteErreur(testErreur, 'command', req.query);;

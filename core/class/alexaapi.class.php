@@ -14,11 +14,29 @@ class alexaapi extends eqLogic {
 		}
 		return $liste;
 	}
-	
-
-    public static function templateWidget(){
+	/*
+public static function templateWidget(){
 		$return = array('info' => array('string' => array()));
+		$return['info']['string']['state'] = array(
+			'template' => 'tmplmultistate','test' => array(
+				array('operation' => '#value# == 2','state' => '<i class="icon maison-vacuum6"></i>'),
+				array('operation' => '#value# == 3','state' => '<i class="fa fa-pause"></i>'),
+				array('operation' => '#value# > 3 || #value# < 2','state' => '<i class="fa fa-home"></i>')
+			)
+		);
+		return $return;
+	}*/
+    public static function templateWidget(){
+		$return = array('info' => array('string' => array(), 'numeric' => array()));
 		$return = array('action' => array('select' => array(), 'slider' => array()));
+		$return['action']['other']['repeat'] = array(
+				'template' => 'tmplicon',
+				'replace' => array("#_icon_off_#" => "<i class='fas fa-redo' style='opacity:0.3'></i>","#_icon_on_#" => "<i class='fas fa-redo'></i>", "#hide_name#" => "hidden", "#message_disable#" => "1")
+			);	
+		$return['action']['other']['shuffle'] = array(
+				'template' => 'tmplicon',
+				'replace' => array("#_icon_off_#" => "<i class='fas fa-random fa-ld' style='opacity:0.3'></i>","#_icon_on_#" => "<i class='fas fa-random fa-ld'></i>", "#hide_name#" => "hidden", "#message_disable#" => "1")
+			);		
 		$return['info']['string']['subText2'] = array('template' => 'album' );
 		$return['info']['string']['alarmmusicalmusic'] = array('template' => 'alarmmusicalmusic', 'replace' => array("#hide_name#" => "hidden"));
 		$return['info']['string']['title'] =    array('template' => 'title');
@@ -437,6 +455,7 @@ class alexaapi extends eqLogic {
 				$device->setConfiguration('device', $item['displayName']);
 				//$device->setConfiguration('type', $item['description']); a voir si on utilise ou pas descriotion
 				$device->setConfiguration('type', $item['providerData']['deviceType']);
+				$device->setConfiguration('icon', $item['icon']['value']);
 				$device->setConfiguration('devicetype', "Smarthome");
 				$device->setConfiguration('family', $item['providerData']['categoryType']);
 				//$device->setConfiguration('members', $item['members']);
@@ -702,7 +721,8 @@ class alexaapi extends eqLogic {
 			self::updateCmd ($F, 'whennexttimerinfo', 'info', 'string', false, 'Prochain Minuteur', true, false, null, null,'alexaapi::timer', null, null, null, 32, $cas3);			
 			self::updateCmd ($F, 'whennextreminderlabelinfo', 'info', 'string', false, 'Reminder Label', true, false, 'loisir-musical7', null,'alexaapi::alarmmusicalmusic', null, null, null, 35, $cas2);
 			self::updateCmd ($F, 'alarm', 'action', 'select', false, 'Lancer une alarme', true, false, null, null, 'alexaapi::list', 'alarm?when=#when#&recurring=#recurring#&sound=#sound#', null, 'system_alerts_melodic_01|Alarme simple;system_alerts_melodic_01|Timer simple;system_alerts_melodic_02|A la dérive;system_alerts_atonal_02|Métallique;system_alerts_melodic_05|Clarté;system_alerts_repetitive_04|Comptoir;system_alerts_melodic_03|Focus;system_alerts_melodic_06|Lueur;system_alerts_repetitive_01|Table de chevet;system_alerts_melodic_07|Vif;system_alerts_soothing_05|Orque;system_alerts_atonal_03|Lumière du porche;system_alerts_rhythmic_02|Pulsar;system_alerts_musical_02|Pluvieux;system_alerts_alarming_03|Ondes carrées', 36, $cas3);
-			//self::updateCmd ($F, 'rwd', 'action', 'other', false, 'Rwd', true, true, 'fa fa-fast-backard', null, null, 'command?command=rwd', null, null, 15, $cas1);
+			//self::updateCmd ($F, 'rwd', 'action', 'other', false, 'Rwd', true, true, 'fa fa-fast-backard', null, null, 'command?command=rwd', null, null, 80, $cas1);
+
 			//self::updateCmd ($F, 'fwd', 'action', 'other', false, 'Fwd', true, true, 'fa fa-step-forward', null, null, 'command?command=fwd', null, null, 20, $cas1);
 			//self::updateCmd ($F, 'repeat', 'action', 'other', false, 'Repeat', true, true, 'fa fa-refresh', null, null, 'command?command=repeat', null, null, 25, $cas1);
 			//self::updateCmd ($F, 'shuffle', 'action', 'other', false, 'Shuffle', true, true, 'fa fa-random', null, null, 'command?command=shuffle', null, null, 26, $cas1);

@@ -114,8 +114,16 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 			break;	
 			
 			case 'ws-media-queue-change':
-				metAJour("loopMode", $result['loopMode'], 'loopMode', false , "PLAYER", $result['deviceSerialNumber']);
-				metAJour("playBackOrder", $result['playBackOrder'], 'playBackOrder', false , "PLAYER", $result['deviceSerialNumber']);
+			// command=repeat&value=on  ==>loopMode": "LOOP_QUEUE"
+			// command=repeat&value=off ==>"loopMode": "NORMAL",
+			// command=shuffle&value=off ==>"playBackOrder": "NORMAL" trackOrderChanged": false
+			// command=shuffle&value=on  ==>"playBackOrder": "SHUFFLE_ALL", "trackOrderChanged": true
+			$shuffle=false;
+			$repeat=false;
+			if ($result['loopMode'] == 'LOOP_QUEUE') $repeat=true;
+			if ($result['playBackOrder'] == 'SHUFFLE_ALL') $shuffle=true;
+			metAJour("repeat", $repeat, 'repeat', false , "PLAYER", $result['deviceSerialNumber']);
+			metAJour("shuffle", $shuffle, 'shuffle', false , "PLAYER", $result['deviceSerialNumber']);
 				
 				if (isset($result['audioPlayerState']))
 				metAJourPlayList($result['deviceSerialNumber'], $result['audioPlayerState'], 'ws-media-queue-change');
@@ -331,7 +339,9 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='perso
 			//if (($value['imageURL']==$imageURLenCoursdeLecture) && $etatPlayer=="PLAYING") 
 			if (($value['album']==$album_enCoursdeLecture) && ($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture) && $etatPlayer=="PLAYING") 
 				$html.="<img style='position:absolute' src='plugins/alexaapi/core/img/playing_petit.gif' />";
-			$html.="<img style='height: 60px;width: 60px;border-radius: 30%;'  src='".$value['imageURL']."'/></a></td>
+			$html.="
+			<object data='".$value['imageURL']."' style='height: 60px;width: 60px;border-radius: 30%;' type='image/png'>
+			<img style='height: 60px;width: 60px;border-radius: 30%;'  src='plugins/alexaapi/core/img/musique.png'/></object></a></td>
 				<td width='100%'>".$value['title']."</td>
 			</tr>
 			<tr>

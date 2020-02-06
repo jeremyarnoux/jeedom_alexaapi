@@ -1660,6 +1660,7 @@ this.deleteNotification(notification, callback);
 
                 let ret = [];
                 if (result.activities) {
+					if (typeof result.activities == "undefined") return;
                     for (let r = 0; r < result.activities.length; r++) {
                         let res = result.activities[r];
                         let o = {
@@ -1814,11 +1815,12 @@ this.deleteNotification(notification, callback);
     }
 
     sendCommand(serialOrName, command, value, callback) {
-		//this._options.logger && this._options.logger('coucou:'+command);
-        return this.sendMessage(serialOrName, command, value, callback);
+       return this.sendMessage(serialOrName, command, value, callback);
     }
     sendMessage(serialOrName, command, value, callback) {
-        let dev = this.find(serialOrName);
+ 		this._options.logger && this._options.logger('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Command : '+command);
+ 		this._options.logger && this._options.logger('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> value : '+value);
+       let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
 
         const commandObj = { contentFocusClientId: null };
@@ -1841,15 +1843,21 @@ this.deleteNotification(notification, callback);
             case 'shuffle':
                 commandObj.type = 'ShuffleCommand';
                 commandObj.shuffle = (value === 'on' || value === true);
+			//	http://192.168.0.21:3456/command?device=G0911W079304113M&command=shuffle&value=off
+			//	http://192.168.0.21:3456/command?device=G0911W079304113M&command=shuffle&value=on
+				
                 break;
             case 'repeat':
                 commandObj.type = 'RepeatCommand';
                 commandObj.repeat = (value === 'on' || value === true);
+				
                 break;
             default:
                 return;
         }
         //this._options.logger && this._options.logger('Alexa-REMOTTTTTTTTTTTTTTTE (alexa-remote.js): ' + `/api/np/command?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}`);
+		
+		this._options.logger && this._options.logger('>>>>>>>>'+JSON.stringify(commandObj));
 
         this.httpsGet (`/api/np/command?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}`,
             callback,
