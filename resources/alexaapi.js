@@ -482,7 +482,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 	if ('device' in req.query === false)  return res.status(500).json(error(500, req.route.path, 'Alexa.SmarthomeCommand', 'Missing parameter "device"'));
 
 
-						if (req.query.entityType=='')
+						if (req.query.entityType!='')
 							entityType=req.query.entityType;
 						else
 							entityType="APPLIANCE";
