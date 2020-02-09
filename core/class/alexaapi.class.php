@@ -443,7 +443,7 @@ public static function templateWidget(){
 		if (in_array("alexasmarthome", self::listePluginsAlexa(false, true))) {	
 			// --- Mise à jour des SmartHome Devices
 			$familleDisable = array(); //Famille qui sont exclues
-			//array_push($familleDisable, "GROUP");
+			array_push($familleDisable, "GROUP");
 			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeEntities");
 			$json = json_decode($json, true);
 			foreach ($json as $item) {
