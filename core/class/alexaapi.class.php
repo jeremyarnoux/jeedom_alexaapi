@@ -371,7 +371,7 @@ public static function templateWidget(){
 		}
 		// --- Mise à jour des Amazon Echo
 		event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
-		/*$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
+		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
 		$json = json_decode($json, true);
 		$numDevices = 0;
 		$numNewDevices = 0;
@@ -439,7 +439,7 @@ public static function templateWidget(){
 			$device->setStatus('online', (($item['online'])?true:false)); //SetStatus doit être lancé après Save et Save après inutile
 			$numDevices++;
 		}
-		*/
+		
 		if (in_array("alexasmarthome", self::listePluginsAlexa(false, true))) {	
 			// --- Mise à jour des SmartHome Devices
 			$familleDisable = array(); //Famille qui sont exclues
