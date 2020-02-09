@@ -510,11 +510,13 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 	
 */
 	alexa.querySmarthomeDevices2(req.query.device, entityType,
-				function(deviceStates){
+		function(deviceStates){
 		//config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
 		//config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG');
 		//config.logger('>entity>'+JSON.stringify(deviceStates."0"),'DEBUG');
 		var toReturn = [];
+		if (typeof deviceStates[0].entity.entityId !== 'undefined') {
+
 			//config.logger('>deviceState>>'+JSON.stringify(deviceStates[0]),'DEBUG');
 			//config.logger('>entity>>'+JSON.stringify(deviceStates[0].entity),'DEBUG');
 			config.logger('queryState:entityId>'+JSON.stringify(deviceStates[0].entity.entityId),'DEBUG');
@@ -535,7 +537,10 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			config.logger('queryState:name>'+capabilityStates['name'],'DEBUG');
 			config.logger('queryState:>value>'+capabilityStates['value'],'DEBUG');
 
-
+		} else {
+		config.logger('deviceStates.entity.entityId>NON trouvée','DEBUG');
+		}
+			
 /*
 		for (var deviceState in deviceStates[0]) {
 			//config.logger('>deviceState>>'+JSON.stringify(deviceState),'DEBUG');
