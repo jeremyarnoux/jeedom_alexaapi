@@ -452,14 +452,14 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 					if (testErreur) traiteErreur(testErreur);
 				}
 			);
-		var etat="0";
-		if (parameters.action == 'turnOn') etat="1";
+		var powerState="0";
+		if (parameters.action == 'turnOn') powerState="1";
 			
 	  	var toReturn = [];		
 		toReturn.push({
 					'device': req.query.device,
 					'command': parameters.action,
-					'state': etat
+					'powerState': powerState
 				});
 		res.status(200).json(toReturn);		
 
@@ -468,7 +468,117 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 
 }
 
+CommandAlexa.querySmarthomeDevices = function(req,res){
+	
+	//-----------------------------------------------------------------------------------
+	// NE FONCTIONNE PAS IL MANQUE applicanceIds QUI EST DIFF2RENT DE entityIds
+	//-----------------------------------------------------------------------------------
+	
+	
+		res.type('json');
 
+	config.logger('Alexa-API:    Lancement /SmarthomeCommand avec paramètres -> device: ' + req.query.device);
+
+	if ('device' in req.query === false)  return res.status(500).json(error(500, req.route.path, 'Alexa.SmarthomeCommand', 'Missing parameter "device"'));
+
+
+						if (req.query.entityType=='')
+							entityType=req.query.entityType;
+						else
+							entityType="APPLIANCE";
+							
+    //executeSmarthomeDeviceAction(entityIds, parameters, entityType, callback) {
+	config.logger('Alexa-API:    Lancement /SmarthomeCommand avec paramètres -> req.query.entityType: ' + req.query.entityType);
+		
+
+		/*
+    alexa.querySmarthomeDevices(req.query.device, entityType,
+				function(devices){
+
+					
+
+			config.logger('Alexa-API: trouvé :'+devices);
+			//valeurvolume=devices["volume"];
+			res.status(200).json({		value: devices	});
+
+
+
+					
+					//if (testErreur) traiteErreur(testErreur);
+				}
+			);
+	
+*/
+	alexa.querySmarthomeDevices2(req.query.device, entityType,
+				function(deviceStates){
+		//config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
+		//config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG');
+		//config.logger('>entity>'+JSON.stringify(deviceStates."0"),'DEBUG');
+		var toReturn = [];
+			//config.logger('>deviceState>>'+JSON.stringify(deviceStates[0]),'DEBUG');
+			//config.logger('>entity>>'+JSON.stringify(deviceStates[0].entity),'DEBUG');
+			config.logger('queryState:entityId>'+JSON.stringify(deviceStates[0].entity.entityId),'DEBUG');
+			//config.logger('>entityType>>'+JSON.stringify(deviceStates[0].entity.entityType),'DEBUG');
+			capabilityStates=JSON.parse(deviceStates[0].capabilityStates[0]);
+			//config.logger('>>>capabilityStates>>'+JSON.stringify(capabilityStates),'DEBUG');
+
+//for (value in capabilityStates) {
+  //config.logger(value+"<=>"+capabilityStates[value],'DEBUG');
+//}
+				toReturn.push({
+					'entityType': entityType,
+					'applicanceId': req.query.device,
+					'name': capabilityStates['name'],
+					'value': capabilityStates['value']
+
+				});
+			config.logger('queryState:name>'+capabilityStates['name'],'DEBUG');
+			config.logger('queryState:>value>'+capabilityStates['value'],'DEBUG');
+
+
+/*
+		for (var deviceState in deviceStates[0]) {
+			//config.logger('>deviceState>>'+JSON.stringify(deviceState),'DEBUG');
+			for (var entity in deviceState) {
+			config.logger('>>>>'+JSON.stringify(entity),'DEBUG');
+			config.logger('>>>>>'+JSON.stringify(deviceState.entity),'DEBUG');
+				//var device = notifications[serial];
+				toReturn.push({
+					'entityType': entityType,
+					'applicanceId': req.query.device,
+					'deviceState': deviceState.capabilityStates,
+					'entityType2': entityType
+
+				});
+			}
+			
+		}*/
+		res.status(200).json(toReturn);
+	});
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	//config.logger("fini");
+	  	
+			
+			
+			//config.logger('Alexa*********************************************************************');
+
+			
+	//res.status(200).json({value: "Send"});	//ne teste pas le résultat
+
+}
 
 // Les boucles qui lancent les commandes sur chaques device d'un multiroom
 function boucleSurSerials_setTunein (req, callback) {
@@ -682,6 +792,7 @@ app.get('/checkAuth', CommandAlexa.checkAuth);
 app.get('/query', CommandAlexa.query);
 app.get('/command', CommandAlexa.Command);
 app.get('/SmarthomeCommand', CommandAlexa.SmarthomeCommand);
+app.get('/querySmarthomeDevices', CommandAlexa.querySmarthomeDevices);
 app.get('/volume', CommandAlexa.Volume);
 app.get('/speak', CommandAlexa.Speak);
 app.get('/announcement', CommandAlexa.Announcement);

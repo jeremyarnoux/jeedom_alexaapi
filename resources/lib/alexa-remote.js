@@ -2455,29 +2455,19 @@ vide(serialOrName, sound,callback) {
             })
         };
         this.httpsGet (`/api/phoenix/state`, callback, flags);
-        /*
-        {
-            'stateRequests': [
-                {
-                    'entityId': 'AAA_SonarCloudService_00:17:88:01:04:1D:4C:A0',
-                    'entityType': 'APPLIANCE'
-                }
-            ]
-        }
-        {
-        	'deviceStates': [],
-        	'errors': [{
-        		'code': 'ENDPOINT_UNREACHABLE',
-        		'data': null,
-        		'entity': {
-        			'entityId': 'AAA_SonarCloudService_00:17:88:01:04:1D:4C:A0',
-        			'entityType': ''
-        		},
-        		'message': null
-        	}]
-        }
-        */
     }
+
+
+	querySmarthomeDevices2(applicanceIds, entityType, callback) 
+	{
+		this.querySmarthomeDevices(applicanceIds, entityType,(err, res) => 
+		{
+		if (err || !res || !res.deviceStates || !Array.isArray(res.deviceStates)) return callback && callback();
+			callback && callback(res.deviceStates);
+		});
+	}
+
+
 
     executeSmarthomeDeviceAction(entityIds, parameters, entityType, callback) {
         if (typeof entityType === 'function') {

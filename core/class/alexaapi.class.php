@@ -371,7 +371,7 @@ public static function templateWidget(){
 		}
 		// --- Mise à jour des Amazon Echo
 		event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
-		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
+		/*$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
 		$json = json_decode($json, true);
 		$numDevices = 0;
 		$numNewDevices = 0;
@@ -439,39 +439,99 @@ public static function templateWidget(){
 			$device->setStatus('online', (($item['online'])?true:false)); //SetStatus doit être lancé après Save et Save après inutile
 			$numDevices++;
 		}
-		
+		*/
 		if (in_array("alexasmarthome", self::listePluginsAlexa(false, true))) {	
 			// --- Mise à jour des SmartHome Devices
+			$familleDisable = array(); //Famille qui sont exclues
+			array_push($familleDisable, "GROUP");
 			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeEntities");
 			$json = json_decode($json, true);
 			foreach ($json as $item) {
-				// Retireve the device (if already registered in Jeedom)
-				$device = alexasmarthome::byLogicalId($item['id'], 'alexasmarthome');
-				if (!is_object($device)) {
-					$device = alexasmarthome::createNewDevice($item['displayName'], $item['id']);
-					$numNewDevices++;
+				if (!in_array($item['providerData']['categoryType'], $familleDisable)) {	
+					// Retireve the device (if already registered in Jeedom)
+					$device = alexasmarthome::byLogicalId($item['id'], 'alexasmarthome');
+					if (!is_object($device)) {
+						$device = alexasmarthome::createNewDevice($item['displayName'], $item['id']);
+						$numNewDevices++;
+					}
+					// Update device configuration
+					$device->setConfiguration('device', $item['displayName']);
+					//$device->setConfiguration('type', $item['description']); a voir si on utilise ou pas descriotion
+					$device->setConfiguration('type', $item['providerData']['deviceType']);
+					$device->setConfiguration('icon', $item['icon']['value']);
+					$device->setConfiguration('devicetype', "Smarthome");
+					$device->setConfiguration('family', $item['providerData']['categoryType']);
+					//$device->setConfiguration('members', $item['members']);
+					$device->setConfiguration('capabilities', $item['supportedProperties']);
+					//On va mettre dispo, on traite plus tard.
+					//$device->setStatus('online', (($item['online'])?true:false));
+					$device->save();
+					$device->setStatus('online', 'true');
+					$numDevices++;
 				}
-				// Update device configuration
-				$device->setConfiguration('device', $item['displayName']);
-				//$device->setConfiguration('type', $item['description']); a voir si on utilise ou pas descriotion
-				$device->setConfiguration('type', $item['providerData']['deviceType']);
-				$device->setConfiguration('icon', $item['icon']['value']);
-				$device->setConfiguration('devicetype', "Smarthome");
-				$device->setConfiguration('family', $item['providerData']['categoryType']);
-				//$device->setConfiguration('members', $item['members']);
-				$device->setConfiguration('capabilities', $item['supportedProperties']);
-				//On va mettre dispo, on traite plus tard.
-				//$device->setStatus('online', (($item['online'])?true:false));
-				$device->save();
-				$device->setStatus('online', 'true');
-				$numDevices++;
 			}
+			self::scanAmazonSmartHome();
 		}		
 		
 
 	event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
 	}
-
+	
+	public static function scanAmazonSmartHome() { // Permet de faire le lien entre entityId et applianceId
+		
+		log::add('alexasmarthome_scan', 'debug', '************************************Lancement du Scan Device smartHome***********************************');
+		$deamon_info = self::deamon_info();
+		if ($deamon_info['launchable'] != "ok") {
+			event::add('jeedom::alert', array('level' => 'danger', 'page' => 'alexaapi', 'message' => __('Cookie Amazon Absent, allez dans la Configuration du plugin', __FILE__),));
+			return;
+		}
+		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeDevices");
+		$json = json_decode($json, true);
+		log::add('alexasmarthome_scan', 'debug', 'json:'.$json);
+		foreach ($json as $key => $value) {
+			log::add('alexasmarthome_scan', 'debug', 'item:'.json_encode($value));
+			foreach ($value as $key2 => $value2) {
+			log::add('alexasmarthome_scan', 'debug', '	item2:'.json_encode($value2));
+				foreach ($value2 as $key3 => $value3) {
+				log::add('alexasmarthome_scan', 'debug', '		item3:'.json_encode($value3));
+					// On traite la boucle de amazonBridgeDetails
+					if (isset($value3['amazonBridgeDetails'])) {
+					log::add('alexasmarthome_scan', 'debug', '			item3bis:'.json_encode($value3['amazonBridgeDetails']));
+						foreach ($value3['amazonBridgeDetails'] as $key4 => $value4) {
+						log::add('alexasmarthome_scan', 'debug', '				item4:'.json_encode($value4));
+							foreach ($value4 as $value5) {
+							log::add('alexasmarthome_scan', 'debug', '					item5:'.json_encode($value5));
+								foreach ($value5 as $key6 => $value6) {
+								log::add('alexasmarthome_scan', 'debug', '						item6:'.json_encode($value6));
+									foreach ($value6 as $value7) {
+									log::add('alexasmarthome_scan', 'debug', '							item7:'.json_encode($value7));
+									log::add('alexasmarthome_scan', 'debug', '							==> applianceId:'.json_encode($value7['applianceId']));
+									log::add('alexasmarthome_scan', 'debug', '							==> entityId:'.json_encode($value7['entityId']));
+										foreach (eqLogic::byType('alexasmarthome', true) as $alexasmarthome) {
+											if ($alexasmarthome->getLogicalId()==$value7['entityId']){
+											$alexasmarthome->setConfiguration('applianceId', $value7['applianceId']);
+											log::add('alexasmarthome_scan', 'info', 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
+											log::add('alexasmarthome_scan', 'info', 'Lien de '.$alexasmarthome->getName().' trouvé et mis à jour!!');
+											log::add('alexasmarthome_scan', 'info', json_encode($value7['entityId']).' <=> '.json_encode($value7['applianceId']));
+											log::add('alexasmarthome_scan', 'info', 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
+											$alexasmarthome->save();
+											}
+										}	
+									}	
+								}	
+							}
+						}	
+					}
+					// On traite la boucle de applianceGroups
+					if (isset($value3['applianceGroups'])) {
+					log::add('alexasmarthome_scan', 'debug', 'item3bis:'.json_encode($value3['applianceGroups']));
+					}
+					//foreach ($value3 as $key4 => $value4) {
+				}	
+			}			
+		}
+	}
+	
 	private static function createNewDevice($deviceName, $deviceSerial) {
 		$defaultRoom = intval(config::byKey('defaultParentObject',"alexaapi",'',true));
 		event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Ajout de "'.$deviceName.'"', __FILE__),));

@@ -328,16 +328,20 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='perso
 						//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>artist:'.$value['artist']."/".$artist_enCoursdeLecture);
 						//log::add('alexaapi_widget', 'debug', '-----------------imageURL:'.$value['imageURL']);			
 						//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>title:'.$value['title']."/".$title_enCoursdeLecture);			
+						//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>album:'.$value['album']."/".$album_enCoursdeLecture);			
+						//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>artist:'.$value['artist']."/".$artist_enCoursdeLecture);			
 						//log::add('alexaapi_widget', 'debug', '-----------------durationSeconds:'.$value['durationSeconds']);			
-			
-					if (($value['album']==$album_enCoursdeLecture) && ($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture)){
+					//if (($value['album']==$album_enCoursdeLecture) && ($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture))			
+					if (($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture))
+					{
 					//if (($value['imageURL']==$imageURLenCoursdeLecture) && $compteurQueue>3){
 							$html="<table style='border-collapse: separate; border-spacing : 10px; ' border='0' width='100%'>";
 						}
 
-			$html.="<tr><td style='padding: 8px;'  rowspan='2' width='50'><a href='' onclick=\"ttttt('55')\">";
+			//$html.="<tr><td style='padding: 8px;'  rowspan='2' width='50'><a href='' onclick=\"ttttt('55')\">";
+			$html.="<tr><td style='padding: 8px;'  rowspan='2' width='50'>";
 			//if (($value['imageURL']==$imageURLenCoursdeLecture) && $etatPlayer=="PLAYING") 
-			if (($value['album']==$album_enCoursdeLecture) && ($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture) && $etatPlayer=="PLAYING") 
+			if (($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture) && $etatPlayer=="PLAYING") 
 				$html.="<img style='position:absolute' src='plugins/alexaapi/core/img/playing_petit.gif' />";
 			$html.="
 			<object data='".$value['imageURL']."' style='height: 60px;width: 60px;border-radius: 30%;' type='image/png'>
@@ -351,13 +355,15 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='perso
 			$compteurQueue++;
 			}	
 			$html.="</table>";
-			metAJour("playlisthtml", $html, 'playlisthtml', true , "PLAYLIST", $serialdevice);
-
-				foreach (alexaapi::listePluginsAlexa() as $pluginAlexaUnparUn)
-				{
-				$alexaapi3=$pluginAlexaUnparUn::byLogicalId($serialdevice."_playlist", $pluginAlexaUnparUn); // PLAYLIST
-				$alexaapi3->refreshWidget(); //refresh Tuile Playlist
-				}
+		} else
+		{
+			$html="<br>";
+		}
+		metAJour("playlisthtml", $html, 'playlisthtml', true , "PLAYLIST", $serialdevice);
+		foreach (alexaapi::listePluginsAlexa() as $pluginAlexaUnparUn)
+		{
+			$alexaapi3=$pluginAlexaUnparUn::byLogicalId($serialdevice."_playlist", $pluginAlexaUnparUn); // PLAYLIST
+			$alexaapi3->refreshWidget(); //refresh Tuile Playlist
 		}
 	} 
 	catch (Exception $e) {log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);} 
