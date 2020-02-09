@@ -538,7 +538,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 
 		}
 		catch(error) {
-				config.logger('deviceStates.entity.entityId>NON trouvé sur '+entityType,'DEBUG');
+				config.logger('deviceStates.entity.entityId>NON trouvé sur '+entityType+"/"+req.query.device,'DEBUG');
 		}
 
 			
