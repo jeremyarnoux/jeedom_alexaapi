@@ -488,7 +488,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 							entityType="APPLIANCE";
 							
     //executeSmarthomeDeviceAction(entityIds, parameters, entityType, callback) {
-	config.logger('Alexa-API:    Lancement /SmarthomeCommand avec paramètres -> req.query.entityType: ' + req.query.entityType);
+	config.logger('Alexa-API:    Lancement /SmarthomeCommand avec paramètres -> req.query.entityType: ' + req.query.entityType+ ' req.query.type: ' + req.query.type);
 		
 
 		/*
@@ -511,8 +511,8 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 */
 	alexa.querySmarthomeDevices2(req.query.device, entityType,
 		function(deviceStates){
-		//config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
-		//config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG');
+		config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
+		config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG');
 		//config.logger('>entity>'+JSON.stringify(deviceStates."0"),'DEBUG');
 		var toReturn = [];
 		try {
@@ -520,21 +520,24 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			//config.logger('>entity>>'+JSON.stringify(deviceStates[0].entity),'DEBUG');
 			config.logger('queryState:entityId>'+JSON.stringify(deviceStates[0].entity.entityId),'DEBUG');
 			//config.logger('>entityType>>'+JSON.stringify(deviceStates[0].entity.entityType),'DEBUG');
-			capabilityStates=JSON.parse(deviceStates[0].capabilityStates[0]);
-			//config.logger('>>>capabilityStates>>'+JSON.stringify(capabilityStates),'DEBUG');
+			capabilityState=JSON.parse(deviceStates[0].capabilityStates[0]);
+			capabilityStates=deviceStates[0].capabilityStates;
+			config.logger('>>>capabilityState>>'+JSON.stringify(capabilityState),'DEBUG');
 
 //for (value in capabilityStates) {
   //config.logger(value+"<=>"+capabilityStates[value],'DEBUG');
 //}
 				toReturn.push({
 					'entityType': entityType,
+					'type': req.query.type,
 					'applicanceId': req.query.device,
-					'name': capabilityStates['name'],
-					'value': capabilityStates['value']
+				//	'name': capabilityState['name'],
+				//	'value': capabilityState['value'],
+					'capabilityStates': capabilityStates
 
 				});
-			config.logger('queryState:name>'+capabilityStates['name'],'DEBUG');
-			config.logger('queryState:>value>'+capabilityStates['value'],'DEBUG');
+			config.logger('queryState:name>'+capabilityState['name'],'DEBUG');
+			config.logger('queryState:>value>'+capabilityState['value'],'DEBUG');
 
 		}
 		catch(error) {

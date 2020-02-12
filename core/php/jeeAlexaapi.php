@@ -62,8 +62,8 @@ if (!is_array($result)) {
 //log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialNumber']);
 $logical_id = $result['deviceSerialNumber']."_player";
 
-$alexaapi=alexaamazonmusic::byLogicalId($logical_id, 'alexaamazonmusic'); // PLAYER
-$alexaapi2=alexaapi::byLogicalId($result['deviceSerialNumber'], 'alexaapi'); // ECHO
+//$alexaapi_player=eqLogic::byLogicalId($logical_id, 'alexaamazonmusic'); // PLAYER
+$alexaapi2=eqLogic::byLogicalId($result['deviceSerialNumber'], 'alexaapi'); // ECHO
 //$alexaapi3=alexaamazonmusic::byLogicalId($result['deviceSerialNumber']."_playlist", 'alexaamazonmusic'); // PLAYLIST
 
 // Choix de ce qu'on doit mettre à jour
@@ -95,13 +95,13 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 						$json=file_get_contents($url);	
 				}
 			break;
-			
+			/*
 			case 'ws-bluetooth-state-change':
 			if ($result['bluetoothEvent'] == 'DEVICE_CONNECTED') metAJour("bluetoothDevice", "Connexion en cours", 'bluetoothDevice', false , "ECHO", $result['deviceSerialNumber']);
 			if ($result['bluetoothEvent'] == 'DEVICE_DISCONNECTED') metAJour("bluetoothDevice", "Déconnexion en cours", 'bluetoothDevice', false , "ECHO", $result['deviceSerialNumber']);				
 				metAJourBluetooth($result['deviceSerialNumber'], $result['audioPlayerState'], $alexaapi2, "PLAYER", $result['deviceSerialNumber']);
 			break;	
-			
+			*/
 			case 'ws-volume-change':
 				metAJour("Volume", $result['volume'], 'volumeinfo', false , "PLAYER", $result['deviceSerialNumber']);
 				metAJour("Volume", $result['volume'], 'volumeinfo', false , "ECHO", $result['deviceSerialNumber']);
@@ -151,9 +151,9 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 				}
 				
 				if (isset($result['audioPlayerState'])) {
-				metAJourPlayer($result['deviceSerialNumber'], $result['audioPlayerState'], $alexaapi);
+				metAJourPlayer($result['deviceSerialNumber'], $result['audioPlayerState']);
 				metAJourPlayList($result['deviceSerialNumber'], $result['audioPlayerState'], 'ws-device-activity');
-				metAJourPlayer($result['deviceSerialNumber'], $result['audioPlayerState'], $alexaapi); //par sécurité
+				metAJourPlayer($result['deviceSerialNumber'], $result['audioPlayerState']); //par sécurité
 				}
 
 				//metAJour("songName", $result['domainAttributes']['nBestList']['songName'], 'songName', true , $alexaapi);
@@ -163,7 +163,7 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 			case 'ws-audio-player-state-change': // elle a visiblement disparue cette balise des logs mqtt
 				metAJour("Audio Player State", $result['audioPlayerState'], 'audioPlayerState', true , "PLAYER", $result['deviceSerialNumber']);
 			case 'refreshPlayer':
-				metAJourPlayer($result['deviceSerialNumber'], $result['audioPlayerState'], $alexaapi);
+				metAJourPlayer($result['deviceSerialNumber'], $result['audioPlayerState']);
 				metAJourPlayList($result['deviceSerialNumber'], $result['audioPlayerState'], 'refreshPlayer');
 			break;
 			
@@ -181,20 +181,20 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 	//log::add('alexaapi_mqtt', 'info',  " ------------------------------------------------------------------------------------------------" );
 	log::add('alexaapi_widget', 'info',  " -------------------------------------------------------------------------------------------------" );	
 	
-	if (is_object($alexaapi)) $alexaapi->refreshWidget();
+//	if (is_object($alexaapi)) $alexaapi_player->refreshWidget();
 	
 
 function metAJour($nom, $variable, $commandejeedom, $effaceSiNull, $_typeDevice, $_deviceSerialNumber) {
 
 	if ($_typeDevice=="ECHO") {
-			$alexaapi2=alexaapi::byLogicalId($_deviceSerialNumber, 'alexaapi'); // ECHO
+			$alexaapi2=eqLogic::byLogicalId($_deviceSerialNumber, 'alexaapi'); // ECHO
 			if (is_object($alexaapi2)) metAJour2($nom, $variable, $commandejeedom, $effaceSiNull, $alexaapi2);
 	}
 
 	if ($_typeDevice=="PLAYER") {
 			foreach (alexaapi::listePluginsAlexa() as $pluginAlexaUnparUn)
 			{
-			$alexaapi=$pluginAlexaUnparUn::byLogicalId($_deviceSerialNumber."_player", $pluginAlexaUnparUn); // PLAYER
+			$alexaapi=eqLogic::byLogicalId($_deviceSerialNumber."_player", $pluginAlexaUnparUn); // PLAYER
 			if (is_object($alexaapi)) metAJour2($nom, $variable, $commandejeedom, $effaceSiNull, $alexaapi);
 			}
 	}
@@ -202,7 +202,7 @@ function metAJour($nom, $variable, $commandejeedom, $effaceSiNull, $_typeDevice,
 	if ($_typeDevice=="PLAYLIST") {
 			foreach (alexaapi::listePluginsAlexa() as $pluginAlexaUnparUn)
 			{
-			$alexaapi3=$pluginAlexaUnparUn::byLogicalId($_deviceSerialNumber."_playlist", $pluginAlexaUnparUn); // PLAYLIST
+			$alexaapi3=eqLogic::byLogicalId($_deviceSerialNumber."_playlist", $pluginAlexaUnparUn); // PLAYLIST
 			if (is_object($alexaapi3)) metAJour2($nom, $variable, $commandejeedom, $effaceSiNull, $alexaapi3);
 			}
 	}
@@ -237,7 +237,7 @@ function metAJourImage($nom, $variable, $commandejeedom, $effaceSiNull, $_device
 //log::add('alexaapi_mqtt', 'debug',  'metAJourImage >>>>>>>'.$_deviceSerialNumber);
 			foreach (alexaapi::listePluginsAlexa() as $pluginAlexaUnparUn)
 			{
-			$alexaapi=$pluginAlexaUnparUn::byLogicalId($_deviceSerialNumber."_player", $pluginAlexaUnparUn); // PLAYER
+			$alexaapi=eqLogic::byLogicalId($_deviceSerialNumber."_player", $pluginAlexaUnparUn); // PLAYER
 			metAJourImage2($nom, $variable, $commandejeedom, $effaceSiNull, $alexaapi);
 			}
 }
@@ -264,7 +264,18 @@ function metAJourImage2($nom, $variable, $commandejeedom, $effaceSiNull, $_alexa
 	}	
 }	
 
-function metAJourPlayer($serialdevice, $audioPlayerState, $alexaapi) {
+function metAJourStatusPlayer($_Status, $_deviceSerialNumber) {
+			foreach (alexaapi::listePluginsAlexa() as $pluginAlexaUnparUn)
+			{
+			$alexaapi=eqLogic::byLogicalId($_deviceSerialNumber."_player", $pluginAlexaUnparUn); // PLAYER
+				if (is_object($alexaapi)) 	{
+					$alexaapi->setStatus('Playing', $_Status);
+					$alexaapi->refreshWidget(); //refresh Tuile Player			
+				}
+			}
+}
+
+function metAJourPlayer($serialdevice, $audioPlayerState) {
 //log::add('alexaapi_mqtt', 'info',  " ***********************[metAJourPlayer]*********************************".$serialdevice );
 
 	try {
@@ -280,14 +291,15 @@ function metAJourPlayer($serialdevice, $audioPlayerState, $alexaapi) {
 	metAJour("mediaProgress", $result['playerInfo']['progress']['mediaProgress'], 'mediaProgress', true , "PLAYER", $serialdevice);
 	metAJour("providerName", $result['playerInfo']['provider']['providerName'], 'providerName', true , "PLAYER", $serialdevice);
 	metAJour("state", $result['playerInfo']['state'], 'state', false , "PLAYER", $serialdevice);
-	$alexaapi->setStatus('Playing', ($result['playerInfo']['state']=="PLAYING"));
+	metAJourStatusPlayer($result['playerInfo']['state']=="PLAYING", $serialdevice);
+	//$alexaapi_player->setStatus('Playing', ($result['playerInfo']['state']=="PLAYING"));
 	
 	} catch (Exception $e) {
 			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);
 	} catch (Error $e) {
 			log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur25: '.$e);
 	}
-if (is_object($alexaapi)) $alexaapi->refreshWidget(); //refresh Tuile Player
+//if (is_object($alexaapi_player)) $alexaapi_player->refreshWidget(); //refresh Tuile Player
 log::add('alexaapi_widget', 'debug',  '** Mise à jour Tuile du Player **');
 }
 
@@ -362,7 +374,7 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='perso
 		metAJour("playlisthtml", $html, 'playlisthtml', true , "PLAYLIST", $serialdevice);
 		foreach (alexaapi::listePluginsAlexa() as $pluginAlexaUnparUn)
 		{
-			$alexaapi3=$pluginAlexaUnparUn::byLogicalId($serialdevice."_playlist", $pluginAlexaUnparUn); // PLAYLIST
+			$alexaapi3=eqLogic::byLogicalId($serialdevice."_playlist", $pluginAlexaUnparUn); // PLAYLIST
 			$alexaapi3->refreshWidget(); //refresh Tuile Playlist
 		}
 	} 
@@ -371,8 +383,9 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='perso
 	
 }	
 
+/*
 // Faudra le tester !!!!!!!!!!!!!!
-function metAJourBluetooth($serialdevice, $audioPlayerState, $alexaapi2, $alexaapi) {
+function metAJourBluetooth($serialdevice, $audioPlayerState, $alexaapi2, $alexaapi_player) {
 		//log::add('alexaapi_widget', 'debug',  'zzzzzzzzzzzzzzzzz metAJourPlayer:');
 
 	try {
@@ -429,7 +442,7 @@ function metAJourBluetooth($serialdevice, $audioPlayerState, $alexaapi2, $alexaa
 	}	
 	
 }	
-	
+	*/
 ?>
 
 
