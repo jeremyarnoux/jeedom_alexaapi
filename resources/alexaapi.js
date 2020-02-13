@@ -536,8 +536,8 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 					'capabilityStates': capabilityStates
 
 				});
-			config.logger('queryState:name>'+capabilityState['name'],'DEBUG');
-			config.logger('queryState:>value>'+capabilityState['value'],'DEBUG');
+			//config.logger('queryState:name>'+capabilityState['name'],'DEBUG');
+			//config.logger('queryState:>value>'+capabilityState['value'],'DEBUG');
 
 		}
 		catch(error) {
