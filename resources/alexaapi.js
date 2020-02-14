@@ -511,18 +511,18 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 */
 	alexa.querySmarthomeDevices2(req.query.device, entityType,
 		function(deviceStates){
-		config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
-		config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG');
+		//config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
+		//config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG');
 		//config.logger('>entity>'+JSON.stringify(deviceStates."0"),'DEBUG');
 		var toReturn = [];
 		try {
 			//config.logger('>deviceState>>'+JSON.stringify(deviceStates[0]),'DEBUG');
 			//config.logger('>entity>>'+JSON.stringify(deviceStates[0].entity),'DEBUG');
-			config.logger('queryState:entityId>'+JSON.stringify(deviceStates[0].entity.entityId),'DEBUG');
+			//config.logger('queryState:entityId>'+JSON.stringify(deviceStates[0].entity.entityId),'DEBUG');
 			//config.logger('>entityType>>'+JSON.stringify(deviceStates[0].entity.entityType),'DEBUG');
 			capabilityState=JSON.parse(deviceStates[0].capabilityStates[0]);
 			capabilityStates=deviceStates[0].capabilityStates;
-			config.logger('>>>capabilityState>>'+JSON.stringify(capabilityState),'DEBUG');
+			//config.logger('>>>capabilityState>>'+JSON.stringify(capabilityState),'DEBUG');
 
 //for (value in capabilityStates) {
   //config.logger(value+"<=>"+capabilityStates[value],'DEBUG');
