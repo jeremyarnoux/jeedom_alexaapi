@@ -568,7 +568,7 @@ public static function templateWidget(){
 		}
 	}
 	
-	public function sortBy($field, &$array, $direction = 'asc') {
+	public function sortByPRECEDENTAVIRER($field, &$array, $direction = 'asc') {
 		usort($array, create_function('$a, $b', '
 		$a = $a["' . $field . '"];
 		$b = $b["' . $field . '"];
@@ -578,7 +578,17 @@ public static function templateWidget(){
     	'));
 		return true;
 	}
-
+	/*
+	public function sortBy($field, &$array) {
+		usort($array, create_function('$a, $b', '
+		$a = $a["' . $field . '"];
+		$b = $b["' . $field . '"];
+		if ($a == $b) return 0;
+		return ($a < $b) ? -1 : 1;
+    	'));
+		return true;
+	}*/
+	
 	public function refresh() { //$_routines c'est pour éviter de charger les routines lors du scan
 		$deamon_info = alexaapi::deamon_info();
 		if ($deamon_info['state'] != 'ok') return false;
@@ -594,14 +604,16 @@ public static function templateWidget(){
 			log::add('alexaapi', 'debug', 'execute : refresh routines (WidgetEcho) avec la requète http://' . config::byKey('internalAddr') . ':3456/routines');
 			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
 			$json = json_decode($json, true);	// Met à jour la liste des routines des commandes action "routine"
-			self::sortBy('utterance', $json, 'asc');
+			//self::sortBy('utterance', $json); //Supprimé car j'arrive pas à trier sans erreur
+
+			
 			$ListeDesRoutines = [];
 			foreach ($json as $item) {
 				//if ($item['utterance'] != '') 
 				if (isset($item['utterance'])) 
 					$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
 				else {
-					if ($item['triggerTime'] != '') {
+					if (isset($item['triggerTime']) && ($item['triggerTime'] != '')) {
 						$resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
 						$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
 					}
@@ -1050,8 +1062,13 @@ class alexaapiCmd extends cmd {
 
 	private function buildRequest($_options = array()) {
 		if ($this->getType() != 'action') return $this->getConfiguration('request');
-		list($command, $arguments) = explode('?', $this->getConfiguration('request'), 2);
-	//log::add('alexaapi', 'info', '----Command:*'.$command.'* Request:'.json_encode($_options));
+		$cmdANDarg = explode('?', $this->getConfiguration('request'), 2);
+		if (count($cmdANDarg) > 1) 
+			list($command, $arguments) = $cmdANDarg;
+		else {
+			$command=$this->getConfiguration('request');
+			$arguments="";
+		}
 		switch ($command) {
 			case 'volume':
 				$request = $this->build_ControledeSliderSelectMessage($_options, '50');
@@ -1125,6 +1142,11 @@ class alexaapiCmd extends cmd {
 		if ((isset($_options['slider'])) && ($_options['slider'] == "")) $_options['slider'] = $default;
 		if ((isset($_options['select'])) && ($_options['select'] == "")) $_options['select'] = $default;
 		if ((isset($_options['message'])) && ($_options['message'] == "")) $_options['message'] = $default;
+		if (!(isset($_options['slider']))) $_options['slider'] = "";
+		if (!(isset($_options['select']))) $_options['select'] = "";
+		if (!(isset($_options['message']))) $_options['message'] = "";
+		if (!(isset($_options['volume']))) $_options['volume'] = "";
+		//log::add('alexaapi_node', 'info', 'xxxxxxxxxxxxx---->_options:'.json_encode($_options));
 		// Si on est sur une commande qui utilise volume, on va remettre après execution le volume courant
 		if (strstr($request, '&volume=')) $request = $request.'&lastvolume='.$lastvolume;
 		$request = str_replace(array('#slider#', '#select#', '#message#', '#volume#'), 

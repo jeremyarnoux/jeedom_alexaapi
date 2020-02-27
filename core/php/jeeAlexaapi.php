@@ -335,37 +335,39 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='perso
 
 				$html="<table style='border-collapse: separate; border-spacing : 10px; ' border='0' width='100%'>";
 				$compteurQueue=1;		
-			foreach ($result['queue'] as $key => $value) {
-						//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>album:'.$value['album']."/".$album_enCoursdeLecture);
-						//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>artist:'.$value['artist']."/".$artist_enCoursdeLecture);
-						//log::add('alexaapi_widget', 'debug', '-----------------imageURL:'.$value['imageURL']);			
-						//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>title:'.$value['title']."/".$title_enCoursdeLecture);			
-						//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>album:'.$value['album']."/".$album_enCoursdeLecture);			
-						//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>artist:'.$value['artist']."/".$artist_enCoursdeLecture);			
-						//log::add('alexaapi_widget', 'debug', '-----------------durationSeconds:'.$value['durationSeconds']);			
-					//if (($value['album']==$album_enCoursdeLecture) && ($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture))			
-					if (($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture))
-					{
-					//if (($value['imageURL']==$imageURLenCoursdeLecture) && $compteurQueue>3){
-							$html="<table style='border-collapse: separate; border-spacing : 10px; ' border='0' width='100%'>";
-						}
+			if (isset($result['queue'])) {
+				foreach ($result['queue'] as $key => $value) {
+							//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>album:'.$value['album']."/".$album_enCoursdeLecture);
+							//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>artist:'.$value['artist']."/".$artist_enCoursdeLecture);
+							//log::add('alexaapi_widget', 'debug', '-----------------imageURL:'.$value['imageURL']);			
+							//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>title:'.$value['title']."/".$title_enCoursdeLecture);			
+							//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>album:'.$value['album']."/".$album_enCoursdeLecture);			
+							//log::add('alexaapi_widget', 'debug', '>>>>>>>>>>>>>>>>>artist:'.$value['artist']."/".$artist_enCoursdeLecture);			
+							//log::add('alexaapi_widget', 'debug', '-----------------durationSeconds:'.$value['durationSeconds']);			
+						//if (($value['album']==$album_enCoursdeLecture) && ($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture))			
+						if (($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture))
+						{
+						//if (($value['imageURL']==$imageURLenCoursdeLecture) && $compteurQueue>3){
+								$html="<table style='border-collapse: separate; border-spacing : 10px; ' border='0' width='100%'>";
+							}
 
-			//$html.="<tr><td style='padding: 8px;'  rowspan='2' width='50'><a href='' onclick=\"ttttt('55')\">";
-			$html.="<tr><td style='padding: 8px;'  rowspan='2' width='50'>";
-			//if (($value['imageURL']==$imageURLenCoursdeLecture) && $etatPlayer=="PLAYING") 
-			if (($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture) && $etatPlayer=="PLAYING") 
-				$html.="<img style='position:absolute' src='plugins/alexaapi/core/img/playing_petit.gif' />";
-			$html.="
-			<object data='".$value['imageURL']."' style='height: 60px;width: 60px;border-radius: 30%;' type='image/png'>
-			<img style='height: 60px;width: 60px;border-radius: 30%;'  src='plugins/alexaapi/core/img/musique.png'/></object></a></td>
-				<td width='100%'>".$value['title']."</td>
-			</tr>
-			<tr>
-				<td width='100%'><small>".$value['artist']." - <font size=1><em>".date('i:s', $value['durationSeconds'])."</em></font></small></td>
-			</tr>";
+				//$html.="<tr><td style='padding: 8px;'  rowspan='2' width='50'><a href='' onclick=\"ttttt('55')\">";
+				$html.="<tr><td style='padding: 8px;'  rowspan='2' width='50'>";
+				//if (($value['imageURL']==$imageURLenCoursdeLecture) && $etatPlayer=="PLAYING") 
+				if (($value['artist']==$artist_enCoursdeLecture) && ($value['title']==$title_enCoursdeLecture) && $etatPlayer=="PLAYING") 
+					$html.="<img style='position:absolute' src='plugins/alexaapi/core/img/playing_petit.gif' />";
+				$html.="
+				<object data='".$value['imageURL']."' style='height: 60px;width: 60px;border-radius: 30%;' type='image/png'>
+				<img style='height: 60px;width: 60px;border-radius: 30%;'  src='plugins/alexaapi/core/img/musique.png'/></object></a></td>
+					<td width='100%'>".$value['title']."</td>
+				</tr>
+				<tr>
+					<td width='100%'><small>".$value['artist']." - <font size=1><em>".date('i:s', $value['durationSeconds'])."</em></font></small></td>
+				</tr>";
 
-			$compteurQueue++;
-			}	
+				$compteurQueue++;
+				}
+			}			
 			$html.="</table>";
 		} else
 		{
