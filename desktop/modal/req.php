@@ -31,6 +31,7 @@ if (empty($_GET['json']))
 						case 'media':
 						case 'lists':
 						case 'deviceNotificationState':
+						case 'notificationSounds':
 						case 'playlists':
 						case 'playerInfo':
 							$masquedevice=false;
@@ -65,18 +66,21 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 <option value="wakeWords" <?php if ($_GET['json']=="wakeWords") echo "selected"?>>WakeWords</option>
 <option value="devicesFull" <?php if ($_GET['json']=="devicesFull") echo "selected"?>>Devices</option>
 <option value="historyFull" <?php if ($_GET['json']=="historyFull") echo "selected"?>>History</option>
+<option value="remindersFull" <?php if ($_GET['json']=="remindersFull") echo "selected"?>>Reminders</option>
 <option value="devicePreferences" <?php if ($_GET['json']=="devicePreferences") echo "selected"?>>Préférences</option>
 <option value="homeGroup" <?php if ($_GET['json']=="homeGroup") echo "selected"?>>Home Group</option>
 <option value="smarthomegroups" <?php if ($_GET['json']=="smarthomegroups") echo "selected"?>>Smarthome Groups</option>
 <option value="smarthomeDevices" <?php if ($_GET['json']=="smarthomeDevices") echo "selected"?>>Smarthome Devices</option>
 <option value="smarthomeentities" <?php if ($_GET['json']=="smarthomeentities") echo "selected"?>>Smarthome Entities</option>
 <option value="smarthomebehaviouractiondefinitions" <?php if ($_GET['json']=="smarthomebehaviouractiondefinitions") echo "selected"?>>Smarthome Behaviour Action Definitions Devices</option>
-<option value="media" <?php if ($_GET['json']=="media") echo "selected"?>>Media</option>
-<option value="musicProviders" <?php if ($_GET['json']=="musicProviders") echo "selected"?>>Music Providers</option>
+<option value="bluetooth" <?php if ($_GET['json']=="bluetooth") echo "selected"?>>Bluetooth</option>
+<option value="media" <?php if ($_GET['json']=="media") echo "selected"?>>Media</option><option value="musicProviders" <?php if ($_GET['json']=="musicProviders") echo "selected"?>>Music Providers</option>
 <option value="playerInfo" <?php if ($_GET['json']=="playerInfo") echo "selected"?>>Player Info</option>?>
+<option value="notificationSounds" <?php if ($_GET['json']=="notificationSounds") echo "selected"?>>Notification Sounds</option>?>
 <option value="playlists" <?php if ($_GET['json']=="playlists") echo "selected"?>>Playlists</option>?>
 <option value="remindersFull" <?php if ($_GET['json']=="remindersFull") echo "selected"?>>Notifications</option>?>
 <option value="lists" <?php if ($_GET['json']=="lists") echo "selected"?>>Lists</option>?>
+<option value="routines" <?php if ($_GET['json']=="routines") echo "selected"?>>Routines</option>?>
 <option value="carts" <?php if ($_GET['json']=="carts") echo "selected"?>>Carts</option>?>
 <option value="alexa-cookie" <?php if ($_GET['json']=="alexa-cookie") echo "selected"?>>Cookie Amazon</option>?>
 <option value="deviceNotificationState" <?php if ($_GET['json']=="deviceNotificationState") echo "selected"?>>Device Notification State</option>?>
@@ -88,7 +92,7 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
 		$eqLogics = alexaapi::byType('alexaapi');
 		foreach ($eqLogics as $eqLogic)
 		{  
-			if ($eqLogic->getConfiguration('devicetype') != "Player") {
+			if (($eqLogic->getConfiguration('devicetype') != "Player") && ($eqLogic->getConfiguration('devicetype') != "PlayList")){
 				echo '<option ';
 				if ($_GET['device']==$eqLogic->getConfiguration('serial')) echo "selected ";
 				echo 'value="'.$eqLogic->getConfiguration('serial').'">'.$eqLogic->getName().'</option>';

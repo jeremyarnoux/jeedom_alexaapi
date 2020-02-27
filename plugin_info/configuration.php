@@ -83,24 +83,6 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
            <input type="checkbox" class="configKey" data-l1key="utilisateurExperimente" />
        </div>
 	</div>
-      <div class="form-group ">
-        <label class="col-lg-4 control-label">{{Activer les fonctions Domotique des Amazon SmartHome}}</label>
-        <div class="col-lg-3">
-           <input type="checkbox"  <?php if ($versionJeedom=="stable") echo 'disabled="disabled"';?> class="configKey" data-l1key="utilisateurSmarthome" /><em>(activable uniquement en Béta pour l'instant)</em>
-       </div> 
-	</div>      
-	<div class="form-group">
-        <label class="col-lg-4 control-label">{{Activer les fonctions Multimedia (Player/Playlist)}}</label>
-        <div class="col-lg-3">
-           <input type="checkbox" <?php if ($versionJeedom=="stable") echo 'disabled="disabled"';?> class="configKey" data-l1key="utilisateurMultimedia" /><em>(activable uniquement en Béta pour l'instant)</em>
-       </div> 
-	</div>	
-	<!--<div class="form-group">
-        <label class="col-lg-4 control-label">{{Activer le client MQTT Amazon (conseillé pour les fonctions multimédia)}}</label>
-        <div class="col-lg-3">
-           <input type="checkbox" class="configKey" data-l1key="utilisateurMQTT" /><em>(activable uniquement en Béta pour l'instant)</em>
-       </div> 
-	</div>	-->	
 	<div class="form-group">
 		  <label class="col-lg-4 control-label" >{{Ajouter automatiquement les équipements détectés dans :}}</label>
 		  <div class="col-lg-3">
@@ -265,7 +247,7 @@ if(nouvellefenetre)
 	$('#md_modal').dialog('close'); 
 	
 		bootbox.confirm({
-			message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API ? Il faudra refaire les scénarios.",
+			message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API (et des autres plugin Alexa-xx) ? Il faudra refaire les scénarios.",
 			buttons: {
 				confirm: {
 					label: 'Oui',

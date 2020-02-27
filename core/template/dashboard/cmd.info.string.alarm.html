@@ -12,15 +12,22 @@
 	<div class="value">
 		<span class="timeCmd#uid# timeCmd label label-default value"></span>
 	</div>
-
 	<script>
 		jeedom.cmd.update['#id#'] = function(_options){
 			var cmd = $('.cmd[data-cmd_id=#id#]');
+			var now = new Date();
 			var inforecuperee=_options.display_value;
 			if (inforecuperee == "none")
 					_options.display_value="";
+					else {
+					// 2019-12-02 19:45:00
+					_options.display_value=inforecuperee.substr(11, 2)+":"+inforecuperee.substr(14, 2)+"<br>"
+					if ((now.getFullYear()==inforecuperee.substr(0, 4)) && (now.getMonth() + 1 == inforecuperee.substr(5, 2))&& (now.getDate() == inforecuperee.substr(8, 2)))
+						_options.display_value=_options.display_value+"Aujourd'hui";
+					else if ((now.getFullYear()==inforecuperee.substr(0, 4)) && (now.getMonth() + 1 == inforecuperee.substr(5, 2))&& (now.getDate() +1 == inforecuperee.substr(8, 2)))
+						_options.display_value=_options.display_value+"Demain";
 					else
-					_options.display_value=inforecuperee.substr(0, 2)+":"+inforecuperee.substr(2, 2);
+						_options.display_value=_options.display_value+inforecuperee.substr(8, 2)+"-"+inforecuperee.substr(5, 2)+"-"+inforecuperee.substr(0, 4);					}
 			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate);
 			cmd.find('.state').empty().append(_options.display_value);			
 		

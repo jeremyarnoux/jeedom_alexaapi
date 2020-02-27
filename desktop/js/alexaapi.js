@@ -261,8 +261,9 @@ function addCmdToTable(_cmd)
 					var DefinitionDivPourCommandesPredefinies='style="display: none;"';
 					if (init(_cmd.logicalId)=="")
 					DefinitionDivPourCommandesPredefinies="";
+//  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == '00whennextalarm') || (init(_cmd.logicalId) == 'whennextreminderlabel') || (init(_cmd.logicalId) == 'musicalalarmmusicentity') || (init(_cmd.logicalId) == 'whennextmusicalalarm')) {
 								
-  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == 'whennextalarm') || (init(_cmd.logicalId) == 'whennextreminderlabel') || (init(_cmd.logicalId) == 'musicalalarmmusicentity') || (init(_cmd.logicalId) == 'whennextmusicalalarm')) {
+  if ((init(_cmd.logicalId) == 'updateallalarms')) {
     return;
   }
   
@@ -318,94 +319,60 @@ function addCmdToTable(_cmd)
 
   if (init(_cmd.type) == 'action')
   {
-    var tr =
-       '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">'
-     +   '<td>'
-     +     '<span class="cmdAttr" data-l1key="id"></span>'
-     +   '</td>'
-     +   '<td>'
-     +     '<div class="row">'
-     +       '<div class="col-lg-1">'
- //    +         '<a class="cmdAction btn btn-default btn-sm" data-l1key="chooseIcon"><i class="fa fa-flag"></i> Icone</a>'
-     +         '<span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>'
-     +       '</div>'
-    +       '<div class="col-lg-8">'
-    +         '<input class="cmdAttr form-control input-sm" data-l1key="name">'
-    +       '</div>'
-     +     '</div>';
- /*if (init(_cmd.logicalId)=="")
- {
- 
-  tr  +=    '<select class="cmdAttr form-control tooltips input-sm" data-l1key="value" style="display : none;margin-top : 5px;" title="{{La valeur de la commande vaut par défaut la commande}}">'
-      +       '<option value="">Aucune</option>'
-      +     '</select>';
- }*/
-    tr  +=   '</td>';
-	
-	
-	      tr  +=   '<td>';
-//     +     '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
-      //tr  +=     '<input class="cmdAttr form-control type input-sm" data-l1key="type" value="info" disabled style="margin-bottom : 5px;" />';
-     // tr  +=     '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
-     // tr  +=   '</td>';
-	
-	
-	
-	/*
-	tr  +='<td>';
+	var tr =
+	'<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">'
+	+   '<td>'
+	+     '<span class="cmdAttr" data-l1key="id"></span>'
+	+   '</td>'
+	+   '<td>'
+	+     '<div class="row">'
+	+       '<div class="col-lg-1">'
+	+         '<span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>'
+	+       '</div>'
+	+       '<div class="col-lg-8">'
+	+         '<input class="cmdAttr form-control input-sm" data-l1key="name">'
+	+       '</div>'
+	+     '</div>';
+
+	tr  +=   '</td>';
 
 
-//	+     '<input class="cmdAttr form-control type input-sm" data-l1key="type" value="info" disabled style="margin-bottom : 0px;" />'
-//     +     '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
-     //+     '<input';
- //if (init(_cmd.logicalId)!="")
- //tr  +='type="hidden"';
-*/
+	tr  +=   '<td>';
 	tr  +='<input class="cmdAttr form-control type input-sm" data-l1key="type" value="action" disabled />';
 	tr  +='<div '+DefinitionDivPourCommandesPredefinies+'>';
 	tr  +=     '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
-	//tr  +=     '<input class="cmdAttr" data-l1key="configuration" data-l2key="virtualAction" value="1" style="display:none;" />';
 	tr  +=   '</div></td>';
 	tr  +=   '<td>'
 	+     '<input class="cmdAttr form-control input-sm"';
- if (init(_cmd.logicalId)!="")
- tr  +='readonly';
+	if (init(_cmd.logicalId)!="")
+	tr  +='readonly';
 
- if (init(_cmd.logicalId)=="refresh")
- tr  +=' style="display:none;" ';
+	if (init(_cmd.logicalId)=="refresh")
+	tr  +=' style="display:none;" ';
 
-	 
-tr+= ' data-l1key="configuration" data-l2key="request">';
-  //   +   '</td>'
-  //   +   '<td>'
-     //+     '<small><small><span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span></small></small><br><br>';
- 
- /*
- supprimé 13/10/2019 pour next previous play...
-  if ((init(_cmd.subType) == 'other') && (init(_cmd.logicalId)!="refresh"))
-
-  {
-    tr +=
-	     '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="infoName" placeholder="{{Nom de la Commande Info}}" style="width : 250px;" />';
-  }
-*/
-    tr +=   '</td>';
+	tr+= ' data-l1key="configuration" data-l2key="request">';
+	
+		if (init(_cmd.subType) == 'select') {
+    tr += '<input class="tooltips cmdAttr form-control input-sm expertModeVisible" data-l1key="configuration" data-l2key="listValue" placeholder="{{Liste de valeur|texte séparé par ;}}" title="{{Liste}}">';	
+		}
+	
+	tr +=   '</td>';
 	tr +=   '<td>';
 	
- if ((init(_cmd.logicalId)=="")||(init(_cmd.logicalId)=="volume"))
- {
-	tr +=     '<input class="cmdAttr form-control input-sm" data-l1key="unite"  style="width : 100px;" placeholder="{{Unité}}" title="{{Unité}}" >';
-	 //   + '<input class="tooltips cmdAttr form-control input-sm expertModeVisible" data-l1key="configuration" data-l2key="listValue" placeholder="{{Liste de valeur|texte séparé par ;}}" title="{{Liste}}" style="margin-top : 5px;">'
-	tr +=     '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}"  title="{{Min}} style="margin-top : 3px;"> ';
-    tr +=   '</td>';
-	tr +=   '<td>';
-	tr +=     '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">';
- }
- else
- {
-    tr +=   '</td>';
-	tr +=   '<td>';
-	  }
+		if ((init(_cmd.logicalId)=="")||(init(_cmd.logicalId)=="volume")) {
+			tr +=     '<input class="cmdAttr form-control input-sm" data-l1key="unite"  style="width : 100px;" placeholder="{{Unité}}" title="{{Unité}}" >';
+			tr +=     '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}"  title="{{Min}} style="margin-top : 3px;"> ';
+			tr +=   '</td>';
+			tr +=   '<td>';
+			tr +=     '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">';
+		}
+		else {
+			tr +=   '</td>';
+			tr +=   '<td>';
+		}
+
+
+
 	  
 	tr +=   '</td>'
      +   '<td>'

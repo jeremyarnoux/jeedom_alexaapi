@@ -80,52 +80,76 @@ var str=data.logicalId
 
 		<!-- Bouton d accès à la configuration -->
 		<div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
-			<i class="fas fa-wrench"></i>
+			<i class="fas fa-wrench" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Configuration}}</span>
+			<span style="color:#42d4eb">{{Configuration}}</span>
 		</div>
 
 		<div class="cursor logoSecondary" id="bt_sante">
-			<i class="fas fa-medkit"></i>
+			<i class="fas fa-medkit" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Santé}}</span>
+			<span  style="color:#42d4eb">{{Santé}}</span>
 		</div>
 
 
 		<div class="cursor logoSecondary" id="bt_routines">
-			<i class="fas divers-viral"></i>
+			<i class="fas divers-viral" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Routines}}</span>
+			<span style="color:#42d4eb">{{Routines}}</span>
 		</div>
 
 
 		<div class="cursor logoSecondary" id="bt_reminders">
-			<i class="fas fa-clock"></i>
+			<i class="fas fa-clock" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Rappels/Alarmes}}</span>
+			<span style="color:#42d4eb">{{Rappels/Alarmes}}</span>
 		</div>
 
 
 		<div class="cursor logoSecondary" id="bt_history">
-			<i class="fas fa-list-alt"></i>
+			<i class="fas fa-list-alt" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Historique}}</span>
+			<span style="color:#42d4eb">{{Historique}}</span>
 		</div>
 <?php
 if (((config::byKey('utilisateurExperimente', 'alexaapi',0)!="0")) && (log::getLogLevel('alexaapi')<200)) :
 ?>
 		<div class="cursor logoSecondary" id="bt_req">
-			<i class="fas fa-key"></i>
+			<i class="fas fa-key" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Requêteur Infos}}</span>
+			<span style="color:#42d4eb">{{Requêteur Infos}}</span>
 		</div>
 
 		<div class="cursor logoSecondary" id="bt_req2">
-			<i class="fas fa-key"></i>
+			<i class="fas fa-key" style="font-size : 5em;color:#42d4eb;"></i>
 			<br />
-			<span>{{Requêteur Actions}}</span>
+			<span style="color:#42d4eb">{{Requêteur Actions}}</span>
 		</div><?php
 endif;
+
+		foreach (alexaapi::listePluginsAlexa(false, true) as $pluginAlexaUnparUn)
+		{
+			//echo $pluginAlexaUnparUn;
+			$nomPlugin="inconnu";
+			if ($pluginAlexaUnparUn=='alexaamazonmusic') $nomPlugin='Amazon Music';
+			if ($pluginAlexaUnparUn=='alexadeezer') $nomPlugin='Deezer';
+			if ($pluginAlexaUnparUn=='alexaspotify') $nomPlugin='Spotify';
+			if ($pluginAlexaUnparUn=='alexasmarthome') $nomPlugin='SmartHome';
+			
+			echo' <div class="cursor eqLogicAction logoSecondary">
+			<a href="index.php?v=d&m='.$pluginAlexaUnparUn.'&p='.$pluginAlexaUnparUn.'"><img  style="margin-top:-32px;" src="plugins/'.$pluginAlexaUnparUn.'/plugin_info/'.$pluginAlexaUnparUn.'_icon.png" width="75" height="75" style="min-height:75px !important;" />
+			<br />
+			<span style="color:#42d4eb">{{'.$nomPlugin.'}}</span></a>
+		</div>';
+			
+			
+			
+		}
+
+
+
+
+
 ?>	  
     </div>
     <!-- Début de la liste des objets -->
@@ -143,12 +167,12 @@ endif;
 <?php
 foreach($eqLogics as $eqLogic) {
 
-	if (($eqLogic->getConfiguration('devicetype') != "Smarthome") && ($eqLogic->getConfiguration('devicetype') != "Player") && ($eqLogic->getConfiguration('devicetype') != "PlayList")) {
+//	if (($eqLogic->getConfiguration('devicetype') != "Smarthome") && ($eqLogic->getConfiguration('devicetype') != "Player") && ($eqLogic->getConfiguration('devicetype') != "PlayList")) {
 
 		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
 		echo '<div class="eqLogicDisplayCard cursor prem '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'" >';
 
-		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")))
+		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")) && (!strstr($eqLogic->getName(), "Ultimate Alexa")))
 			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
 
 		$alternateImg = $eqLogic->getConfiguration('type');
@@ -165,116 +189,13 @@ foreach($eqLogics as $eqLogic) {
 		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
 
 		echo '</div>';
-	}
-}
-?>
-			</div>
-		</div>
-    </div>
-	<?php	
-	if (config::byKey('utilisateurMultimedia', 'alexaapi',0)!="0")
-	{	
-?>
-	
-	<legend><i class="fas fa-table"></i> {{Mes Amazon Player}}</legend>
-	<div class="input-group" style="margin-bottom:5px;">
-		<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic2" />
-		<div class="input-group-btn">
-			<a id="bt_resetEqlogicSearch2" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
-		</div>
-	</div>	
-    <!-- Container de la liste -->
-	<div class="panel">
-		<div class="panel-body">
-			<div class="eqLogicThumbnailContainer second">
-<?php
-foreach($eqLogics as $eqLogic) {
-
-	if ($eqLogic->getConfiguration('devicetype') == "Player") {
-
-		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
-		echo '<div class="eqLogicDisplayCard cursor second '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'" >';
-
-		if (($eqLogic->getStatus('online') != 'true'))
-			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
-		else {
-				if (($eqLogic->getStatus('Playing') == 'true'))
-					echo '<i class="fa fa-play" style="color: green;text-shadow: 4px 4px 4px #ccc;float:right" title="Playing"></i>';
-				else
-					echo '<i class="fas loisir-musical7" style="color: #2c8af6;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>'; // Dire que c'est un Player
-		}
-
-		$alternateImg = $eqLogic->getConfiguration('type');
-		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" style="min-height:75px !important;" />';
-		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" style="min-height:75px !important;" />';
-		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" style="min-height:75px !important;" />';
-		else
-			echo '<img class="lazy" src="'.$plugin->getPathImgIcon().'" style="min-height:75px !important;" />';
-
-		echo '<br />';
-		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
-
-		echo '</div>';
-	}
+	//}
 }
 ?>
 			</div>
 		</div>
     </div>
 	
-<?php	
-	}
-	if (config::byKey('utilisateurSmarthome', 'alexaapi',0)!="0")
-	{	
-?>
-    <!-- Début de la liste des objets -->
-    <legend><i class="fas fa-table"></i> {{Mes Amazon Smarthome}}</legend>
-	<div class="input-group" style="margin-bottom:5px;">
-		<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic3" />
-		<div class="input-group-btn">
-			<a id="bt_resetEqlogicSearch3" class="btn roundedRight" style="width:30px"><i class="fas fa-times"></i></a>
-		</div>
-	</div>	
-    <!-- Container de la liste -->
-	<div class="panel">
-		<div class="panel-body">
-			<div class="eqLogicThumbnailContainer third">
-<?php
-foreach($eqLogics as $eqLogic) {
-	if ($eqLogic->getConfiguration('devicetype') == "Smarthome") {
-
-		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
-		echo '<div class="eqLogicDisplayCard cursor third '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'">';
-
-		if (($eqLogic->getStatus('online') != 'true'))
-			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
-
-		$alternateImg = $eqLogic->getConfiguration('type');
-		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$alternateImg.'.png" style="min-height:75px !important;" />';
-		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/'.$eqLogic->getConfiguration('family').'.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/'.$eqLogic->getConfiguration('family').'.png" style="min-height:75px !important;" />';
-		elseif(file_exists(dirname(__FILE__).'/../../core/config/devices/default.png'))
-			echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" style="min-height:75px !important;" />';
-		else
-			echo '<img class="lazy" src="'.$plugin->getPathImgIcon().'" style="min-height:75px !important;" />';
-
-		echo '<br />';
-		echo '<span class="name">'.$eqLogic->getHumanName(true, true).'</span>';
-		echo '</div>';
-	}
-}
-?>
-			</div>
-		</div>
-    </div>  
-
-<?php	
-	}	
-?>
 
 	
   </div>
@@ -284,9 +205,11 @@ foreach($eqLogics as $eqLogic) {
     <a class="btn btn-success eqLogicAction pull-right" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}</a>
     <!-- Bouton Supprimer -->
     <a class="btn btn-danger eqLogicAction pull-right" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}</a>
+     <!-- Bouton configuration par défaut -->
+	<a id="bt_forcerDefaultCmd" class="btn btn-warning pull-right"><i class="fas fa-search"></i> {{Recharger configuration par défaut}}</a>
     <!-- Bouton configuration avancée -->
     <a class="btn btn-default eqLogicAction pull-right" data-action="configure"><i class="fas fa-cogs"></i> {{Configuration avancée}}</a>
-    <!-- Liste des onglets -->
+   <!-- Liste des onglets -->
     <ul class="nav nav-tabs" role="tablist">
       <!-- Bouton de retour -->
       <li role="presentation"><a class="eqLogicAction cursor" aria-controls="home" role="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
@@ -386,12 +309,6 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
           <div class="col-sm-5">
             <form class="form-horizontal">
               <fieldset>
-				<div class="form-group">
-					<label class="col-sm-2 control-label">{{}}</label>
-					<div class="col-sm-8">
-						<a id="bt_forcerDefaultCmd" class="btn btn-warning"><i class="fas fa-search"></i> {{Recharger configuration par défaut}}</a>
-					</div>
-				</div>
                 <div class="form-group">
                   <label class="col-sm-2 control-label">{{ID}}</label>
                   <div class="col-sm-8">

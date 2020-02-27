@@ -1,23 +1,19 @@
-<div class="cmd" data-type="info" data-version="#version#" data-eqLogic_id="#eqLogic_id#" data-subtype="string" data-cmd_id="#id#" data-cmd_uid="#uid#">
+<div class="cmd cmd-widget #history#" data-type="info" data-subtype="string" data-template="default" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
 <br>
-<table  border="0"  width="202">
+<table border="0" cellpadding="0" width="202">
     <tr>
-        <td style="padding: 15px;" ><center><i  class="fa jeedomapp-audiospeak"></i></center></td>
-        <td width="90%">
-		<center><font size="2"><strong class="state"></strong></font></center></td>
-
+        <td style="padding: 0px;" width="100%">  
+			<div class="cmdName"> #name_display#</div>
+		</td>
+    </tr>
+    <tr>
+        <td style="padding: 5px;" width="100%">
+			<div class="content-xs">
+			<center><font size="2"><strong class="state"></strong></font></center>
+			</div>
+  </td>
     </tr>
 </table>
-<!--
-<p>id : <strong>#id#</strong><br>
-uid : <strong>#uid#</strong><br>
-name : <strong>#name#</strong><br>
-state : <strong>#state#</strong><br>
-name_display : <strong>#name_display#</strong><br>
-logicalId : <strong>#logicalId#</strong><br>
-version : <strong>#version#</strong><br>
-</p>
--->
 	<script>
 		jeedom.cmd.update['#id#'] = function(_options) {
 			var cmd = $('.cmd[data-cmd_id=#id#]')
