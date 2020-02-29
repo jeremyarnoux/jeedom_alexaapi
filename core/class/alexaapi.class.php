@@ -640,12 +640,12 @@ public static function templateWidget(){
 			try {
 							//log::add('alexaapi', 'info', 'coucou');
 				foreach ($this->getCmd('action') as $cmd) {
-							//log::add('alexaapi', 'info', 'Test refresh de la commande '.$cmd->getName().' valeur -> '.$cmd->getConfiguration('RunWhenRefresh', 0));
+					//log::add('alexaapi', 'info', 'Test refresh de la commande '.$cmd->getName().' valeur -> '.$cmd->getConfiguration('RunWhenRefresh', 0));
 
 					if ($cmd->getConfiguration('RunWhenRefresh', 0) != '1') {
 						continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
 					}
-							//log::add('alexaapi', 'info', 'OUI pour '.$cmd->getName());
+							log::add('alexaapi', 'info', 'OUI pour '.$cmd->getName());
 					$value = $cmd->execute();
 				}
 			}
@@ -678,6 +678,7 @@ public static function templateWidget(){
 		
 	public function updateCmd ($forceUpdate, $LogicalId, $Type, $SubType, $RunWhenRefresh, $Name, $IsVisible, $title_disable, $setDisplayicon, $infoNameArray, $setTemplate_lien, $request, $infoName, $listValue, $Order, $Test) {
 		if ($Test) {
+			//log::add('alexaapi', 'info', 'ajout commande FORCAGE '.$LogicalId);
 			try {
 				if (empty($Name)) $Name=$LogicalId;
 				$cmd = $this->getCmd(null, $LogicalId);
@@ -768,7 +769,7 @@ public static function templateWidget(){
 			self::updateCmd ($F, 'interactioninfo', 'info', 'string', false, 'Dernier dialogue avec Alexa', true, false, null, null,'alexaapi::interaction', null, null, null, 2, $cas7);	
 			self::updateCmd ($F, 'bluetoothDevice', 'info', 'string', false, 'Est connecté en Bluetooth', true, false, null, null,'alexaapi::interaction', null, null, null, 2, $cas7);	
 			self::updateCmd ($F, 'updateallalarms', 'action', 'other', true, 'UpdateAllAlarms', false, false, null, ["musicalalarmmusicentityinfo","whennextalarminfo","whennextmusicalalarminfo","whennextreminderinfo","whennexttimerinfo","whennextreminderlabelinfo"] , null, 'updateallalarms', null , null, 2, $cas2);	
-			self::updateCmd ($F, 'deleteReminder', 'action', 'message', false, 'DeleteReminder', false, false, 'maison-poubelle', null, null, 'deleteReminder?id=#id#', null, null, 2, $cas3);			
+			self::updateCmd ($F, 'deleteReminder', 'action', 'message', false, 'Supprimer un rappel', false, false, 'maison-poubelle', null, null, 'deleteReminder?id=#id#', null, null, 2, $cas3);			
 			self::updateCmd ($F, 'subText2', 'info', 'string', false, null, true, false, null, null, 'alexaapi::subText2', null, null, null, 2, $cas1);
 			self::updateCmd ($F, 'subText1', 'info', 'string', false, null, true, false, null, null, 'alexaapi::title', null, null, null, 4, $cas1);			
 			self::updateCmd ($F, 'url', 'info', 'string', false, null, true, false, null, null, 'alexaapi::image', null, null, null, 5, $cas1);			
@@ -819,7 +820,7 @@ public static function templateWidget(){
 			//self::updateCmd ($F, 'loopMode', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, $cas1);
 			//self::updateCmd ($F, 'playBackOrder', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, $cas1);
 			//self::updateCmd ($F, 'alarm', 'action', 'message', false, 'Alarm', false, true, 'fa fa-bell', null, null, 'alarm?when=#when#&recurring=#recurring#&sound=#sound#', null, null, 79, $cas2);
-			self::updateCmd ($F, 'deleteallalarms', 'action', 'message', false, 'Delete All Alarms', false, false, 'maison-poubelle', null, null, 'deleteallalarms?type=alarm&status=all', null, null, 79, $cas2);
+			self::updateCmd ($F, 'deleteallalarms', 'action', 'message', false, 'Delete All Alarms', false, false, 'maison-poubelle', null, null, 'deleteallalarms?type=#type#&status=#status#', null, null, 79, $cas2);
 				if($type == "A15ERDAKK5HQQG") {
 					log::add('alexaapi', 'warning', '****Rencontre du type A15ERDAKK5HQQG = Sonos Première Génération sur : '.$this->getName());
 					log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus car bug!');
@@ -1151,7 +1152,7 @@ class alexaapiCmd extends cmd {
 		if (strstr($request, '&volume=')) $request = $request.'&lastvolume='.$lastvolume;
 		$request = str_replace(array('#slider#', '#select#', '#message#', '#volume#'), 
 		array($_options['slider'], $_options['select'], urlencode(self::decodeTexteAleatoire($_options['message'])), $_options['volume']), $request);
-		log::add('alexaapi_node', 'info', '---->RequestFinale:'.$request);
+		//log::add('alexaapi_node', 'info', '---->RequestFinale:'.$request);
 		return $request;
 	}	
 
@@ -1186,8 +1187,8 @@ class alexaapiCmd extends cmd {
 
 	private function build_ControleWhenTextRecurring($defaultWhen, $defaultText, $_options = array()) {
 		$request = $this->getConfiguration('request');
-		log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage RequestFinale:'.$request);
-		log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage _optionsAVANT:'.json_encode($_options));
+		//log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage RequestFinale:'.$request);
+		//log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage _optionsAVANT:'.json_encode($_options));
 		if ((!isset($_options['sound'])) && (!isset($_options['message'])) && (!isset($_options['when']))) {
 			if (isset($_options['select'])) { // On est dans le cas d'un son d'alarme envoyé depuis le widget
 				$_options['sound']=urlencode($_options['select']);
@@ -1213,6 +1214,7 @@ class alexaapiCmd extends cmd {
 	
 	private function buildDeleteAllAlarmsRequest($_options = array()) {
 		$request = $this->getConfiguration('request');
+		log::add('alexaapi', 'debug', '----buildDeleteAllAlarmsRequest RequestFinale:'.$request);
 		if ($_options['type'] == "") $_options['type'] = "alarm";
 		if ($_options['status'] == "") $_options['status'] = "ON";
 		return str_replace(array('#type#', '#status#'), array($_options['type'], $_options['status']), $request);
@@ -1220,7 +1222,7 @@ class alexaapiCmd extends cmd {
 	
 	private function builddeleteReminderRequest($_options = array()) {
 		$request = $this->getConfiguration('request');
-		if ($_options['id'] == "") $_options['id'] = "coucou";
+		if ($_options['id'] == "") $_options['id'] = "ManqueID";
 		if ($_options['status'] == "") $_options['status'] = "ON";
 		return str_replace(array('#id#', '#status#'), array($_options['id'], $_options['status']), $request);
 	}	
@@ -1238,6 +1240,8 @@ class alexaapiCmd extends cmd {
 			return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
 		if ($command == 'reminder') 
 			return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');
+		if ($command == 'deleteReminder') 
+			return getTemplate('core', 'scenario', 'cmd.deletereminder', 'alexaapi');		
 		if ($command == 'deleteallalarms') 
 			return getTemplate('core', 'scenario', 'cmd.deleteallalarms', 'alexaapi');
 		if ($command == 'command' && strpos($arguments, '#select#')) 
