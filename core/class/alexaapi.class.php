@@ -828,6 +828,7 @@ public static function templateWidget(){
 			self::updateCmd ($F, 'reminder', 'action', 'message', false, 'Envoyer un rappel', true, false, null, null, 'alexaapi::message', 'reminder?text=#message#&when=#when#&recurring=#recurring#', null, null, 79, $cas3);	
 
 
+
 			$volinfo = $this->getCmd(null, 'volumeinfo');
 			$vol = $this->getCmd(null, 'volume');
 					if((is_object($volinfo)) && (is_object($vol))) {
@@ -1187,8 +1188,8 @@ class alexaapiCmd extends cmd {
 
 	private function build_ControleWhenTextRecurring($defaultWhen, $defaultText, $_options = array()) {
 		$request = $this->getConfiguration('request');
-		//log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage RequestFinale:'.$request);
-		//log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage _optionsAVANT:'.json_encode($_options));
+		log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage RequestFinale:'.$request);
+		log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage _optionsAVANT:'.json_encode($_options));
 		if ((!isset($_options['sound'])) && (!isset($_options['message'])) && (!isset($_options['when']))) {
 			if (isset($_options['select'])) { // On est dans le cas d'un son d'alarme envoyé depuis le widget
 				$_options['sound']=urlencode($_options['select']);

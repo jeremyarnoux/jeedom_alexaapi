@@ -1259,7 +1259,8 @@ getNotificationSounds2(serialOrName, idSound, callback) {
         if (!dev) return null;
 
 	// Fix Aidom 01/03/2020
-	if (reccuring == null || recurring === undefined || recurring === "") {
+	//isrecurring = false;
+	if (recurring == null || recurring === undefined || recurring === "") {
 		recurring = null;
 	}
 	// End Fix
@@ -1284,8 +1285,8 @@ getNotificationSounds2(serialOrName, idSound, callback) {
             'originalTime': `${_00(value.getHours())}:${_00(value.getMinutes())}:${_00(value.getSeconds())}.000`,// **Modif Sigalou 2019.02.28
             'id': 'create' + type,
 
-            'isRecurring' : recurring, // Fix Aidom 01/03/2020
-            'recurringPattern': null,
+            //'isRecurring' : isrecurring, // Fix Aidom 01/03/2020
+            'recurringPattern': recurring, // Fix Aidom 01/03/2020
 
             'timeZoneId': null,
             'reminderIndex': null,
@@ -2308,9 +2309,9 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
         );
     }
 
-    setReminder(serialOrName, timestamp, label, callback) {
+    setReminder(serialOrName, timestamp, label, recurring, callback) { // Fix Aidom 01/03/2020
         //const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(timestamp)); **Modif Sigalou 2019.02.28
-        const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(Number(timestamp)));
+        const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(Number(timestamp)), recurring); // Fix Aidom 01/03/2020
         this.createNotification(notification, callback);
     }
     setAlarm2(serialOrName, timestamp, recurring, sound, callback) {        // **Modif Sigalou 2019.02.28
