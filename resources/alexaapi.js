@@ -867,10 +867,11 @@ app.get('/routine', CommandAlexa.Routine);
 
 
 /***** Create a reminder *****
-  URL /reminder?device=?&text=?&when=?
+  URL /reminder?device=?&text=?&when=?&recurring=? // Fix Aidom 01/03/2020
     device - String - name of the device
     text - String - Content of the reminder
     when - String - Date at which the reminder should occur. Date format: YYYY-MM-DD HH24:MI:SS
+    recurring - String - Get parameter, depending on the requests recognized by Alexa // Fix Aidom 01/03/2020
 
   Return an empty object if the function succeed.
   Otherwise, an error object is returned.
@@ -892,6 +893,12 @@ app.get('/reminder', (req, res) => {
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Reminder', 'Missing parameter "when"'));
 	config.logger('Alexa-API: when: ' + req.query.when);
 
+	// Fix Aidom 01/03/2020
+	if ('recurring' in req.query === false)
+		return res.status(500).json(error(500, req.route.path, 'Alexa.Reminder', 'Missing parameter "recurring"'));
+	config.logger('Alexa-API: recurring: ' + req.query.recurring);
+	// End Fix
+
 	// when: YYYY-MM-DD HH:MI:SS
 	let dateValues = req.query.when.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
 	if (dateValues === null)
@@ -899,7 +906,7 @@ app.get('/reminder', (req, res) => {
 	let when = new Date(dateValues[1], dateValues[2] - 1, dateValues[3], dateValues[4], dateValues[5], dateValues[6]);
 	config.logger('Alexa-API: when: ' + when);
 
-	alexa.setReminder(req.query.device, when.getTime(), req.query.text, function(err) {
+	alexa.setReminder(req.query.device, when.getTime(), req.query.text, req.query.recurring, function(err) { // Fix Aidom 01/03/2020
 		if (err)
 			return res.status(500).json(error(500, req.route.path, 'createReminder', err));
 		res.status(200).json({});

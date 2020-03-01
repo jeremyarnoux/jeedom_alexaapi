@@ -1246,7 +1246,7 @@ getNotificationSounds2(serialOrName, idSound, callback) {
 	
 
 
-    createNotificationObject(serialOrName, type, label, value, status, sound) { // type = Reminder, Alarm
+    createNotificationObject(serialOrName, type, label, value, recurring, status, sound) { // type = Reminder, Alarm ; recurring = from JS // Fix Aidom 01/03/2020
         if (status && typeof status === 'object') {
             sound = status;
             status = 'ON';
@@ -1257,6 +1257,12 @@ getNotificationSounds2(serialOrName, idSound, callback) {
 
         let dev = this.find(serialOrName);
         if (!dev) return null;
+
+	// Fix Aidom 01/03/2020
+	if (reccuring == null || recurring === undefined || recurring === "") {
+		recurring = null;
+	}
+	// End Fix
 
         //const now = new Date(); **Modif Sigalou 2019.02.28
         const notification = {
@@ -1278,7 +1284,7 @@ getNotificationSounds2(serialOrName, idSound, callback) {
             'originalTime': `${_00(value.getHours())}:${_00(value.getMinutes())}:${_00(value.getSeconds())}.000`,// **Modif Sigalou 2019.02.28
             'id': 'create' + type,
 
-            'isRecurring' : false,
+            'isRecurring' : recurring, // Fix Aidom 01/03/2020
             'recurringPattern': null,
 
             'timeZoneId': null,
