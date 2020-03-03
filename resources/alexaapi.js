@@ -201,7 +201,13 @@ CommandAlexa.Speak = function(req,res){
 	
 	var SpeakouAnnouncement = 'speak';
 	if (('jingle' in req.query === true) && (req.query.jingle == true)) SpeakouAnnouncement = 'announcement';
-	if (('ssml' in req.query === true) && (req.query.ssml == true)) SpeakouAnnouncement = 'ssml';
+	if (('ssml' in req.query === true) && (req.query.ssml == true)) {
+		SpeakouAnnouncement = 'ssml';
+		//Si c'est un test, ajouter la balise Speak
+		if (req.query.text.indexOf ("Ceci est un test de message pour la commande")==0)	req.query.text="<speak>"+req.query.text+"</speak>";	
+		// Prévenir si le text envoyé ne contient pas la balise speak
+		if (req.query.text.indexOf ("<speak>")!=0)	req.query.text="<speak>La syntaxe au format SSML n'est pas correct</speak>";	
+	}
 
 	let Commands = [];
 	var test = ('volume' in req.query === true) && (req.query.volume != "");
