@@ -7,9 +7,9 @@
 
 <div class="input-group input-group-sm" style="width: 50%">
         <span class="input-group-addon" id="basic-addon1" style="width: 100px">Quand</span>
-        <input type="text" class="datetimepicker-reminder form-control slider expressionAttr input-sm" data-l1key="options" data-l2key="when" value="#when#" data-cmd_id="#id#" data-uid="#uid#"/>
-        <span class="input-group-addon">
-                <span class="fa fa-calendar"></span>
+        <input type="text" id="datetimepicker-reminder" class="form-control slider expressionAttr input-sm" data-l1key="options" data-l2key="when" value="#when#" data-cmd_id="#id#" data-uid="#uid#"/>
+        <span class="input-group-btn">
+                <span class="btn btn-default fa fa-calendar"></span>
         </span> 
 </div>
 
@@ -31,13 +31,16 @@
             $.include(['plugins/alexaapi/desktop/js/bootstrap-datetimepicker.js'], function () {});
             $.include(['plugins/alexaapi/desktop/js/bootstrap-datetimepicker-fr.js'], function () {});
             $(function () {
-                  $('.datetimepicker-reminder').datetimepicker({
+                  $('#datetimepicker-reminder').datetimepicker({
                         setDate: new Date(),
                         use24hours: true,
                         format: 'yyyy-mm-dd hh:ii:ss',
                         language: 'fr',
                         stepSecond: '10',
                         todayBtn: true,
+                    });
+                  $('.fa-calendar').click(function() {
+                        $("#datetimepicker-reminder").focus();
                     });
                });
 	</script>
