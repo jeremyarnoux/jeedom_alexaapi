@@ -445,12 +445,51 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 	if ('command' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.SmarthomeCommand', 'Missing parameter "command"'));
 
 						var parameters = {};
-					
+						var toReturn = [];						
+			
+						if (req.query.entityType=='')
+							req.query.entityType="APPLIANCE";	
+						
 						parameters.action = 'turnOn'; // Même opération mais d'une autre manière
 						parameters.action = 'turnOff'; // Même opération mais d'une autre manière
+						parameters.action = 'setColor'; // Même opération mais d'une autre manière
 						parameters.action = req.query.command; 
-						if (req.query.entityType=='')
-							req.query.entityType="APPLIANCE";
+						
+	if (parameters.action == "turnOn" || parameters.action == "turnOff") {
+		var powerState="0";
+		if (parameters.action == 'turnOn') powerState="1";
+		toReturn.push({
+					'device': req.query.device,
+					'command': parameters.action,
+					'powerState': powerState
+				});
+	} else if (parameters.action == "setColorTemperature") {
+
+	} else if (parameters.action == "setColor") {
+		
+		toReturn.push({
+					'device': req.query.device,
+					'command': parameters.action,
+					'color': req.query.color
+				});
+	
+				parameters.colorName=req.query.color;
+				
+				
+				
+				
+	} else if (parameters.action == "setBrightness") {
+
+		parameters.brightness=req.query.brightness;
+
+		toReturn.push({
+					'device': req.query.device,
+					'command': parameters.action,
+					'brightness': req.query.brightness
+				});
+
+	}							
+
 							
     //executeSmarthomeDeviceAction(entityIds, parameters, entityType, callback) {
 		
@@ -459,15 +498,7 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 					if (testErreur) traiteErreur(testErreur);
 				}
 			);
-		var powerState="0";
-		if (parameters.action == 'turnOn') powerState="1";
-			
-	  	var toReturn = [];		
-		toReturn.push({
-					'device': req.query.device,
-					'command': parameters.action,
-					'powerState': powerState
-				});
+
 		res.status(200).json(toReturn);		
 
 			
