@@ -1,41 +1,39 @@
 #!/bin/bash
 
-PROGRESS_FILE=/tmp/jeedom/${2}/dependance
+######################### INCLUSION LIB ##########################
+BASEDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+wget https://raw.githubusercontent.com/NebzHB/dependance.lib/master/dependance.lib -O $BASEDIR/dependance.lib &>/dev/null
+PLUGIN=$(basename "$(realpath $BASEDIR/..)")
+. ${BASEDIR}/dependance.lib
+##################################################################
+TIMED=1
+
 installVer='12' 	#NodeJS major version to be installed
 minVer='12'	#min NodeJS major version to be accepted
 
-touch ${PROGRESS_FILE}
-echo 0 > ${PROGRESS_FILE}
-echo "--0%"
-if [ "$3" = "1" ]; then
-  date +'--[%Y/%m/%d %H:%M:%S]-Mode Debug--'
-fi
-BASEDIR=$1
+pre
+step 0 "Vérification des droits"
 DIRECTORY="/var/www"
 if [ ! -d "$DIRECTORY" ]; then
-  echo "Création du home www-data pour npm"
-  sudo mkdir $DIRECTORY
+  silent sudo mkdir $DIRECTORY
 fi
-sudo chown -R www-data $DIRECTORY
+silent sudo chown -R www-data $DIRECTORY
 
-echo 10 > ${PROGRESS_FILE}
-echo "--10%"
-echo "Lancement de l'installation/mise à jour des dépendances"
-
+step 10 "Prérequis"
 if [ -f /etc/apt/sources.list.d/deb-multimedia.list* ]; then
   echo "Vérification si la source deb-multimedia existe (bug lors du apt-get update si c'est le cas)"
   echo "deb-multimedia existe !"
-  if [ -f /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${2} ]; then
+  if [ -f /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${PLUGIN} ]; then
     echo "mais on l'a déjà désactivé..."
   else
     if [ -f /etc/apt/sources.list.d/deb-multimedia.list ]; then
       echo "Désactivation de la source deb-multimedia !"
-      sudo mv /etc/apt/sources.list.d/deb-multimedia.list /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${2}
+      silent sudo mv /etc/apt/sources.list.d/deb-multimedia.list /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${PLUGIN}
     else
       if [ -f /etc/apt/sources.list.d/deb-multimedia.list.disabled ]; then
         echo "mais il est déjà désactivé..."
       else
-        echo "mais n'est ni 'disabled' ou 'disabledBy${2}'... il sera normalement ignoré donc ca devrait passer..."
+        echo "mais n'est ni 'disabled' ou 'disabledBy${PLUGIN}'... il sera normalement ignoré donc ca devrait passer..."
       fi
     fi
   fi
@@ -47,36 +45,36 @@ if [ -f /media/boot/multiboot/meson64_odroidc2.dtb.linux ]; then
     if [ "$hasRepo" -ne "0" ]; then
       echo "Désactivation de la source repo.jeedom.com !"
       toReAddRepo=1
-      sudo apt-add-repository -r "deb http://repo.jeedom.com/odroid/ stable main"
+      silent sudo apt-add-repository -r "deb http://repo.jeedom.com/odroid/ stable main"
     fi
 fi
 
 
 #prioritize nodesource nodejs
-sudo bash -c "cat >> /etc/apt/preferences.d/nodesource" << EOL
+try sudo bash -c "cat >> /etc/apt/preferences.d/nodesource" << EOL
 Package: nodejs
 Pin: origin deb.nodesource.com
 Pin-Priority: 600
 EOL
 
-echo 20 > ${PROGRESS_FILE}
-echo "--20%"
-sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lsb-release
+step 20 "Mise à jour APT et installation des packages nécessaires"
+try sudo apt-get update
+try sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lsb-release
 
-echo 30 > ${PROGRESS_FILE}
-echo "--30%"
-type nodejs &>/dev/null
+step 30 "Vérification de la version de NodeJS installée"
+silent type nodejs
 if [ $? -eq 0 ]; then actual=`nodejs -v`; fi
 echo "Version actuelle : ${actual}"
 arch=`arch`
 
+#jeedom mini and rpi 1 2, 12 does not support arm6l
 if [[ $arch == "armv6l" ]]
 then
   installVer='8' 	#NodeJS major version to be installed
   minVer='8'	#min NodeJS major version to be accepted  
 fi
 
+#jessie as libstdc++ > 4.9 needed for nodejs 12
 lsb_release -c | grep jessie
 if [ $? -eq 0 ]
 then
@@ -98,90 +96,74 @@ then
   echo "Ok, version suffisante";
   new=$actual
 else
-  echo 40 > ${PROGRESS_FILE}
-  echo "--40%"
-  echo "KO, version obsolète à upgrader";
+  step 40 "Installation de NodeJS $installVer"
+  echo "Version obsolète à upgrader";
   echo "Suppression du Nodejs existant et installation du paquet recommandé"
   #if npm exists
-  type npm &>/dev/null
+  silent type npm
   if [ $? -eq 0 ]; then
     cd `npm root -g`;
-    sudo npm rebuild &>/dev/null
+    silent sudo npm rebuild
     npmPrefix=`npm prefix -g`
   else
     npmPrefix="/usr"
   fi
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove npm
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove nodejs
+  silent sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove npm
+  silent sudo DEBIAN_FRONTEND=noninteractive apt-get -y --purge autoremove nodejs
 
-  echo 45 > ${PROGRESS_FILE}
-  echo "--45%"
   if [[ $arch == "armv6l" ]]
   then
     echo "Raspberry 1, 2 ou zéro détecté, utilisation du paquet v${installVer} pour ${arch}"
-    wget -nd -nH -nc -np -e robots=off -r -l1 --no-parent -A"node-*-linux-${arch}.tar.gz" https://nodejs.org/download/release/latest-v${installVer}.x/
-    tar -xvf node-*-linux-${arch}.tar.gz
+    try wget -nd -nH -nc -np -e robots=off -r -l1 --no-parent -A"node-*-linux-${arch}.tar.gz" https://nodejs.org/download/release/latest-v${installVer}.x/
+    try tar -xvf node-*-linux-${arch}.tar.gz
     cd node-*-linux-${arch}
-    sudo cp -R * /usr/local/
+    try sudo cp -R * /usr/local/
     cd ..
-    rm -fR node-*-linux-${arch}*
-    ln -s /usr/local/bin/node /usr/bin/node &>/dev/null
-    ln -s /usr/local/bin/node /usr/bin/nodejs &>/dev/null
+    silent rm -fR node-*-linux-${arch}*
+    silent ln -s /usr/local/bin/node /usr/bin/node
+    silent ln -s /usr/local/bin/node /usr/bin/nodejs
     #upgrade to recent npm
-    sudo npm install -g npm
+    try sudo npm install -g npm
   else
       echo "Utilisation du dépot officiel"
-      curl -sL https://deb.nodesource.com/setup_${installVer}.x | sudo -E bash -
-      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs  
+      try curl -sL https://deb.nodesource.com/setup_${installVer}.x | sudo -E bash -
+      try sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs  
   fi
 
-  npm config set prefix ${npmPrefix}
+  silent npm config set prefix ${npmPrefix}
 
   new=`nodejs -v`;
   echo "Version actuelle : ${new}"
 fi
 
-type npm &>/dev/null
+silent type npm
 if [ $? -ne 0 ]; then
-  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y npm  
-  sudo npm install -g npm
+  step 45 "Installation de npm car non présent"
+  try sudo DEBIAN_FRONTEND=noninteractive apt-get install -y npm  
+  try sudo npm install -g npm
 fi
 
-echo 50 > ${PROGRESS_FILE}
-echo "--50%"
+step 50 "Nettoyage ancien modules"
 cd ${BASEDIR};
 #remove old local modules
-sudo rm -rf node_modules
+silent sudo rm -rf node_modules
 
-echo 60 > ${PROGRESS_FILE}
-echo "--60%"
-echo "Installation..."
-if [ "$3" = "1" ]; then
-  sudo npm install --verbose
-else
-  sudo npm install
-fi
-sudo chown -R www-data node_modules
+step 60 "Installation des librairies, veuillez patienter svp"
+try sudo npm install --no-fund --no-package-lock --no-audit
+silent sudo chown -R www-data node_modules
 
-echo 95 > ${PROGRESS_FILE}
-echo "--95%"
-sudo rm -f /etc/apt/preferences.d/nodesource
+step 90 "Nettoyage"
+silent sudo rm -f /etc/apt/preferences.d/nodesource
 
-if [ -f /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${2} ]; then
+if [ -f /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${PLUGIN} ]; then
   echo "Réactivation de la source deb-multimedia qu'on avait désactivé !"
-  sudo mv /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${2} /etc/apt/sources.list.d/deb-multimedia.list
+  silent sudo mv /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${PLUGIN} /etc/apt/sources.list.d/deb-multimedia.list
 fi
 
 if [ "$toReAddRepo" -ne "0" ]; then
   echo "Réactivation de la source repo.jeedom.com qu'on avait désactivé !"
   toReAddRepo=0
-  sudo apt-add-repository "deb http://repo.jeedom.com/odroid/ stable main"
+  silent sudo apt-add-repository "deb http://repo.jeedom.com/odroid/ stable main"
 fi
 
-echo 100 > ${PROGRESS_FILE}
-echo "--100%"
-echo "Installation des dépendances ${2} terminée, vérifiez qu'il n'y a pas d'erreur"
-if [ "$3" = "1" ]; then
-  date +'--[%Y/%m/%d %H:%M:%S]--'
-fi
-rm -f ${PROGRESS_FILE}
+post
