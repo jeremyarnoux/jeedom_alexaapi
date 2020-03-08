@@ -45,6 +45,7 @@ toReAddRepo=0
 if [ -f /media/boot/multiboot/meson64_odroidc2.dtb.linux ]; then
     hasRepo=$(grep "repo.jeedom.com" /etc/apt/sources.list | wc -l)
     if [ "$hasRepo" -ne "0" ]; then
+      echo "Désactivation de la source repo.jeedom.com !"
       toReAddRepo=1
       sudo apt-add-repository -r "deb http://repo.jeedom.com/odroid/ stable main"
     fi
@@ -172,6 +173,7 @@ if [ -f /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${2} ]; then
 fi
 
 if [ "$toReAddRepo" -ne "0" ]; then
+  echo "Réactivation de la source repo.jeedom.com qu'on avait désactivé !"
   toReAddRepo=0
   sudo apt-add-repository "deb http://repo.jeedom.com/odroid/ stable main"
 fi
