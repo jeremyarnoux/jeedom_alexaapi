@@ -41,31 +41,15 @@ if [ -f /etc/apt/sources.list.d/deb-multimedia.list* ]; then
   fi
 fi
 
-if [ -f /etc/apt/sources.list.d/jeedom.list* ]; then
-  if [ -f /media/boot/multiboot/meson64_odroidc2.dtb.linux ]; then
-    echo "Smart détectée, migration du repo NodeJS"
-    sudo wget --quiet -O - http://repo.jeedom.com/odroid/conf/jeedom.gpg.key | sudo apt-key add -
-    sudo rm -rf /etc/apt/sources.list.d/jeedom.list*
-    sudo apt-add-repository "deb http://repo.jeedom.com/odroid/ stable main"
-  else
-    echo "Vérification si la source repo.jeedom.com existe (bug sur mini+)"
-    echo "repo.jeedom.com existe !"
-    if [ -f /etc/apt/sources.list.d/jeedom.list.disabledBy${2} ]; then
-      echo "mais on l'a déjà désactivé..."
-    else
-      if [ -f /etc/apt/sources.list.d/jeedom.list ]; then
-        echo "Désactivation de la source repo.jeedom.com !"
-        sudo mv /etc/apt/sources.list.d/jeedom.list /etc/apt/sources.list.d/jeedom.list.disabledBy${2}
-      else
-        if [ -f /etc/apt/sources.list.d/jeedom.list.disabled ]; then
-  	  echo "mais il est déjà désactivé..."
-        else
-	  echo "mais n'est ni 'disabled' ou 'disabledBy${2}'... il sera normalement ignoré donc ca devrait passer..."
-        fi
-      fi
+toReAddRepo=0
+if [ -f /media/boot/multiboot/meson64_odroidc2.dtb.linux ]; then
+    hasRepo=$(grep "repo.jeedom.com" /etc/apt/sources.list | wc -l)
+    if [ "$hasRepo" -ne "0" ]; then
+      toReAddRepo=1
+      sudo apt-add-repository -r "deb http://repo.jeedom.com/odroid/ stable main"
     fi
-  fi
 fi
+
 
 #prioritize nodesource nodejs
 sudo bash -c "cat >> /etc/apt/preferences.d/nodesource" << EOL
@@ -186,9 +170,10 @@ if [ -f /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${2} ]; then
   echo "Réactivation de la source deb-multimedia qu'on avait désactivé !"
   sudo mv /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${2} /etc/apt/sources.list.d/deb-multimedia.list
 fi
-if [ -f /etc/apt/sources.list.d/jeedom.list.disabledBy${2} ]; then
-  echo "Réactivation de la source repo.jeedom.com qu'on avait désactivé !"
-  sudo mv /etc/apt/sources.list.d/jeedom.list.disabledBy${2} /etc/apt/sources.list.d/jeedom.list
+
+if [ "$toReAddRepo" -ne "0" ]; then
+  toReAddRepo=0
+  sudo apt-add-repository "deb http://repo.jeedom.com/odroid/ stable main"
 fi
 
 echo 100 > ${PROGRESS_FILE}
