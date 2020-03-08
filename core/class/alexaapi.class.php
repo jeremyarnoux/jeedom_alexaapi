@@ -893,7 +893,7 @@ public static function templateWidget(){
 		if (log::getLogLevel('alexaapi') == 100 || $verbose === "true" || $verbose === true) $_debug = 1;
 		log::add('alexaapi', 'info', 'Installation des dépendances : ');
 		$resource_path = realpath(dirname(__FILE__) . '/../../resources');
-		return array('script' => $resource_path . '/nodejs.sh ' . $resource_path . ' alexaapi ' . $_debug, 'log' => log::getPathToLog('alexaapi_dep'));
+		return array('script' => $resource_path . '/nodejs.sh', 'log' => log::getPathToLog('alexaapi_dep'));
 	}
 
 	public function preUpdate() {
