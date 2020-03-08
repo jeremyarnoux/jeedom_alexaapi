@@ -463,9 +463,8 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 					'command': parameters.action,
 					'powerState': powerState
 				});
-	} else if (parameters.action == "setColorTemperature") {
-
-	} else if (parameters.action == "setColor") {
+				
+	} else if ((parameters.action == "setColor") || (parameters.action == "setColorTemperature")) {
 		
 		toReturn.push({
 					'device': req.query.device,
@@ -474,10 +473,7 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 				});
 	
 				parameters.colorName=req.query.color;
-				
-				
-				
-				
+			
 	} else if (parameters.action == "setBrightness") {
 
 		parameters.brightness=req.query.brightness;
