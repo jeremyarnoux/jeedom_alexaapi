@@ -83,7 +83,7 @@ class AlexaWsMqtt extends EventEmitter {
             }, 30000);
 
             // tell Tuning Service that we support "A:H" protocol = AlphaPrococol
-            const msg = new Buffer('0x99d4f71a 0x0000001d A:HTUNE');
+            const msg = Buffer.from('0x99d4f71a 0x0000001d A:HTUNE');
             //console.log('SEND: ' + msg.toString('ascii'));
             this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Initialization Msg 1 sent','INFO');
             this.websocket.send(msg);
@@ -146,7 +146,7 @@ class AlexaWsMqtt extends EventEmitter {
                 else {
                     this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Unexpected Response: ' + JSON.stringify(message), "ERROR");
                 }
-                let msg = new Buffer('0xa6f6a951 0x0000009c {"protocolName":"A:H","parameters":{"AlphaProtocolHandler.receiveWindowSize":"16","AlphaProtocolHandler.maxFragmentSize":"16000"}}TUNE');
+                let msg = Buffer.from('0xa6f6a951 0x0000009c {"protocolName":"A:H","parameters":{"AlphaProtocolHandler.receiveWindowSize":"16","AlphaProtocolHandler.maxFragmentSize":"16000"}}TUNE');
                 //console.log('SEND: ' + msg.toString('ascii'));
                 this.websocket.send(msg);
                 //msg = new Buffer('MSG 0x00000361 0x0e414e45 f 0x00000001 0xd7c62f29 0x0000009b INI 0x00000003 1.0 0x00000024 ff1c4525-c036-4942-bf6c-a098755ac82f 0x00000164d106ce6b END FABE');
