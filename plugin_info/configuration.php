@@ -35,7 +35,11 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 		$versionJeedom = $return['configuration']['version'];
 
 ?>
-
+<style>
+pre#pre_eventlog {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace !important;
+}
+</style>
 	<legend><i class="icon divers-triangular42"></i> {{Génération manuelle du cookie Amazon}}</legend>
 	<center>
 		<a class="btn btn-success btn-sm bt_startDeamonCookie"> {{Identifiez-vous sur Amazon pour créer le cookie d'identification}} </a>
