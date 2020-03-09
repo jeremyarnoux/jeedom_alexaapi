@@ -463,8 +463,17 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 					'command': parameters.action,
 					'powerState': powerState
 				});
+	} else if (parameters.action == "setColorTemperature") {
+		
+		toReturn.push({
+					'device': req.query.device,
+					'command': parameters.action,
+					'color': req.query.color
+				});
+	
+				parameters.colorTemperatureName=req.query.color;
 				
-	} else if ((parameters.action == "setColor") || (parameters.action == "setColorTemperature")) {
+	} else if (parameters.action == "setColor") {
 		
 		toReturn.push({
 					'device': req.query.device,
@@ -545,6 +554,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 */
 	alexa.querySmarthomeDevices2(req.query.device, entityType,
 		function(deviceStates){
+		config.logger('>0000000000000000000000000000000000000000000000000000000000000000000000','DEBUG');
 		config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
 		config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG');
 		//config.logger('>entity>'+JSON.stringify(deviceStates."0"),'DEBUG');
