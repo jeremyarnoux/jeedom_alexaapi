@@ -520,7 +520,6 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 	
 		res.type('json');
 
-	config.logger('Alexa-API:    Lancement /SmarthomeCommand avec paramètres -> device: ' + req.query.device);
 
 	if ('device' in req.query === false)  return res.status(500).json(error(500, req.route.path, 'Alexa.SmarthomeCommand', 'Missing parameter "device"'));
 
@@ -531,7 +530,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 							entityType="APPLIANCE";
 							
     //executeSmarthomeDeviceAction(entityIds, parameters, entityType, callback) {
-	config.logger('Alexa-API:    Lancement /SmarthomeCommand avec paramètres -> req.query.entityType: ' + req.query.entityType+ ' req.query.type: ' + req.query.type);
+	config.logger('Alexa-API:    Lancement /querySmarthomeDevices avec paramètres -> device: ' + req.query.device+'req.query.entityType: ' + req.query.entityType+ ' req.query.type: ' + req.query.type);
 		
 
 		/*
@@ -553,20 +552,47 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 	
 */
 	alexa.querySmarthomeDevices2(req.query.device, entityType,
-		function(deviceStates){
-		config.logger('>0000000000000000000000000000000000000000000000000000000000000000000000','DEBUG');
-		config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
-		config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG');
+		function(deviceStatesErrors){
+			deviceStates=deviceStatesErrors.deviceStates;
+			errors=deviceStatesErrors.errors;
+			
+			//config.logger('>0000000000000000000000000000000000000000000000000000000000000000000000','DEBUG');
+		//config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
 		//config.logger('>entity>'+JSON.stringify(deviceStates."0"),'DEBUG');
 		var toReturn = [];
 		try {
+			
+			if (JSON.stringify(deviceStates[0]) === undefined) {
+			//config.logger('0>'+JSON.stringify(errors[0]),'DEBUG');
+			//config.logger('--->'+JSON.stringify(errors),'DEBUG');
+			//config.logger('--0->'+JSON.stringify(errors[0]),'DEBUG');
+				config.logger('Alexa-Remote : !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!','DEBUG');
+				config.logger('Alexa-Remote : Il y a une erreur sur la communication le device : [['+JSON.stringify(errors[0]['code'])+"]]",'DEBUG');
+			
+				toReturn.push({
+					'entityType': entityType,
+					'type': req.query.type,
+					'applicanceId': req.query.device,
+				//	'name': capabilityState['name'],
+				//	'value': capabilityState['value'],
+					'error': JSON.stringify(errors[0]['code'])
+
+				});			
+			
+			}
+			else {
+			config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG');
 			//config.logger('>deviceState>>'+JSON.stringify(deviceStates[0]),'DEBUG');
 			//config.logger('>entity>>'+JSON.stringify(deviceStates[0].entity),'DEBUG');
 			config.logger('queryState:entityId>'+JSON.stringify(deviceStates[0].entity.entityId),'DEBUG');
+			if (JSON.stringify(deviceStates[0].entity.entityType) != undefined)
+				entityType=JSON.stringify(deviceStates[0].entity.entityType);
+			config.logger('queryState:entityType>'+JSON.stringify(deviceStates[0].entity.entityType),'DEBUG');
 			//config.logger('>entityType>>'+JSON.stringify(deviceStates[0].entity.entityType),'DEBUG');
 			var capabilityState=JSON.parse(deviceStates[0].capabilityStates[0]);
 			var capabilityStates=deviceStates[0].capabilityStates;
-			config.logger('>>>capabilityState>>'+JSON.stringify(capabilityState),'DEBUG');
+			//config.logger('>>>capabilityState>>'+JSON.stringify(capabilityState),'DEBUG');
+			//config.logger('>>>entityType>>'+entityType,'DEBUG');
 
 //for (value in capabilityStates) {
   //config.logger(value+"<=>"+capabilityStates[value],'DEBUG');
@@ -582,7 +608,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 				});
 			//config.logger('queryState:name>'+capabilityState['name'],'DEBUG');
 			//config.logger('queryState:>value>'+capabilityState['value'],'DEBUG');
-
+			}
 		}
 		catch(error) {
 				config.logger('deviceStates.entity.entityId>NON trouvé sur '+entityType+"/"+req.query.device,'DEBUG');

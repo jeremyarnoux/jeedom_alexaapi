@@ -2443,7 +2443,7 @@ vide(serialOrName, sound,callback) {
     querySmarthomeDevices(applicanceIds, entityType, callback) {
         if (typeof entityType === 'function') {
             callback = entityType;
-            entityType = 'APPLIANCE'; // other value 'GROUP'
+            entityType = 'APPLIANCE'; // other value 'GROUP' ou 'CLOUD_DISCOVERED_DEVICE' mais semble etre corrigé dans la réponse
         }
 
         let reqArr = [];
@@ -2470,7 +2470,8 @@ vide(serialOrName, sound,callback) {
 		this.querySmarthomeDevices(applicanceIds, entityType,(err, res) => 
 		{
 		if (err || !res || !res.deviceStates || !Array.isArray(res.deviceStates)) return callback && callback();
-			callback && callback(res.deviceStates);
+			//callback && callback(res.deviceStates); on enlève deicestates pour avoir les erreurs
+			callback && callback(res);
 		});
 	}
 
