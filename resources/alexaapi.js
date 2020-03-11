@@ -566,7 +566,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			//config.logger('0>'+JSON.stringify(errors[0]),'DEBUG');
 			//config.logger('--->'+JSON.stringify(errors),'DEBUG');
 			//config.logger('--0->'+JSON.stringify(errors[0]),'DEBUG');
-				config.logger('Alexa-Remote : !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!','DEBUG');
+				//config.logger('Alexa-Remote : !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!','DEBUG');
 				config.logger('Alexa-Remote : Il y a une erreur sur la communication le device : [['+JSON.stringify(errors[0]['code'])+"]]",'DEBUG');
 			
 				toReturn.push({
@@ -581,7 +581,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			
 			}
 			else {
-			config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG');
+			config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG'); // provoque souci
 			//config.logger('>deviceState>>'+JSON.stringify(deviceStates[0]),'DEBUG');
 			//config.logger('>entity>>'+JSON.stringify(deviceStates[0].entity),'DEBUG');
 			config.logger('queryState:entityId>'+JSON.stringify(deviceStates[0].entity.entityId),'DEBUG');
