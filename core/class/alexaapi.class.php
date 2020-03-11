@@ -181,20 +181,21 @@ public static function templateWidget(){
 	}
 
 	public static function deamon_stop() {
+		log::add('alexaapi', 'info', 'Arrêt du service alexaapi');
 		@file_get_contents("http://" . config::byKey('internalAddr') . ":3456/stop");
 		sleep(3);
-		if(shell_exec('ps aux | grep "resources/alexaapi.js" | grep -v "grep" | wc -l') == '1')
+		if(shell_exec('ps aux | grep "resources/alexaapi.js" | grep -v "grep" | wc -l') == '1') {
 			exec('sudo kill $(ps aux | grep "resources/alexaapi.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
-		log::add('alexaapi', 'info', 'Arrêt du service alexaapi');
-		$deamon_info = self::deamon_info();
-		if ($deamon_info['state'] == 'ok') {
-			sleep(1);
-			exec('sudo kill -9 $(ps aux | grep "resources/alexaapi.js" | awk \'{print $2}\') &>/dev/null');
-		}
-		$deamon_info = self::deamon_info();
-		if ($deamon_info['state'] == 'ok') {
-			sleep(1);
-			exec('sudo kill -9 $(ps aux | grep "resources/alexaapi.js" | awk \'{print $2}\') &>/dev/null');
+			$deamon_info = self::deamon_info();
+			if ($deamon_info['state'] == 'ok') {
+				sleep(1);
+				exec('sudo kill -9 $(ps aux | grep "resources/alexaapi.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
+			}
+			$deamon_info = self::deamon_info();
+			if ($deamon_info['state'] == 'ok') {
+				sleep(1);
+				exec('sudo kill -9 $(ps aux | grep "resources/alexaapi.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
+			}
 		}
 	}
 	
