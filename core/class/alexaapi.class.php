@@ -219,8 +219,7 @@ public static function templateWidget(){
 		log::add('alexaapi_cookie', 'info', 'Lancement du démon cookie');
 		$log = $_debug ? '1' : '0';
 		$sensor_path = realpath(dirname(__FILE__) . '/../../resources');
-		$cmd = "kill $(ps aux | grep 'initCookie.js' | awk '{print $2}')";	//Par sécurité, on Kill un éventuel précédent proessus initCookie.js
-		log::add('alexaapi', 'debug', '---- Kill initCookie.js: ' . $cmd);
+
 		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/initCookie.js ' . config::byKey('internalAddr') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr');
 		log::add('alexaapi', 'debug', '---- Lancement démon Alexa-API-Cookie sur port 3457 : ' . $cmd);
 		$result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
@@ -234,12 +233,13 @@ public static function templateWidget(){
 	}
 
 	public static function deamonCookie_stop() {
-		exec('kill $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')');
-		log::add('alexaapi', 'info', 'Arrêt du service cookie');
-		$deamon_info = self::deamon_info();
-		if ($deamon_info['stateCookie'] == 'ok') {
-			sleep(1);
-			exec('kill -9 $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')');
+		if(shell_exec('ps aux | grep "resources/initCookie.js" | grep -v "grep" | wc -l') == '1') {
+			log::add('alexaapi', 'info', 'Arrêt du service cookie');
+			exec('sudo kill $(ps aux | grep "resources/initCookie.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
+			sleep(3);
+			if(shell_exec('ps aux | grep "resources/initCookie.js" | grep -v "grep" | wc -l') == '1') {
+				exec('sudo kill -9 $(ps aux | grep "resources/initCookie.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
+			}
 		}
 	}
 
