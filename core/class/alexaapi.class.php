@@ -133,9 +133,11 @@ public static function templateWidget(){
 		$return = array();
 		$return['log'] = 'alexaapi_node';
 		$return['state'] = 'nok'; 
+		
 		// Regarder si alexaapi.js est lancé
-		$pid = trim(shell_exec('ps ax | grep "alexaapi/resources/alexaapi.js" | grep -v "grep" | wc -l'));
+		$pid = trim(shell_exec('ps ax | grep "resources/alexaapi.js" | grep -v "grep" | wc -l'));
 		if ($pid != '' && $pid != '0') $return['state'] = 'ok';
+		
 		// Regarder si le cookie existe :alexa-cookie.json
 		$request = realpath(dirname(__FILE__) . '/../../resources/data/alexa-cookie.json');
 		if (file_exists($request)) $return['launchable'] = 'ok';
@@ -156,7 +158,7 @@ public static function templateWidget(){
 		$sensor_path = realpath(dirname(__FILE__) . '/../../resources');
 		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ' . network::getNetworkAccess('internal') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr').' '.jeedom::getApiKey('alexaapi').' '.log::getLogLevel('alexaapi');
 		log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
-		$result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
+		$result = exec('NODE_ENV=production nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
 		//$cmdStart='nohup ' . $cmd . ' | tee >(grep "WS-MQTT">>'.log::getPathToLog('alexaapi_mqtt').') >(grep -v "WS-MQTT">>'. log::getPathToLog('alexaapi_node') . ')';
 		if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
 			log::add('alexaapi', 'error', $result);
@@ -179,17 +181,20 @@ public static function templateWidget(){
 	}
 
 	public static function deamon_stop() {
-		exec('kill $(ps aux | grep "/alexaapi.js" | awk \'{print $2}\')');
+		@file_get_contents("http://" . config::byKey('internalAddr') . ":3456/stop");
+		sleep(3);
+		if(shell_exec('ps aux | grep "resources/alexaapi.js" | grep -v "grep" | wc -l') == '1')
+			exec('sudo kill $(ps aux | grep "resources/alexaapi.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
 		log::add('alexaapi', 'info', 'Arrêt du service alexaapi');
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['state'] == 'ok') {
 			sleep(1);
-			exec('kill -9 $(ps aux | grep "/alexaapi.js" | awk \'{print $2}\')');
+			exec('sudo kill -9 $(ps aux | grep "resources/alexaapi.js" | awk \'{print $2}\') &>/dev/null');
 		}
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['state'] == 'ok') {
 			sleep(1);
-			exec('sudo kill -9 $(ps aux | grep "/alexaapi.js" | awk \'{print $2}\')');
+			exec('sudo kill -9 $(ps aux | grep "resources/alexaapi.js" | awk \'{print $2}\') &>/dev/null');
 		}
 	}
 	
