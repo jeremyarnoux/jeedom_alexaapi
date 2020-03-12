@@ -375,6 +375,7 @@ public static function templateWidget(){
 			event::add('jeedom::alert', array('level' => 'danger', 'page' => 'alexaapi', 'message' => __('Cookie Amazon Absent, allez dans la Configuration du plugin', __FILE__),));
 			return;
 		}
+		log::add('alexaapi_scan', 'debug', '*************************** Lancement du Scan Alexa-API ***********************************');
 		// --- Mise à jour des Amazon Echo
 		event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
 		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
@@ -384,9 +385,11 @@ public static function templateWidget(){
 		foreach ($json as $item) {
 			// Skip the special device named "This Device"
 			if ($item['name'] == 'This Device') continue;
+		//log::add('alexaapi_scan', 'debug', 'Niveau 1');
 
 			foreach (self::listePluginsAlexa() as $pluginAlexaUnparUn)
 			{
+				//log::add('alexaapi_scan', 'debug', 'Détection pour le plugin '.$pluginAlexaUnparUn);
 				if  (in_array("AUDIO_PLAYER",$item['capabilities'])) {
 							//message::add('alexaapi', '////////////////////////////// On est dans :'.$pluginAlexaUnparUn);
 						// Device PLAYLIST
@@ -395,6 +398,7 @@ public static function templateWidget(){
 							$device=$pluginAlexaUnparUn::createNewDevice($item['name']." PlayList", $item['serial']."_playlist");
 							$device->setIsVisible(0);					
 						}
+						log::add('alexaapi_scan', 'debug', '[Plugin '.$pluginAlexaUnparUn.'] ->> détection de '.$device->getName());
 						// Update device configuration
 						$device->setConfiguration('device', $item['name']);
 						$device->setConfiguration('type', $item['type']);
@@ -435,6 +439,7 @@ public static function templateWidget(){
 				$numNewDevices++;
 			}
 			// Update device configuration
+			log::add('alexaapi_scan', 'debug', '[Plugin Alexa-API       ] ->> détection de '.$device->getName());
 			$device->setConfiguration('device', $item['name']);
 			$device->setConfiguration('type', $item['type']);
 			$device->setConfiguration('devicetype', "Echo");
@@ -460,6 +465,7 @@ public static function templateWidget(){
 						$device = alexasmarthome::createNewDevice($item['displayName'], $item['id']);
 						$numNewDevices++;
 					}
+					log::add('alexaapi_scan', 'debug', '[Plugin AlexasmartHome  ] ->> détection de '.$device->getName());
 					// Update device configuration
 					$device->setConfiguration('device', $item['displayName']);
 					//$device->setConfiguration('type', $item['description']); a voir si on utilise ou pas descriotion
@@ -476,9 +482,11 @@ public static function templateWidget(){
 					$numDevices++;
 				}
 			}
+		log::add('alexaapi_scan', 'debug', '*************************** Lancement du Scan Alexa-smartHome (cf. log smartHome_scan)***');
 			self::scanAmazonSmartHome();
 		}		
 		
+		log::add('alexaapi_scan', 'debug', '*************************** Fin       du Scan Alexa-API ***********************************');
 
 	event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
 	}
