@@ -465,7 +465,7 @@ public static function templateWidget(){
 						$device = alexasmarthome::createNewDevice($item['displayName'], $item['id']);
 						$numNewDevices++;
 					}
-					log::add('alexaapi_scan', 'debug', '[Plugin AlexasmartHome  ] ->> détection de '.$device->getName());
+					log::add('alexaapi_scan', 'debug', '[Plugin AlexasmartHome  ] ->> détection de ['.$item['id']."]".$device->getName());
 					// Update device configuration
 					$device->setConfiguration('device', $item['displayName']);
 					//$device->setConfiguration('type', $item['description']); a voir si on utilise ou pas descriotion
@@ -482,9 +482,14 @@ public static function templateWidget(){
 					$numDevices++;
 				}
 			}
+		
 		log::add('alexaapi_scan', 'debug', '*************************** Lancement du Scan Alexa-smartHome (cf. log smartHome_scan)***');
 			self::scanAmazonSmartHome();
 		}		
+		
+		
+		
+		
 		
 		log::add('alexaapi_scan', 'debug', '*************************** Fin       du Scan Alexa-API ***********************************');
 
@@ -521,6 +526,8 @@ public static function templateWidget(){
 									log::add('alexasmarthome_scan', 'debug', '							item7:'.json_encode($value7));
 									log::add('alexasmarthome_scan', 'debug', '							==> applianceId:'.json_encode($value7['applianceId']));
 									log::add('alexasmarthome_scan', 'debug', '							==> entityId:'.json_encode($value7['entityId']));
+									log::add('alexaapi_scan', 'debug', 'smarthomeDevices ==> '.json_encode($value7['friendlyName']).'=['.json_encode($value7['entityId']).']');
+
 										foreach (eqLogic::byType('alexasmarthome', true) as $alexasmarthome) {
 											if ($alexasmarthome->getLogicalId()==$value7['entityId']){
 											$alexasmarthome->setConfiguration('applianceId', $value7['applianceId']);
