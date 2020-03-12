@@ -24,6 +24,6 @@ function alexaapi_update() {
 		$alexaapi->save();
     	}
 	//message::removeAll('alexaapi');
-    message::add('alexaapi', 'Mise à jour du plugin Alexa-API terminée.', '', null);
+    message::add('alexaapi', 'Mise à jour du plugin Alexa-API terminée.');
 
 }
