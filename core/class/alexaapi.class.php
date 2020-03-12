@@ -527,7 +527,7 @@ public static function templateWidget(){
 									log::add('alexasmarthome_scan', 'debug', '							==> applianceId:'.json_encode($value7['applianceId']));
 									log::add('alexasmarthome_scan', 'debug', '							==> entityId:'.json_encode($value7['entityId']));
 									log::add('alexaapi_scan', 'debug', 'smarthomeDevices ==> '.json_encode($value7['friendlyName']).'=['.json_encode($value7['entityId']).']');
-
+										$Onatrouvelelien=false;
 										foreach (eqLogic::byType('alexasmarthome', true) as $alexasmarthome) {
 											if ($alexasmarthome->getLogicalId()==$value7['entityId']){
 											$alexasmarthome->setConfiguration('applianceId', $value7['applianceId']);
@@ -536,8 +536,11 @@ public static function templateWidget(){
 											log::add('alexasmarthome_scan', 'info', json_encode($value7['entityId']).' <=> '.json_encode($value7['applianceId']));
 											log::add('alexasmarthome_scan', 'info', 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
 											$alexasmarthome->save();
+											$Onatrouvelelien=true;
 											}
 										}	
+										if (!($Onatrouvelelien))
+											log::add('alexasmarthome_scan', 'info','!!!!!!!!!!!!!!!!FAUT UNE RUSTINE ICI!!!!!!!!!!');											
 									}	
 								}	
 							}
