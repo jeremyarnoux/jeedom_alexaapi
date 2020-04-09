@@ -54,19 +54,23 @@ log::add('alexaapi_mqtt', 'debug',  "nom: ".$nom);
 
 $result = json_decode($chaineRecupereeCorrigee, true);
 
-//log::add('alexaapi_mqtt', 'debug',  "result: ".$result);
+log::add('alexaapi_mqtt', 'debug',  "result: ".$result);
+log::add('alexaapi_mqtt', 'debug',  "0");
 
 if (!is_array($result)) {
 		log::add('alexaapi_mqtt', 'debug', 'Format Invalide');
 		die();
 		
 }
+log::add('alexaapi_mqtt', 'debug',  "00");
 //log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialNumber']);
 $logical_id = $result['deviceSerialNumber']."_player";
+log::add('alexaapi_mqtt', 'debug',  "000");
 
 //$alexaapi_player=eqLogic::byLogicalId($logical_id, 'alexaamazonmusic'); // PLAYER
 $alexaapi2=eqLogic::byLogicalId($result['deviceSerialNumber'], 'alexaapi'); // ECHO
 //$alexaapi3=alexaamazonmusic::byLogicalId($result['deviceSerialNumber']."_playlist", 'alexaamazonmusic'); // PLAYLIST
+log::add('alexaapi_mqtt', 'debug',  "0000");
 
 // Choix de ce qu'on doit mettre à jour
 // ECHO
@@ -131,11 +135,14 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 
 			//break; // il ne faut pas s'arrêter mais aller tout mettre à jour.	
 			case 'ws-device-activity':
+				log::add('alexaapi_mqtt', 'debug',  '1');
 
-				if (isset($result['description']['summary']) && (!is_null($result['description']['summary']))){
+				//if (isset($result['description']['summary']) && ($result['description']['summary']!="") ){
+				if (isset($result['description']['summary'])){
 				metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "PLAYER", $result['deviceSerialNumber']);
 				metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "ECHO", $result['deviceSerialNumber']);
 				}
+				log::add('alexaapi_mqtt', 'debug',  '2');
 				
 				if (isset($result['activityStatus']))
 				metAJour("activityStatus", $result['activityStatus'], 'activityStatus', true , "PLAYER", $result['deviceSerialNumber']);
