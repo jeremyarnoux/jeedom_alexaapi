@@ -54,10 +54,12 @@ log::add('alexaapi_mqtt', 'debug',  "nom: ".$nom);
 
 $result = json_decode($chaineRecupereeCorrigee, true);
 
+//log::add('alexaapi_mqtt', 'debug',  "result: ".$result);
 
 if (!is_array($result)) {
-	log::add('alexaapi_mqtt', 'debug', 'Format Invalide');
-	die();
+		log::add('alexaapi_mqtt', 'debug', 'Format Invalide');
+		die();
+		
 }
 //log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialNumber']);
 $logical_id = $result['deviceSerialNumber']."_player";
@@ -106,7 +108,6 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 				metAJour("Volume", $result['volume'], 'volumeinfo', false , "PLAYER", $result['deviceSerialNumber']);
 				metAJour("Volume", $result['volume'], 'volumeinfo', false , "ECHO", $result['deviceSerialNumber']);
 			break;	
-			
 			case 'ws-notification-change': //changement d'une alarme/rappel
 			log::add('alexaapi_node', 'info',  'Alexa-jee: notificationVersion: '.$result['notificationVersion']);
 
@@ -131,7 +132,7 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 			//break; // il ne faut pas s'arrêter mais aller tout mettre à jour.	
 			case 'ws-device-activity':
 
-				if (isset($result['description']['summary'])){
+				if (isset($result['description']['summary']) && (!is_null($result['description']['summary']))){
 				metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "PLAYER", $result['deviceSerialNumber']);
 				metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "ECHO", $result['deviceSerialNumber']);
 				}
@@ -159,7 +160,10 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 				//metAJour("songName", $result['domainAttributes']['nBestList']['songName'], 'songName', true , $alexaapi);
 				
 			break;			
-		
+			case 'message_add':
+			//log::add('alexaapi_node', 'info',  'Alexa-jee: '.$result['message']);
+			message::add('alexaapi', $result['message']);
+			break;
 			case 'ws-audio-player-state-change': // elle a visiblement disparue cette balise des logs mqtt
 				metAJour("Audio Player State", $result['audioPlayerState'], 'audioPlayerState', true , "PLAYER", $result['deviceSerialNumber']);
 			case 'refreshPlayer':

@@ -2542,11 +2542,17 @@ fs.readFile(config.cookieLocation, 'utf8', (err, data) => {
 
 	try {
 	config.cookie = JSON.parse(data);
+	startServer(); // remonté de 5 lignes, inutile de lancer le serveur si cookier pose souci
 	} catch (err) {
-		config.logger('Alexa-API: Si vous voyez ce message, relancez la génération du COOKIE AMAZON, il y a un souci dessus');
-		config.logger('Alexa-API: ' + err);
+		config.logger('Alexa-API: *********************************************************************');
+		config.logger('Alexa-API: *********************************************************************');
+		config.logger('Alexa-API: ** Relancez la génération du COOKIE AMAZON, il y a un souci dessus **');
+		config.logger('Alexa-API: *********************************************************************');
+		config.logger('Alexa-API: *********************************************************************');
+		config.logger('Alexa-API: ');
+		httpPost('message_add', {message: "Relancez la génération du COOKIE AMAZON, il y a un souci dessus"});
+		//config.logger('Alexa-API: ' + err);
 	}
-	startServer();
 
 });
 

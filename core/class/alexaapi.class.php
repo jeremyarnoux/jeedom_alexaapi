@@ -116,7 +116,8 @@ public static function templateWidget(){
 
 
 	public static function callProxyAlexaapi($_url) {
-		$url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('openzwave');
+		//$url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('openzwave');
+		$url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('alexaapi');
 		$ch = curl_init();
 		curl_setopt_array($ch, array(CURLOPT_URL => $url, CURLOPT_HEADER => false, CURLOPT_RETURNTRANSFER => true,));
 		$result = curl_exec($ch);
@@ -649,7 +650,7 @@ public static function templateWidget(){
 				$cmd->save();
 			}
 
-		
+		/*
 			// On va sauvegarder la valeur de chaque ANCIENNE prochaine Alarme/Rappel/Minuteur ...
 			$maintenant = date("i H d m w Y");//40 18 20 11 3 2019
 
@@ -695,7 +696,7 @@ public static function templateWidget(){
 					
 				}	
 
-
+*/
 			
 		}
 	}
