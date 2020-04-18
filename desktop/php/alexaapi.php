@@ -126,34 +126,40 @@ if (((config::byKey('utilisateurExperimente', 'alexaapi',0)!="0")) && (log::getL
 			<span style="color:#42d4eb">{{Requêteur Actions}}</span>
 		</div><?php
 endif;
-
+		$compteNombrePlayeurs=0;
 		foreach (alexaapi::listePluginsAlexa(false, true) as $pluginAlexaUnparUn)
 		{
+		$compteNombrePlayeurs++;
 			//echo $pluginAlexaUnparUn;
 			$nomPlugin="inconnu";
 			if ($pluginAlexaUnparUn=='alexaamazonmusic') $nomPlugin='Amazon Music';
 			if ($pluginAlexaUnparUn=='alexadeezer') $nomPlugin='Deezer';
 			if ($pluginAlexaUnparUn=='alexaspotify') $nomPlugin='Spotify';
-			if ($pluginAlexaUnparUn=='alexasmarthome') $nomPlugin='SmartHome';
+			if ($pluginAlexaUnparUn=='alexasmarthome') {$nomPlugin='SmartHome'; $compteNombrePlayeurs--;}
 			
 			echo' <div class="cursor eqLogicAction logoSecondary">
 			<a href="index.php?v=d&m='.$pluginAlexaUnparUn.'&p='.$pluginAlexaUnparUn.'"><img  style="margin-top:-32px;" src="plugins/'.$pluginAlexaUnparUn.'/plugin_info/'.$pluginAlexaUnparUn.'_icon.png" width="75" height="75" style="min-height:75px !important;" />
 			<br />
 			<span style="color:#42d4eb">{{'.$nomPlugin.'}}</span></a>
 		</div>';
-			
-			
-			
 		}
 
+echo '</div>';
 
+	  
+    
+		if ($compteNombrePlayeurs>1) {
+			?>
+			
+			<div class="alert-danger bg-success">
+	Vous avez plus d'un playeur activé, cela ne fonctionnera pas !!! Merci de n'en activer qu'un à la fois.
+	</div>
+			<?php
+		} 
 
-
-
-?>	  
-    </div>
-    <!-- Début de la liste des objets -->
-    <legend><i class="fas fa-table"></i> {{Mes Amazon Echo}}</legend>
+		
+?> 		<!-- Début de la liste des objets -->
+   <legend><i class="fas fa-table"></i> {{Mes Amazon Echo}}</legend>
 	<div class="input-group" style="margin-bottom:5px;">
 		<input class="form-control roundedLeft" placeholder="{{Rechercher}}" id="in_searchEqlogic" />
 		<div class="input-group-btn">

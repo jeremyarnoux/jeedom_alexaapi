@@ -473,6 +473,8 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
             this.emit('ws-unknown-message', incomingMsg);
         });
         this.alexaWsMqtt.on('command', (command, payload) => {
+			
+//this._options.logger && this._options.logger('-------------->>>>>>>>>>>>>>>>>>>>>>>'.payload,'DEBUG');
             switch(command) {
                 case 'PUSH_DOPPLER_CONNECTION_CHANGE':
                     /*

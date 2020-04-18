@@ -390,11 +390,11 @@ public static function templateWidget(){
 
 			foreach (self::listePluginsAlexa() as $pluginAlexaUnparUn)
 			{
-				//log::add('alexaapi_scan', 'debug', 'Détection pour le plugin '.$pluginAlexaUnparUn);
+				log::add('alexaapi_scan', 'debug', 'Détection pour le plugin '.$pluginAlexaUnparUn);
 				if  (in_array("AUDIO_PLAYER",$item['capabilities'])) {
-							//message::add('alexaapi', '////////////////////////////// On est dans :'.$pluginAlexaUnparUn);
-						// Device PLAYLIST
-						$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_playlist", $pluginAlexaUnparUn);
+					if  ($pluginAlexaUnparUn=='alexaamazonmusic') {
+						// Device PLAYLIST -----------------------------------------------------------------------------------------------------------------
+						//$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_playlist", $pluginAlexaUnparUn);
 						if (!is_object($device)) {
 							$device=$pluginAlexaUnparUn::createNewDevice($item['name']." PlayList", $item['serial']."_playlist");
 							$device->setIsVisible(0);					
@@ -409,25 +409,36 @@ public static function templateWidget(){
 						$device->setIsVisible(1);
 						//$device->setIsEnable(0);
 						$device->setConfiguration('capabilities', $item['capabilities']);
+						try {
 						$device->save();
-						$device->setStatus('online', (($item['online'])?true:false));
-						// Device PLAYER
-						$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_player", $pluginAlexaUnparUn);
-							if (!is_object($device)) {
-								$device=$pluginAlexaUnparUn::createNewDevice($item['name']." Player", $item['serial']."_player");
-								//$numNewDevices++;
-								$device->setConfiguration('widgetPlayListEnable', 0);
-							}
-						// Update device configuration
-						$device->setConfiguration('device', $item['name']);
-						$device->setConfiguration('type', $item['type']);
-						$device->setConfiguration('devicetype', "Player");
-						$device->setConfiguration('family', $item['family']);
-						$device->setConfiguration('members', $item['members']);
-						$device->setConfiguration('capabilities', $item['capabilities']);
+						} catch (Exception $e) {
+						$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
 						$device->save();
+						}
 						$device->setStatus('online', (($item['online'])?true:false));
-						//$numDevices++;
+					}
+					// Device PLAYER -----------------------------------------------------------------------------------------------------------------
+					$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_player", $pluginAlexaUnparUn);
+						if (!is_object($device)) {
+							$device=$pluginAlexaUnparUn::createNewDevice($item['name']." Player", $item['serial']."_player");
+							//$numNewDevices++;
+							$device->setConfiguration('widgetPlayListEnable', 0);
+						}
+					// Update device configuration
+					$device->setConfiguration('device', $item['name']);
+					$device->setConfiguration('type', $item['type']);
+					$device->setConfiguration('devicetype', "Player");
+					$device->setConfiguration('family', $item['family']);
+					$device->setConfiguration('members', $item['members']);
+					$device->setConfiguration('capabilities', $item['capabilities']);
+					try {
+					$device->save();
+					} catch (Exception $e) {
+					$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
+					$device->save();
+					}
+					$device->setStatus('online', (($item['online'])?true:false));
+					//$numDevices++;
 				}
 			}
 			
@@ -447,7 +458,12 @@ public static function templateWidget(){
 			$device->setConfiguration('family', $item['family']);
 			$device->setConfiguration('members', $item['members']);
 			$device->setConfiguration('capabilities', $item['capabilities']);
-			$device->save();
+						try {
+						$device->save();
+						} catch (Exception $e) {
+						$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
+						$device->save();
+						}
 			$device->setStatus('online', (($item['online'])?true:false)); //SetStatus doit être lancé après Save et Save après inutile
 			$numDevices++;
 		}
@@ -478,7 +494,12 @@ public static function templateWidget(){
 					$device->setConfiguration('capabilities', $item['supportedProperties']);
 					//On va mettre dispo, on traite plus tard.
 					//$device->setStatus('online', (($item['online'])?true:false));
-					$device->save();
+						try {
+						$device->save();
+						} catch (Exception $e) {
+						$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
+						$device->save();
+						}
 					$device->setStatus('online', 'true');
 					$numDevices++;
 				}

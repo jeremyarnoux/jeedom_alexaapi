@@ -50,7 +50,7 @@ log::add('alexaapi_mqtt', 'debug',  "->".$chaineRecupereeCorrigee);
 		$chaineRecupereeCorrigee=str_replace ("]", "", $chaineRecupereeCorrigee);
 	}*/
 
-log::add('alexaapi_mqtt', 'debug',  "chaineRecupereeCorrigee: ".$chaineRecupereeCorrigee);
+//log::add('alexaapi_mqtt', 'debug',  "chaineRecupereeCorrigee: ".$chaineRecupereeCorrigee);
 log::add('alexaapi_mqtt', 'debug',  "nom: ".$nom);
 
 $result = json_decode($chaineRecupereeCorrigee, true);
@@ -132,14 +132,14 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 
 			//break; // il ne faut pas s'arrêter mais aller tout mettre à jour.	
 			case 'ws-device-activity':
-				log::add('alexaapi_mqtt', 'debug',  '1');
+				//log::add('alexaapi_mqtt', 'debug',  '1');
 
 				//if (isset($result['description']['summary']) && ($result['description']['summary']!="") ){
 				if ((isset($result['description']['summary'])) && ($result['description']['summary']!="")){
 				metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "PLAYER", $result['deviceSerialNumber']);
 				metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "ECHO", $result['deviceSerialNumber']);
 				}
-				log::add('alexaapi_mqtt', 'debug',  '2');
+				//log::add('alexaapi_mqtt', 'debug',  '2');
 				
 				if (isset($result['activityStatus']))
 				metAJour("activityStatus", $result['activityStatus'], 'activityStatus', true , "PLAYER", $result['deviceSerialNumber']);
