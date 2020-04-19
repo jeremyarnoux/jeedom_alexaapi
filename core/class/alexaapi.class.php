@@ -387,19 +387,22 @@ public static function templateWidget(){
 			// Skip the special device named "This Device"
 			if ($item['name'] == 'This Device') continue;
 		//log::add('alexaapi_scan', 'debug', 'Niveau 1');
+			log::add('alexaapi_scan', 'debug', '------------------------------------------------------------------------------');
+			log::add('alexaapi_scan', 'debug', '-> Ajout du device '.$item['name']);
+			log::add('alexaapi_scan', 'debug', '------------------------------------------------------------------------------');
 
 			foreach (self::listePluginsAlexa() as $pluginAlexaUnparUn)
 			{
-				log::add('alexaapi_scan', 'debug', 'Détection pour le plugin '.$pluginAlexaUnparUn);
+				//log::add('alexaapi_scan', 'debug', '*** Détection pour le plugin '.$pluginAlexaUnparUn);
 				if  (in_array("AUDIO_PLAYER",$item['capabilities'])) {
 					if  ($pluginAlexaUnparUn=='alexaamazonmusic') {
 						// Device PLAYLIST -----------------------------------------------------------------------------------------------------------------
-						//$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_playlist", $pluginAlexaUnparUn);
+						$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_playlist", $pluginAlexaUnparUn);
 						if (!is_object($device)) {
 							$device=$pluginAlexaUnparUn::createNewDevice($item['name']." PlayList", $item['serial']."_playlist");
 							$device->setIsVisible(0);					
 						}
-						log::add('alexaapi_scan', 'debug', '[Plugin '.$pluginAlexaUnparUn.'] ->> détection de '.$device->getName());
+						log::add('alexaapi_scan', 'debug', '*** [Plugin '.$pluginAlexaUnparUn.'] ->> détection1 de '.$device->getName());
 						// Update device configuration
 						$device->setConfiguration('device', $item['name']);
 						$device->setConfiguration('type', $item['type']);
@@ -424,6 +427,7 @@ public static function templateWidget(){
 							//$numNewDevices++;
 							$device->setConfiguration('widgetPlayListEnable', 0);
 						}
+						log::add('alexaapi_scan', 'debug', '*** [Plugin '.$pluginAlexaUnparUn.'] ->> détection2 de '.$device->getName());
 					// Update device configuration
 					$device->setConfiguration('device', $item['name']);
 					$device->setConfiguration('type', $item['type']);
@@ -451,7 +455,7 @@ public static function templateWidget(){
 				$numNewDevices++;
 			}
 			// Update device configuration
-			log::add('alexaapi_scan', 'debug', '[Plugin Alexa-API       ] ->> détection de '.$device->getName());
+			log::add('alexaapi_scan', 'debug', '*** [Plugin Alexa-API       ] ->> détection de '.$device->getName());
 			$device->setConfiguration('device', $item['name']);
 			$device->setConfiguration('type', $item['type']);
 			$device->setConfiguration('devicetype', "Echo");
