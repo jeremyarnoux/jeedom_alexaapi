@@ -136,8 +136,34 @@ log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 
 				//if (isset($result['description']['summary']) && ($result['description']['summary']!="") ){
 				if ((isset($result['description']['summary'])) && ($result['description']['summary']!="")){
+				//metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "PLAYER", $result['deviceSerialNumber']);
+				//metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "ECHO", $result['deviceSerialNumber']);
+				// Modif Thibaut
 				metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "PLAYER", $result['deviceSerialNumber']);
 				metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "ECHO", $result['deviceSerialNumber']);
+
+				$alexaapieqlogic=eqLogic::byLogicalId($result['deviceSerialNumber'], 'alexaapi');
+				log::add('alexaapi', 'debug', 'Interaction ' . $alexaapieqlogic->getConfiguration('interactionjeedom') == 1);
+				if ($alexaapieqlogic->getConfiguration('interactionjeedom') == 1) {
+					$demandeinteract = $result['description']['summary'];
+					if (strpos($demandeinteract, 'jacques dit') === false && $demandeinteract != "alexa") {
+						log::add('alexaapi', 'debug', 'Interaction demande : ' . $demandeinteract);
+
+						$parameters['plugin'] = 'alexaapi';
+						$reply = interactQuery::tryToReply(trim($demandeinteract), $parameters);
+						log::add('alexaapi', 'debug', 'Interaction ' . print_r($reply, true));
+						if ($reply['reply'] != "Désolé je n'ai pas compris" && $reply['reply'] != "Désolé je n'ai pas compris la demande" && $reply['reply'] != "Désolé je ne comprends pas la demande" && $reply['reply'] != "Je ne comprends pas" && $reply['reply'] != "ceci est un message de test" && $reply['reply'] != "" && $reply['reply'] != " ") {
+							log::add('alexaapi', 'debug',  "La reponse : ".$reply['reply']. " est valide je vous l'ai donc renvoyée");
+							$cmd = $alexaapieqlogic->getCmd('action', 'speak');
+							$option = array('message' => $reply['reply']);
+							$cmd->execute($option);
+						} else {
+							log::add('alexaapi', 'debug',  "La reponse : ".$reply['reply']. " est une reponse générique je vous l'ai donc pas renvoyée");
+						}
+					}
+				}
+				
+				
 				}
 				//log::add('alexaapi_mqtt', 'debug',  '2');
 				
