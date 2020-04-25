@@ -80,82 +80,44 @@ var str=data.logicalId
 
 		<!-- Bouton d accès à la configuration -->
 		<div class="cursor eqLogicAction logoSecondary" data-action="gotoPluginConf">
-			<i class="fas fa-wrench" style="font-size : 5em;color:#42d4eb;"></i>
+			<i class="fas fa-wrench" style="font-size : 5em;"></i>
 			<br />
-			<span style="color:#42d4eb">{{Configuration}}</span>
+			<span >{{Configuration}}</span>
 		</div>
 
 		<div class="cursor logoSecondary" id="bt_sante">
-			<i class="fas fa-medkit" style="font-size : 5em;color:#42d4eb;"></i>
+			<i class="fas fa-medkit" style="font-size : 5em;"></i>
 			<br />
-			<span  style="color:#42d4eb">{{Santé}}</span>
+			<span  >{{Santé}}</span>
 		</div>
 
 
 		<div class="cursor logoSecondary" id="bt_routines">
-			<i class="fas divers-viral" style="font-size : 5em;color:#42d4eb;"></i>
+			<i class="fas divers-viral" style="font-size : 5em;"></i>
 			<br />
-			<span style="color:#42d4eb">{{Routines}}</span>
+			<span >{{Routines}}</span>
 		</div>
 
 
 		<div class="cursor logoSecondary" id="bt_reminders">
-			<i class="fas fa-clock" style="font-size : 5em;color:#42d4eb;"></i>
+			<i class="fas fa-clock" style="font-size : 5em;"></i>
 			<br />
-			<span style="color:#42d4eb">{{Rappels/Alarmes}}</span>
+			<span >{{Rappels/Alarmes}}</span>
 		</div>
 
 
 		<div class="cursor logoSecondary" id="bt_history">
-			<i class="fas fa-list-alt" style="font-size : 5em;color:#42d4eb;"></i>
+			<i class="fas fa-list-alt" style="font-size : 5em;"></i>
 			<br />
-			<span style="color:#42d4eb">{{Historique}}</span>
+			<span >{{Historique}}</span>
 		</div>
 <?php
-if (((config::byKey('utilisateurExperimente', 'alexaapi',0)!="0")) && (log::getLogLevel('alexaapi')<200)) :
-?>
-		<div class="cursor logoSecondary" id="bt_req">
-			<i class="fas fa-key" style="font-size : 5em;color:#42d4eb;"></i>
-			<br />
-			<span style="color:#42d4eb">{{Requêteur Infos}}</span>
-		</div>
 
-		<div class="cursor logoSecondary" id="bt_req2">
-			<i class="fas fa-key" style="font-size : 5em;color:#42d4eb;"></i>
-			<br />
-			<span style="color:#42d4eb">{{Requêteur Actions}}</span>
-		</div><?php
-endif;
-		$compteNombrePlayeurs=0;
-		foreach (alexaapi::listePluginsAlexa(false, true) as $pluginAlexaUnparUn)
-		{
-		$compteNombrePlayeurs++;
-			//echo $pluginAlexaUnparUn;
-			$nomPlugin="inconnu";
-			if ($pluginAlexaUnparUn=='alexaamazonmusic') $nomPlugin='Amazon Music';
-			if ($pluginAlexaUnparUn=='alexadeezer') $nomPlugin='Deezer';
-			if ($pluginAlexaUnparUn=='alexaspotify') $nomPlugin='Spotify';
-			if ($pluginAlexaUnparUn=='alexasmarthome') {$nomPlugin='SmartHome'; $compteNombrePlayeurs--;}
-			
-			echo' <div class="cursor eqLogicAction logoSecondary">
-			<a href="index.php?v=d&m='.$pluginAlexaUnparUn.'&p='.$pluginAlexaUnparUn.'"><img  style="margin-top:-32px;" src="plugins/'.$pluginAlexaUnparUn.'/plugin_info/'.$pluginAlexaUnparUn.'_icon.png" width="75" height="75" style="min-height:75px !important;" />
-			<br />
-			<span style="color:#42d4eb">{{'.$nomPlugin.'}}</span></a>
-		</div>';
-		}
+
 
 echo '</div>';
 
-	  
-    
-		if ($compteNombrePlayeurs>1) {
-			?>
-			
-			<div class="alert-danger bg-success">
-	Vous avez plus d'un playeur activé, cela ne fonctionnera pas !!! Merci de n'en activer qu'un à la fois.
-	</div>
-			<?php
-		} 
+
 
 		
 ?> 		<!-- Début de la liste des objets -->
@@ -201,8 +163,88 @@ foreach($eqLogics as $eqLogic) {
 			</div>
 		</div>
     </div>
-	
 
+
+ 		<!-- Début de la liste des objets -->
+   <legend><i class="fas fa-table"></i> {{Plugins d'Alexa-API}}</legend>
+    <!-- Container de la liste -->
+		<div class="panel">
+		<div class="panel-body">
+			<div class="eqLogicThumbnailContainer">
+<?php		
+		$compteNombrePlayeurs=0;
+		foreach (alexaapi::listePluginsAlexaArray(false, true, true) as $pluginAlexaUnparUn)
+		{
+			//echo $pluginAlexaUnparUn;
+			//$nomPlugin="inconnu";
+			/*if ($pluginAlexaUnparUn['pluginId']=='alexaamazonmusic') $nomPlugin=$pluginAlexaUnparUn['nom'];
+			if ($pluginAlexaUnparUn=='alexadeezer') $nomPlugin='Deezer';
+			if ($pluginAlexaUnparUn=='alexaspotify') $nomPlugin='Spotify';*/
+			//eqLogicDisplayCard cursor prem
+			echo '<div class="cursor eqLogicAction logoSecondary"';
+			
+			if ($pluginAlexaUnparUn['actif'] != true) {
+				echo ' style="filter: grayscale(100%); opacity: 0.35;"';
+			} else 
+				if ($pluginAlexaUnparUn['pluginId']!='alexasmarthome') $compteNombrePlayeurs++;
+			
+			echo '> <a href="';
+			
+			if ($pluginAlexaUnparUn['install'] == true) 
+				echo 'index.php?v=d&m='.$pluginAlexaUnparUn['pluginId'].'&p='.$pluginAlexaUnparUn['pluginId'];
+			else
+				echo 'https://www.jeedom.com/market/index.php?v=d&p=market&type=plugin&plugin_id='.$pluginAlexaUnparUn['idMarket'].'" target="_blank';
+			
+			echo '"><img  style="margin-top:-10px;" src="plugins/alexaapi/plugin_info/'.$pluginAlexaUnparUn['pluginId'].'_icon.png" width="75" height="75" style="min-height:75px !important;" />
+			<br /><span >{{'.$pluginAlexaUnparUn['nom'].'}}</span></a>
+		</div>';
+		}
+?>
+			</div>
+		</div>
+    </div>
+		  
+    
+
+<?php
+		if ($compteNombrePlayeurs>1) {
+			?>
+			
+			<div class="alert-danger bg-success">
+	Vous avez plus d'un playeur activé, cela ne fonctionnera pas !!! Merci de n'en activer qu'un à la fois.
+	</div>
+			<?php
+		} 
+		
+		
+		if (((config::byKey('utilisateurExperimente', 'alexaapi',0)!="0")) && (log::getLogLevel('alexaapi')<200)) :
+?>
+ 		<!-- Début de la liste des objets -->
+   <legend><i class="fas fa-table"></i> {{Outils Utilisateurs expérimentés}}</legend>
+    <!-- Container de la liste -->
+	<div class="panel">
+		<div class="panel-body">
+			<div class="eqLogicThumbnailContainer">
+
+		<div class="cursor logoSecondary" id="bt_req">
+			<i class="fas fa-key" style="font-size : 5em;"></i>
+			<br />
+			<span >{{Requêteur Infos}}</span>
+		</div>
+
+		<div class="cursor logoSecondary" id="bt_req2">
+			<i class="fas fa-key" style="font-size : 5em;"></i>
+			<br />
+			<span >{{Requêteur Actions}}</span>
+		</div>
+		
+		
+			</div>
+		</div>
+    </div>
+
+<?php
+endif;?>
 	
   </div>
   <!-- Container du panneau de contrôle -->

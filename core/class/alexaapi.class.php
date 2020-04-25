@@ -3,7 +3,8 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 class alexaapi extends eqLogic {
 	
-    public static function listePluginsAlexa($withAPI=false, $withSmartHome=false){
+    // A supprimer dans quelques temps, tous les listePluginsAlexa sont remplacés par listePluginsAlexaArray
+	public static function listePluginsAlexa($withAPI=false, $withSmartHome=false){
 		$liste = array();
 		if ($withAPI) array_push($liste, "alexaapi");
 		try {$test = plugin::byId('alexaamazonmusic');  if ($test->isActive()) array_push($liste, "alexaamazonmusic");}  catch(Exception $e) {}
@@ -14,6 +15,45 @@ class alexaapi extends eqLogic {
 		}
 		return $liste;
 	}
+	
+    public static function listePluginsAlexaArray($withAPI=false, $withSmartHome=false, $all=false){
+		$liste = array();
+		if ($withAPI) array_push($liste, array("pluginId" => "alexaapi", "nom" => "Alexa-API", "actif" => true));
+		if ($withSmartHome) {
+		  try {$test = plugin::byId('alexasmarthome'); array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914'));      } 
+		  catch(Exception $e) {if ($all) {             array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914'));      }}}
+		try {$test = plugin::byId('alexaamazonmusic'); array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910')); } 
+		catch(Exception $e) {if ($all) {               array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910')); }}
+		try {$test = plugin::byId('alexadeezer');      array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911'));            } 
+		catch(Exception $e) {if ($all) {               array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911'));            }}
+		try {$test = plugin::byId('alexaspotify');     array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913'));          } 
+		catch(Exception $e) {if ($all) {               array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913'));          }}
+		return $liste;
+	}
+	
+    public static function listePluginsAlexaArray_controle($pluginId="", $plugin="inconnu", $idMarket="3910"){
+		$valeurs = array();
+		try {
+				$valeurs = array(
+				"pluginId" => $pluginId,
+				"idMarket" => $idMarket,
+				"nom" => $plugin,
+				"install" => true,
+				"actif" => plugin::byId($pluginId)->isActive()
+				);
+		}  catch(Exception $e) {
+				$valeurs = array(
+				"pluginId" => $pluginId,
+				"idMarket" => $idMarket,
+				"nom" => $plugin,
+				"install" => false,
+				"actif" => false
+				);
+		}
+			array_push($liste, $valeurs);			
+		return $valeurs;
+	}	
+
 	/*
 public static function templateWidget(){
 		$return = array('info' => array('string' => array()));
