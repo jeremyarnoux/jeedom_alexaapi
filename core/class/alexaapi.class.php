@@ -715,7 +715,7 @@ public static function templateWidget(){
 				$cmd->save();
 			}
 
-		/*
+		
 			// On va sauvegarder la valeur de chaque ANCIENNE prochaine Alarme/Rappel/Minuteur ...
 			$maintenant = date("i H d m w Y");//40 18 20 11 3 2019
 
@@ -733,6 +733,7 @@ public static function templateWidget(){
 					//log::add('alexaapi', 'info', 'Test refresh de la commande '.$cmd->getName().' valeur -> '.$cmd->getConfiguration('RunWhenRefresh', 0));
 
 					if ($cmd->getConfiguration('RunWhenRefresh', 0) != '1') {
+							//log::add('alexaapi', 'info', 'NON pour '.$cmd->getName());
 						continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
 					}
 							log::add('alexaapi', 'info', 'OUI pour '.$cmd->getName());
@@ -741,6 +742,7 @@ public static function templateWidget(){
 			}
 			catch(Exception $exc) {log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());}
 			
+			/*
 			// On va sauvegarder la valeur de chaque NOUVELLE prochaine Alarme/Rappel/Minuteur ...
 			$cmd = $this->getCmd(null, 'whennextalarminfo'); if (is_object($cmd)) $whennextalarminfo_actuelleValeur=$cmd->execCmd();
 			$cmd = $this->getCmd(null, 'whennextmusicalalarminfo'); if (is_object($cmd)) $whennextmusicalalarminfo_actuelleValeur=$cmd->execCmd();
@@ -760,15 +762,15 @@ public static function templateWidget(){
 						log::add('alexaapi_node', 'debug', '-------------------------------->today:TTTIIIIMMMMMEEEERRRR'.$today);
 					
 				}	
-
 */
+
 			
 		}
 	}
 		
 	public function updateCmd ($forceUpdate, $LogicalId, $Type, $SubType, $RunWhenRefresh, $Name, $IsVisible, $title_disable, $setDisplayicon, $infoNameArray, $setTemplate_lien, $request, $infoName, $listValue, $Order, $Test) {
 		if ($Test) {
-			//log::add('alexaapi', 'info', 'ajout commande FORCAGE '.$LogicalId);
+			log::add('alexaapi', 'info', 'ajout commande FORCAGE '.$LogicalId);
 			try {
 				if (empty($Name)) $Name=$LogicalId;
 				$cmd = $this->getCmd(null, $LogicalId);

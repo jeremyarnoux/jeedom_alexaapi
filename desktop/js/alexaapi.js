@@ -267,6 +267,8 @@ function addCmdToTable(_cmd)
     return;
   }
   
+  console.log ("addCmdToTable : "+init(_cmd.logicalId));
+  
   if (init(_cmd.type) == 'info')
   {
     var tr =
