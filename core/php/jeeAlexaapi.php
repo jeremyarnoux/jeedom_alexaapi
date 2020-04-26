@@ -51,11 +51,11 @@ log::add('alexaapi_mqtt', 'debug',  "->".$chaineRecupereeCorrigee);
 	}*/
 
 //log::add('alexaapi_mqtt', 'debug',  "chaineRecupereeCorrigee: ".$chaineRecupereeCorrigee);
-log::add('alexaapi_mqtt', 'debug',  "nom: ".$nom);
+//log::add('alexaapi_mqtt', 'debug',  "nom: ".$nom);
 
 $result = json_decode($chaineRecupereeCorrigee, true);
 
-log::add('alexaapi_mqtt', 'debug',  "result: ".$result);
+//log::add('alexaapi_mqtt', 'debug',  "result: ".$result); // Attention déclenche un PHP Notice:  Array to string conversion 
 
 if (!is_array($result)) {
 		log::add('alexaapi_mqtt', 'debug', 'Format Invalide');

@@ -195,7 +195,7 @@ foreach($eqLogics as $eqLogic) {
 			else
 				echo 'https://www.jeedom.com/market/index.php?v=d&p=market&type=plugin&plugin_id='.$pluginAlexaUnparUn['idMarket'].'" target="_blank';
 			
-			echo '"><img  style="margin-top:-10px;" src="plugins/alexaapi/plugin_info/'.$pluginAlexaUnparUn['pluginId'].'_icon.png" width="75" height="75" style="min-height:75px !important;" />
+			echo '"><img src="plugins/alexaapi/plugin_info/'.$pluginAlexaUnparUn['pluginId'].'_icon.png" width="75" height="75" style="min-height:75px !important;" />
 			<br /><span >{{'.$pluginAlexaUnparUn['nom'].'}}</span></a>
 		</div>';
 		}
