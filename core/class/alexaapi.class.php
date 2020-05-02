@@ -837,6 +837,7 @@ public static function templateWidget(){
 						self::updateCmd ($F, 'push', 'action', 'message', false, 'Push', true, true, 'fa jeedomapp-audiospeak', null, null, 'push?text=#message#', null, null, 1, true);
 						return;
 					}
+			$widgetEcho=($this->getConfiguration('devicetype') == "Echo");
 			$widgetPlayer=($this->getConfiguration('devicetype') == "Player");
 			$widgetSmarthome=($this->getConfiguration('devicetype') == "Smarthome");
 			$widgetPlaylist=($this->getConfiguration('devicetype') == "PlayList");
@@ -850,6 +851,7 @@ public static function templateWidget(){
 			$cas6=($cas5 && (!$this->hasCapaorFamilyorType("WHA")));
 			$cas7=((!$this->hasCapaorFamilyorType("WHA")) && ($this->getConfiguration('devicetype') != "Player") &&(!$this->hasCapaorFamilyorType("FIRE_TV")) && !$widgetSmarthome && (!$this->hasCapaorFamilyorType("AMAZONMOBILEMUSIC_ANDROID")));
 			$cas8=(($this->hasCapaorFamilyorType("turnOff")) && $widgetSmarthome);
+			$cas9=($this->hasCapaorFamilyorType("WHA") && $widgetEcho);
 			$false=false;
 
 			//Anciennes functions a supprimer si elles existent encore
@@ -877,7 +879,13 @@ public static function templateWidget(){
 			self::updateCmd ($F, 'playList', 'action', 'select', false, 'Ecouter une playlist', true, false, null, null, 'alexaapi::list', 'playlist?playlist=#select#', null, 'Lancer Refresh|Lancer Refresh', 24, $cas1);
 			self::updateCmd ($F, 'radio', 'action', 'select', false, 'Ecouter une radio', true, false, null, null, 'alexaapi::list', 'radio?station=#select#', null, 's2960|Nostalgie;s6617|RTL;s6566|Europe1', 25, $cas1);	
 			self::updateCmd ($F, 'playMusicTrack', 'action', 'select', false, 'Ecouter une piste musicale', true, false, null, null, 'alexaapi::list', 'playmusictrack?trackId=#select#', null, '53bfa26d-f24c-4b13-97a8-8c3debdf06f0|Piste1;7b12ee4f-5a69-4390-ad07-00618f32f110|Piste2', 26, $cas1);
-			self::updateCmd ($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fa fa-volume-up', null,'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas5);			
+			self::updateCmd ($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fa fa-volume-up', null,'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas6);
+			self::updateCmd ($F, '0', 'action', 'other', false, '0', true, true, null, null,null, 'volume?value=0', null, null, 1, $cas9);
+			self::updateCmd ($F, 'volume20', 'action', 'other', false, '20', true, true, null, null,null, 'volume?value=20', null, null, 2, $cas9);
+			self::updateCmd ($F, 'volume40', 'action', 'other', false, '40', true, true, null, null,null, 'volume?value=40', null, null, 3, $cas9);
+			self::updateCmd ($F, 'volume60', 'action', 'other', false, '60', true, true, null, null,null, 'volume?value=60', null, null, 4, $cas9);
+			self::updateCmd ($F, 'volume80', 'action', 'other', false, '80', true, true, null, null,null, 'volume?value=80', null, null, 5, $cas9);
+			self::updateCmd ($F, 'volume100', 'action', 'other', false, '100', true, true, null, null,null, 'volume?value=100', null, null, 6, $cas9);
 			self::updateCmd ($F, 'volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fa fa-volume-up', null, null, null, null, null, 28, $cas6);	
 			self::updateCmd ($F, 'whennextalarminfo', 'info', 'string', false, 'Prochaine Alarme', true, false, null, null,'alexaapi::alarm', null, null, null, 29, $cas2);			
 			self::updateCmd ($F, 'whennextmusicalalarminfo', 'info', 'string', false, 'Prochaine Alarme Musicale', true, false, null, null,'alexaapi::alarmmusical', null, null, null, 30, $cas2);	
