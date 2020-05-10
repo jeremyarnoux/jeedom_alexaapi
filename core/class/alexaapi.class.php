@@ -50,7 +50,7 @@ class alexaapi extends eqLogic {
 				"actif" => false
 				);
 		}
-			array_push($liste, $valeurs);			
+		//	array_push($liste, $valeurs);			
 		return $valeurs;
 	}	
 

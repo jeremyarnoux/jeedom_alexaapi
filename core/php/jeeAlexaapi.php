@@ -317,15 +317,15 @@ function metAJourPlayer($serialdevice, $audioPlayerState) {
 		$result = json_decode($json,true);		
 		log::add('alexaapi_widget', 'debug',  ' JSON:'.$json);
 
-	metAJour("subText1", $result['playerInfo']['infoText']['subText1'], 'subText1', true , "PLAYER", $serialdevice);
-	metAJour("subText2", $result['playerInfo']['infoText']['subText2'], 'subText2', true , "PLAYER", $serialdevice);
-	metAJour("title", $result['playerInfo']['infoText']['title'], 'title', true , "PLAYER", $serialdevice);
-	metAJourImage("url", $result['playerInfo']['mainArt']['url'], 'url', true , $serialdevice);
-	metAJour("mediaLength", $result['playerInfo']['progress']['mediaLength'], 'mediaLength', true , "PLAYER", $serialdevice);
-	metAJour("mediaProgress", $result['playerInfo']['progress']['mediaProgress'], 'mediaProgress', true , "PLAYER", $serialdevice);
-	metAJour("providerName", $result['playerInfo']['provider']['providerName'], 'providerName', true , "PLAYER", $serialdevice);
-	metAJour("state", $result['playerInfo']['state'], 'state', false , "PLAYER", $serialdevice);
-	metAJourStatusPlayer($result['playerInfo']['state']=="PLAYING", $serialdevice);
+	if (isset($result['playerInfo']['infoText']['subText1'])) metAJour("subText1", $result['playerInfo']['infoText']['subText1'], 'subText1', true , "PLAYER", $serialdevice);
+	if (isset($result['playerInfo']['infoText']['subText2'])) metAJour("subText2", $result['playerInfo']['infoText']['subText2'], 'subText2', true , "PLAYER", $serialdevice);
+	if (isset($result['playerInfo']['infoText']['title'])) metAJour("title", $result['playerInfo']['infoText']['title'], 'title', true , "PLAYER", $serialdevice);
+	if (isset($result['playerInfo']['mainArt']['url'])) metAJourImage("url", $result['playerInfo']['mainArt']['url'], 'url', true , $serialdevice);
+	if (isset($result['playerInfo']['progress']['mediaLength'])) metAJour("mediaLength", $result['playerInfo']['progress']['mediaLength'], 'mediaLength', true , "PLAYER", $serialdevice);
+	if (isset($result['playerInfo']['progress']['mediaProgress'])) metAJour("mediaProgress", $result['playerInfo']['progress']['mediaProgress'], 'mediaProgress', true , "PLAYER", $serialdevice);
+	if (isset($result['playerInfo']['provider']['providerName'])) metAJour("providerName", $result['playerInfo']['provider']['providerName'], 'providerName', true , "PLAYER", $serialdevice);
+	if (isset($result['playerInfo']['state'])) metAJour("state", $result['playerInfo']['state'], 'state', false , "PLAYER", $serialdevice);
+	if (isset($result['playerInfo']['state'])) metAJourStatusPlayer($result['playerInfo']['state']=="PLAYING", $serialdevice);
 	//$alexaapi_player->setStatus('Playing', ($result['playerInfo']['state']=="PLAYING"));
 	
 	} catch (Exception $e) {
@@ -340,7 +340,7 @@ log::add('alexaapi_widget', 'debug',  '** Mise à jour Tuile du Player **');
 function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='personne') {
 		log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist par '.$_quiMetaJour.'********************');
 	try {
-		if ($audioPlayerState!="FINISHED") 	{		
+		if (($audioPlayerState!="FINISHED") && (isset($result['playerInfo']['miniArt']['url']))) 	{		
 		//Pour avoir la piste en cours, on va aller chercher la valeur de playerinfo/mainArt/url pour pouvoir la comparer aux images de la playlist
 		//sleep(2);
 		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/playerinfo?device=".$serialdevice);
