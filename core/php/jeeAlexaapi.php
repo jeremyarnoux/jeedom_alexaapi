@@ -74,7 +74,7 @@ $alexaapi2=eqLogic::byLogicalId($result['deviceSerialNumber'], 'alexaapi'); // E
 // PLAYER
 // PLAYLIST
 
-log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
+//log::add('alexaapi_node', 'info',  'Alexa-jee: '.$nom);
 
 	switch ($nom) {
 		

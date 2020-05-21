@@ -193,7 +193,7 @@ public static function templateWidget(){
 		self::deamon_stop();
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['launchable'] != 'ok') throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
-		log::add('alexaapi', 'info', 'Lancement du démon alexaapi');
+		log::add('alexaapi', 'info', ' Lancement du démon alexaapi');
 		$url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/alexaapi/core/api/jeealexaapi.php?apikey=' . jeedom::getApiKey('alexaapi');
 		$log = $_debug ? '1' : '0';
 		$sensor_path = realpath(dirname(__FILE__) . '/../../resources');
@@ -217,12 +217,12 @@ public static function templateWidget(){
 			return false;
 		}
 		message::removeAll('alexaapi', 'unableStartDeamon');
-		log::add('alexaapi', 'info', 'Démon alexaapi lancé');
+		log::add('alexaapi', 'info', ' Démon alexaapi lancé');
 		return true;
 	}
 
 	public static function deamon_stop() {
-		log::add('alexaapi', 'info', 'Arrêt du service alexaapi');
+		log::add('alexaapi', 'info', ' Arrêt du service alexaapi');
 		@file_get_contents("http://" . config::byKey('internalAddr') . ":3456/stop");
 		sleep(3);
 		if(shell_exec('ps aux | grep "resources/alexaapi.js" | grep -v "grep" | wc -l') == '1') {
@@ -258,7 +258,7 @@ public static function templateWidget(){
 	public static function deamonCookie_start($_debug = false) { //*********** Demon Cookie***************
 		self::deamonCookie_stop();
 		$deamon_info = self::deamon_info();
-		log::add('alexaapi_cookie', 'info', 'Lancement du démon cookie');
+		log::add('alexaapi_cookie', 'info', ' Lancement du démon cookie');
 		$log = $_debug ? '1' : '0';
 		$sensor_path = realpath(dirname(__FILE__) . '/../../resources');
 
@@ -270,7 +270,7 @@ public static function templateWidget(){
 			return false;
 		}
 		message::removeAll('alexaapi', 'unableStartDeamonCookie');
-		log::add('alexaapi_cookie', 'info', 'Démon cookie lancé');
+		log::add('alexaapi_cookie', 'info', ' Démon cookie lancé');
 		return true;
 	}
 
@@ -357,10 +357,11 @@ public static function templateWidget(){
 		self::restartServeurPHP();		
 		}
 		
-		$r = new Cron\CronExpression('*/15 * * * *', new Cron\FieldFactory);// boucle refresh
+		$r = new Cron\CronExpression('*/16 * * * *', new Cron\FieldFactory);// boucle refresh
 //		$r = new Cron\CronExpression('* * * * *', new Cron\FieldFactory);// boucle refresh
 		if ($r->isDue() && $deamon_info['state'] == 'ok') {
 			$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
+			config::save("listRoutinesProchain",time()+960,"alexaapi");	
 			foreach ($eqLogics as $alexaapi) {
 				//log::add('alexaapi_node', 'debug', 'CRON Refresh: '.$alexaapi->getName());
 				$alexaapi->refresh(); 				
@@ -691,27 +692,44 @@ public static function templateWidget(){
 		$device=str_replace("_player", "", $this->getConfiguration('serial'));
 
 		if ($widgetEcho)	{
-			log::add('alexaapi', 'debug', 'execute : refresh routines (WidgetEcho) avec la requète http://' . config::byKey('internalAddr') . ':3456/routines');
-			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
-			$json = json_decode($json, true);	// Met à jour la liste des routines des commandes action "routine"
-			//self::sortBy('utterance', $json); //Supprimé car j'arrive pas à trier sans erreur
-
+			$trouveRoutines = false;
+			if (config::byKey("listRoutinesValidFin","alexaapi",time()-20) < time()) { // On regarde si on va chercher la liste des routines sur Amazon ou dans la Config
+				log::add('alexaapi', 'debug', 'execute : refresh routines ('.$this->getName().') avec la requète http://' . config::byKey('internalAddr') . ':3456/routines');
+				$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
+				$json = json_decode($json, true);	// Met à jour la liste des routines des commandes action "routine"
+				//self::sortBy('utterance', $json); //Supprimé car j'arrive pas à trier sans erreur
 			
-			$ListeDesRoutines = [];
-			foreach ($json as $item) {
-				//if ($item['utterance'] != '') 
-				if (isset($item['utterance'])) 
-					$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
-				else {
-					if (isset($item['triggerTime']) && ($item['triggerTime'] != '')) {
-						$resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
-						$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
+				$ListeDesRoutines = [];
+				foreach ($json as $item) {
+					//if ($item['utterance'] != '') 
+					if (isset($item['utterance'])) 
+						$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
+					else {
+						if (isset($item['triggerTime']) && ($item['triggerTime'] != '')) {
+							$resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
+							$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
+						}
 					}
 				}
+				$ListeDesRoutines_string=join(';',$ListeDesRoutines);
+				config::save("listRoutines",$ListeDesRoutines_string,"alexaapi");		
+				config::save("listRoutinesValidDebut",time(),"alexaapi");		
+				config::save("listRoutinesValidFin",time()+86400,"alexaapi");					
+				log::add('alexaapi', 'debug', '╠═ Enregistre Routines dans Config sur plugin: '.$ListeDesRoutines_string);
+				$ouRecupRoutines="Amazon";
+	
+			} else
+			{
+				$ListeDesRoutines_string=config::byKey("listRoutines","alexaapi","");
+				//log::add('alexaamazonmusic', 'debug', '╚═> ListeDesPlaylists_string : '.$ListeDesPlaylists_string);
+				if ($ListeDesRoutines_string!="") $trouveRoutines = true;
+				$ouRecupRoutines="Configuation";
 			}
+			
+			
 			$cmd = $this->getCmd(null, 'routine');
 			if (is_object($cmd)) {
-				$cmd->setConfiguration('listValue', join(';',$ListeDesRoutines));
+				$cmd->setConfiguration('listValue', $ListeDesRoutines_string);
 				$cmd->save();
 			}
 
