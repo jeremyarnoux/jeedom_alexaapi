@@ -7,7 +7,7 @@
 
 const modifyResponse = require('http-proxy-response-rewrite');
 const express = require('express');
-const proxy = require('http-proxy-middleware');
+const proxy = require('http-proxy-middleware').createProxyMiddleware;
 const querystring = require('querystring');
 const cookieTools = require('cookie');
 
@@ -141,6 +141,9 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
                 _options.logger && _options.logger('Alexa-Cookie: Initial Page Request: ' + initialUrl);
                 return initialUrl;
             }
+			            else {
+                return `https://alexa.amazon.com`;
+            }
         }
         return `https://alexa.amazon.com`;
     }
@@ -160,7 +163,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         data = data.replace(/&#x2F;/g, '/');
         data = data.replace(amazonRegex, `http://${_options.proxyOwnIp}:${_options.proxyPort}/www.amazon.com/`);
         data = data.replace(alexaRegex, `http://${_options.proxyOwnIp}:${_options.proxyPort}/alexa.amazon.com/`);
-        _options.logger && _options.logger('REPLACEHOSTS: ' + data);
+        //_options.logger && _options.logger('REPLACEHOSTS: ' + data);
         return data;
     }
 
@@ -311,7 +314,12 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
     });
     let server = app.listen(_options.proxyPort, _options.proxyListenBind, function() {
         _options.logger && _options.logger('Alexa-Cookie: Proxy-Server listening on port ' + server.address().port);
-        callbackListening(server);
+        callbackListening && callbackListening(server);
+        callbackListening = null;
+    }).on('error', err => {
+        _options.logger && _options.logger('Alexa-Cookie: Proxy-Server Error: ' + err);
+        callbackListening && callbackListening(null);
+        callbackListening = null;
     });
 
 }
