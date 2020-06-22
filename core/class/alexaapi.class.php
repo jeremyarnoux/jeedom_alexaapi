@@ -225,7 +225,7 @@ public static function templateWidget(){
 		log::add('alexaapi', 'info', ' Arrêt du service alexaapi');
 		@file_get_contents("http://" . config::byKey('internalAddr') . ":3456/stop");
 		sleep(3);
-		if(shell_exec('ps aux | grep "resources/alexaapi.js" | grep -v "grep" | wc -l') == '1') {
+		if(shell_exec('ps aux | grep "resources/alexaapi.js" | grep -v "grep" | wc -l') == 1) {
 			exec('sudo kill $(ps aux | grep "resources/alexaapi.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
 			$deamon_info = self::deamon_info();
 			if ($deamon_info['state'] == 'ok') {
@@ -238,7 +238,8 @@ public static function templateWidget(){
 				exec('sudo kill -9 $(ps aux | grep "resources/alexaapi.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
 			}
 		}
-	}
+			self::deamonCookie_stop();
+		}
 	
 	public static function reinstallNodeJS() { // Reinstall NODEJS from scratch (to use if there is errors in dependancy install)
 		$pluginalexaapi = plugin::byId('alexaapi');
@@ -275,11 +276,11 @@ public static function templateWidget(){
 	}
 
 	public static function deamonCookie_stop() {
-		if(shell_exec('ps aux | grep "resources/initCookie.js" | grep -v "grep" | wc -l') == '1') {
+		if(shell_exec('ps aux | grep "resources/initCookie.js" | grep -v "grep" | wc -l') == 1) {
 			log::add('alexaapi', 'info', 'Arrêt du service cookie');
 			exec('sudo kill $(ps aux | grep "resources/initCookie.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
 			sleep(3);
-			if(shell_exec('ps aux | grep "resources/initCookie.js" | grep -v "grep" | wc -l') == '1') {
+			if(shell_exec('ps aux | grep "resources/initCookie.js" | grep -v "grep" | wc -l') == 1) {
 				exec('sudo kill -9 $(ps aux | grep "resources/initCookie.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
 			}
 		}

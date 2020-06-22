@@ -184,7 +184,7 @@ function AlexaCookie() {
             _options.logger && _options.logger('Alexa-Cookie: Proxy mode disabled');
         }
         _options.proxyLogLevel = _options.proxyLogLevel || 'warn';
-        _options.amazonPageProxyLanguage = _options.amazonPageProxyLanguage || 'de_DE';
+        _options.amazonPageProxyLanguage = _options.amazonPageProxyLanguage || 'fr_FR';
 
         if (_options.formerRegistrationData) _options.proxyOnly = true;
     };
