@@ -3,7 +3,8 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 class alexaapi extends eqLogic {
 	
-    public static function listePluginsAlexa($withAPI=false, $withSmartHome=false){
+    // A supprimer dans quelques temps, tous les listePluginsAlexa sont remplacés par listePluginsAlexaArray
+	public static function listePluginsAlexa($withAPI=false, $withSmartHome=false){
 		$liste = array();
 		if ($withAPI) array_push($liste, "alexaapi");
 		try {$test = plugin::byId('alexaamazonmusic');  if ($test->isActive()) array_push($liste, "alexaamazonmusic");}  catch(Exception $e) {}
@@ -14,6 +15,45 @@ class alexaapi extends eqLogic {
 		}
 		return $liste;
 	}
+	
+    public static function listePluginsAlexaArray($withAPI=false, $withSmartHome=false, $all=false){
+		$liste = array();
+		if ($withAPI) array_push($liste, array("pluginId" => "alexaapi", "nom" => "Alexa-API", "actif" => true));
+		if ($withSmartHome) {
+		  try {$test = plugin::byId('alexasmarthome'); array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914'));      } 
+		  catch(Exception $e) {if ($all) {             array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914'));      }}}
+		try {$test = plugin::byId('alexaamazonmusic'); array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910')); } 
+		catch(Exception $e) {if ($all) {               array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910')); }}
+		try {$test = plugin::byId('alexadeezer');      array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911'));            } 
+		catch(Exception $e) {if ($all) {               array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911'));            }}
+		try {$test = plugin::byId('alexaspotify');     array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913'));          } 
+		catch(Exception $e) {if ($all) {               array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913'));          }}
+		return $liste;
+	}
+	
+    public static function listePluginsAlexaArray_controle($pluginId="", $plugin="inconnu", $idMarket="3910"){
+		$valeurs = array();
+		try {
+				$valeurs = array(
+				"pluginId" => $pluginId,
+				"idMarket" => $idMarket,
+				"nom" => $plugin,
+				"install" => true,
+				"actif" => plugin::byId($pluginId)->isActive()
+				);
+		}  catch(Exception $e) {
+				$valeurs = array(
+				"pluginId" => $pluginId,
+				"idMarket" => $idMarket,
+				"nom" => $plugin,
+				"install" => false,
+				"actif" => false
+				);
+		}
+		//	array_push($liste, $valeurs);			
+		return $valeurs;
+	}	
+
 	/*
 public static function templateWidget(){
 		$return = array('info' => array('string' => array()));
@@ -116,7 +156,8 @@ public static function templateWidget(){
 
 
 	public static function callProxyAlexaapi($_url) {
-		$url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('openzwave');
+		//$url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('openzwave');
+		$url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('alexaapi');
 		$ch = curl_init();
 		curl_setopt_array($ch, array(CURLOPT_URL => $url, CURLOPT_HEADER => false, CURLOPT_RETURNTRANSFER => true,));
 		$result = curl_exec($ch);
@@ -133,9 +174,11 @@ public static function templateWidget(){
 		$return = array();
 		$return['log'] = 'alexaapi_node';
 		$return['state'] = 'nok'; 
+		
 		// Regarder si alexaapi.js est lancé
-		$pid = trim(shell_exec('ps ax | grep "alexaapi/resources/alexaapi.js" | grep -v "grep" | wc -l'));
+		$pid = trim(shell_exec('ps ax | grep "resources/alexaapi.js" | grep -v "grep" | wc -l'));
 		if ($pid != '' && $pid != '0') $return['state'] = 'ok';
+		
 		// Regarder si le cookie existe :alexa-cookie.json
 		$request = realpath(dirname(__FILE__) . '/../../resources/data/alexa-cookie.json');
 		if (file_exists($request)) $return['launchable'] = 'ok';
@@ -150,13 +193,13 @@ public static function templateWidget(){
 		self::deamon_stop();
 		$deamon_info = self::deamon_info();
 		if ($deamon_info['launchable'] != 'ok') throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
-		log::add('alexaapi', 'info', 'Lancement du démon alexaapi');
+		log::add('alexaapi', 'info', ' Lancement du démon alexaapi');
 		$url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/alexaapi/core/api/jeealexaapi.php?apikey=' . jeedom::getApiKey('alexaapi');
 		$log = $_debug ? '1' : '0';
 		$sensor_path = realpath(dirname(__FILE__) . '/../../resources');
 		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/alexaapi.js ' . network::getNetworkAccess('internal') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr').' '.jeedom::getApiKey('alexaapi').' '.log::getLogLevel('alexaapi');
 		log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
-		$result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
+		$result = exec('NODE_ENV=production nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
 		//$cmdStart='nohup ' . $cmd . ' | tee >(grep "WS-MQTT">>'.log::getPathToLog('alexaapi_mqtt').') >(grep -v "WS-MQTT">>'. log::getPathToLog('alexaapi_node') . ')';
 		if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
 			log::add('alexaapi', 'error', $result);
@@ -174,24 +217,29 @@ public static function templateWidget(){
 			return false;
 		}
 		message::removeAll('alexaapi', 'unableStartDeamon');
-		log::add('alexaapi', 'info', 'Démon alexaapi lancé');
+		log::add('alexaapi', 'info', ' Démon alexaapi lancé');
 		return true;
 	}
 
 	public static function deamon_stop() {
-		exec('kill $(ps aux | grep "/alexaapi.js" | awk \'{print $2}\')');
-		log::add('alexaapi', 'info', 'Arrêt du service alexaapi');
-		$deamon_info = self::deamon_info();
-		if ($deamon_info['state'] == 'ok') {
-			sleep(1);
-			exec('kill -9 $(ps aux | grep "/alexaapi.js" | awk \'{print $2}\')');
+		log::add('alexaapi', 'info', ' Arrêt du service alexaapi');
+		@file_get_contents("http://" . config::byKey('internalAddr') . ":3456/stop");
+		sleep(3);
+		if(shell_exec('ps aux | grep "resources/alexaapi.js" | grep -v "grep" | wc -l') == 1) {
+			exec('sudo kill $(ps aux | grep "resources/alexaapi.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
+			$deamon_info = self::deamon_info();
+			if ($deamon_info['state'] == 'ok') {
+				sleep(1);
+				exec('sudo kill -9 $(ps aux | grep "resources/alexaapi.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
+			}
+			$deamon_info = self::deamon_info();
+			if ($deamon_info['state'] == 'ok') {
+				sleep(1);
+				exec('sudo kill -9 $(ps aux | grep "resources/alexaapi.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
+			}
 		}
-		$deamon_info = self::deamon_info();
-		if ($deamon_info['state'] == 'ok') {
-			sleep(1);
-			exec('sudo kill -9 $(ps aux | grep "/alexaapi.js" | awk \'{print $2}\')');
+			self::deamonCookie_stop();
 		}
-	}
 	
 	public static function reinstallNodeJS() { // Reinstall NODEJS from scratch (to use if there is errors in dependancy install)
 		$pluginalexaapi = plugin::byId('alexaapi');
@@ -211,11 +259,10 @@ public static function templateWidget(){
 	public static function deamonCookie_start($_debug = false) { //*********** Demon Cookie***************
 		self::deamonCookie_stop();
 		$deamon_info = self::deamon_info();
-		log::add('alexaapi_cookie', 'info', 'Lancement du démon cookie');
+		log::add('alexaapi_cookie', 'info', ' Lancement du démon cookie');
 		$log = $_debug ? '1' : '0';
 		$sensor_path = realpath(dirname(__FILE__) . '/../../resources');
-		$cmd = "kill $(ps aux | grep 'initCookie.js' | awk '{print $2}')";	//Par sécurité, on Kill un éventuel précédent proessus initCookie.js
-		log::add('alexaapi', 'debug', '---- Kill initCookie.js: ' . $cmd);
+
 		$cmd = 'nice -n 19 nodejs ' . $sensor_path . '/initCookie.js ' . config::byKey('internalAddr') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr');
 		log::add('alexaapi', 'debug', '---- Lancement démon Alexa-API-Cookie sur port 3457 : ' . $cmd);
 		$result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
@@ -224,17 +271,18 @@ public static function templateWidget(){
 			return false;
 		}
 		message::removeAll('alexaapi', 'unableStartDeamonCookie');
-		log::add('alexaapi_cookie', 'info', 'Démon cookie lancé');
+		log::add('alexaapi_cookie', 'info', ' Démon cookie lancé');
 		return true;
 	}
 
 	public static function deamonCookie_stop() {
-		exec('kill $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')');
-		log::add('alexaapi', 'info', 'Arrêt du service cookie');
-		$deamon_info = self::deamon_info();
-		if ($deamon_info['stateCookie'] == 'ok') {
-			sleep(1);
-			exec('kill -9 $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')');
+		if(shell_exec('ps aux | grep "resources/initCookie.js" | grep -v "grep" | wc -l') == 1) {
+			log::add('alexaapi', 'info', 'Arrêt du service cookie');
+			exec('sudo kill $(ps aux | grep "resources/initCookie.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
+			sleep(3);
+			if(shell_exec('ps aux | grep "resources/initCookie.js" | grep -v "grep" | wc -l') == 1) {
+				exec('sudo kill -9 $(ps aux | grep "resources/initCookie.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
+			}
 		}
 	}
 
@@ -310,10 +358,11 @@ public static function templateWidget(){
 		self::restartServeurPHP();		
 		}
 		
-		$r = new Cron\CronExpression('*/15 * * * *', new Cron\FieldFactory);// boucle refresh
+		$r = new Cron\CronExpression('*/16 * * * *', new Cron\FieldFactory);// boucle refresh
 //		$r = new Cron\CronExpression('* * * * *', new Cron\FieldFactory);// boucle refresh
 		if ($r->isDue() && $deamon_info['state'] == 'ok') {
 			$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
+			config::save("listRoutinesProchain",time()+960,"alexaapi");	
 			foreach ($eqLogics as $alexaapi) {
 				//log::add('alexaapi_node', 'debug', 'CRON Refresh: '.$alexaapi->getName());
 				$alexaapi->refresh(); 				
@@ -369,6 +418,7 @@ public static function templateWidget(){
 			event::add('jeedom::alert', array('level' => 'danger', 'page' => 'alexaapi', 'message' => __('Cookie Amazon Absent, allez dans la Configuration du plugin', __FILE__),));
 			return;
 		}
+		log::add('alexaapi_scan', 'debug', '*************************** Lancement du Scan Alexa-API ***********************************');
 		// --- Mise à jour des Amazon Echo
 		event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
 		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
@@ -378,17 +428,23 @@ public static function templateWidget(){
 		foreach ($json as $item) {
 			// Skip the special device named "This Device"
 			if ($item['name'] == 'This Device') continue;
+		//log::add('alexaapi_scan', 'debug', 'Niveau 1');
+			log::add('alexaapi_scan', 'debug', '------------------------------------------------------------------------------');
+			log::add('alexaapi_scan', 'debug', '-> Ajout du device '.$item['name']);
+			log::add('alexaapi_scan', 'debug', '------------------------------------------------------------------------------');
 
 			foreach (self::listePluginsAlexa() as $pluginAlexaUnparUn)
 			{
+				//log::add('alexaapi_scan', 'debug', '*** Détection pour le plugin '.$pluginAlexaUnparUn);
 				if  (in_array("AUDIO_PLAYER",$item['capabilities'])) {
-							//message::add('alexaapi', '////////////////////////////// On est dans :'.$pluginAlexaUnparUn);
-						// Device PLAYLIST
+					if  ($pluginAlexaUnparUn=='alexaamazonmusic') {
+						// Device PLAYLIST -----------------------------------------------------------------------------------------------------------------
 						$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_playlist", $pluginAlexaUnparUn);
 						if (!is_object($device)) {
 							$device=$pluginAlexaUnparUn::createNewDevice($item['name']." PlayList", $item['serial']."_playlist");
 							$device->setIsVisible(0);					
 						}
+						log::add('alexaapi_scan', 'debug', '*** [Plugin '.$pluginAlexaUnparUn.'] ->> détection1 de '.$device->getName());
 						// Update device configuration
 						$device->setConfiguration('device', $item['name']);
 						$device->setConfiguration('type', $item['type']);
@@ -398,25 +454,37 @@ public static function templateWidget(){
 						$device->setIsVisible(1);
 						//$device->setIsEnable(0);
 						$device->setConfiguration('capabilities', $item['capabilities']);
+						try {
 						$device->save();
-						$device->setStatus('online', (($item['online'])?true:false));
-						// Device PLAYER
-						$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_player", $pluginAlexaUnparUn);
-							if (!is_object($device)) {
-								$device=$pluginAlexaUnparUn::createNewDevice($item['name']." Player", $item['serial']."_player");
-								//$numNewDevices++;
-								$device->setConfiguration('widgetPlayListEnable', 0);
-							}
-						// Update device configuration
-						$device->setConfiguration('device', $item['name']);
-						$device->setConfiguration('type', $item['type']);
-						$device->setConfiguration('devicetype', "Player");
-						$device->setConfiguration('family', $item['family']);
-						$device->setConfiguration('members', $item['members']);
-						$device->setConfiguration('capabilities', $item['capabilities']);
+						} catch (Exception $e) {
+						$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
 						$device->save();
+						}
 						$device->setStatus('online', (($item['online'])?true:false));
-						//$numDevices++;
+					}
+					// Device PLAYER -----------------------------------------------------------------------------------------------------------------
+					$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_player", $pluginAlexaUnparUn);
+						if (!is_object($device)) {
+							$device=$pluginAlexaUnparUn::createNewDevice($item['name']." Player", $item['serial']."_player");
+							//$numNewDevices++;
+							$device->setConfiguration('widgetPlayListEnable', 0);
+						}
+						log::add('alexaapi_scan', 'debug', '*** [Plugin '.$pluginAlexaUnparUn.'] ->> détection2 de '.$device->getName());
+					// Update device configuration
+					$device->setConfiguration('device', $item['name']);
+					$device->setConfiguration('type', $item['type']);
+					$device->setConfiguration('devicetype', "Player");
+					$device->setConfiguration('family', $item['family']);
+					$device->setConfiguration('members', $item['members']);
+					$device->setConfiguration('capabilities', $item['capabilities']);
+					try {
+					$device->save();
+					} catch (Exception $e) {
+					$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
+					$device->save();
+					}
+					$device->setStatus('online', (($item['online'])?true:false));
+					//$numDevices++;
 				}
 			}
 			
@@ -429,13 +497,19 @@ public static function templateWidget(){
 				$numNewDevices++;
 			}
 			// Update device configuration
+			log::add('alexaapi_scan', 'debug', '*** [Plugin Alexa-API       ] ->> détection de '.$device->getName());
 			$device->setConfiguration('device', $item['name']);
 			$device->setConfiguration('type', $item['type']);
 			$device->setConfiguration('devicetype', "Echo");
 			$device->setConfiguration('family', $item['family']);
 			$device->setConfiguration('members', $item['members']);
 			$device->setConfiguration('capabilities', $item['capabilities']);
-			$device->save();
+						try {
+						$device->save();
+						} catch (Exception $e) {
+						$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
+						$device->save();
+						}
 			$device->setStatus('online', (($item['online'])?true:false)); //SetStatus doit être lancé après Save et Save après inutile
 			$numDevices++;
 		}
@@ -454,6 +528,7 @@ public static function templateWidget(){
 						$device = alexasmarthome::createNewDevice($item['displayName'], $item['id']);
 						$numNewDevices++;
 					}
+					log::add('alexaapi_scan', 'debug', '[Plugin AlexasmartHome  ] ->> détection de ['.$item['id']."]".$device->getName());
 					// Update device configuration
 					$device->setConfiguration('device', $item['displayName']);
 					//$device->setConfiguration('type', $item['description']); a voir si on utilise ou pas descriotion
@@ -465,14 +540,26 @@ public static function templateWidget(){
 					$device->setConfiguration('capabilities', $item['supportedProperties']);
 					//On va mettre dispo, on traite plus tard.
 					//$device->setStatus('online', (($item['online'])?true:false));
-					$device->save();
+						try {
+						$device->save();
+						} catch (Exception $e) {
+						$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
+						$device->save();
+						}
 					$device->setStatus('online', 'true');
 					$numDevices++;
 				}
 			}
+		
+		log::add('alexaapi_scan', 'debug', '*************************** Lancement du Scan Alexa-smartHome (cf. log smartHome_scan)***');
 			self::scanAmazonSmartHome();
 		}		
 		
+		
+		
+		
+		
+		log::add('alexaapi_scan', 'debug', '*************************** Fin       du Scan Alexa-API ***********************************');
 
 	event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
 	}
@@ -507,6 +594,8 @@ public static function templateWidget(){
 									log::add('alexasmarthome_scan', 'debug', '							item7:'.json_encode($value7));
 									log::add('alexasmarthome_scan', 'debug', '							==> applianceId:'.json_encode($value7['applianceId']));
 									log::add('alexasmarthome_scan', 'debug', '							==> entityId:'.json_encode($value7['entityId']));
+									log::add('alexaapi_scan', 'debug', 'smarthomeDevices ==> '.json_encode($value7['friendlyName']).'=['.json_encode($value7['entityId']).']');
+										$Onatrouvelelien=false;
 										foreach (eqLogic::byType('alexasmarthome', true) as $alexasmarthome) {
 											if ($alexasmarthome->getLogicalId()==$value7['entityId']){
 											$alexasmarthome->setConfiguration('applianceId', $value7['applianceId']);
@@ -515,8 +604,11 @@ public static function templateWidget(){
 											log::add('alexasmarthome_scan', 'info', json_encode($value7['entityId']).' <=> '.json_encode($value7['applianceId']));
 											log::add('alexasmarthome_scan', 'info', 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
 											$alexasmarthome->save();
+											$Onatrouvelelien=true;
 											}
 										}	
+										if (!($Onatrouvelelien))
+											log::add('alexasmarthome_scan', 'info','!!!!!!!!!!!!!!!!FAUT UNE RUSTINE ICI!!!!!!!!!!');											
 									}	
 								}	
 							}
@@ -601,27 +693,44 @@ public static function templateWidget(){
 		$device=str_replace("_player", "", $this->getConfiguration('serial'));
 
 		if ($widgetEcho)	{
-			log::add('alexaapi', 'debug', 'execute : refresh routines (WidgetEcho) avec la requète http://' . config::byKey('internalAddr') . ':3456/routines');
-			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
-			$json = json_decode($json, true);	// Met à jour la liste des routines des commandes action "routine"
-			//self::sortBy('utterance', $json); //Supprimé car j'arrive pas à trier sans erreur
-
+			$trouveRoutines = false;
+			if (config::byKey("listRoutinesValidFin","alexaapi",time()-20) < time()) { // On regarde si on va chercher la liste des routines sur Amazon ou dans la Config
+				log::add('alexaapi', 'debug', 'execute : refresh routines ('.$this->getName().') avec la requète http://' . config::byKey('internalAddr') . ':3456/routines');
+				$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
+				$json = json_decode($json, true);	// Met à jour la liste des routines des commandes action "routine"
+				//self::sortBy('utterance', $json); //Supprimé car j'arrive pas à trier sans erreur
 			
-			$ListeDesRoutines = [];
-			foreach ($json as $item) {
-				//if ($item['utterance'] != '') 
-				if (isset($item['utterance'])) 
-					$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
-				else {
-					if (isset($item['triggerTime']) && ($item['triggerTime'] != '')) {
-						$resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
-						$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
+				$ListeDesRoutines = [];
+				foreach ($json as $item) {
+					//if ($item['utterance'] != '') 
+					if (isset($item['utterance'])) 
+						$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
+					else {
+						if (isset($item['triggerTime']) && ($item['triggerTime'] != '')) {
+							$resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
+							$ListeDesRoutines[]= $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
+						}
 					}
 				}
+				$ListeDesRoutines_string=join(';',$ListeDesRoutines);
+				config::save("listRoutines",$ListeDesRoutines_string,"alexaapi");		
+				config::save("listRoutinesValidDebut",time(),"alexaapi");		
+				config::save("listRoutinesValidFin",time()+86400,"alexaapi");					
+				log::add('alexaapi', 'debug', '╠═ Enregistre Routines dans Config sur plugin: '.$ListeDesRoutines_string);
+				$ouRecupRoutines="Amazon";
+	
+			} else
+			{
+				$ListeDesRoutines_string=config::byKey("listRoutines","alexaapi","");
+				//log::add('alexaamazonmusic', 'debug', '╚═> ListeDesPlaylists_string : '.$ListeDesPlaylists_string);
+				if ($ListeDesRoutines_string!="") $trouveRoutines = true;
+				$ouRecupRoutines="Configuation";
 			}
+			
+			
 			$cmd = $this->getCmd(null, 'routine');
 			if (is_object($cmd)) {
-				$cmd->setConfiguration('listValue', join(';',$ListeDesRoutines));
+				$cmd->setConfiguration('listValue', $ListeDesRoutines_string);
 				$cmd->save();
 			}
 
@@ -640,17 +749,19 @@ public static function templateWidget(){
 			try {
 							//log::add('alexaapi', 'info', 'coucou');
 				foreach ($this->getCmd('action') as $cmd) {
-							//log::add('alexaapi', 'info', 'Test refresh de la commande '.$cmd->getName().' valeur -> '.$cmd->getConfiguration('RunWhenRefresh', 0));
+					//log::add('alexaapi', 'info', 'Test refresh de la commande '.$cmd->getName().' valeur -> '.$cmd->getConfiguration('RunWhenRefresh', 0));
 
 					if ($cmd->getConfiguration('RunWhenRefresh', 0) != '1') {
+							//log::add('alexaapi', 'info', 'NON pour '.$cmd->getName());
 						continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
 					}
-							//log::add('alexaapi', 'info', 'OUI pour '.$cmd->getName());
+							log::add('alexaapi', 'info', 'OUI pour '.$cmd->getName());
 					$value = $cmd->execute();
 				}
 			}
 			catch(Exception $exc) {log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());}
 			
+			/*
 			// On va sauvegarder la valeur de chaque NOUVELLE prochaine Alarme/Rappel/Minuteur ...
 			$cmd = $this->getCmd(null, 'whennextalarminfo'); if (is_object($cmd)) $whennextalarminfo_actuelleValeur=$cmd->execCmd();
 			$cmd = $this->getCmd(null, 'whennextmusicalalarminfo'); if (is_object($cmd)) $whennextmusicalalarminfo_actuelleValeur=$cmd->execCmd();
@@ -670,7 +781,7 @@ public static function templateWidget(){
 						log::add('alexaapi_node', 'debug', '-------------------------------->today:TTTIIIIMMMMMEEEERRRR'.$today);
 					
 				}	
-
+*/
 
 			
 		}
@@ -678,6 +789,7 @@ public static function templateWidget(){
 		
 	public function updateCmd ($forceUpdate, $LogicalId, $Type, $SubType, $RunWhenRefresh, $Name, $IsVisible, $title_disable, $setDisplayicon, $infoNameArray, $setTemplate_lien, $request, $infoName, $listValue, $Order, $Test) {
 		if ($Test) {
+			log::add('alexaapi', 'info', 'ajout commande FORCAGE '.$LogicalId);
 			try {
 				if (empty($Name)) $Name=$LogicalId;
 				$cmd = $this->getCmd(null, $LogicalId);
@@ -744,6 +856,7 @@ public static function templateWidget(){
 						self::updateCmd ($F, 'push', 'action', 'message', false, 'Push', true, true, 'fa jeedomapp-audiospeak', null, null, 'push?text=#message#', null, null, 1, true);
 						return;
 					}
+			$widgetEcho=($this->getConfiguration('devicetype') == "Echo");
 			$widgetPlayer=($this->getConfiguration('devicetype') == "Player");
 			$widgetSmarthome=($this->getConfiguration('devicetype') == "Smarthome");
 			$widgetPlaylist=($this->getConfiguration('devicetype') == "PlayList");
@@ -757,6 +870,7 @@ public static function templateWidget(){
 			$cas6=($cas5 && (!$this->hasCapaorFamilyorType("WHA")));
 			$cas7=((!$this->hasCapaorFamilyorType("WHA")) && ($this->getConfiguration('devicetype') != "Player") &&(!$this->hasCapaorFamilyorType("FIRE_TV")) && !$widgetSmarthome && (!$this->hasCapaorFamilyorType("AMAZONMOBILEMUSIC_ANDROID")));
 			$cas8=(($this->hasCapaorFamilyorType("turnOff")) && $widgetSmarthome);
+			$cas9=($this->hasCapaorFamilyorType("WHA") && $widgetEcho);
 			$false=false;
 
 			//Anciennes functions a supprimer si elles existent encore
@@ -768,7 +882,7 @@ public static function templateWidget(){
 			self::updateCmd ($F, 'interactioninfo', 'info', 'string', false, 'Dernier dialogue avec Alexa', true, false, null, null,'alexaapi::interaction', null, null, null, 2, $cas7);	
 			self::updateCmd ($F, 'bluetoothDevice', 'info', 'string', false, 'Est connecté en Bluetooth', true, false, null, null,'alexaapi::interaction', null, null, null, 2, $cas7);	
 			self::updateCmd ($F, 'updateallalarms', 'action', 'other', true, 'UpdateAllAlarms', false, false, null, ["musicalalarmmusicentityinfo","whennextalarminfo","whennextmusicalalarminfo","whennextreminderinfo","whennexttimerinfo","whennextreminderlabelinfo"] , null, 'updateallalarms', null , null, 2, $cas2);	
-			self::updateCmd ($F, 'deleteReminder', 'action', 'message', false, 'DeleteReminder', false, false, 'maison-poubelle', null, null, 'deleteReminder?id=#id#', null, null, 2, $cas3);			
+			self::updateCmd ($F, 'deleteReminder', 'action', 'message', false, 'Supprimer un rappel', false, false, 'maison-poubelle', null, null, 'deleteReminder?id=#id#', null, null, 2, $cas3);			
 			self::updateCmd ($F, 'subText2', 'info', 'string', false, null, true, false, null, null, 'alexaapi::subText2', null, null, null, 2, $cas1);
 			self::updateCmd ($F, 'subText1', 'info', 'string', false, null, true, false, null, null, 'alexaapi::title', null, null, null, 4, $cas1);			
 			self::updateCmd ($F, 'url', 'info', 'string', false, null, true, false, null, null, 'alexaapi::image', null, null, null, 5, $cas1);			
@@ -784,7 +898,13 @@ public static function templateWidget(){
 			self::updateCmd ($F, 'playList', 'action', 'select', false, 'Ecouter une playlist', true, false, null, null, 'alexaapi::list', 'playlist?playlist=#select#', null, 'Lancer Refresh|Lancer Refresh', 24, $cas1);
 			self::updateCmd ($F, 'radio', 'action', 'select', false, 'Ecouter une radio', true, false, null, null, 'alexaapi::list', 'radio?station=#select#', null, 's2960|Nostalgie;s6617|RTL;s6566|Europe1', 25, $cas1);	
 			self::updateCmd ($F, 'playMusicTrack', 'action', 'select', false, 'Ecouter une piste musicale', true, false, null, null, 'alexaapi::list', 'playmusictrack?trackId=#select#', null, '53bfa26d-f24c-4b13-97a8-8c3debdf06f0|Piste1;7b12ee4f-5a69-4390-ad07-00618f32f110|Piste2', 26, $cas1);
-			self::updateCmd ($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fa fa-volume-up', null,'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas5);			
+			self::updateCmd ($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fa fa-volume-up', null,'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas6);
+			self::updateCmd ($F, '0', 'action', 'other', false, '0', true, true, null, null,null, 'volume?value=0', null, null, 1, $cas9);
+			self::updateCmd ($F, 'volume20', 'action', 'other', false, '20', true, true, null, null,null, 'volume?value=20', null, null, 2, $cas9);
+			self::updateCmd ($F, 'volume40', 'action', 'other', false, '40', true, true, null, null,null, 'volume?value=40', null, null, 3, $cas9);
+			self::updateCmd ($F, 'volume60', 'action', 'other', false, '60', true, true, null, null,null, 'volume?value=60', null, null, 4, $cas9);
+			self::updateCmd ($F, 'volume80', 'action', 'other', false, '80', true, true, null, null,null, 'volume?value=80', null, null, 5, $cas9);
+			self::updateCmd ($F, 'volume100', 'action', 'other', false, '100', true, true, null, null,null, 'volume?value=100', null, null, 6, $cas9);
 			self::updateCmd ($F, 'volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fa fa-volume-up', null, null, null, null, null, 28, $cas6);	
 			self::updateCmd ($F, 'whennextalarminfo', 'info', 'string', false, 'Prochaine Alarme', true, false, null, null,'alexaapi::alarm', null, null, null, 29, $cas2);			
 			self::updateCmd ($F, 'whennextmusicalalarminfo', 'info', 'string', false, 'Prochaine Alarme Musicale', true, false, null, null,'alexaapi::alarmmusical', null, null, null, 30, $cas2);	
@@ -819,12 +939,13 @@ public static function templateWidget(){
 			//self::updateCmd ($F, 'loopMode', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, $cas1);
 			//self::updateCmd ($F, 'playBackOrder', 'info', 'string', false, null, true, false, null, null, null, null, null, null, 79, $cas1);
 			//self::updateCmd ($F, 'alarm', 'action', 'message', false, 'Alarm', false, true, 'fa fa-bell', null, null, 'alarm?when=#when#&recurring=#recurring#&sound=#sound#', null, null, 79, $cas2);
-			self::updateCmd ($F, 'deleteallalarms', 'action', 'message', false, 'Delete All Alarms', false, false, 'maison-poubelle', null, null, 'deleteallalarms?type=alarm&status=all', null, null, 79, $cas2);
+			self::updateCmd ($F, 'deleteallalarms', 'action', 'message', false, 'Delete All Alarms', false, false, 'maison-poubelle', null, null, 'deleteallalarms?type=#type#&status=#status#', null, null, 79, $cas2);
 				if($type == "A15ERDAKK5HQQG") {
 					log::add('alexaapi', 'warning', '****Rencontre du type A15ERDAKK5HQQG = Sonos Première Génération sur : '.$this->getName());
 					log::add('alexaapi', 'warning', '****On ne crée pas les commandes REMINDERS dessus car bug!');
 				}
 			self::updateCmd ($F, 'reminder', 'action', 'message', false, 'Envoyer un rappel', true, false, null, null, 'alexaapi::message', 'reminder?text=#message#&when=#when#&recurring=#recurring#', null, null, 79, $cas3);	
+
 
 
 			$volinfo = $this->getCmd(null, 'volumeinfo');
@@ -891,7 +1012,7 @@ public static function templateWidget(){
 		if (log::getLogLevel('alexaapi') == 100 || $verbose === "true" || $verbose === true) $_debug = 1;
 		log::add('alexaapi', 'info', 'Installation des dépendances : ');
 		$resource_path = realpath(dirname(__FILE__) . '/../../resources');
-		return array('script' => $resource_path . '/nodejs.sh ' . $resource_path . ' alexaapi ' . $_debug, 'log' => log::getPathToLog('alexaapi_dep'));
+		return array('script' => $resource_path . '/nodejs.sh', 'log' => log::getPathToLog('alexaapi_dep'));
 	}
 
 	public function preUpdate() {
@@ -1151,7 +1272,7 @@ class alexaapiCmd extends cmd {
 		if (strstr($request, '&volume=')) $request = $request.'&lastvolume='.$lastvolume;
 		$request = str_replace(array('#slider#', '#select#', '#message#', '#volume#'), 
 		array($_options['slider'], $_options['select'], urlencode(self::decodeTexteAleatoire($_options['message'])), $_options['volume']), $request);
-		log::add('alexaapi_node', 'info', '---->RequestFinale:'.$request);
+		//log::add('alexaapi_node', 'info', '---->RequestFinale:'.$request);
 		return $request;
 	}	
 
@@ -1186,8 +1307,8 @@ class alexaapiCmd extends cmd {
 
 	private function build_ControleWhenTextRecurring($defaultWhen, $defaultText, $_options = array()) {
 		$request = $this->getConfiguration('request');
-		log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage RequestFinale:'.$request);
-		log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage _optionsAVANT:'.json_encode($_options));
+		//log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage RequestFinale:'.$request);
+		//log::add('alexaapi', 'debug', '----build_ControledeSliderSelectMessage _optionsAVANT:'.json_encode($_options));
 		if ((!isset($_options['sound'])) && (!isset($_options['message'])) && (!isset($_options['when']))) {
 			if (isset($_options['select'])) { // On est dans le cas d'un son d'alarme envoyé depuis le widget
 				$_options['sound']=urlencode($_options['select']);
@@ -1213,6 +1334,7 @@ class alexaapiCmd extends cmd {
 	
 	private function buildDeleteAllAlarmsRequest($_options = array()) {
 		$request = $this->getConfiguration('request');
+		log::add('alexaapi', 'debug', '----buildDeleteAllAlarmsRequest RequestFinale:'.$request);
 		if ($_options['type'] == "") $_options['type'] = "alarm";
 		if ($_options['status'] == "") $_options['status'] = "ON";
 		return str_replace(array('#type#', '#status#'), array($_options['type'], $_options['status']), $request);
@@ -1220,7 +1342,7 @@ class alexaapiCmd extends cmd {
 	
 	private function builddeleteReminderRequest($_options = array()) {
 		$request = $this->getConfiguration('request');
-		if ($_options['id'] == "") $_options['id'] = "coucou";
+		if ($_options['id'] == "") $_options['id'] = "ManqueID";
 		if ($_options['status'] == "") $_options['status'] = "ON";
 		return str_replace(array('#id#', '#status#'), array($_options['id'], $_options['status']), $request);
 	}	
@@ -1238,6 +1360,8 @@ class alexaapiCmd extends cmd {
 			return getTemplate('core', 'scenario', 'cmd.speak.volume', 'alexaapi');
 		if ($command == 'reminder') 
 			return getTemplate('core', 'scenario', 'cmd.reminder', 'alexaapi');
+		if ($command == 'deleteReminder') 
+			return getTemplate('core', 'scenario', 'cmd.deletereminder', 'alexaapi');		
 		if ($command == 'deleteallalarms') 
 			return getTemplate('core', 'scenario', 'cmd.deleteallalarms', 'alexaapi');
 		if ($command == 'command' && strpos($arguments, '#select#')) 

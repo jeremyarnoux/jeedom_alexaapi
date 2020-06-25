@@ -1,0 +1,141 @@
+#!/bin/bash
+
+TMPFOLDER=/tmp/jeedom/${PLUGIN}
+PROGRESS_FILE=${TMPFOLDER}/dependance
+HR=$(printf '=%.0s' {1..70})
+TAB="echo -n "________""
+
+echo_success() {
+	echo -en "[  OK  ]\r"
+	return 0
+}
+
+echo_failure() {
+	echo -en "[ERREUR]\r"
+	return 1
+}
+
+show_time() {
+    num=$1
+    min=0
+    if((num>59));then
+        ((sec=num%60))
+        ((min=num/60))
+    else
+        ((sec=num))
+    fi
+    ret="["
+    [[ $min -gt 0 ]] && ret+="$min:"
+    ret+="$sec"
+    [[ $min -lt 1 ]] && ret+="sec"
+    ret+="] : "
+    echo -n "$ret"
+}
+
+info() {
+  $TAB
+  if [ "$1" != "echo" ]; then
+    echo "$@"
+  else
+    $@
+  fi;
+  return $?
+}
+
+pre() {
+	echo "$HR"
+	echo "== $(date +'%d/%m/%Y %H:%M:%S') == Installation des dépendances de $PLUGIN"
+	echo "$HR"
+	echo
+	touch $TMPFOLDER/errorLog.$$
+	echo 0 > $TMPFOLDER/hasError.$$
+	touch $PROGRESS_FILE
+	STEP_IN_PROG=0
+}
+
+step() {
+	if [[ $STEP_IN_PROG -eq 1 ]]; then
+		STEP=$(($1-1))
+		next
+	fi
+	[[ $TIMED -eq 1 ]] && startStep=`date +%s`
+	echo $1 > $PROGRESS_FILE
+	STEP_IN_PROG=1
+	STEP=$1
+	shift
+	STEP_NAME=$@
+	if [[ $STEP -lt 10 ]]; then
+		echo -e "[  $STEP% ] : $STEP_NAME..."
+	else
+		echo -e "[ $STEP% ] : $STEP_NAME..."
+	fi 
+	STEP_OK=0
+	echo $STEP_OK > $TMPFOLDER/step.$$
+}
+
+try() {
+	cmdout="$("$@" 2>&1)"
+	local EXIT_CODE=$?
+	if [[ $EXIT_CODE -ne 0 ]]; then
+		STEP_OK=$EXIT_CODE
+		echo $STEP_OK > $TMPFOLDER/step.$$
+		echo 1 > $TMPFOLDER/hasError.$$
+
+		local LINE=${BASH_LINENO[0]}
+		echo -e "== Erreur à l'étape : $STEP_NAME" >> $TMPFOLDER/errorLog.$$
+		echo -e "== Ligne $LINE" >> $TMPFOLDER/errorLog.$$
+		echo -e "== La commande \`$*' pose problème" >> $TMPFOLDER/errorLog.$$
+		echo -e "== Le code de retour est $EXIT_CODE" >> $TMPFOLDER/errorLog.$$
+		echo -e "== Le message d'erreur :" >> $TMPFOLDER/errorLog.$$
+		echo -e "$cmdout\n" >> $TMPFOLDER/errorLog.$$
+		echo -e "$HR" >> $TMPFOLDER/errorLog.$$
+	fi
+	return $EXIT_CODE
+}
+
+silent() {
+	"$@" &>/dev/null
+	return $?
+}
+
+next() {
+	echo $STEP > ${PROGRESS_FILE}
+	[[ -f $TMPFOLDER/step.$$ ]] && { STEP_OK=$(< $TMPFOLDER/step.$$); rm -f $TMPFOLDER/step.$$; }
+	if [[ $STEP -lt 10 ]]; then
+		echo -en "[  $STEP% ] : "
+	else
+		echo -en "[ $STEP% ] : "
+	fi 
+	echo -n "$STEP_NAME : "
+	[[ $TIMED -eq 1 ]] && show_time $((`date +%s`-$startStep))
+	if [[ $STEP_OK -eq 0 ]]; then
+		echo_success
+	else
+		echo_failure
+	fi
+	echo
+	STEP_IN_PROG=0
+	return $STEP_OK
+}
+
+post() {
+	if [[ $STEP_IN_PROG -eq 1 ]]; then
+		STEP=99
+		next
+	fi
+	echo 100 > ${PROGRESS_FILE}
+	echo "[100% ] : Terminé !"
+	[[ -f $TMPFOLDER/hasError.$$ ]] && { hasError=$(< $TMPFOLDER/hasError.$$); rm -f $TMPFOLDER/hasError.$$; }
+	echo
+	if [[ $hasError -eq 1 ]]; then
+		echo "$HR"
+		echo "== KO == Erreur d'Installation"
+		echo "$HR"
+		[[ -f $TMPFOLDER/errorLog.$$ ]] && { cat $TMPFOLDER/errorLog.$$; rm -f $TMPFOLDER/errorLog.$$; }
+	else
+		echo "$HR"
+		echo "== OK == Installation Réussie"
+		echo "$HR"
+	fi
+	rm -f ${PROGRESS_FILE}
+}

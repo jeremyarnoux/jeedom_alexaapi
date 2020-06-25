@@ -41,6 +41,10 @@ function customStringify(v, func, intent) {
             // Store value in our map
             cache.set(value, true);
         }
+        if (Buffer.isBuffer(value)) {
+            // Buffers not relevant to be logged, ignore
+            return;
+        }
         return value;
     }, intent);
 }
@@ -107,7 +111,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
     optionsAlexa.pathRewrite[`^/alexa..amazon.com`] = '';
     optionsAlexa.cookieDomainRewrite[`.amazon.com`] = _options.proxyOwnIp;
     optionsAlexa.cookieDomainRewrite['amazon.com'] = _options.proxyOwnIp;
-    if (_options.logger) optionsAlexa.logProvider = function logProvider(provider) {
+    if (_options.logger) optionsAlexa.logProvider = function logProvider(_provider) {
         return {
             log: _options.logger.log || _options.logger,
             debug: _options.logger.debug || _options.logger,
@@ -156,7 +160,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         data = data.replace(/&#x2F;/g, '/');
         data = data.replace(amazonRegex, `http://${_options.proxyOwnIp}:${_options.proxyPort}/www.amazon.com/`);
         data = data.replace(alexaRegex, `http://${_options.proxyOwnIp}:${_options.proxyPort}/alexa.amazon.com/`);
-        //_options.logger && _options.logger('REPLACEHOSTS: ' + dataOrig + ' --> ' + data);
+        _options.logger && _options.logger('REPLACEHOSTS: ' + data);
         return data;
     }
 
@@ -168,17 +172,17 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         return data;
     }
 
-    function onProxyReq(proxyReq, req, res) {
+    function onProxyReq(proxyReq, req, _res) {
         const url = req.originalUrl || req.url;
         if (url.endsWith('.ico') || url.endsWith('.js') || url.endsWith('.ttf') || url.endsWith('.svg') || url.endsWith('.png') || url.endsWith('.appcache')) return;
-        if (url.startsWith('/ap/uedata')) return;
+        //if (url.startsWith('/ap/uedata')) return;
 
         _options.logger && _options.logger('Alexa-Cookie: Proxy-Request: ' + req.method + ' ' + url);
         //_options.logger && _options.logger('Alexa-Cookie: Proxy-Request-Data: ' + customStringify(proxyReq, null, 2));
 
-        if (proxyReq._headers) {
-            _options.logger && _options.logger('Alexa-Cookie: Headers: ' + JSON.stringify(proxyReq._headers));
-            let reqCookie = proxyReq._headers.cookie;
+        if (typeof proxyReq.getHeader === 'function') {
+            _options.logger && _options.logger('Alexa-Cookie: Headers: ' + JSON.stringify(proxyReq.getHeaders()));
+            let reqCookie = proxyReq.getHeader('cookie');
             if (reqCookie === undefined) {
                 reqCookie = "";
             }
@@ -197,18 +201,18 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             } else {
                 proxyCookies += '; ' + reqCookie;
             }
-            _options.logger && _options.logger('Alexa-Cookie: Headers: ' + JSON.stringify(proxyReq._headers));
+            _options.logger && _options.logger('Alexa-Cookie: Headers: ' + JSON.stringify(proxyReq.getHeaders()));
         }
 
         let modified = false;
         if (req.method === 'POST') {
-            if (proxyReq._headers && proxyReq._headers.referer) {
-                proxyReq._headers.referer = replaceHostsBack(proxyReq._headers.referer);
+            if (typeof proxyReq.getHeader === 'function' && proxyReq.getHeader('referer')) {
+                proxyReq.setHeader('referer', replaceHostsBack(proxyReq.getHeader('referer')));
                 _options.logger && _options.logger('Alexa-Cookie: Modify headers: Changed Referer');
                 modified = true;
             }
-            if (proxyReq._headers && proxyReq._headers.origin !== 'https://' + proxyReq._headers.host) {
-                delete proxyReq._headers.origin;
+            if (typeof proxyReq.getHeader === 'function' && proxyReq.getHeader('origin') !== 'https://' + proxyReq.getHeader('host')) {
+                 proxyReq.removeHeader('origin');
                 _options.logger && _options.logger('Alexa-Cookie: Modify headers: Delete Origin');
                 modified = true;
             }
@@ -229,21 +233,22 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         let reqestHost = null;
         if (proxyRes.socket && proxyRes.socket._host) reqestHost = proxyRes.socket._host;
         _options.logger && _options.logger('Alexa-Cookie: Proxy Response from Host: ' + reqestHost);
-        _options.proxyLogLevel === 'debug' && _options.logger && _options.logger('Alexa-Cookie: Proxy-Response Headers: ' + customStringify(proxyRes._headers, null, 2));
+        _options.proxyLogLevel === 'debug' && _options.logger && _options.logger('Alexa-Cookie: Proxy-Response Headers: ' + customStringify(proxyRes.headers, null, 2));
         _options.proxyLogLevel === 'debug' && _options.logger && _options.logger('Alexa-Cookie: Proxy-Response Outgoing: ' + customStringify(proxyRes.socket.parser.outgoing, null, 2));
         //_options.logger && _options.logger('Proxy-Response RES!!: ' + customStringify(res, null, 2));
 
         if (proxyRes && proxyRes.headers && proxyRes.headers['set-cookie']) {
             // make sure cookies are also sent to http by remove secure flags
             for (let i = 0; i < proxyRes.headers['set-cookie'].length; i++) {
-                proxyRes.headers['set-cookie'][i] = proxyRes.headers['set-cookie'][i].replace('Secure;', '');
+                proxyRes.headers['set-cookie'][i] = proxyRes.headers['set-cookie'][i].replace('Secure', '');
             }
             proxyCookies = addCookies(proxyCookies, proxyRes.headers);
         }
+        _options.logger && _options.logger('Alexa-Cookie: Cookies handled: ' + JSON.stringify(proxyCookies));
 
         if (
             (proxyRes.socket && proxyRes.socket._host === `www.amazon.com` && proxyRes.socket.parser.outgoing && proxyRes.socket.parser.outgoing.method === 'GET' && proxyRes.socket.parser.outgoing.path.startsWith('/ap/maplanding')) ||
-            (proxyRes.socket && proxyRes.socket.parser.outgoing && proxyRes.socket.parser.outgoing._headers.location && proxyRes.socket.parser.outgoing._headers.location.includes('/ap/maplanding?')) ||
+            (proxyRes.socket && proxyRes.socket.parser.outgoing && proxyRes.socket.parser.outgoing.getHeader('location') && proxyRes.socket.parser.outgoing.getHeader('location').includes('/ap/maplanding?')) ||
             (proxyRes.headers.location && proxyRes.headers.location.includes('/ap/maplanding?'))
         ) {
             _options.logger && _options.logger('Alexa-Cookie: Proxy detected SUCCESS!!');
@@ -284,7 +289,12 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             if (body) {
                 const bodyOrig = body;
                 body = replaceHosts(body);
-                if (body !== bodyOrig) _options.logger && _options.logger('Alexa-Cookie: MODIFIED Response Body to rewrite URLs');
+                if (body !== bodyOrig) {
+                    _options.logger && _options.logger('Alexa-Cookie: MODIFIED Response Body to rewrite URLs');
+                    _options.logger && _options.logger('');
+                    _options.logger && _options.logger('');
+                    _options.logger && _options.logger('');
+                }
             }
             return body;
         });

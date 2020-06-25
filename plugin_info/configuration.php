@@ -35,7 +35,11 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 		$versionJeedom = $return['configuration']['version'];
 
 ?>
-
+<style>
+pre#pre_eventlog {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace !important;
+}
+</style>
 	<legend><i class="icon divers-triangular42"></i> {{Génération manuelle du cookie Amazon}}</legend>
 	<center>
 		<a class="btn btn-success btn-sm bt_startDeamonCookie"> {{Identifiez-vous sur Amazon pour créer le cookie d'identification}} </a>
@@ -114,7 +118,7 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 
 <form class="form-horizontal">
     <fieldset>
-    <legend><i class="icon nature-planet5"></i> {{Option Lien serveur}}</legend>
+    <legend><i class="fas fa-server"></i> {{Option Lien serveur}}</legend>
 
 	<div class="form-group">
 			<label class="col-sm-4 control-label">{{Relance de l'identification au serveur}}</label>
@@ -130,9 +134,75 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 </div>
 </fieldset>
 </form>
+<?php
+		$foundSelect = false;
+		if (config::byKey("listRoutines","alexaapi","") != '') {
+			$listRoutines = '';
+			$elements = explode(';', config::byKey("listRoutines","alexaapi",""));
+			// code trouvé dans core\class\cmd?.class.php
+			foreach ($elements as $element) {
+				$coupleArray = explode('|', $element);
+				$listRoutines .= '<option value="' . $coupleArray[0] . '">' . $coupleArray[1] . '</option>';
+				$foundSelect = true;
+			}
+		}
+		if (!$foundSelect) $listRoutines = '<option value="">Aucune</option>' . $listRoutines;
+		
+		$listRoutinesValidDebut = date("d-m-Y H:i:s",config::byKey("listRoutinesValidDebut","alexaapi",""));
+		$listRoutinesValidFin = date("d-m-Y H:i:s",config::byKey("listRoutinesValidFin","alexaapi",""));
+		$listRoutinesProchain = date("d-m-Y H:i:s",config::byKey("listRoutinesProchain","alexaapi",""));
+		if (config::byKey("listRoutinesValidFin","alexaapi","")=="123") $listRoutinesValidFin=$listRoutinesProchain; //si on a appuyé sur Reset
+		?>
+<form class="form-horizontal">
+    <fieldset>
+    <legend><i class="fas fa-project-diagram"></i> {{Routines Amazon}}</legend>
+  <div class="form-group">
+        <label class="col-sm-4 control-label">{{Liste des Routines Amazon}}</label>
+    <div class="col-lg-3">
+        <select class="selectCmd"><?php echo $listRoutines?></select>
+    </div>
+	<div class="col-lg-4">
+		<input class="configKey form-control" data-l1key="listRoutines" placeholder="{{en test}}" />
+	</div>  
+ </div>
 
-
+  <div class="form-group">
+    <label class="col-lg-4 control-label">{{Mise à jour}}</label>
+    <div class="col-lg-3">
+        Dernière mise à jour : <?php echo $listRoutinesValidDebut?>
+    </div>
+    <div class="col-lg-3">
+        sera rechargée le  <?php echo $listRoutinesValidFin?>
+    </div><a class="btn btn-success btn-xs pull-left" id="bt_saveUpdateRoutines"><i class="fas fa-sync"></i> {{Avancer la mise à jour}}</a>
+</div>   
+</fieldset>
+</form>
+          
+		  
 <script>
+$("#bt_saveUpdateRoutines").on('click', function (event) {
+//console.log("coucou");
+  //var el = $(this);
+//console.log(el);
+var heureMaintenant=Math.round(+new Date() / 1000);
+var heureMaintenant="123";
+  jeedom.config.save({
+    plugin : 'alexaapi',
+//    configuration: {listPlaylistsValidFin: el.attr('data-state')},
+    configuration: {listRoutinesValidFin: heureMaintenant},
+    error: function (error) {
+      $('#div_alert').showAlert({message: error.message, level: 'danger'});
+    },
+    success: function () {
+		$('#md_modal').dialog( "close" );
+		$('#md_modal').dialog({title: "{{Configuration du plugin (après Reset validité Routines)}}"});
+		$("#md_modal").load('index.php?v=d&p=plugin&ajax=1&id='+eqType).dialog('open');
+      //$('#div_alert').showAlert({message: 'coucou', level: 'danger'});
+    }
+  });
+
+  return false;
+});
 
     var compteVerifCookie=0;
     var CookiePresent=0;

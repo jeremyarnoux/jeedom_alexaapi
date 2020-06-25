@@ -120,11 +120,11 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
         }
 //        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): amazonserver=' + amazonserver);
 //        this._options.logger && this._options.logger('Alexa-Config (alexa-remote.js): alexaserver=' + alexaserver);
-//        this._options.logger && this._options.logger('Alexa-Remote: Use as User-Agent: ' + this._options.userAgent);
-//        this._options.logger && this._options.logger('Alexa-Remote: Use as Login-Amazon-URL: ' + this._options.amazonPage);
+//        this._options.logger && this._options.logger('{Remote} ║ Use as User-Agent: ' + this._options.userAgent);
+//        this._options.logger && this._options.logger('{Remote} ║ Use as Login-Amazon-URL: ' + this._options.amazonPage);
         if (this._options.alexaServiceHost)
             this.baseUrl = this._options.alexaServiceHost;
-//        this._options.logger && this._options.logger('Alexa-Remote: Use as Base-URL: ' + this.baseUrl);
+//        this._options.logger && this._options.logger('{Remote} ║ Use as Base-URL: ' + this.baseUrl);
         this._options.alexaServiceHost = this.baseUrl;
         if (this._options.refreshCookieInterval !== 0)
             this._options.refreshCookieInterval = this._options.refreshCookieInterval || 7*24*60*1000; // Auto Refresh after 7 days
@@ -134,7 +134,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
         {
             if (!self.cookie)
             {
-                self._options.logger && self._options.logger('Alexa-Remote: No cookie given, generate one');
+                self._options.logger && self._options.logger('{Remote} ║ No cookie given, generate one');
                 self._options.cookieJustCreated = true;
                 self.generateCookie(self._options.email, self._options.password, function(err, res)
                 {
@@ -149,19 +149,19 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
             }
             else
             {
-                self._options.logger && self._options.logger('Alexa-Remote: cookie was provided','DEBUG');
+                self._options.logger && self._options.logger('{Remote} ╠═══> cookie was provided','DEBUG');
                 if (self._options.formerRegistrationData)
                 {
                     const tokensValidSince = Date.now() - self._options.formerRegistrationData.tokenDate;
                     if (tokensValidSince < 24 * 60 * 60 * 1000)
                         return callback(null);
 
-                    self._options.logger && self._options.logger('Alexa-Remote: former registration data exist, try refresh');
+                    self._options.logger && self._options.logger('{Remote} ║ former registration data exist, try refresh');
                     self.refreshCookie(function(err, res)
                     {
                         if (err || !res)
                         {
-                            self._options.logger && self._options.logger('Alexa-Remote: Error from refreshing cookies');
+                            self._options.logger && self._options.logger('{Remote} ║ Error from refreshing cookies');
                             self.cookie = null;
                             return getCookie(callback); // error on refresh
                         }
@@ -185,7 +185,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
 
             if (err)
             {
-                this._options.logger && this._options.logger('Alexa-Remote: Error from retrieving cookies');
+                this._options.logger && this._options.logger('{Remote} ║ Error from retrieving cookies');
                 return callback && callback(err);
             }
 
@@ -195,10 +195,10 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
 /* ancienne version
             this.checkAuthentication((authenticated) =>
             {
-                this._options.logger && this._options.logger('Alexa-Remote: Authentication checked: ' + authenticated);
+                this._options.logger && this._options.logger('{Remote} ║ Authentication checked: ' + authenticated);
                 if (! authenticated && !this._options.cookieJustCreated)
                 {
-                    this._options.logger && this._options.logger('Alexa-Remote: Cookie was set, but authentication invalid');
+                    this._options.logger && this._options.logger('{Remote} ║ Cookie was set, but authentication invalid');
                     delete this._options.cookie;
                     delete this._options.csrf;
                     return this.init(this._options, callback);
@@ -231,9 +231,9 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                 if (err && authenticated === null) {
                     return callback && callback(new Error('Error while checking Authentication: ' + err));
                 }
-                this._options.logger && this._options.logger('Alexa-Remote: Authentication checked: ' + authenticated,'DEBUG');
+                this._options.logger && this._options.logger('{Remote} ║ Authentication checked: ' + authenticated,'DEBUG');
                 if (! authenticated && !this._options.cookieJustCreated) {
-                    this._options.logger && this._options.logger('Alexa-Remote: Cookie was set, but authentication invalid');
+                    this._options.logger && this._options.logger('{Remote} ║ Cookie was set, but authentication invalid');
                     delete this._options.cookie;
                     delete this._options.csrf;
                     delete this._options.localCookie;
@@ -254,7 +254,7 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                 }
 					
 					this.prepare(() => {
-					//this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Test2'+this._options.useWsMqtt);                
+					//this._options.logger && this._options.logger('{Remote} WS-MQTT: Test2'+this._options.useWsMqtt);                
                     if (this._options.useWsMqtt) {
                         this.initWsMqttConnection();
                     }
@@ -473,6 +473,8 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
             this.emit('ws-unknown-message', incomingMsg);
         });
         this.alexaWsMqtt.on('command', (command, payload) => {
+			
+//this._options.logger && this._options.logger('-------------->>>>>>>>>>>>>>>>>>>>>>>'.payload,'DEBUG');
             switch(command) {
                 case 'PUSH_DOPPLER_CONNECTION_CHANGE':
                     /*
@@ -731,10 +733,10 @@ if (!this.cookie || typeof this.cookie !== 'string') return;
                         }
 
                         if (!activity) {
-                            this._options.logger && this._options.logger('Alexa-Remote: Activity for id ' + payload.key.entryId + ' not found');
+                            this._options.logger && this._options.logger('{Remote} ║ Activity for id ' + payload.key.entryId + ' not found');
                             return;
                         }
-                        //this._options.logger && this._options.logger('Alexa-Remote: Activity found for id ' + payload.key.entryId + ': ' + JSON.stringify(activity));
+                        //this._options.logger && this._options.logger('{Remote} ║ Activity found for id ' + payload.key.entryId + ': ' + JSON.stringify(activity));
 
                         activity.destinationUserId = payload.destinationUserId;
                         this.httpPost('ws-device-activity', activity);
@@ -796,49 +798,49 @@ this.httpPost() ;
         }
         // bypass check because set or last check done before less then 10 mins
         if (noCheck || (new Date().getTime() - this.lastAuthCheck) < 600000) {
-            this._options.logger && this._options.logger('Alexa-Remote: No authentication check needed (time elapsed ' + (new Date().getTime() - this.lastAuthCheck) + ')','DEBUG');
+            this._options.logger && this._options.logger('{Remote} ║ No authentication check needed (time elapsed ' + (new Date().getTime() - this.lastAuthCheck) + ')','DEBUG');
             return this.httpsGetCall(path, callback, flags);
         }
 
 /* Ancienne version modif juin2019
         this.checkAuthentication((authenticated) => { change juin 2019
             if (authenticated) {
-                this._options.logger && this._options.logger('Alexa-Remote: Authentication check successfull');
+                this._options.logger && this._options.logger('{Remote} ║ Authentication check successfull');
                 this.lastAuthCheck = new Date().getTime();
                 return this.httpsGetCall(path, callback, flags);
             }
             if (this._options.email && this.options.password) {
-                this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error, but email and password, get new cookie');
+                this._options.logger && this._options.logger('{Remote} ║ Authentication check Error, but email and password, get new cookie');
                 delete this._options.csrf;
                 delete this._options.cookie;
                 this.init(this._options, function(err) {
                     if (err) {
-                        this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error and renew unsuccessfull. STOP');
+                        this._options.logger && this._options.logger('{Remote} ║ Authentication check Error and renew unsuccessfull. STOP');
                         return callback(new Error('Cookie invalid, Renew unsuccessfull'));
                     }
                     return this.httpsGet(path, callback, flags);
                 });
             }
-            this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error and no email and password. STOP');
+            this._options.logger && this._options.logger('{Remote} ║ Authentication check Error and no email and password. STOP');
             callback(new Error('Cookie invalid'));
 */
 
         this.checkAuthentication((authenticated, err) => {
             if (authenticated) {
-                this._options.logger && this._options.logger('Alexa-Remote: Authentication check successfull');
+                this._options.logger && this._options.logger('{Remote} ║ Authentication check successfull');
                 this.lastAuthCheck = new Date().getTime();
                 return this.httpsGetCall(path, callback, flags);
             }
             else if (err && authenticated === null) {
-                this._options.logger && this._options.logger('Alexa-Remote: Authentication check returned error: ' + err + '. Still try request');
+                this._options.logger && this._options.logger('{Remote} ║ Authentication check returned error: ' + err + '. Still try request');
                 return this.httpsGetCall(path, callback, flags);
             }
-            this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error, try re-init');
+            this._options.logger && this._options.logger('{Remote} ║ Authentication check Error, try re-init');
             delete this._options.csrf;
             delete this._options.cookie;
             this.init(this._options, function(err) {
                 if (err) {
-                    this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error and renew unsuccessfull. STOP');
+                    this._options.logger && this._options.logger('{Remote} ║ Authentication check Error and renew unsuccessfull. STOP');
                     return callback(new Error('Cookie invalid, Renew unsuccessfull'));
                 }
                 return this.httpsGet(path, callback, flags);
@@ -944,17 +946,17 @@ this._options.logger && this._options.logger(obj.headers);
 	
 	
 	
-        this._options.logger && this._options.logger('Alexa-Remote: Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? ' and data=' + flags.data : ''),'DEBUG');
+        this._options.logger && this._options.logger('{Remote} ║ Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? ' and data=' + flags.data : ''),'DEBUG');
 //	}	
-	    //this._options.logger && this._options.logger('Alexa-Remote: >>>>> ' + JSON.stringify(options)+"<<<<" );
-	    //this._options.logger && this._options.logger('Alexa-Remote: >>>>> ' + options+"<<<<" );
+	    //this._options.logger && this._options.logger('{Remote} ║ >>>>> ' + JSON.stringify(options)+"<<<<" );
+	    //this._options.logger && this._options.logger('{Remote} ║ >>>>> ' + options+"<<<<" );
 /*		console.log ("*************************== Trame envoyée ==********************************************");
 		console.log (options);
 		console.log ("****************************************************************************************");
 		console.log ("*************************== Données envoyées ==*****************************************");
 		console.log (flags);
 		console.log ("****************************************************************************************");
-	    //this._options.logger && this._options.logger('Alexa-Remote: data >>>>> ' + JSON.stringify(flags.data) );
+	    //this._options.logger && this._options.logger('{Remote} ║ data >>>>> ' + JSON.stringify(flags.data) );
 	
 	*/	
 		
@@ -969,12 +971,12 @@ this._options.logger && this._options.logger(obj.headers);
 //if (flags.data !=undefined) body="Unauthorized";
 
 
-			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.statusCode: '+res.statusCode);
-			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  '+JSON.stringify(res));
-			this._options.logger && this._options.logger('Alexa-Remote (Réponse Serveur):  res.statusMessage: '+res.statusMessage,'DEBUG');
-			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.httpVersion: '+res.httpVersion);
-			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.headers: '+JSON.stringify(res.headers));
-			//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  res.rawHeaders : '+res.rawHeaders);
+			//this._options.logger && this._options.logger('>>> Alexa-Remote ║ (debug) :  res.statusCode: '+res.statusCode);
+			//this._options.logger && this._options.logger('>>> Alexa-Remote ║ (debug) :  '+JSON.stringify(res));
+			this._options.logger && this._options.logger('{Remote} ║ (Réponse Serveur):  res.statusMessage: '+res.statusMessage,'DEBUG');
+			//this._options.logger && this._options.logger('>>> Alexa-Remote ║ (debug) :  res.httpVersion: '+res.httpVersion);
+			//this._options.logger && this._options.logger('>>> Alexa-Remote ║ (debug) :  res.headers: '+JSON.stringify(res.headers));
+			//this._options.logger && this._options.logger('>>> Alexa-Remote ║ (debug) :  res.rawHeaders : '+res.rawHeaders);
 			var resstatusMessage=res.statusMessage;
 			var resstatusCode=res.statusCode;
 
@@ -983,18 +985,18 @@ this._options.logger && this._options.logger(obj.headers);
 
             res.on('data', (chunk) => {
                 body += chunk;
-				//this._options.logger && this._options.logger('>>> Alexa-Remote (debug) :  chunk: '+body);
+				//this._options.logger && this._options.logger('>>> Alexa-Remote ║ (debug) :  chunk: '+body);
             });
 
             res.on('end', () =>
             {
-				this._options.logger && this._options.logger('Alexa-Remote (Réponse Valeur): '+body,'DEBUG');
+				this._options.logger && this._options.logger('{Remote} ║ (Réponse Valeur): '+body,'DEBUG');
                 let ret;
                 if (typeof callback === 'function')
                 {
                     if (!body)
                     {
-						this._options.logger && this._options.logger('Alexa-Remote: Response(3): '+resstatusMessage, "INFO");
+						this._options.logger && this._options.logger('{Remote} ║ Response(3): '+resstatusMessage, "INFO");
                         
 						if (resstatusCode=="200") // C'est OK
                         return callback && callback(null, null);
@@ -1009,8 +1011,8 @@ this._options.logger && this._options.logger(obj.headers);
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
                         //this._options.logger && this._options.logger('*********************DEBUG****************************','ERROR');
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
-                        //this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote: Response: No/Invalid JSON','ERROR');
-                        this._options.logger && this._options.logger("Alexa-Remote: "+body, 'ERROR');
+                        //this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote ║ Response: No/Invalid JSON','ERROR');
+                        this._options.logger && this._options.logger("Alexa-Remote ║ "+body, 'ERROR');
                         //this._options.logger && this._options.logger('**DEBUG**DEBUG* Message Exception :'+e.message);
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
@@ -1028,9 +1030,9 @@ this._options.logger && this._options.logger(obj.headers);
                     }
 					
 					if (JSON.stringify(ret)=='{"error":null}')
-						this._options.logger && this._options.logger('Alexa-Remote: Response(2): OK');
+						this._options.logger && this._options.logger('{Remote} ║ Response(2): OK');
 						else
-						this._options.logger && this._options.logger('Alexa-Remote: Response(1): ' + JSON.stringify(ret),'DEBUG');
+						this._options.logger && this._options.logger('{Remote} ║ Response(1): ' + JSON.stringify(ret),'DEBUG');
                     return callback && callback (null, ret);
                 }
             });
@@ -1053,8 +1055,8 @@ httpPost(nom, jsonaenvoyer) {
 var url=IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey="+ClePlugin+"&nom="+nom;
  
 jsonaenvoyer=JSON.stringify(jsonaenvoyer);
-this._options.logger && this._options.logger('URL envoyée: '+url,'DEBUG');
-this._options.logger && this._options.logger('DATA envoyé:'+jsonaenvoyer,'DEBUG');
+this._options.logger && this._options.logger('{Remote} ║ URL envoyée: '+url,'DEBUG');
+this._options.logger && this._options.logger('{Remote} ║ DATA envoyé:'+jsonaenvoyer,'DEBUG');
 
 	request.post(url, {
 
@@ -1246,7 +1248,7 @@ getNotificationSounds2(serialOrName, idSound, callback) {
 	
 
 
-    createNotificationObject(serialOrName, type, label, value, status, sound) { // type = Reminder, Alarm
+    createNotificationObject(serialOrName, type, label, value, recurring, status, sound) { // type = Reminder, Alarm ; recurring = from JS // Fix Aidom 01/03/2020
         if (status && typeof status === 'object') {
             sound = status;
             status = 'ON';
@@ -1257,6 +1259,13 @@ getNotificationSounds2(serialOrName, idSound, callback) {
 
         let dev = this.find(serialOrName);
         if (!dev) return null;
+
+	// Fix Aidom 01/03/2020
+	//isrecurring = false;
+	if (recurring == null || recurring === undefined || recurring === "") {
+		recurring = null;
+	}
+	// End Fix
 
         //const now = new Date(); **Modif Sigalou 2019.02.28
         const notification = {
@@ -1278,8 +1287,8 @@ getNotificationSounds2(serialOrName, idSound, callback) {
             'originalTime': `${_00(value.getHours())}:${_00(value.getMinutes())}:${_00(value.getSeconds())}.000`,// **Modif Sigalou 2019.02.28
             'id': 'create' + type,
 
-            'isRecurring' : false,
-            'recurringPattern': null,
+            //'isRecurring' : isrecurring, // Fix Aidom 01/03/2020
+            'recurringPattern': recurring, // Fix Aidom 01/03/2020
 
             'timeZoneId': null,
             'reminderIndex': null,
@@ -2083,7 +2092,7 @@ this.deleteNotification(notification, callback);
 
         let nodes = [];
         for (let command of commands) {
-			this._options.logger && this._options.logger("----MultiSequenceCommand------>"+JSON.stringify(command), 'DEBUG');
+			//this._options.logger && this._options.logger("----MultiSequenceCommand------>"+JSON.stringify(command), 'DEBUG');
             //const commandNode = this.createSequenceNode(command.command, command.value, callback);
 			const commandNode = this.createSequenceNode(command.command, command.value, command.device ? command.device : serialOrName, callback);
             if (commandNode) nodes.push(commandNode);
@@ -2187,7 +2196,7 @@ this.deleteNotification(notification, callback);
 getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
 
     this.getAutomationRoutines((err, res) => {
-					//this._options.logger && this._options.logger('Alexa-Remote: >>>>>>>>>>>>>>>>>>>>>>>: ' + JSON.stringify(res));
+					//this._options.logger && this._options.logger('{Remote} ║ >>>>>>>>>>>>>>>>>>>>>>>: ' + JSON.stringify(res));
 		        callback && callback(res);
     });
 }
@@ -2302,9 +2311,9 @@ getAutomationRoutines2(callback) { //**ajouté SIGALOU 23/03/2019
         );
     }
 
-    setReminder(serialOrName, timestamp, label, callback) {
+    setReminder(serialOrName, timestamp, label, recurring, callback) { // Fix Aidom 01/03/2020
         //const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(timestamp)); **Modif Sigalou 2019.02.28
-        const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(Number(timestamp)));
+        const notification = this.createNotificationObject(serialOrName, 'Reminder', label, new Date(Number(timestamp)), recurring); // Fix Aidom 01/03/2020
         this.createNotification(notification, callback);
     }
     setAlarm2(serialOrName, timestamp, recurring, sound, callback) {        // **Modif Sigalou 2019.02.28
@@ -2436,7 +2445,7 @@ vide(serialOrName, sound,callback) {
     querySmarthomeDevices(applicanceIds, entityType, callback) {
         if (typeof entityType === 'function') {
             callback = entityType;
-            entityType = 'APPLIANCE'; // other value 'GROUP'
+            entityType = 'APPLIANCE'; // other value 'GROUP' ou 'CLOUD_DISCOVERED_DEVICE' mais semble etre corrigé dans la réponse
         }
 
         let reqArr = [];
@@ -2463,7 +2472,8 @@ vide(serialOrName, sound,callback) {
 		this.querySmarthomeDevices(applicanceIds, entityType,(err, res) => 
 		{
 		if (err || !res || !res.deviceStates || !Array.isArray(res.deviceStates)) return callback && callback();
-			callback && callback(res.deviceStates);
+			//callback && callback(res.deviceStates); on enlève deicestates pour avoir les erreurs
+			callback && callback(res);
 		});
 	}
 
