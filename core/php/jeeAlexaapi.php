@@ -203,7 +203,7 @@ $alexaapi2=eqLogic::byLogicalId($result['deviceSerialNumber'], 'alexaapi'); // E
 			
 			default:
 
-				if (!is_object($alexaapi)) {
+				if (!(isset($alexaapi) && is_object($alexaapi))) {
 				log::add('alexaapi_mqtt', 'debug',  'Device non trouvé: '.$logical_id);
 				die();
 				}

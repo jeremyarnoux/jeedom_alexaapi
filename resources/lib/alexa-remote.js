@@ -857,7 +857,7 @@ this.httpPost() ;
 var host=this.baseUrl;
 var pathQuery=null;
 var methodQuery=null;
-var timeout=10000;
+var timeout=flags.timeout || 9876;
 var flagsQuery= {};
 		
 if (path.startsWith('{')) // Pour détecter le requeteur
@@ -959,11 +959,13 @@ this._options.logger && this._options.logger(obj.headers);
 	    //this._options.logger && this._options.logger('{Remote} ║ data >>>>> ' + JSON.stringify(flags.data) );
 	
 	*/	
+	    this._options.logger && this._options.logger('{Remote} ║ >>>>> ' + JSON.stringify(options)+"<<<<" );
 		
+        this._options.logger && this._options.logger('DEBUG0 >>>>> ' + JSON.stringify(options)+"<<<<");
 		let req = https.request(options, (res) => {
         //console.log(res);
             let body  = '';
-        //this._options.logger && this._options.logger('DEBUG1');
+        this._options.logger && this._options.logger('DEBUG1 >>>>> ' + JSON.stringify(options)+"<<<<");
 		
 			
 //SIMULER UN BUG CONNEXION CLOSE!!!
@@ -996,7 +998,7 @@ this._options.logger && this._options.logger(obj.headers);
                 {
                     if (!body)
                     {
-						this._options.logger && this._options.logger('{Remote} ║ Response(3): '+resstatusMessage, "INFO");
+						this._options.logger && this._options.logger('{Remote}  ║ Response(3): '+resstatusMessage, "INFO");
                         
 						if (resstatusCode=="200") // C'est OK
                         return callback && callback(null, null);
@@ -1030,7 +1032,7 @@ this._options.logger && this._options.logger(obj.headers);
                     }
 					
 					if (JSON.stringify(ret)=='{"error":null}')
-						this._options.logger && this._options.logger('{Remote} ║ Response(2): OK');
+						this._options.logger && this._options.logger('{Remote} ║ Response(2): OK','DEBUG');
 						else
 						this._options.logger && this._options.logger('{Remote} ║ Response(1): ' + JSON.stringify(ret),'DEBUG');
                     return callback && callback (null, ret);
@@ -1617,7 +1619,7 @@ this.deleteNotification(notification, callback);
         }
         let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
-
+		
         this.httpsGet (`/api/tunein/queue-and-play
            ?deviceSerialNumber=${dev.serialNumber}
            &deviceType=${dev.deviceType}
@@ -1628,6 +1630,14 @@ this.deleteNotification(notification, callback);
             callback,
             { method: 'POST' });
     }
+
+ /*   getPlayerInfo(serialOrName, callback) {
+        let dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+
+        this.httpsGet (`/api/np/player?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
+    }
+*/
 
     getHistory(options, callback) {
         return this.getActivities(options, callback);
@@ -1827,8 +1837,8 @@ this.deleteNotification(notification, callback);
        return this.sendMessage(serialOrName, command, value, callback);
     }
     sendMessage(serialOrName, command, value, callback) {
- 		this._options.logger && this._options.logger('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Command : '+command);
- 		this._options.logger && this._options.logger('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> value : '+value);
+ 		//this._options.logger && this._options.logger('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Command : '+command);
+ 		//this._options.logger && this._options.logger('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> value : '+value);
        let dev = this.find(serialOrName);
         if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
 
@@ -1866,7 +1876,7 @@ this.deleteNotification(notification, callback);
         }
         //this._options.logger && this._options.logger('Alexa-REMOTTTTTTTTTTTTTTTE (alexa-remote.js): ' + `/api/np/command?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}`);
 		
-		this._options.logger && this._options.logger('>>>>>>>>'+JSON.stringify(commandObj));
+		//this._options.logger && this._options.logger('>>>>>>>>'+JSON.stringify(commandObj));
 
         this.httpsGet (`/api/np/command?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}`,
             callback,
