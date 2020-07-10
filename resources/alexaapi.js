@@ -229,7 +229,7 @@ CommandAlexa.Announcement = function(req,res){
 	
 	res.type('json');
 	
-	config.logger(' {API}    ╔═══════[Lancement /Announcement avec paramètres -> device:' + req.query.device+'/text:' + req.query.text +'/volume:' + req.query.volume +'/lastvolume:' + req.query.lastvolume, 'INFO');
+	config.logger(' {API}    ╔═══════[Lancement /Announcement avec paramètres -> device:' + req.query.device+'/text:' + req.query.text +'/volume:' + req.query.volume +'/lastvolume:' + req.query.lastvolume);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Announcement', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Announcement', 'Missing parameter "text"'));
@@ -280,27 +280,21 @@ CommandAlexa.Radio = function(req,res){
 	if ('device' in req.query === false)  return res.status(500).json(error(500, req.route.path, 'Alexa.Radio', 'Missing parameter "device"'));
 	if ('station' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Radio', 'Missing parameter "station"'));
 	
-	config.logger(' {API}    ╔═══════[Lancement /Radio avec paramètres -> device: ' + req.query.device+' & station: ' + req.query.station, 'INFO');
+	config.logger(' {API}    ╔═══════[Lancement /Radio avec paramètres -> device: ' + req.query.device+' & station: ' + req.query.station);
 
 	// Suppression de la boucle des serial, en effet, si on envoi sur un groupe, la radio fonctionne en multiroom
 	//boucleSurSerials_setTunein(req);
 
 			alexa.setTunein(req.query.device, req.query.station, 
 				function(testErreur){
-						config.logger(' ******** 1', 'INFO');
 						if (testErreur) 
-						{						
-					config.logger(' ******** 2', 'INFO');
-					traiteErreur(testErreur, 'radio', req.query);
+						{traiteErreur(testErreur, 'radio', req.query);
 						res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Radio', testErreur.message));
 						}
-						else {
-					config.logger(' ******** 3', 'INFO');
-					res.status(200).json({value: "OK"});	//ne teste pas le résultat
-						}
+						else
+						res.status(200).json({value: "OK"});	//ne teste pas le résultat
 					}
 			);
-					config.logger(' ******** 4', 'INFO');
 
 };
 
@@ -348,7 +342,7 @@ CommandAlexa.playList = function(req,res){
 	
 	res.type('json');
 
-	config.logger(' {API}    ╔═══════[Lancement /playList avec paramètres -> device: ' + req.query.device+' & playlist: ' + req.query.playlist, 'INFO');
+	config.logger(' {API}    ╔═══════[Lancement /playList avec paramètres -> device: ' + req.query.device+' & playlist: ' + req.query.playlist);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.playList', 'Missing parameter "device"'));
 	if ('playlist' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.playList', 'Missing parameter "playlist"'));
@@ -374,7 +368,7 @@ CommandAlexa.playMusicTrack = function(req,res){
 	
 	res.type('json');
 
-	config.logger(' {API}    ╔═══════[Lancement /playMusicTrack avec paramètres -> device: ' + req.query.device+' & trackId: ' + req.query.trackId, 'INFO');
+	config.logger(' {API}    ╔═══════[Lancement /playMusicTrack avec paramètres -> device: ' + req.query.device+' & trackId: ' + req.query.trackId);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.playMusicTrack', 'Missing parameter "device"'));
 	if ('trackId' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.playMusicTrack', 'Missing parameter "trackId"'));
@@ -401,14 +395,14 @@ CommandAlexa.playMusicTrack = function(req,res){
 CommandAlexa.Command = function(req,res){
 	res.type('json');
 
-	config.logger(' {API}    ╔═══════[Lancement /Command avec paramètres -> device: ' + req.query.device+' & command: ' + req.query.command, 'INFO');
+	config.logger(' {API}    ╔═══════[Lancement /Command avec paramètres -> device: ' + req.query.device+' & command: ' + req.query.command);
 
 	if ('device' in req.query === false)  return res.status(500).json(error(500, req.route.path, 'Alexa.Command', 'Missing parameter "device"'));
 	if ('command' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Command', 'Missing parameter "command"'));
 	
 	// suppression de la boucle des serial
 	//boucleSurSerials_sendCommand(req);
-	//config.logger('{API}:    *******************************************');
+	config.logger('{API}:    *******************************************');
 
 			alexa.sendCommand(req.query.device, req.query.command, req.query.value,
 				function(testErreur){
@@ -446,7 +440,7 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 	
 		res.type('json');
 
-	config.logger(' {API}    ╔═══════[Lancement /SmarthomeCommand avec paramètres -> device: ' + req.query.device+' & command: ' + req.query.command, 'INFO');
+	config.logger(' {API}    ╔═══════[Lancement /SmarthomeCommand avec paramètres -> device: ' + req.query.device+' & command: ' + req.query.command);
 
 	if ('device' in req.query === false)  return res.status(500).json(error(500, req.route.path, 'Alexa.SmarthomeCommand', 'Missing parameter "device"'));
 	if ('command' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.SmarthomeCommand', 'Missing parameter "command"'));
@@ -668,7 +662,6 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 
 // Les boucles qui lancent les commandes sur chaques device d'un multiroom
 // PAS UTILISÉ
-/*
 function boucleSurSerials_setTunein (req, callback) {
 		forEachDevices(req.query.device, (serial) => {
 			alexa.setTunein(serial, req.query.station, 
@@ -677,7 +670,7 @@ function boucleSurSerials_setTunein (req, callback) {
 				}
 			);
 		});
-}*/
+}
 
 function boucleSurSerials_sendMultiSequenceCommand (req, actions, callback) {
 		
@@ -759,7 +752,7 @@ CommandAlexa.Push = function(req,res){
 	
 	res.type('json');
 	
-	config.logger(' {API}    ╔═══════[Lancement /Push avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text, 'INFO');
+	config.logger(' {API}    ╔═══════[Lancement /Push avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Push', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Push', 'Missing parameter "text"'));
@@ -1294,7 +1287,7 @@ config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+
 	res.type('json');
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
-	//config.logger('{API}: device: ' + req.query.device, 'DEBUG');
+	config.logger('{API}: device: ' + req.query.device, 'DEBUG');
 
 	Appel_getPlayerInfo(req.query.device, function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
@@ -2683,10 +2676,10 @@ function httpPost(nom, jsonaenvoyer) {
 //config.logger && config.logger('httpPost httpPost httpPost httpPost httpPost httpPost httpPost httpPost httpPost httpPost httpPost '+nom);
 var url=IPJeedom+"/plugins/alexaapi/core/php/jeeAlexaapi.php?apikey="+ClePlugin+"&nom="+nom;
 	
-//config.logger && config.logger('URL envoyée: '+url, "DEBUG");
+config.logger && config.logger('URL envoyée: '+url, "DEBUG");
  
 jsonaenvoyer=JSON.stringify(jsonaenvoyer);
-//config.logger && config.logger('DATA envoyé:'+jsonaenvoyer,'DEBUG');
+config.logger && config.logger('DATA envoyé:'+jsonaenvoyer,'DEBUG');
 
 	request.post(url, {
 

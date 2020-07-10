@@ -5,10 +5,6 @@
 /* jslint esversion: 6 */
 "use strict";
 
-
-
-
-
 const modifyResponse = require('http-proxy-response-rewrite');
 const express = require('express');
 const proxy = require('http-proxy-middleware');
