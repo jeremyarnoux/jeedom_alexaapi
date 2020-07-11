@@ -378,6 +378,7 @@ function addCmdToTable(_cmd)
 	  
 	tr +=   '</td>'
      +   '<td>'
+     +     '<input class="tooltips cmdAttr form-control input-sm expertModeVisible" data-l1key="configuration" data-l2key="listValue" placeholder="{{Liste de valeur|texte séparé par ;}}" title="{{Liste}}" style="margin-top : 5px;">'
      +     '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> '
      +   '</td>'
      + '<td>';
