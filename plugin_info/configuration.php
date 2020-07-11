@@ -41,7 +41,7 @@ pre#pre_eventlog {
 }
 </style>
 	<legend><i class="icon divers-triangular42"></i> {{Génération manuelle du cookie Amazon}}</legend>
-	<center>
+	<center><div class="alert-warning bg-success"><b>Attention, Message du 11/07/2020</b> - Amazon est en train de changer de protocole d'identification. La génération du cookies fonctionne de manière très aléatoire. Vous pouvez tenter de générer celui-ci, mais en cas de message d'erreur, ne vous inquiétez pas et recommencez quelques temps après. Certains arrivent à s'identifier et pas d'autres. Nous travaillons à corriger cela. Infos sur le <a href="https://community.jeedom.com/t/probleme-creation-cookies-probleme-amazon/32287/">Forum Jeedom</a></div><br>
 		<a class="btn btn-success btn-sm bt_startDeamonCookie"> {{Identifiez-vous sur Amazon pour créer le cookie d'identification}} </a>
 		<a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fa fa-clock"></i> {{... Attendez la génération du Cookie Amazon ...}} </a>
 		<a class="btn btn-default btn-sm bt_identificationCookie2bis"><i class="fa fa-clock"></i> {{... Attendez la génération du Cookie Amazon ...}} </a>
