@@ -174,10 +174,15 @@ public static function templateWidget(){
 		$return = array();
 		$return['log'] = 'alexaapi_node';
 		$return['state'] = 'nok'; 
+		$return['stateCookies'] = 'non lancé';
 		
 		// Regarder si alexaapi.js est lancé
 		$pid = trim(shell_exec('ps ax | grep "resources/alexaapi.js" | grep -v "grep" | wc -l'));
 		if ($pid != '' && $pid != '0') $return['state'] = 'ok';
+		
+		// Regarder si alexaapi.js est lancé
+		$pid = trim(shell_exec('ps ax | grep "resources/initCookie.js" | grep -v "grep" | wc -l'));
+		if ($pid != '' && $pid != '0') $return['stateCookies'] = 'lancé';
 		
 		// Regarder si le cookie existe :alexa-cookie.json
 		$request = realpath(dirname(__FILE__) . '/../../resources/data/alexa-cookie.json');
