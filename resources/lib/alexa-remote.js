@@ -12,6 +12,7 @@ const extend = require('extend');
 const AlexaWsMqtt = require('./alexa-wsmqtt.js');
 const { v1: uuidv1 } = require('uuid');
 const EventEmitter = require('events');
+const request = require('request');
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
@@ -401,7 +402,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
                         'dopplerConnectionState': 'OFFLINE' / 'ONLINE'
                     }
                     */
-                    this.emit('ws-device-connection-change', {
+                    this.httpPost('ws-device-connection-change', {
                         destinationUserId: payload.destinationUserId,
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
                         deviceType: payload.dopplerId.deviceType,
@@ -421,7 +422,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
                         'bluetoothEventSuccess': false/true
                     }
                     */
-                    this.emit('ws-bluetooth-state-change', {
+                    this.httpPost('ws-bluetooth-state-change', {
                         destinationUserId: payload.destinationUserId,
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
                         deviceType: payload.dopplerId.deviceType,
@@ -444,7 +445,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
                         'errorMessage': null
                     }
                     */
-                    this.emit('ws-audio-player-state-change', {
+                    this.httpPost('ws-audio-player-state-change', {
                         destinationUserId: payload.destinationUserId,
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
                         deviceType: payload.dopplerId.deviceType,
@@ -468,7 +469,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
                         }
                     }
                     */
-                    this.emit('ws-media-queue-change', {
+                    this.httpPost('ws-media-queue-change', {
                         destinationUserId: payload.destinationUserId,
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
                         deviceType: payload.dopplerId.deviceType,
@@ -489,7 +490,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
                         }
                     }
                     */
-                    this.emit('ws-media-change', {
+                    this.httpPost('ws-media-change', {
                         destinationUserId: payload.destinationUserId,
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
                         deviceType: payload.dopplerId.deviceType,
@@ -511,7 +512,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
                         "mediaReferenceId": "c4a72dbe-ef6b-42b7-8104-0766aa32386f:1"
                     }
                     */
-                    this.emit('ws-media-progress-change', {
+                    this.httpPost('ws-media-progress-change', {
                         destinationUserId: payload.destinationUserId,
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
                         deviceType: payload.dopplerId.deviceType,
@@ -532,7 +533,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
                         'volumeSetting': 50
                     }
                     */
-                    this.emit('ws-volume-change', {
+                    this.httpPost('ws-volume-change', {
                         destinationUserId: payload.destinationUserId,
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
                         deviceType: payload.dopplerId.deviceType,
@@ -552,7 +553,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
                         'deviceComponent': 'com.amazon.dee.device.capability.audioplayer.AudioPlayer'
                     }
                     */
-                    this.emit('ws-content-focus-change', {
+                    this.httpPost('ws-content-focus-change', {
                         destinationUserId: payload.destinationUserId,
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
                         deviceType: payload.dopplerId.deviceType,
@@ -572,7 +573,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
                         'midrange': 0
                     }
                     */
-                    this.emit('ws-equilizer-state-change', {
+                    this.httpPost('ws-equilizer-state-change', {
                         destinationUserId: payload.destinationUserId,
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
                         deviceType: payload.dopplerId.deviceType,
@@ -594,7 +595,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
                         'notificationVersion': 2
                     }
                     */
-                    this.emit('ws-notification-change', {
+                    this.httpPost('ws-notification-change', {
                         destinationUserId: payload.destinationUserId,
                         deviceSerialNumber: payload.dopplerId.deviceSerialNumber,
                         deviceType: payload.dopplerId.deviceType,
@@ -660,7 +661,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
 						listItemId:'c6852978-bb79-44dc-b7e5-8f5e577432cf'
 					}
 					*/
-					this.emit('ws-todo-change', {
+					this.httpPost('ws-todo-change', {
 						destinationUserId: payload.destinationUserId,
 						eventType: payload.eventName, // itemCreated, itemUpdated (including checked ToDo), itemDeleted
 						listId: payload.listId,
@@ -680,6 +681,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
 
         this.alexaWsMqtt.connect();
     }
+
 
     getPushedActivities() {
         if (this.activityUpdateRunning || !this.activityUpdateQueue.length) return;
