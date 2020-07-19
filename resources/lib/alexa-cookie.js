@@ -10,6 +10,7 @@
  * http://blog.loetzimmer.de/2017/10/amazon-alexa-hort-auf-die-shell-echo.html AND on
  * https://github.com/thorsten-gehrig/alexa-remote-control
  * and much enhanced ...
+ * Version la plus récente sur : https://github.com/Apollon77/alexa-cookie
  */
 
 const https = require('https');
@@ -21,9 +22,8 @@ const amazonProxy = require('./proxy.js');
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
-
-//const defaultAmazonPage = 'amazon.fr';
 const defaultAmazonPage = amazonserver;
+
 const defaultUserAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0';
 const defaultUserAgentLinux = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
 //const defaultUserAgentMacOs = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
@@ -44,7 +44,6 @@ function AlexaCookie() {
     let _options;
 
     let Cookie = '';
-
     const addCookies = (Cookie, headers) => {
         if (!headers || !headers['set-cookie']) return Cookie;
         const cookies = cookieTools.parse(Cookie || '');
@@ -152,6 +151,19 @@ function AlexaCookie() {
 
         _options.baseAmazonPage = _options.baseAmazonPage || 'amazon.com';
         _options.logger && _options.logger('Alexa-Cookie: Use as Base-Amazon-URL: ' + _options.baseAmazonPage);
+
+        if (!_options.baseAmazonPageHandle) {
+            const amazonDomain = _options.baseAmazonPage.substr(_options.baseAmazonPage.lastIndexOf('.') + 1);
+            if (amazonDomain !== 'com') {
+                _options.baseAmazonPageHandle = '_' + amazonDomain;
+            }
+            else {
+                _options.baseAmazonPageHandle = '';
+            }
+        }
+        else {
+            _options.baseAmazonPageHandle = '';
+        }
 
         if (!_options.userAgent) {
             let platform = os.platform();
@@ -365,6 +377,9 @@ function AlexaCookie() {
             });
         } else {
             amazonProxy.initAmazonProxy(_options, prepareResult, (server) => {
+                if (!server) {
+                    callback && callback(new Error('Proxy Server could not be initialized. Check Logs.'), null);
+                }
                 proxyServer = server;
                 if (!_options.proxyPort || _options.proxyPort === 0) {
                     _options.proxyPort = proxyServer.address().port;

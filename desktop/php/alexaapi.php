@@ -17,7 +17,6 @@ foreach ($eqLogics as $eqLogic)
   $logicalIdToHumanReadable[$eqLogic->getLogicalId()] = $eqLogic->getHumanName(true, false);
 }
 ?>
-
 <script>
 var logicalIdToHumanReadable = <?php echo json_encode($logicalIdToHumanReadable); ?>
 
@@ -140,8 +139,20 @@ foreach($eqLogics as $eqLogic) {
 		$opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
 		echo '<div class="eqLogicDisplayCard cursor prem '.$opacity.'" data-eqLogic_id="'.$eqLogic->getId().'" >';
 
-		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")) && (!strstr($eqLogic->getName(), "Ultimate Alexa")))
-			echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
+$datetimecreation = new DateTime($eqLogic->getConfiguration('createtime'));
+$datetimeaujourdhui = new DateTime(date('Y-m-d'));
+$interval = $datetimecreation->diff($datetimeaujourdhui);
+				
+				
+		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")) && (!strstr($eqLogic->getName(), "Ultimate Alexa"))) {
+			//echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
+		echo '<span class="badge badge-danger">Off</span>';
+		} else {
+			if ($interval->format('%a') <1) {
+				echo '<span class="badge badge-success">Nouveau</span>';
+				
+			}
+		}
 
 		$alternateImg = $eqLogic->getConfiguration('type');
 		if (file_exists(dirname(__FILE__).'/../../core/config/devices/'.$alternateImg.'.png'))
@@ -188,7 +199,9 @@ foreach($eqLogics as $eqLogic) {
 			} else 
 				if ($pluginAlexaUnparUn['pluginId']!='alexasmarthome') $compteNombrePlayeurs++;
 			
-			echo '> <a href="';
+			echo '>';
+if ($pluginAlexaUnparUn['nb'] != "0") echo '<span class="badge">'.$pluginAlexaUnparUn['nb'].'</span>';
+			echo '<a href="';
 			
 			if ($pluginAlexaUnparUn['install'] == true) 
 				echo 'index.php?v=d&m='.$pluginAlexaUnparUn['pluginId'].'&p='.$pluginAlexaUnparUn['pluginId'];
@@ -203,8 +216,7 @@ foreach($eqLogics as $eqLogic) {
 			</div>
 		</div>
     </div>
-		  
-    
+
 
 <?php
 		if ($compteNombrePlayeurs>1) {
@@ -443,10 +455,6 @@ foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value)
 	}
 ?>		
       </div>
-
-
-
-
 
 
     </div>

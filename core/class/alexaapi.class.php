@@ -20,23 +20,24 @@ class alexaapi extends eqLogic {
 		$liste = array();
 		if ($withAPI) array_push($liste, array("pluginId" => "alexaapi", "nom" => "Alexa-API", "actif" => true));
 		if ($withSmartHome) {
-		  try {$test = plugin::byId('alexasmarthome'); array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914'));      } 
+		  try {$test = plugin::byId('alexasmarthome'); array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914', config::byKey('numsmartHome','alexaapi')));      } 
 		  catch(Exception $e) {if ($all) {             array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914'));      }}}
-		try {$test = plugin::byId('alexaamazonmusic'); array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910')); } 
+		try {$test = plugin::byId('alexaamazonmusic'); array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910', config::byKey('numAudioPlayer','alexaapi'))); } 
 		catch(Exception $e) {if ($all) {               array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910')); }}
-		try {$test = plugin::byId('alexadeezer');      array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911'));            } 
+		try {$test = plugin::byId('alexadeezer');      array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911', config::byKey('numAudioPlayer','alexaapi')));            } 
 		catch(Exception $e) {if ($all) {               array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911'));            }}
-		try {$test = plugin::byId('alexaspotify');     array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913'));          } 
+		try {$test = plugin::byId('alexaspotify');     array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913', config::byKey('numAudioPlayer','alexaapi')));          } 
 		catch(Exception $e) {if ($all) {               array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913'));          }}
 		return $liste;
 	}
 	
-    public static function listePluginsAlexaArray_controle($pluginId="", $plugin="inconnu", $idMarket="3910"){
+    public static function listePluginsAlexaArray_controle($pluginId="", $plugin="inconnu", $idMarket="3910", $nb="0"){
 		$valeurs = array();
 		try {
 				$valeurs = array(
 				"pluginId" => $pluginId,
 				"idMarket" => $idMarket,
+				"nb" => $nb,
 				"nom" => $plugin,
 				"install" => true,
 				"actif" => plugin::byId($pluginId)->isActive()
@@ -45,6 +46,7 @@ class alexaapi extends eqLogic {
 				$valeurs = array(
 				"pluginId" => $pluginId,
 				"idMarket" => $idMarket,
+				"nb" => $nb,
 				"nom" => $plugin,
 				"install" => false,
 				"actif" => false
@@ -174,10 +176,15 @@ public static function templateWidget(){
 		$return = array();
 		$return['log'] = 'alexaapi_node';
 		$return['state'] = 'nok'; 
+		$return['stateCookies'] = 'non lancé';
 		
 		// Regarder si alexaapi.js est lancé
 		$pid = trim(shell_exec('ps ax | grep "resources/alexaapi.js" | grep -v "grep" | wc -l'));
 		if ($pid != '' && $pid != '0') $return['state'] = 'ok';
+		
+		// Regarder si alexaapi.js est lancé
+		$pid = trim(shell_exec('ps ax | grep "resources/initCookie.js" | grep -v "grep" | wc -l'));
+		if ($pid != '' && $pid != '0') $return['stateCookies'] = 'lancé';
 		
 		// Regarder si le cookie existe :alexa-cookie.json
 		$request = realpath(dirname(__FILE__) . '/../../resources/data/alexa-cookie.json');
@@ -382,7 +389,7 @@ public static function templateWidget(){
 		{
 			log::add('alexaapi', 'debug', 'Résultat du checkAuth NOK ('.$value.') ==> Relance Serveur');
 			self::restartServeurPHP();
-			message::add('alexaapi', '(Beta Alexa-api) Authentification Amazon revalidée, tout va bien');
+			//message::add('alexaapi', '(Beta Alexa-api) Authentification Amazon revalidée, tout va bien');
 		}
 	}
 
@@ -425,6 +432,7 @@ public static function templateWidget(){
 		$json = json_decode($json, true);
 		$numDevices = 0;
 		$numNewDevices = 0;
+		$numAudioPlayer = 0;
 		foreach ($json as $item) {
 			// Skip the special device named "This Device"
 			if ($item['name'] == 'This Device') continue;
@@ -437,6 +445,7 @@ public static function templateWidget(){
 			{
 				//log::add('alexaapi_scan', 'debug', '*** Détection pour le plugin '.$pluginAlexaUnparUn);
 				if  (in_array("AUDIO_PLAYER",$item['capabilities'])) {
+					$numAudioPlayer++;
 					if  ($pluginAlexaUnparUn=='alexaamazonmusic') {
 						// Device PLAYLIST -----------------------------------------------------------------------------------------------------------------
 						$device = $pluginAlexaUnparUn::byLogicalId($item['serial']."_playlist", $pluginAlexaUnparUn);
@@ -514,12 +523,13 @@ public static function templateWidget(){
 			$numDevices++;
 		}
 		
-		if (in_array("alexasmarthome", self::listePluginsAlexa(false, true))) {	
 			// --- Mise à jour des SmartHome Devices
 			$familleDisable = array(); //Famille qui sont exclues
 			//array_push($familleDisable, "GROUP");
 			$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeEntities");
 			$json = json_decode($json, true);
+			$numsmartHome=count($json);
+		if (in_array("alexasmarthome", self::listePluginsAlexa(false, true))) {	
 			foreach ($json as $item) {
 				if (!in_array($item['providerData']['categoryType'], $familleDisable)) {	
 					// Retireve the device (if already registered in Jeedom)
@@ -560,6 +570,10 @@ public static function templateWidget(){
 		
 		
 		log::add('alexaapi_scan', 'debug', '*************************** Fin       du Scan Alexa-API ***********************************');
+		config::save("numsmartHome",$numsmartHome,"alexaapi");
+		config::save("numAudioPlayer",$numAudioPlayer,"alexaapi");
+		config::save("numDevices",$numDevices,"alexaapi");
+		log::add('alexaapi_scan', 'debug', $numAudioPlayer.' Players / '.$numsmartHome.' smartHome/ '.$numDevices.' numDevices  -> enregistré dans Config');
 
 	event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
 	}

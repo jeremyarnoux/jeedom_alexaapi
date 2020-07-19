@@ -5,11 +5,23 @@
 /* jslint esversion: 6 */
 "use strict";
 
+/**
+ * partly based on Amazon Alexa Remote Control (PLAIN shell)
+ * http://blog.loetzimmer.de/2017/10/amazon-alexa-hort-auf-die-shell-echo.html AND on
+ * https://github.com/thorsten-gehrig/alexa-remote-control
+ * and much enhanced ...
+ * Version la plus récente sur : https://github.com/Apollon77/alexa-cookie/tree/master/lib
+ */
+
 const modifyResponse = require('http-proxy-response-rewrite');
 const express = require('express');
 const proxy = require('http-proxy-middleware');
 const querystring = require('querystring');
 const cookieTools = require('cookie');
+const fs = require('fs');
+const path = require('path');
+
+const FORMERDATA_STORE_VERSION = 2;
 
 function addCookies(Cookie, headers) {
     if (!headers || !headers['set-cookie']) return Cookie;
@@ -51,6 +63,24 @@ function customStringify(v, func, intent) {
 
 function initAmazonProxy(_options, callbackCookie, callbackListening) {
     const initialCookies = {};
+
+    if (!_options.formerRegistrationData) {
+        try {
+            if (fs.existsSync(path.join(__dirname, 'formerDataStore.json'))) {
+                const formerDataStore = JSON.parse(fs.readFileSync(path.join(__dirname, 'formerDataStore.json'), 'utf8'));
+                if (typeof formerDataStore === 'object' && formerDataStore.storeVersion === FORMERDATA_STORE_VERSION) {
+                    _options.formerRegistrationData = _options.formerRegistrationData || {};
+                    _options.formerRegistrationData.frc = _options.formerRegistrationData.frc || formerDataStore.frc;
+                    _options.formerRegistrationData['map-md'] = _options.formerRegistrationData['map-md'] || formerDataStore['map-md'];
+                    _options.formerRegistrationData.deviceId = _options.formerRegistrationData.deviceId || formerDataStore.deviceId;
+                    _options.logger && _options.logger('Proxy Init: loaded temp data store ass fallback former data');
+                }
+            }
+        } catch (_err) {
+            // ignore
+        }
+    }
+
     if (!_options.formerRegistrationData || !_options.formerRegistrationData.frc) {
         // frc contains 313 random bytes, encoded as base64
         const frcBuffer = Buffer.alloc(313);
@@ -74,14 +104,27 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
 
     let deviceId = '';
     if (!_options.formerRegistrationData || !_options.formerRegistrationData.deviceId) {
-        for (let i = 0; i < 64; i++) {
+        for (let i = 0; i < 3; i++) {
             deviceId += Math.floor(Math.random() * 9).toString();
         }
-        deviceId += '23413249564c5635564d32573831';
+        deviceId += '34c4643374c3541464b';
     }
     else {
         _options.logger && _options.logger('Proxy Init: reuse deviceId from former data');
         deviceId = _options.formerRegistrationData.deviceId;
+    }
+
+    try {
+        const formerDataStore = {
+            'storeVersion': FORMERDATA_STORE_VERSION,
+            'deviceId': deviceId,
+            'map-md': initialCookies['map-md'],
+            'frc': initialCookies.frc
+        };
+        fs.writeFileSync(path.join(__dirname, 'formerDataStore.json'), JSON.stringify(formerDataStore), 'utf8');
+    }
+    catch (_err) {
+        // ignore
     }
 
     let proxyCookies = "";
@@ -100,8 +143,9 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         onProxyRes: onProxyRes,
         onProxyReq: onProxyReq,
         headers: {
-            'user-agent': "AmazonWebView/Amazon Alexa/2.2.223830.0/iOS/11.4.1/iPhone",
-            'accept-language': _options.acceptLanguage
+            'user-agent': "Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 PitanguiBridge/2.2.345247.0-[HARDWARE=iPhone10_4][SOFTWARE=13.5.1]",
+            'accept-language': _options.acceptLanguage,
+            'authority': `www.${_options.baseAmazonPage}`
         },
         cookieDomainRewrite: { // enhanced below
             "*": ""
@@ -120,6 +164,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             error: _options.logger.error || _options.logger
         };
     };
+    let returnedInitUrl;
 
     function router(req) {
         const url = (req.originalUrl || req.url);
@@ -137,9 +182,9 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
                 }
             }
             if (url === '/') { // initial redirect
-                const initialUrl =  `https://www.${_options.baseAmazonPage}/ap/signin?openid.return_to=https%3A%2F%2Fwww.${_options.baseAmazonPage}%2Fap%2Fmaplanding&openid.assoc_handle=amzn_dp_project_dee_ios&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&pageId=amzn_dp_project_dee_ios&accountStatusPolicy=P1&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns.oa2=http%3A%2F%2Fwww.${_options.baseAmazonPage}%2Fap%2Fext%2Foauth%2F2&openid.oa2.client_id=device%3A${deviceId}&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.oa2.response_type=token&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.pape.max_auth_age=0&openid.oa2.scope=device_auth_access&language=${_options.amazonPageProxyLanguage}`;
-                _options.logger && _options.logger('Alexa-Cookie: Initial Page Request: ' + initialUrl);
-                return initialUrl;
+                returnedInitUrl =  `https://www.${_options.baseAmazonPage}/ap/signin?openid.return_to=https%3A%2F%2Fwww.${_options.baseAmazonPage}%2Fap%2Fmaplanding&openid.assoc_handle=amzn_dp_project_dee_ios${_options.baseAmazonPageHandle}&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&pageId=amzn_dp_project_dee_ios${_options.baseAmazonPageHandle}&accountStatusPolicy=P1&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns.oa2=http%3A%2F%2Fwww.${_options.baseAmazonPage}%2Fap%2Fext%2Foauth%2F2&openid.oa2.client_id=device%3A${deviceId}&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.oa2.response_type=token&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.pape.max_auth_age=0&openid.oa2.scope=device_auth_access&language=${_options.amazonPageProxyLanguage}`;
+                _options.logger && _options.logger('Alexa-Cookie: Initial Page Request: ' + returnedInitUrl);
+                return returnedInitUrl;
             }
             else {
                 return `https://www.${_options.baseAmazonPage}`;
@@ -158,8 +203,8 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
 
     function replaceHosts(data) {
         //const dataOrig = data;
-        const amazonRegex = new RegExp(`https?://www.${_options.baseAmazonPage}/`.replace(/\./g, "\\."), 'g');
-        const alexaRegex = new RegExp(`https?://alexa.${_options.baseAmazonPage}/`.replace(/\./g, "\\."), 'g');
+        const amazonRegex = new RegExp(`https?://www.${_options.baseAmazonPage}:?[0-9]*/`.replace(/\./g, "\\."), 'g');
+        const alexaRegex = new RegExp(`https?://alexa.${_options.baseAmazonPage}:?[0-9]*/`.replace(/\./g, "\\."), 'g');
         data = data.replace(/&#x2F;/g, '/');
         data = data.replace(amazonRegex, `http://${_options.proxyOwnIp}:${_options.proxyPort}/www.${_options.baseAmazonPage}/`);
         data = data.replace(alexaRegex, `http://${_options.proxyOwnIp}:${_options.proxyPort}/alexa.${_options.baseAmazonPage}/`);
@@ -172,6 +217,9 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         const alexaRegex = new RegExp(`http://${_options.proxyOwnIp}:${_options.proxyPort}/alexa.${_options.baseAmazonPage}/`.replace(/\./g, "\\."), 'g');
         data = data.replace(amazonRegex, `https://www.${_options.baseAmazonPage}/`);
         data = data.replace(alexaRegex, `https://alexa.${_options.baseAmazonPage}/`);
+        if (data === `http://${_options.proxyOwnIp}:${_options.proxyPort}/`) {
+            data = returnedInitUrl;
+        }
         return data;
     }
 
@@ -210,12 +258,13 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         let modified = false;
         if (req.method === 'POST') {
             if (typeof proxyReq.getHeader === 'function' && proxyReq.getHeader('referer')) {
-                proxyReq.setHeader('referer', replaceHostsBack(proxyReq.getHeader('referer')));
-                _options.logger && _options.logger('Alexa-Cookie: Modify headers: Changed Referer');
+                let fixedReferer = replaceHostsBack(proxyReq.getHeader('referer'));
+                proxyReq.setHeader('referer', fixedReferer);
+                _options.logger && _options.logger('Alexa-Cookie: Modify headers: Changed Referer: ' + fixedReferer);
                 modified = true;
             }
             if (typeof proxyReq.getHeader === 'function' && proxyReq.getHeader('origin') !== 'https://' + proxyReq.getHeader('host')) {
-                proxyReq.removeHeader('origin');
+                proxyReq.setHeader('origin', `https://www.${_options.baseAmazonPage}`);
                 _options.logger && _options.logger('Alexa-Cookie: Modify headers: Delete Origin');
                 modified = true;
             }
@@ -252,7 +301,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         if (
             (proxyRes.socket && proxyRes.socket._host === `www.${_options.baseAmazonPage}` && proxyRes.socket.parser.outgoing && proxyRes.socket.parser.outgoing.method === 'GET' && proxyRes.socket.parser.outgoing.path.startsWith('/ap/maplanding')) ||
             (proxyRes.socket && proxyRes.socket.parser.outgoing && proxyRes.socket.parser.outgoing.getHeader('location') && proxyRes.socket.parser.outgoing.getHeader('location').includes('/ap/maplanding?')) ||
-            (proxyRes.headers.location && proxyRes.headers.location.includes('/ap/maplanding?'))
+            (proxyRes.headers.location && (proxyRes.headers.location.includes('/ap/maplanding?') || proxyRes.headers.location.includes('/spa/index.html')))
         ) {
             _options.logger && _options.logger('Alexa-Cookie: Proxy detected SUCCESS!!');
 
@@ -286,9 +335,8 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             _options.logger && _options.logger('Redirect: Final Location ----> ' + proxyRes.headers.location);
             return;
         }
-        if (!proxyRes || !proxyRes.headers || !proxyRes.headers['content-encoding']) return;
 
-        modifyResponse(res, proxyRes.headers['content-encoding'], function(body) {
+        modifyResponse(res, (proxyRes && proxyRes.headers ? proxyRes.headers['content-encoding'] || '' : ''), function(body) {
             if (body) {
                 const bodyOrig = body;
                 body = replaceHosts(body);
@@ -311,7 +359,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
 
     app.use(myProxy);
     app.get('/cookie-success', function(req, res) {
-        res.send('<b>Amazon Alexa Cookie successfully retrieved. You can close the browser.</b>');
+        res.send('<center><img src="http://jeedom.sigalou-domotique.fr/wp-content/uploads/2020/07/poucegauche.png" width="400" height="490"><br><br><b>Bravo !!! Le Cookie Amazon Alexa a été généré.</b><br>Vous pouvez fermer cette fenêtre.</b><br><br><img src="http://jeedom.sigalou-domotique.fr/wp-content/uploads/2020/07/sigaloupetit.png" width="50" height="76">');
     });
     let server = app.listen(_options.proxyPort, _options.proxyListenBind, function() {
         _options.logger && _options.logger('Alexa-Cookie: Proxy-Server listening on port ' + server.address().port);

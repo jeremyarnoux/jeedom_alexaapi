@@ -27,6 +27,13 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 include_file('core', 'authentification', 'php');
 include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 
+// Ajouté pour le serveur Cookies 11/07/2020
+$plugin = plugin::byId('alexaapi');
+$deamon_info = $plugin->deamon_info();
+
+
+
+
         //log::add('alexaapi', 'debug', 'Test de config::byKey dans config: ' . config::byKey('amazonserver','alexaapi'));
 
 // code trouvé dans core\ajax\plugin.ajax.php
@@ -41,7 +48,8 @@ pre#pre_eventlog {
 }
 </style>
 	<legend><i class="icon divers-triangular42"></i> {{Génération manuelle du cookie Amazon}}</legend>
-	<center><div class="alert-warning bg-success"><b>Attention, Message du 11/07/2020</b> - Amazon est en train de changer de protocole d'identification. La génération du cookies fonctionne de manière très aléatoire. Vous pouvez tenter de générer celui-ci, mais en cas de message d'erreur, ne vous inquiétez pas et recommencez quelques temps après. Certains arrivent à s'identifier et pas d'autres. Nous travaillons à corriger cela. Infos sur le <a href="https://community.jeedom.com/t/probleme-creation-cookies-probleme-amazon/32287/">Forum Jeedom</a></div><br>
+	<center>
+
 		<a class="btn btn-success btn-sm bt_startDeamonCookie"> {{Identifiez-vous sur Amazon pour créer le cookie d'identification}} </a>
 		<a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fa fa-clock"></i> {{... Attendez la génération du Cookie Amazon ...}} </a>
 		<a class="btn btn-default btn-sm bt_identificationCookie2bis"><i class="fa fa-clock"></i> {{... Attendez la génération du Cookie Amazon ...}} </a>
@@ -49,8 +57,10 @@ pre#pre_eventlog {
 		<a class="btn btn-success btn-sm bt_identificationCookie3"><i class="fa fa-check"></i> {{Bravo : Cookie d'identification Amazon chargé !}} </a>
 		<a class="btn btn-primary btn-sm bt_identificationCookie"><i class="fa fa-spinner fa-spin"></i> {{Ouverture de la fenetre d'identification Amazon Alexa en cours ...}} </a>
 		<a class="btn btn-default btn-sm bt_identificationCookie1"><i class="fa fa-spinner fa-spin"></i> {{Cliquez ici quand vous avez terminé l'identification}} </a>
+		<br><br>
 	</center>
-	<br />
+		<?php //echo '<p align="right"><span class="label label-info">{{Debug Proxy 3457 : }}'. $deamon_info['stateCookies'] .'</span></p>';
+		?>	<br />
 	<legend><i class="fa fa-wrench"></i> {{Réparations}}</legend>
 	<center>
 		<a class="btn btn-danger btn-sm" id="bt_reinstallNodeJS"><i class="fa fa-recycle"></i> {{Réparation de NodeJS}} </a>
@@ -178,7 +188,41 @@ pre#pre_eventlog {
 </fieldset>
 </form>
           
-		  
+
+<form class="form-horizontal">
+    <fieldset>
+    <legend><i class="fas fa-info-circle"></i> {{Informations diverses}}</legend>
+	
+       <div class="form-group">
+        <label class="col-sm-4 control-label">{{Nombre d'équipements détectés}}</label>
+    <div class="col-lg-1">
+        <input class="configKey form-control" data-l1key="numDevices" />
+    </div>
+   </div>
+
+   <div class="form-group">
+    <label class="col-lg-4 control-label">{{Nombre de players Audio}}</label>
+    <div class="col-lg-1">
+        <input class="configKey form-control" data-l1key="numAudioPlayer" />
+    </div>
+</div>   
+
+<div class="form-group">
+    <label class="col-lg-4 control-label">{{Nombre d'équipements smartHome}}</label>
+    <div class="col-lg-1">
+        <input class="configKey form-control" data-l1key="numsmartHome" />
+    </div>
+</div>
+</fieldset>
+</form>
+
+
+
+
+
+
+
+  
 <script>
 $("#bt_saveUpdateRoutines").on('click', function (event) {
 //console.log("coucou");

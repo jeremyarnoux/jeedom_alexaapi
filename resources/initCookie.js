@@ -7,14 +7,18 @@ var fs = require('fs');
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
 
-  
+console.log('Alexa-Config - Lancement de '+ __filename );
+
 alexa.init({
   proxyOnly: true,
   proxyOwnIp: process.argv[2],
   proxyPort: 3457,
   proxyLogLevel: 'info',
   logger: console.log,
-  alexaServiceHost: alexaserver
+  //alexaServiceHost: 'layla.amazon.de', // optional, e.g. "pitangui.amazon.com" for amazon.com, default is "layla.amazon.de"
+  alexaServiceHost: alexaserver,
+          useWsMqtt: true, // optional, true to use the Websocket/MQTT direct push connection
+        cookieRefreshInterval: 7*24*60*1000 // optional, cookie refresh intervall, set to 0 to disable refresh
 },
 function (err)
 {
