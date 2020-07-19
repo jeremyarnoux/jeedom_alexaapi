@@ -142,8 +142,6 @@ foreach($eqLogics as $eqLogic) {
 $datetimecreation = new DateTime($eqLogic->getConfiguration('createtime'));
 $datetimeaujourdhui = new DateTime(date('Y-m-d'));
 $interval = $datetimecreation->diff($datetimeaujourdhui);
-
-
 				
 				
 		if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")) && (!strstr($eqLogic->getName(), "Ultimate Alexa"))) {
