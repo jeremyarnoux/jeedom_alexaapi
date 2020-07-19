@@ -5,6 +5,14 @@
 /* jslint esversion: 6 */
 'use strict';
 
+/**
+ * partly based on Amazon Alexa Remote Control (PLAIN shell)
+ * http://blog.loetzimmer.de/2017/10/amazon-alexa-hort-auf-die-shell-echo.html AND on
+ * https://github.com/thorsten-gehrig/alexa-remote-control
+ * and much enhanced ...
+ * Version la plus récente sur : https://github.com/Apollon77/alexa-remote
+ */
+
 const https = require('https');
 const querystring = require('querystring');
 const os = require('os');
@@ -762,7 +770,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
         }
         // bypass check because set or last check done before less then 10 mins
         if (noCheck || (new Date().getTime() - this.lastAuthCheck) < 600000) {
-            this._options.logger && this._options.logger('Alexa-Remote: No authentication check needed (time elapsed ' + (new Date().getTime() - this.lastAuthCheck) + ')');
+            //this._options.logger && this._options.logger('Alexa-Remote: No authentication check needed (time elapsed ' + (new Date().getTime() - this.lastAuthCheck) + ')');
             return this.httpsGetCall(path, callback, flags);
         }
         this.checkAuthentication((authenticated, err) => {

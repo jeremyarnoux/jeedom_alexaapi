@@ -10,6 +10,7 @@
  * http://blog.loetzimmer.de/2017/10/amazon-alexa-hort-auf-die-shell-echo.html AND on
  * https://github.com/thorsten-gehrig/alexa-remote-control
  * and much enhanced ...
+ * Version la plus récente sur : https://github.com/Apollon77/alexa-cookie
  */
 
 const https = require('https');

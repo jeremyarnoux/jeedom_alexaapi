@@ -188,7 +188,41 @@ pre#pre_eventlog {
 </fieldset>
 </form>
           
-		  
+
+<form class="form-horizontal">
+    <fieldset>
+    <legend><i class="fas fa-info-circle"></i> {{Informations diverses}}</legend>
+	
+       <div class="form-group">
+        <label class="col-sm-4 control-label">{{Nombre d'équipements détectés}}</label>
+    <div class="col-lg-1">
+        <input class="configKey form-control" data-l1key="numDevices" />
+    </div>
+   </div>
+
+   <div class="form-group">
+    <label class="col-lg-4 control-label">{{Nombre de players Audio}}</label>
+    <div class="col-lg-1">
+        <input class="configKey form-control" data-l1key="numAudioPlayer" />
+    </div>
+</div>   
+
+<div class="form-group">
+    <label class="col-lg-4 control-label">{{Nombre d'équipements smartHome}}</label>
+    <div class="col-lg-1">
+        <input class="configKey form-control" data-l1key="numsmartHome" />
+    </div>
+</div>
+</fieldset>
+</form>
+
+
+
+
+
+
+
+  
 <script>
 $("#bt_saveUpdateRoutines").on('click', function (event) {
 //console.log("coucou");
