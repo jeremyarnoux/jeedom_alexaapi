@@ -710,7 +710,7 @@ console.log('Alexa-Remote - Lancement de '+ __filename );
                         const activity = res.splice(found, 1)[0];
                         this._options.logger && this._options.logger('Alexa-Remote: Activity found ' + found + ' for Activity ID ' + entry.key.entryId);
                         activity.destinationUserId = entry.destinationUserId;
-                        this.emit('ws-device-activity', activity);
+                        this.httpPost('ws-device-activity', activity);
                     }
                 });
 
