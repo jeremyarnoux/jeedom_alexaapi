@@ -913,6 +913,7 @@ public static function templateWidget(){
 			self::updateCmd ($F, 'radio', 'action', 'select', false, 'Ecouter une radio', true, false, null, null, 'alexaapi::list', 'radio?station=#select#', null, 's2960|Nostalgie;s6617|RTL;s6566|Europe1', 25, $cas1);	
 			self::updateCmd ($F, 'playMusicTrack', 'action', 'select', false, 'Ecouter une piste musicale', true, false, null, null, 'alexaapi::list', 'playmusictrack?trackId=#select#', null, '53bfa26d-f24c-4b13-97a8-8c3debdf06f0|Piste1;7b12ee4f-5a69-4390-ad07-00618f32f110|Piste2', 26, $cas1);
 			self::updateCmd ($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fa fa-volume-up', null,'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas6);
+			self::updateCmd ($F, 'volume', 'action', 'slider', false, 'Volume', false, true, 'fa fa-volume-up', null,'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas9);
 			self::updateCmd ($F, '0', 'action', 'other', false, '0', true, true, null, null,null, 'volume?value=0', null, null, 1, $cas9);
 			self::updateCmd ($F, 'volume20', 'action', 'other', false, '20', true, true, null, null,null, 'volume?value=20', null, null, 2, $cas9);
 			self::updateCmd ($F, 'volume40', 'action', 'other', false, '40', true, true, null, null,null, 'volume?value=40', null, null, 3, $cas9);
