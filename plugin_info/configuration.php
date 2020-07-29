@@ -335,7 +335,7 @@ if(nouvellefenetre)
   // On appuie sur Le lancement du serveur... on lance "deamonCookieStart" via action=deamonCookieStart dans alexaapi.ajax.php
   $('.bt_startDeamonCookie').off('click').on('click',function()
   {
-	var textToDisplay='{{<b>Cette interface n\'est disponible que en local, pas à distance !!</b>}}';
+	var textToDisplay='{{<b>NB : Cette fonctionnalité n\'est disponible que en local, pas à distance !!</b>}}';
 	if(window.location.hostname != "<?php echo network::getNetworkAccess('internal','ip'); ?>") {
 		textToDisplay+='{{<font color="red"><br /><br /><b>!! ATTENTION !!</b><br />Vous n\'accédez pas à votre Jeedom via son ip interne (voir config Jeedom>Réseau)<br />Utilisant un autre port (3457), il est donc possible que cette fonctionnalité ne fonctionne pas... <br />Si c\'est le cas, réessayez à partir de votre réseau interne sur l\'ip interne de Jeedom<br /><br />Ou cliquez sur OK pour essayer quand même...</font>}}';
 	}
