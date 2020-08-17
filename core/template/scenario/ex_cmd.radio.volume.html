@@ -1,26 +1,40 @@
 <div class="input-group input-group-sm" style="width: 100%; padding-top: 1px">
-	<span class="input-group-addon" id="basic-addon1" style="width: 100px">Station</span>
-	<textarea class="message expressionAttr form-control ta_autosize" data-l1key="options" data-l2key="station" rows="1" style="resize:vertical;" data-cmd_id="#id#" data-uid="#uid#">#station#</textarea>
+  <span class="input-group-addon" id="basic-addon1" style="width: 100px">Station</span>
+  <textarea class="message expressionAttr form-control ta_autosize" data-l1key="options" data-l2key="station" rows="1"
+    style="resize:vertical;" data-cmd_id="#id#" data-uid="#uid#">#station#</textarea>
   <span class="input-group-btn">
-		<button class="btn btn-default listEquipementInfo" type="button" title="{{SÃ©lectionner la commande}}" data-cmd_id="#id#"  data-uid="#uid#"><i class="fa fa-list-alt"></i></button>
-	</span>
+    <button class="btn btn-default listEquipementInfo" type="button" title="{{SÃ©lectionner la commande}}"
+      data-cmd_id="#id#" data-uid="#uid#"><i class="fas fa-list-alt"></i></button>
+  </span>
 </div>
 
 <div class="input-group input-group-sm" style="width: 50%">
-	<span class="input-group-addon" id="basic-addon1" style="width: 100px">Volume 0-100</span>
-	<input class="slider expressionAttr form-control input-sm" data-l1key="options" data-l2key="volume" value="#volume#" data-cmd_id="#id#" data-uid="#uid#"/>
+  <span class="input-group-addon" id="basic-addon1" style="width: 100px">Volume 0-100</span>
+  <input class="slider expressionAttr form-control input-sm" data-l1key="options" data-l2key="volume" value="#volume#"
+    data-cmd_id="#id#" data-uid="#uid#" />
 </div>
 
 <script>
-$('.listEquipementInfo[data-uid=#uid#]').on('click', function() {
-  if('#message_cmd_subtype#' != ''){
-    jeedom.cmd.getSelectModal({cmd: {type: '#message_cmd_type#',subType : '#message_cmd_subtype#'}}, function(result) {
-      $('.expressionAttr[data-l1key=options][data-l2key=station][data-uid=#uid#]').atCaret('insert', result.human);
-    });
-  }else{
-    jeedom.cmd.getSelectModal({cmd: {type: '#message_cmd_type#'}}, function(result) {
-      $('.expressionAttr[data-l1key=options][data-l2key=station][data-uid=#uid#]').atCaret('insert', result.human);
-    });
-  }
-});
+  $('.listEquipementInfo[data-uid=#uid#]').on('click', function () {
+    if ('#message_cmd_subtype#' != '') {
+      jeedom.cmd.getSelectModal({
+        cmd: {
+          type: '#message_cmd_type#',
+          subType: '#message_cmd_subtype#'
+        }
+      }, function (result) {
+        $('.expressionAttr[data-l1key=options][data-l2key=station][data-uid=#uid#]').atCaret('insert', result
+          .human);
+      });
+    } else {
+      jeedom.cmd.getSelectModal({
+        cmd: {
+          type: '#message_cmd_type#'
+        }
+      }, function (result) {
+        $('.expressionAttr[data-l1key=options][data-l2key=station][data-uid=#uid#]').atCaret('insert', result
+          .human);
+      });
+    }
+  });
 </script>
