@@ -43,7 +43,7 @@ $masters = watchdog_master::all();
 		<a class="btn btn-danger watchdogMasterAction pull-right" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}</a>
 
 		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation" class="active"><a href="#watchdogMasterConfigtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fa fa-tachometer"></i> {{Configuration}}</a></li>
+			<li role="presentation" class="active"><a href="#watchdogMasterConfigtab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Configuration}}</a></li>
 			<li role="presentation"><a href="#watchdogMasterAffecttab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-list-alt"></i> {{Affectation}}</a></li>
 		</ul>
 

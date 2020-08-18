@@ -984,7 +984,7 @@ public static function templateWidget(){
 			self::updateCmd($F, 'subText1', 'info', 'string', false, null, true, false, null, null, 'alexaapi::title', null, null, null, 4, $cas1);
 			self::updateCmd($F, 'url', 'info', 'string', false, null, true, false, null, null, 'alexaapi::image', null, null, null, 5, $cas1);
 			self::updateCmd($F, 'title', 'info', 'string', false, null, true, false, null, null, 'alexaapi::title', null, null, null, 9, $cas1);
-			self::updateCmd($F, 'previous', 'action', 'other', false, 'Previous', true, true, 'fa fa-step-backward', null, null, 'command?command=previous', null, null, 16, $cas1);
+			self::updateCmd($F, 'previous', 'action', 'other', false, 'Previous', true, true, 'fas fa-step-backward', null, null, 'command?command=previous', null, null, 16, $cas1);
 			self::updateCmd($F, 'pause', 'action', 'other', false, 'Pause', true, true, 'fas fa-pause', null, null, 'command?command=pause', null, null, 17, $cas1);
 			self::updateCmd($F, 'play', 'action', 'other', false, 'Play', true, true, 'fas fa-play', null, null, 'command?command=play', null, null, 18, $cas1);
 			self::updateCmd($F, 'next', 'action', 'other', false, 'Next', true, true, 'fas fa-step-forward', null, null, 'command?command=next', null, null, 19, $cas1);
@@ -1011,7 +1011,7 @@ public static function templateWidget(){
 			self::updateCmd($F, 'whennexttimerinfo', 'info', 'string', false, 'Prochain Minuteur', true, false, null, null, 'alexaapi::timer', null, null, null, 32, $cas3);
 			self::updateCmd($F, 'whennextreminderlabelinfo', 'info', 'string', false, 'Reminder Label', true, false, 'loisir-musical7', null, 'alexaapi::alarmmusicalmusic', null, null, null, 35, $cas2);
 			self::updateCmd($F, 'alarm', 'action', 'select', false, 'Lancer une alarme', true, false, null, null, 'alexaapi::list', 'alarm?when=#when#&recurring=#recurring#&sound=#sound#', null, 'system_alerts_melodic_01|Alarme simple;system_alerts_melodic_01|Timer simple;system_alerts_melodic_02|A la dérive;system_alerts_atonal_02|Métallique;system_alerts_melodic_05|Clarté;system_alerts_repetitive_04|Comptoir;system_alerts_melodic_03|Focus;system_alerts_melodic_06|Lueur;system_alerts_repetitive_01|Table de chevet;system_alerts_melodic_07|Vif;system_alerts_soothing_05|Orque;system_alerts_atonal_03|Lumière du porche;system_alerts_rhythmic_02|Pulsar;system_alerts_musical_02|Pluvieux;system_alerts_alarming_03|Ondes carrées', 36, $cas3);
-			//self::updateCmd ($F, 'rwd', 'action', 'other', false, 'Rwd', true, true, 'fa fa-fast-backard', null, null, 'command?command=rwd', null, null, 80, $cas1);
+			//self::updateCmd ($F, 'rwd', 'action', 'other', false, 'Rwd', true, true, 'fas fa-fast-backard', null, null, 'command?command=rwd', null, null, 80, $cas1);
 
 			//self::updateCmd ($F, 'fwd', 'action', 'other', false, 'Fwd', true, true, 'fas fa-step-forward', null, null, 'command?command=fwd', null, null, 20, $cas1);
 			//self::updateCmd ($F, 'repeat', 'action', 'other', false, 'Repeat', true, true, 'fas fa-refresh', null, null, 'command?command=repeat', null, null, 25, $cas1);
