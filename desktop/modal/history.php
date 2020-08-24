@@ -17,13 +17,12 @@
 
 if (!isConnect('admin')) {
 	throw new Exception('401 Unauthorized');
-	
 }
 
 
 
 ?>
-<div class="input-group " style="float:right"><a class="btn btn-default pull-right refreshAction" data-action="refresh"><i class="fa fa-refresh"></i>  {{Rafraichir}}</a>
+<div class="input-group " style="float:right"><a class="btn btn-default pull-right refreshAction" data-action="refresh"><i class="fas fa-refresh"></i> {{Rafraichir}}</a>
 </div>
 
 <?php
@@ -56,9 +55,9 @@ else
 	$size=$_GET['size'];
 $json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/history?size=".$size);
 */
-$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/history?size=50");
+$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/history?size=50");
 //file_put_contents($data_path, $json);
-$json = json_decode($json,true);
+$json = json_decode($json, true);
 //echo "****"."http://" . config::byKey('internalAddr') . ":3456/history?size=".$size."****";
 ?>
 
@@ -73,68 +72,66 @@ $json = json_decode($json,true);
 		</tr>
 	</thead>
 	<tbody>
-	 <?php
-	
-	$TouslesDevices = array(); 
-	//$TouslesDevices["coucou"] = "sonnom";
- $compteur=1;
-foreach($json as $item)
-{
+		<?php
+
+		$TouslesDevices = array();
+		//$TouslesDevices["coucou"] = "sonnom";
+		$compteur = 1;
+		foreach ($json as $item) {
 
 
-		$couleur="success";
-//Petit tableau pour garder les valeurs de devices			
-if (array_key_exists($item['deviceSerialNumber'], $TouslesDevices)) 
-$ledevice = $TouslesDevices[$item['deviceSerialNumber']];	
-else
-{
-    $device = alexaapi::byLogicalId($item['deviceSerialNumber'], 'alexaapi');
-	if (is_object($device)) {
-		$ledevice=$device->getName();
-		$TouslesDevices[$item['deviceSerialNumber']] = $ledevice;
-	} else {
-		continue;
-	}
-}	
-//***************************************************
-$compteur=""; //pour vérifier les lignes
+			$couleur = "success";
+			//Petit tableau pour garder les valeurs de devices			
+			if (array_key_exists($item['deviceSerialNumber'], $TouslesDevices))
+				$ledevice = $TouslesDevices[$item['deviceSerialNumber']];
+			else {
+				$device = alexaapi::byLogicalId($item['deviceSerialNumber'], 'alexaapi');
+				if (is_object($device)) {
+					$ledevice = $device->getName();
+					$TouslesDevices[$item['deviceSerialNumber']] = $ledevice;
+				} else {
+					continue;
+				}
+			}
+			//***************************************************
+			$compteur = ""; //pour vérifier les lignes
 
-			$heures=date("d-m-Y H:i:s",intval($item['creationTimestamp']/1000));
-			
-			echo '<tr><td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' .$heures.'</span></td>';			
-          if ($ledevice!="")
-	echo '<td>'.$compteur.'<span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">'.$ledevice.'</span></td>';
+			$heures = date("d-m-Y H:i:s", intval($item['creationTimestamp'] / 1000));
+
+			echo '<tr><td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $heures . '</span></td>';
+			if ($ledevice != "")
+				echo '<td>' . $compteur . '<span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $ledevice . '</span></td>';
 			else
-	echo '<td>'.$compteur.'<span class="label label-danger" style="font-size : 1em; cursor : default;">?????</span></td>';
+				echo '<td>' . $compteur . '<span class="label label-danger" style="font-size : 1em; cursor : default;">?????</span></td>';
 
-$compteur++;
-	echo '<td><span style="font-size : 1em; cursor : default;">' . str_replace("jacques dit", "(via Jeedom)", $item['summary']) . '</span></td>';
-			
-
+			$compteur++;
+			echo '<td><span style="font-size : 1em; cursor : default;">' . str_replace("jacques dit", "(via Jeedom)", $item['summary']) . '</span></td>';
 
 
-	echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $item['activityStatus'] . '</span></td>';
-	
 
-	echo '</tr>';
-	
-}
-?>
+
+			echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $item['activityStatus'] . '</span></td>';
+
+
+			echo '</tr>';
+		}
+		?>
 	</tbody>
 </table>
 
-    
+
 <script>
+	$('.refreshAction[data-action=refresh]').off('click').on('click', function() {
+		//var selectElmt = document.getElementById("Liste15a5000");
+		//var selectedSize = selectElmt.options[selectElmt.selectedIndex].value;	
 
-$('.refreshAction[data-action=refresh]').off('click').on('click',function(){
-	//var selectElmt = document.getElementById("Liste15a5000");
-	//var selectedSize = selectElmt.options[selectElmt.selectedIndex].value;	
-
-	$('#md_modal').dialog('close');
-	$('#md_modal').dialog({title: "{{Historique}}"});
-//	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=history&id=alexaapi&size='+selectedSize).dialog('open');
-	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=history&id=alexaapi').dialog('open');
-});
+		$('#md_modal').dialog('close');
+		$('#md_modal').dialog({
+			title: "{{Historique}}"
+		});
+		//	$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=history&id=alexaapi&size='+selectedSize).dialog('open');
+		$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=history&id=alexaapi').dialog('open');
+	});
 </script>
 
-<?php include_file('desktop', 'alexaapi', 'js', 'alexaapi');?>
+<?php include_file('desktop', 'alexaapi', 'js', 'alexaapi'); ?>
