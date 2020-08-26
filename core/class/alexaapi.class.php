@@ -883,7 +883,7 @@ public static function templateWidget(){
 		}
 	}
 
-	public static function updateCmd($forceUpdate, $LogicalId, $Type, $SubType, $RunWhenRefresh, $Name, $IsVisible, $title_disable, $setDisplayicon, $infoNameArray, $setTemplate_lien, $request, $infoName, $listValue, $Order, $Test)
+	public  function updateCmd($forceUpdate, $LogicalId, $Type, $SubType, $RunWhenRefresh, $Name, $IsVisible, $title_disable, $setDisplayicon, $infoNameArray, $setTemplate_lien, $request, $infoName, $listValue, $Order, $Test)
 	{
 		if ($Test) {
 			log::add('alexaapi', 'info', 'ajout commande FORCAGE ' . $LogicalId);
