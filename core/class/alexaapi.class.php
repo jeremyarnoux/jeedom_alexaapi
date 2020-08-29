@@ -410,8 +410,8 @@ public static function templateWidget(){
 			}
 		}
 
-		//$d = new Cron\CronExpression('*/15 * * * *', new Cron\FieldFactory);
-		$d = new Cron\CronExpression('* * * * *', new Cron\FieldFactory);
+		$d = new Cron\CronExpression('*/15 * * * *', new Cron\FieldFactory);
+		//$d = new Cron\CronExpression('* * * * *', new Cron\FieldFactory);
 		$deamon_info = self::deamon_info();
 		if ($d->isDue() && $deamon_info['state'] == 'ok') {
 			//log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON-'.$autorefresh.'-----------------------');
@@ -425,7 +425,6 @@ public static function templateWidget(){
 				if (is_object($eq)) {
 					log::add('alexaapi', 'debug', 'mise à jour Online status of ' . $item['name'] . ' to ' . (($item['online']) ? 'true' : 'false'));
 					$eq->setStatus('online', (($item['online']) ? true : false)); //status online
-					//$eq->getEqLogic()->checkAndUpdateCmd($LogicalIdCmd, $resultjson[0][$LogicalIdCmd]);
 					$eq->checkAndUpdateCmd('onLine', (($item['online']) ? true : false)); // commande info onLine
 
 				}
