@@ -410,7 +410,8 @@ public static function templateWidget(){
 			}
 		}
 
-		$d = new Cron\CronExpression('*/15 * * * *', new Cron\FieldFactory);
+		//$d = new Cron\CronExpression('*/15 * * * *', new Cron\FieldFactory);
+		$d = new Cron\CronExpression('* * * * *', new Cron\FieldFactory);
 		$deamon_info = self::deamon_info();
 		if ($d->isDue() && $deamon_info['state'] == 'ok') {
 			//log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON-'.$autorefresh.'-----------------------');
@@ -422,8 +423,11 @@ public static function templateWidget(){
 
 				$eq = eqLogic::byLogicalId($item['serial'], 'alexaapi');
 				if (is_object($eq)) {
-					log::add('alexaapi', 'debug', 'updating online status of ' . $item['name'] . ' to ' . (($item['online']) ? 'true' : 'false'));
-					$eq->setStatus('online', (($item['online']) ? true : false));
+					log::add('alexaapi', 'debug', 'mise à jour Online status of ' . $item['name'] . ' to ' . (($item['online']) ? 'true' : 'false'));
+					$eq->setStatus('online', (($item['online']) ? true : false)); //status online
+					//$eq->getEqLogic()->checkAndUpdateCmd($LogicalIdCmd, $resultjson[0][$LogicalIdCmd]);
+					$eq->checkAndUpdateCmd('onLine', (($item['online']) ? true : false)); // commande info onLine
+
 				}
 			}
 		}
@@ -1045,6 +1049,7 @@ public static function templateWidget(){
 			}
 			self::updateCmd($F, 'reminder', 'action', 'message', false, 'Envoyer un rappel', true, false, null, null, 'alexaapi::message', 'reminder?text=#message#&when=#when#&recurring=#recurring#', null, null, 79, $cas3);
 
+			self::updateCmd($F, 'onLine', 'info', 'binary', false, "En ligne", false, true, null, null, null, null, null, null, 99, true); //ajouté aout 2020
 
 
 			$volinfo = $this->getCmd(null, 'volumeinfo');
