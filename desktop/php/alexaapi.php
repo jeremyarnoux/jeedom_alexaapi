@@ -283,7 +283,7 @@ foreach ($eqLogics as $eqLogic) {
                   <div class="form-group">
                     <label class="col-sm-4 control-label">{{Nom de l'équipement Jeedom}}</label>
                     <div class="col-sm-8">
-                      <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement Amazon}}" />
+                      <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement}}" />
                     </div>
                   </div>
 

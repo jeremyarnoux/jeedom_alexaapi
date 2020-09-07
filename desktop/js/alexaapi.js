@@ -291,13 +291,13 @@ function addCmdToTable(_cmd) {
     return;
   }
 
-  console.log("addCmdToTable : " + init(_cmd.logicalId));
+  //console.log("addCmdToTable : " + init(_cmd.logicalId));
 
   if (init(_cmd.type) == 'info') {
     var tr =
       '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">' +
       '<td>' +
-      '<span class="cmdAttr" data-l1key="id"></span>' +
+      '<small><small><span class="cmdAttr" data-l1key="id"></span></small></small>' +
       '</td>' +
       '<td>' +
       '<div class="row">' +
@@ -350,7 +350,7 @@ function addCmdToTable(_cmd) {
     var tr =
       '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">' +
       '<td>' +
-      '<span class="cmdAttr" data-l1key="id"></span>' +
+      '<small><small><span class="cmdAttr" data-l1key="id"></span></small></small>' +
       '</td>' +
       '<td>' +
       '<div class="row">' +
