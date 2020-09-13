@@ -197,6 +197,8 @@ $alexaapi2=eqLogic::byLogicalId($result['deviceSerialNumber'], 'alexaapi'); // E
 			case 'ws-audio-player-state-change': // elle a visiblement disparue cette balise des logs mqtt
 				metAJour("Audio Player State", $result['audioPlayerState'], 'audioPlayerState', true , "PLAYER", $result['deviceSerialNumber']);
 			case 'refreshPlayer':
+				//log::add('alexaapi_widget', 'debug', '*********************************rrrrefreshPlayer avec '.$result['playerInfo']['miniArt']['url']."//".json_encode($result).'********************');
+
 				metAJourPlayer($result['deviceSerialNumber'], $result['audioPlayerState']);
 				metAJourPlayList($result['deviceSerialNumber'], $result['audioPlayerState'], 'refreshPlayer');
 			break;
@@ -310,7 +312,7 @@ function metAJourStatusPlayer($_Status, $_deviceSerialNumber) {
 }
 
 function metAJourPlayer($serialdevice, $audioPlayerState) {
-//log::add('alexaapi_mqtt', 'info',  " ***********************[metAJourPlayer]*********************************".$serialdevice );
+log::add('alexaapi_widget', 'info',  " ***********************[metAJourPlayer]*********************************".$serialdevice );
 
 	try {
 		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/playerInfo?device=".$serialdevice);
@@ -338,11 +340,14 @@ log::add('alexaapi_widget', 'debug',  '** Mise à jour Tuile du Player **');
 }
 
 function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='personne') {
-		log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist par '.$_quiMetaJour.'********************');
+		//log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist par '.$_quiMetaJour.'********************');
+		//log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist AVEC '.$result.'********************');
 	try {
-		if (($audioPlayerState!="FINISHED") && (isset($result['playerInfo']['miniArt']['url']))) 	{		
+//		if (($audioPlayerState!="FINISHED") && (isset($result['playerInfo']['miniArt']['url']))) 	{	//modif Sigalou 24/08/2020 ? Pourquoi 2eme partie du test ?	
+		if (($audioPlayerState!="FINISHED") ) 	{		
 		//Pour avoir la piste en cours, on va aller chercher la valeur de playerinfo/mainArt/url pour pouvoir la comparer aux images de la playlist
 		//sleep(2);
+		//log::add('alexaapi_widget', 'debug', '*********************************1metAJourPlaylist par '.$_quiMetaJour.'********************');
 		$json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/playerinfo?device=".$serialdevice);
 		$result = json_decode($json,true);		
 		$imageURLenCoursdeLecture=$result['playerInfo']['miniArt']['url']; //Modif 09/12/2019 proposée par Aidom, annulée 10/12/2019
@@ -359,12 +364,15 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='perso
 		//log::add('alexaapi_widget', 'debug', '-----------------result:'.json_encode($result));
 		}
 		else {
+		//log::add('alexaapi_widget', 'debug', '*********************************1BISmetAJourPlaylist par '.$_quiMetaJour.'********************');
 		}
 		
 		if (isset($result)) {
+			//log::add('alexaapi_widget', 'debug', '*********************************2metAJourPlaylist par '.$_quiMetaJour.'********************');
 
 			//ON RECUPERE CE QUIE ST AU D2BUT DE MEDIA
 			if (isset($result['contentId']))
+
 			metAJour("contentId", $result['contentId'], 'contentId', true , "PLAYER", $serialdevice);
 
 				$html="<table style='border-collapse: separate; border-spacing : 10px; ' border='0' width='100%'>";
@@ -406,6 +414,8 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='perso
 		} else
 		{
 			$html="<br>";
+			//log::add('alexaapi_widget', 'debug', '*********************************2BISmetAJourPlaylist par '.$_quiMetaJour.'********************');
+
 		}
 		metAJour("playlisthtml", $html, 'playlisthtml', true , "PLAYLIST", $serialdevice);
 		foreach (alexaapi::listePluginsAlexa() as $pluginAlexaUnparUn)
@@ -416,7 +426,10 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour='perso
 	} 
 	catch (Exception $e) {log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur1: '.$e);} 
 	catch (Error $e) {log::add('alexaapi_widget', 'info',  ' ['.$nom.':'.$commandejeedom.'] erreur26: '.$e);}	
-	
+			
+		//log::add('alexaapi_widget', 'debug', '*********************************FINmetAJourPlaylist par '.$_quiMetaJour.'********************');
+		//log::add('alexaapi_widget', 'debug', '*********************************FINmetAJourPlaylist par '.$_quiMetaJour.'********************');
+
 }	
 
 /*
