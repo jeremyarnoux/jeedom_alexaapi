@@ -38,7 +38,7 @@ class AlexaRemote extends EventEmitter {
 
     constructor() {
         super();
-console.log('Alexa-Remote - Lancement de '+ __filename );
+//console.log('Alexa-Remote - Lancement de '+ __filename );
 
         this.serialNumbers = {};
         this.names = {};

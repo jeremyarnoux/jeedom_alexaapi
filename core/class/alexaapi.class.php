@@ -889,16 +889,19 @@ public static function templateWidget(){
 	public  function updateCmd($forceUpdate, $LogicalId, $Type, $SubType, $RunWhenRefresh, $Name, $IsVisible, $title_disable, $setDisplayicon, $infoNameArray, $setTemplate_lien, $request, $infoName, $listValue, $Order, $Test)
 	{
 		if ($Test) {
-			log::add('alexaapi', 'info', 'ajout commande FORCAGE ' . $LogicalId);
+			//log::add('alexaapi', 'info', 'ajout commande FORCAGE de ' . $LogicalId);
 			try {
-				if (empty($Name)) $Name = $LogicalId;
 				$cmd = $this->getCmd(null, $LogicalId);
+
+
 				if ((!is_object($cmd)) || $forceUpdate) {
+					//log::add('alexaapi', 'info', 'ajout commande FORCAGE forceUpdate :' . $forceUpdate);
 					if (!is_object($cmd)) $cmd = new alexaapiCmd();
 					$cmd->setType($Type);
 					$cmd->setLogicalId($LogicalId);
 					$cmd->setSubType($SubType);
 					$cmd->setEqLogic_id($this->getId());
+					if (empty($Name)) $Name = $LogicalId; // déplacé le 19/09/2020
 					$cmd->setName($Name);
 					$cmd->setIsVisible((($IsVisible) ? 1 : 0));
 					if (!empty($setTemplate_lien)) {
@@ -927,8 +930,9 @@ public static function templateWidget(){
 						$cmd->setConfiguration('maxValue', '100');
 						$cmd->setDisplay('forceReturnLineBefore', true);
 					}
+				$cmd->save(); // déplacé le 19/09/2020
+					//log::add('alexaapi', 'info', 'Enregistre Logical ID :' . $cmd->getLogicalId());
 				}
-				$cmd->save();
 			} catch (Exception $exc) {
 				log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . ' : ' . $exc->getMessage());
 			}
@@ -947,7 +951,7 @@ public static function templateWidget(){
 
 	public function postSave()
 	{
-		//log::add('alexaapi', 'debug', '**********************postSave '.$this->getName().'***********************************');
+		//log::add('alexaapi', 'debug', '-------------------------------postSave '.$this->getName().'***********************************');
 		$F = $this->getStatus('forceUpdate'); // forceUpdate permet de recharger les commandes à valeur d'origine, mais sans supprimer/recréer les commandes
 		$capa = $this->getConfiguration('capabilities', '');
 		$type = $this->getConfiguration('type', '');
@@ -972,6 +976,10 @@ public static function templateWidget(){
 			$cas8 = (($this->hasCapaorFamilyorType("turnOff")) && $widgetSmarthome);
 			$cas9 = ($this->hasCapaorFamilyorType("WHA") && $widgetEcho);
 			$false = false;
+
+			// Volume on traite en premier car c'est fonction de WHA
+			if ($cas6) self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fas fa-volume-up', null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas6);
+			else	   self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', false, true, 'fas fa-volume-up', null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas9);
 
 			//Anciennes functions a supprimer si elles existent encore
 			self::updateCmd($F, 'musicalalarmmusicentity', 'action', 'other', true, 'musicalalarmmusicentity', false, false, null, null, null, 'musicalalarmmusicentity?position=1', 'Musical Alarm Music', null, 1, $false);
@@ -998,8 +1006,7 @@ public static function templateWidget(){
 			self::updateCmd($F, 'playList', 'action', 'select', false, 'Ecouter une playlist', true, false, null, null, 'alexaapi::list', 'playlist?playlist=#select#', null, 'Lancer Refresh|Lancer Refresh', 24, $cas1);
 			self::updateCmd($F, 'radio', 'action', 'select', false, 'Ecouter une radio', true, false, null, null, 'alexaapi::list', 'radio?station=#select#', null, 's2960|Nostalgie;s6617|RTL;s6566|Europe1', 25, $cas1);
 			self::updateCmd($F, 'playMusicTrack', 'action', 'select', false, 'Ecouter une piste musicale', true, false, null, null, 'alexaapi::list', 'playmusictrack?trackId=#select#', null, '53bfa26d-f24c-4b13-97a8-8c3debdf06f0|Piste1;7b12ee4f-5a69-4390-ad07-00618f32f110|Piste2', 26, $cas1);
-			self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fas fa-volume-up', null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas6);
-			self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', false, true, 'fas fa-volume-up', null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas9);
+
 			self::updateCmd($F, '0', 'action', 'other', false, '0', true, true, null, null, null, 'volume?value=0', null, null, 1, $cas9);
 			self::updateCmd($F, 'volume20', 'action', 'other', false, '20', true, true, null, null, null, 'volume?value=20', null, null, 2, $cas9);
 			self::updateCmd($F, 'volume40', 'action', 'other', false, '40', true, true, null, null, null, 'volume?value=40', null, null, 3, $cas9);
@@ -1104,6 +1111,7 @@ public static function templateWidget(){
 
 
 		$this->setStatus('forceUpdate', false); //dans tous les cas, on repasse forceUpdate à false
+
 	}
 
 	public static function dependancy_install($verbose = "false")
@@ -1121,6 +1129,7 @@ public static function templateWidget(){
 
 	public function preUpdate()
 	{
+				//log::add('alexaapi', 'debug', '-------------------------------preUpdate '.$this->getName().'***********************************');
 	}
 
 	public function preRemove()
@@ -1130,10 +1139,13 @@ public static function templateWidget(){
 			$eq = eqLogic::byLogicalId($device_playlist, 'alexaapi');
 			if (is_object($eq)) $eq->remove();
 		}
+				//log::add('alexaapi', 'debug', '-------------------------------preRemove '.$this->getName().'***********************************');
 	}
 
 	public function preSave()
 	{
+				//log::add('alexaapi', 'debug', '-------------------------------preSave '.$this->getName().'***********************************');
+
 	}
 
 	// https://github.com/NextDom/NextDom/wiki/Ajout-d%27un-template-a-votre-plugin	
@@ -1192,6 +1204,8 @@ class alexaapiCmd extends cmd
 
 	public function postSave()
 	{
+		//log::add('alexaapi', 'debug', '**********************postSave '.$this->getName().'***********************************'.$this->getLogicalId());
+
 	}
 
 
@@ -1199,6 +1213,9 @@ class alexaapiCmd extends cmd
 
 	public function preSave()
 	{
+		//log::add('alexaapi', 'debug', '**********************preSave '.$this->getName().'***********************************'.$this->getLogicalId());
+
+		
 		if ($this->getLogicalId() == 'refresh') {
 			return;
 		}

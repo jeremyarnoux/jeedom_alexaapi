@@ -18,7 +18,6 @@
 
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 					
-					
 
 if (!jeedom::apiAccess(init('apikey'), 'alexaapi')) {
 	echo __('Vous n\'êtes pas autorisé à effectuer cette action', __FILE__);
