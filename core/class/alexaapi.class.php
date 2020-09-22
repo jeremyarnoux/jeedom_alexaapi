@@ -433,7 +433,7 @@ public static function templateWidget(){
 
 		$c = new Cron\CronExpression('*/6 * * * *', new Cron\FieldFactory);
 		if ($c->isDue() && $deamon_info['state'] == 'ok') {
-			self::checkAuth();
+			//self::checkAuth(); 20/09/2020 on désactive ce test pour voir s'il est utile ou pas
 		}
 
 		$autorefreshRR = config::byKey('autorefresh', 'alexaapi', '33 3 * * *');/* boucle qui relance la connexion au serveur*/
@@ -627,6 +627,13 @@ public static function templateWidget(){
 					$device->setConfiguration('family', $item['providerData']['categoryType']);
 					//$device->setConfiguration('members', $item['members']);
 					$device->setConfiguration('capabilities', $item['supportedProperties']);
+						// pas certain de cette partie, pas pu tester un device avec plus de deux triggers
+						if ((count($item['supportedTriggers'])) == 1)
+						$device->setConfiguration('triggers', $item['supportedTriggers'][0]);
+						else if ((count($item['supportedTriggers'])) > 1)
+						$device->setConfiguration('triggers', $item['supportedTriggers']);
+						else
+						$device->setConfiguration('triggers', "");
 					//On va mettre dispo, on traite plus tard.
 					//$device->setStatus('online', (($item['online'])?true:false));
 					try {
