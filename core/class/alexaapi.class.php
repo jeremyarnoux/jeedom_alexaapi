@@ -977,7 +977,7 @@ public static function templateWidget(){
 			$cas2 = (($this->hasCapaorFamilyorType("TIMERS_AND_ALARMS")) && !$widgetPlayer);
 			$cas3 = (($this->hasCapaorFamilyorType("REMINDERS")) && !$widgetPlayer);
 			$cas4 = (($this->hasCapaorFamilyorType("REMINDERS")) && !$widgetSmarthome);
-			$cas5 = (($this->hasCapaorFamilyorType("VOLUME_SETTING")) || ($this->hasCapaorFamilyorType("VOLUME_SETTING")));
+			$cas5 = (($this->hasCapaorFamilyorType("VOLUME_SETTING")) || ($this->hasCapaorFamilyorType("SOUND_SETTINGS")));
 			$cas6 = ($cas5 && (!$this->hasCapaorFamilyorType("WHA")));
 			$cas7 = ((!$this->hasCapaorFamilyorType("WHA")) && ($this->getConfiguration('devicetype') != "Player") && (!$this->hasCapaorFamilyorType("FIRE_TV")) && !$widgetSmarthome && (!$this->hasCapaorFamilyorType("AMAZONMOBILEMUSIC_ANDROID")));
 			$cas8 = (($this->hasCapaorFamilyorType("turnOff")) && $widgetSmarthome);
