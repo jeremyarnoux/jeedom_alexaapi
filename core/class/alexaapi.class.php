@@ -1158,8 +1158,10 @@ public static function templateWidget(){
         $replace = $this->preToHtml($_version);
         //log::add('alexaapi_widget','debug','************Début génération Widget de '.$replace['#logicalId#']);
         $typeWidget = "alexaapi";
-        if ((substr($replace['#logicalId#'], -7)) == "_player") $typeWidget = "alexaapi_player";
-        if ((substr($replace['#logicalId#'], -9)) == "_playlist") $typeWidget = "alexaapi_playlist";
+
+        $typeWidget = $this->getLogicalId();
+        //if ((substr($replace['#logicalId#'], -7)) == "_player") $typeWidget = "alexaapi_player";
+        //if ((substr($replace['#logicalId#'], -9)) == "_playlist") $typeWidget = "alexaapi_playlist";
         if ($typeWidget != "alexaapi_playlist") return parent::toHtml($_version);
         //log::add('alexaapi_widget','debug',$typeWidget.'************Début génération Widget de '.$replace['#name#']);
         if (!is_array($replace)) {
