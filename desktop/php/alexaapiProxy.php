@@ -18,13 +18,13 @@
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 include_file('core', 'authentification', 'php');
 if (!isConnect('admin')) {
-	echo '401 - Accès non autorisé';
-	die();
+    echo '401 - Accès non autorisé';
+    die();
 }
 ajax::init();
 try {
-	echo json_encode(alexaapi::callProxyAlexaapi(str_replace('//', '/', init('request'))));
+    echo json_encode(alexaapi::callProxyAlexaapi(str_replace('//', '/', init('request'))));
 } catch (Exception $e) {
-	http_response_code(500);
-	die($e->getMessage());
+    http_response_code(500);
+    die($e->getMessage());
 }

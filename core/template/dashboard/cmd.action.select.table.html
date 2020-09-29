@@ -1,24 +1,25 @@
-<div class="cmd cmd-widget reportModeHidden" data-type="action" data-subtype="select" data-template="default" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
-<br>
-<table border="0" cellpadding="0" width="202">
-    <tr>
-        <td style="padding: 0px;" width="100%">  
-			<div class="title #hide_name#">
-			<div class="cmdName">#name_display#</div>
-			</div>
-		</td>
-    </tr>
-    <tr>
-        <td style="padding: 5px;" width="100%">
-			<div class="content-xs">
-			<select class="selectCmd">#listValue#</select>
-			</div>
-  </td>
-    </tr>
-</table>
-  <script>
-    $(".cmd[data-cmd_uid=#uid#] .selectCmd").on('change', function () {
-      jeedom.cmd.execute({id: '#id#', value: {select: $(this).value()}});
-    });
-  </script>
+<div class="cmd cmd-widget reportModeHidden" data-type="action" data-subtype="select" data-template="default"
+     data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
+    <br>
+    <table border="0" cellpadding="0" width="202">
+        <tr>
+            <td style="padding: 0px;" width="100%">
+                <div class="title #hide_name#">
+                    <div class="cmdName">#name_display#</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 5px;" width="100%">
+                <div class="content-xs">
+                    <select class="selectCmd">#listValue#</select>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <script>
+        $(".cmd[data-cmd_uid=#uid#] .selectCmd").on('change', function () {
+            jeedom.cmd.execute({id: '#id#', value: {select: $(this).value()}});
+        });
+    </script>
 </div>

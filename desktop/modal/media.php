@@ -16,11 +16,11 @@
  */
 
 if (!isConnect('admin')) {
-	throw new Exception('401 Unauthorized');
+    throw new Exception('401 Unauthorized');
 }
 
 echo "<table width=100% border=0><tr><td>";
-echo  '<a class="btn btn-default pull-left refreshAction" data-action="refresh"><i class="fas fa-refresh"></i>  {{Rafraichir}}</a>';
+echo '<a class="btn btn-default pull-left refreshAction" data-action="refresh"><i class="fas fa-refresh"></i>  {{Rafraichir}}</a>';
 
 $fichierMediaJson = realpath(dirname(__FILE__) . '/../../resources/data/media-' . $_GET['iddevice'] . '.json');
 
@@ -37,99 +37,99 @@ $myObject = json_decode($myData);
 
 
 foreach ($myObject as $item) :
-	if ($item->info == 'imageURL')
-		echo '<p style="float:right"><img src="' . $item->value . '" alt="logo media" /></p>';
+    if ($item->info == 'imageURL')
+        echo '<p style="float:right"><img src="' . $item->value . '" alt="logo media" /></p>';
 endforeach;
 
 
-
-
 ?>
-</td>
-</tr>
-</table>
+    </td>
+    </tr>
+    </table>
 
 
-<table class="table table-condensed tablesorter" id="table1">
-	<thead>
-		<tr>
-			<th>{{Info}}</th>
-			<th>{{Valeur}}</th>
+    <table class="table table-condensed tablesorter" id="table1">
+        <thead>
+        <tr>
+            <th>{{Info}}</th>
+            <th>{{Valeur}}</th>
 
-		</tr>
-	</thead>
-	<tbody>
-		<?php foreach ($myObject as $item) : ?>
-			<tr>
-				<td><span class="label label-info" style="font-size : 1em; cursor : default;"><?PHP echo $item->info; ?></span></td>
-				<td><?PHP echo $item->value; ?></td>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($myObject as $item) : ?>
+            <tr>
+                <td><span class="label label-info"
+                          style="font-size : 1em; cursor : default;"><?PHP echo $item->info; ?></span></td>
+                <td><?PHP echo $item->value; ?></td>
 
-			</tr>
-		<?php endforeach; ?>
-	</tbody>
-</table>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
 
 <?php
 
 foreach ($myObject as $item) :
-	if ($item->info == 'queue') {
+    if ($item->info == 'queue') {
+        ?>
+
+
+
+        <table class="table table-condensed tablesorter" id="table2">
+        <thead>
+        <tr>
+            <th>{{File d'attente}}</th>
+            <th></th>
+
+        </tr>
+        </thead>
+        <tbody>
+
+        <?php foreach ($item->value as $key => $serial) :
+            foreach ($serial as $key => $suite) : ?>
+                <tr>
+                    <td><span class="label label-info"
+                              style="font-size : 1em; cursor : default;"><?PHP echo $key; ?></span></td>
+                    <td><?PHP echo $suite; ?></td>
+
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+            </table>
+
+        <?php
+        endforeach;
+    }
+endforeach;
+
+
+$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/media?device=" . $_GET['iddevice']);
+
 ?>
+    <script>
+        $('.refreshAction[data-action=refresh]').off('click').on('click', function () {
+
+            /*	const Url='http://192.168.0.21:3456/volume';
+                const data={
+                    value:"50",
+                    device:"G090LF118173117U"
+                };
+
+                    $.post(Url, data, function(data, status){
+                        $('#div_alert').showAlert({message: '55', level: 'danger'});
+                    console.log('${data} and status is ${status}');
+                });
+                */
 
 
-
-		<table class="table table-condensed tablesorter" id="table2">
-			<thead>
-				<tr>
-					<th>{{File d'attente}}</th>
-					<th></th>
-
-				</tr>
-			</thead>
-			<tbody>
-
-				<?php foreach ($item->value as $key => $serial) :
-					foreach ($serial as $key => $suite) : ?>
-						<tr>
-							<td><span class="label label-info" style="font-size : 1em; cursor : default;"><?PHP echo $key; ?></span></td>
-							<td><?PHP echo $suite; ?></td>
-
-						</tr>
-					<?php endforeach; ?>
-			</tbody>
-		</table>
-
-<?php
-				endforeach;
-			}
-		endforeach;
-
-
-		$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/media?device=" . $_GET['iddevice']);
-
-?>
-<script>
-	$('.refreshAction[data-action=refresh]').off('click').on('click', function() {
-
-		/*	const Url='http://192.168.0.21:3456/volume';
-			const data={
-				value:"50",
-				device:"G090LF118173117U"
-			};
-
-				$.post(Url, data, function(data, status){
-					$('#div_alert').showAlert({message: '55', level: 'danger'});
-				console.log('${data} and status is ${status}');
-			});
-			*/
-
-
-		$('#md_modal').dialog('close');
-		$('#md_modal').dialog({
-			title: "{{Info Média}}"
-		});
-		$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=media&id=alexaapi&iddevice=' + $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
-	});
-</script>
+            $('#md_modal').dialog('close');
+            $('#md_modal').dialog({
+                title: "{{Info Média}}"
+            });
+            $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=media&id=alexaapi&iddevice=' + $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
+        });
+    </script>
 
 
 <?php include_file('desktop', 'alexaapi', 'js', 'alexaapi'); ?>

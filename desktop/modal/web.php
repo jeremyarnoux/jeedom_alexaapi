@@ -15,16 +15,16 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 if (!isConnect('admin')) {
-	throw new Exception('{{401 - Accès non autorisé}}');
+    throw new Exception('{{401 - Accès non autorisé}}');
 }
 
 //if (init('ip') == '') {
 //    throw new Exception('{{L\'ip alexaapi ne peut etre vide : }}' . init('op_id'));
 //}
-$url = "http://".init('ip').":3457";
+$url = "http://" . init('ip') . ":3457";
 $url = "http://www.google.fr";
 $url = "http://192.168.0.200";
-print "Affichage de : ".$url;
+print "Affichage de : " . $url;
 //<iframe src="<?php echo $url; ?>" height="100%" width="100%">You need a Frames Capable browser to view this content.</iframe>
 ?>
 

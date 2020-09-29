@@ -16,7 +16,7 @@
  */
 
 if (!isConnect('admin')) {
-	throw new Exception('401 Unauthorized');
+    throw new Exception('401 Unauthorized');
 }
 /*
 	DEPLACE DANS 	public static function ScanAmazonAlexa($_logical_id = null, $_exclusion = 0) de core class alexaapi.class.php
@@ -55,42 +55,42 @@ foreach($json as $item)
 $eqLogics = alexaapi::byType('alexaapi');
 ?>
 <table class="table table-condensed tablesorter" id="table_healthNetwork">
-	<thead>
-		<tr>
-			<th>{{Module}}</th>
-			<th>{{ID}}</th>
-			<th>{{Device}}</th>
-			<th>{{Serial}}</th>
-			<th>{{Type}}</th>
-			<th>{{Présent *}}</th>
-			<th>{{Date création}}</th>
-		</tr>
-	</thead>
-	<tbody>
-		<?php
-		foreach ($eqLogics as $eqLogic) {
+    <thead>
+    <tr>
+        <th>{{Module}}</th>
+        <th>{{ID}}</th>
+        <th>{{Device}}</th>
+        <th>{{Serial}}</th>
+        <th>{{Type}}</th>
+        <th>{{Présent *}}</th>
+        <th>{{Date création}}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php
+    foreach ($eqLogics as $eqLogic) {
 
-			if ($eqLogic->getStatus('online') == 'true') {
-				$present = 1;
-			}
-			if ($present == 1) {
-				$present = '<span class="label label-success" style="font-size : 1em;" title="{{Présent}}"><i class="fas fa-check-circle"></i></span>';
-			} else {
-				$present = '<span class="label label-danger" style="font-size : 1em;" title="{{Absent}}"><i class="fas fa-times-circle"></i></span>';
-			}
+        if ($eqLogic->getStatus('online') == 'true') {
+            $present = 1;
+        }
+        if ($present == 1) {
+            $present = '<span class="label label-success" style="font-size : 1em;" title="{{Présent}}"><i class="fas fa-check-circle"></i></span>';
+        } else {
+            $present = '<span class="label label-danger" style="font-size : 1em;" title="{{Absent}}"><i class="fas fa-times-circle"></i></span>';
+        }
 
-			if ((strstr($eqLogic->getName(), "Alexa Apps")))
-				$present = '<span class="label label-warning" style="font-size : 1em;" title="{{Inconnu}}"><i class="fas fa-question-circle"></i></span>';
+        if ((strstr($eqLogic->getName(), "Alexa Apps")))
+            $present = '<span class="label label-warning" style="font-size : 1em;" title="{{Inconnu}}"><i class="fas fa-question-circle"></i></span>';
 
-			echo '<tr><td><a href="' . $eqLogic->getLinkToConfiguration() . '" style="text-decoration: none;">' . $eqLogic->getHumanName(true) . '</a></td>';
-			echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getId() . '</span></td>';
-			echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('device') . '</span></td>';
-			echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('serial') . '</span></td>';
-			echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('type') . '</span></td>';
-			echo '<td>' . $present . '</td>';
-			echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('createtime') . '</span></td></tr>';
-		}
-		?>
-	</tbody>
+        echo '<tr><td><a href="' . $eqLogic->getLinkToConfiguration() . '" style="text-decoration: none;">' . $eqLogic->getHumanName(true) . '</a></td>';
+        echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getId() . '</span></td>';
+        echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('device') . '</span></td>';
+        echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('serial') . '</span></td>';
+        echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('type') . '</span></td>';
+        echo '<td>' . $present . '</td>';
+        echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getConfiguration('createtime') . '</span></td></tr>';
+    }
+    ?>
+    </tbody>
 </table>
 * Pour actualiser la colonne <B>Présent</B>, Faites un <B>Scan</B> sur l'écran précédent.
