@@ -16,7 +16,7 @@
  */
 
 if (!isConnect('admin')) {
-	throw new Exception('401 Unauthorized');
+    throw new Exception('401 Unauthorized');
 }
 
 $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/reminders");
@@ -27,7 +27,7 @@ $json = json_decode($json, true);
 
 function sortBy($field, &$array, $direction = 'asc')
 {
-	usort($array, create_function('$a, $b', '
+    usort($array, create_function('$a, $b', '
         $a = $a["' . $field . '"];
         $b = $b["' . $field . '"];
 
@@ -38,8 +38,9 @@ function sortBy($field, &$array, $direction = 'asc')
         return ($a ' . ($direction == 'desc' ? '>' : '<') . ' $b) ? -1 : 1;
     '));
 
-	return true;
+    return true;
 }
+
 sortBy('status', $json, 'desc');
 /*
 
@@ -74,238 +75,236 @@ foreach($json as $item)
 //$eqLogics = alexaapi::byType('alexaapi');
 ?>
 
-<table class="table table-condensed tablesorter" id="table_healthNetwork">
-	<thead>
-		<tr>
-			<th>{{Alexa}}</th>
-			<th>{{Type}}</th>
-			<th>{{Nom ou Musique}}</th>
-			<th>{{Heure}}</th>
-			<th>{{Date}}</th>
-			<th>{{Activé}}</th>
-			<th>{{Répétition}}</th>
-			<th>{{Supprimer}}</th>
-		</tr>
-	</thead>
-	<tbody>
-		<?php
-		foreach ($json as $item) {
+    <table class="table table-condensed tablesorter" id="table_healthNetwork">
+        <thead>
+        <tr>
+            <th>{{Alexa}}</th>
+            <th>{{Type}}</th>
+            <th>{{Nom ou Musique}}</th>
+            <th>{{Heure}}</th>
+            <th>{{Date}}</th>
+            <th>{{Activé}}</th>
+            <th>{{Répétition}}</th>
+            <th>{{Supprimer}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php
+        foreach ($json as $item) {
 
-			//log::add('alexaapi_debug', 'info', json_encode($item));
+            //log::add('alexaapi_debug', 'info', json_encode($item));
 
-			switch ($item['type']) {
-				case "Alarm":
-					$couleur = "primary";
-					break;
-				case "MusicAlarm":
-					$couleur = "warning";
-					break;
-				case "Reminder":
-					$couleur = "info";
-					break;
-				case "Timer":
-					$couleur = "success";
-					break;
-				default:
-					$couleur = "danger";
-					break;
-			}
-
-
-			if ($item['status'] == 'ON') {
-				$present = '<a class="btn btn-success disableReminder" data-id="' . $item['id'] . '"><span class="label label-success" style="font-size : 1em;" title="{{Actif}}"><i class="fas fa-check-circle"></i></span></a>';
-			} else {
-				$present = '<a class="btn btn-default enableReminder" data-id="' . $item['id'] . '"><span class="label label-default" style="font-size : 1em;" title="{{Inactif}}"><i class="fas fa-times-circle"></i></span></a>';
-				$couleur = "default";
-			}
+            switch ($item['type']) {
+                case "Alarm":
+                    $couleur = "primary";
+                    break;
+                case "MusicAlarm":
+                    $couleur = "warning";
+                    break;
+                case "Reminder":
+                    $couleur = "info";
+                    break;
+                case "Timer":
+                    $couleur = "success";
+                    break;
+                default:
+                    $couleur = "danger";
+                    break;
+            }
 
 
-			switch ($item['type']) {
-				case "Alarm":
-					$type = '<span class="label label-' . $couleur . '" style="font-size : 1em;" title="{{Alarme}}"><i class="fas fa-bell"></i> Alarme</span>';
-					break;
-				case "MusicAlarm":
-					$type = '<span class="label label-' . $couleur . '" style="font-size : 1em;" title="{{Alarme Musicale}}"><i class="fa loisir-musical7"></i> Alarme musicale</span>';
-					break;
-				case "Reminder":
-					$type = '<span class="label label-' . $couleur . '" style="font-size : 1em;" title="{{Rappel}}"><i class="fa divers-circular114"></i> Rappel</span>';
-					break;
-				case "Timer":
-					$type = '<span class="label label-' . $couleur . '" style="font-size : 1em;" title="{{Minuteur}}"><i class="fa divers-circular114"></i> Minuteur</span>';
-					break;
-				default:
-					$type = '<span class="label label-' . $couleur . '" style="font-size : 1em;" title="{{????}}"><i class="fas fa-bell"></i> ????</span>';
-					break;
-			}
+            if ($item['status'] == 'ON') {
+                $present = '<a class="btn btn-success disableReminder" data-id="' . $item['id'] . '"><span class="label label-success" style="font-size : 1em;" title="{{Actif}}"><i class="fas fa-check-circle"></i></span></a>';
+            } else {
+                $present = '<a class="btn btn-default enableReminder" data-id="' . $item['id'] . '"><span class="label label-default" style="font-size : 1em;" title="{{Inactif}}"><i class="fas fa-times-circle"></i></span></a>';
+                $couleur = "default";
+            }
 
 
-			$repetition = "";
-			switch ($item['recurringPattern']) {
-				case "P1D":
-					$repetition = "Tous les jours";
-					break;
-				case "XXXX-WD":
-					$repetition = "En semaine";
-					break;
-				case "XXXX-WE":
-					$repetition = "Week-ends";
-					break;
-				case "XXXX-WXX-1":
-					$repetition = "Chaque lundi";
-					break;
-				case "XXXX-WXX-2":
-					$repetition = "Chaque mardi";
-					break;
-				case "XXXX-WXX-3":
-					$repetition = "Chaque mercredi";
-					break;
-				case "XXXX-WXX-4":
-					$repetition = "Chaque jeudi";
-					break;
-				case "XXXX-WXX-5":
-					$repetition = "Chaque vendredi";
-					break;
-				case "XXXX-WXX-6":
-					$repetition = "Chaque samedi";
-					break;
-				case "XXXX-WXX-7":
-					$repetition = "Chaque dimanche";
-					break;
-			}
-
-			// Retireve the device (if already registered in Jeedom)
-			$device = alexaapi::byLogicalId($item['deviceSerialNumber'], 'alexaapi');
-			if (is_object($device))
+            switch ($item['type']) {
+                case "Alarm":
+                    $type = '<span class="label label-' . $couleur . '" style="font-size : 1em;" title="{{Alarme}}"><i class="fas fa-bell"></i> Alarme</span>';
+                    break;
+                case "MusicAlarm":
+                    $type = '<span class="label label-' . $couleur . '" style="font-size : 1em;" title="{{Alarme Musicale}}"><i class="fa loisir-musical7"></i> Alarme musicale</span>';
+                    break;
+                case "Reminder":
+                    $type = '<span class="label label-' . $couleur . '" style="font-size : 1em;" title="{{Rappel}}"><i class="fa divers-circular114"></i> Rappel</span>';
+                    break;
+                case "Timer":
+                    $type = '<span class="label label-' . $couleur . '" style="font-size : 1em;" title="{{Minuteur}}"><i class="fa divers-circular114"></i> Minuteur</span>';
+                    break;
+                default:
+                    $type = '<span class="label label-' . $couleur . '" style="font-size : 1em;" title="{{????}}"><i class="fas fa-bell"></i> ????</span>';
+                    break;
+            }
 
 
+            $repetition = "";
+            switch ($item['recurringPattern']) {
+                case "P1D":
+                    $repetition = "Tous les jours";
+                    break;
+                case "XXXX-WD":
+                    $repetition = "En semaine";
+                    break;
+                case "XXXX-WE":
+                    $repetition = "Week-ends";
+                    break;
+                case "XXXX-WXX-1":
+                    $repetition = "Chaque lundi";
+                    break;
+                case "XXXX-WXX-2":
+                    $repetition = "Chaque mardi";
+                    break;
+                case "XXXX-WXX-3":
+                    $repetition = "Chaque mercredi";
+                    break;
+                case "XXXX-WXX-4":
+                    $repetition = "Chaque jeudi";
+                    break;
+                case "XXXX-WXX-5":
+                    $repetition = "Chaque vendredi";
+                    break;
+                case "XXXX-WXX-6":
+                    $repetition = "Chaque samedi";
+                    break;
+                case "XXXX-WXX-7":
+                    $repetition = "Chaque dimanche";
+                    break;
+            }
 
-				echo '<tr><td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $device->getName() . '</span></td>';
-			else
-				echo '<tr><td><span class="label label-danger" style="font-size : 1em; cursor : default;">?????</span></td>';
+            // Retireve the device (if already registered in Jeedom)
+            $device = alexaapi::byLogicalId($item['deviceSerialNumber'], 'alexaapi');
+            if (is_object($device))
 
 
+                echo '<tr><td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $device->getName() . '</span></td>';
+            else
+                echo '<tr><td><span class="label label-danger" style="font-size : 1em; cursor : default;">?????</span></td>';
 
 
-			echo '<td>' . $type . '</td>';
-			echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $item['soundDisplayName'] . $item['musicEntity'] . $item['reminderLabel'] . '</span></td>';
+            echo '<td>' . $type . '</td>';
+            echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $item['soundDisplayName'] . $item['musicEntity'] . $item['reminderLabel'] . '</span></td>';
 
-			if ($item['type'] == "Timer") {
-				//$date = DateTime::createFromFormat('U',strval(intval(intval($item['remainingTime'])/1000)));
-				$remainingTime = intval($item['remainingTime']);
-				$heures = floor($remainingTime / 1000 / 60 / 60);
-				$minutes = floor(($remainingTime - $heures * 60) / 1000 / 60);
-				$secondes = floor($remainingTime / 1000 - $minutes * 60);
-				if ($heures < 10) $heures = '0' . $heures;
-				if ($minutes < 10) $minutes = '0' . $minutes;
-				if ($secondes < 10) $secondes = '0' . $secondes;
+            if ($item['type'] == "Timer") {
+                //$date = DateTime::createFromFormat('U',strval(intval(intval($item['remainingTime'])/1000)));
+                $remainingTime = intval($item['remainingTime']);
+                $heures = floor($remainingTime / 1000 / 60 / 60);
+                $minutes = floor(($remainingTime - $heures * 60) / 1000 / 60);
+                $secondes = floor($remainingTime / 1000 - $minutes * 60);
+                if ($heures < 10) $heures = '0' . $heures;
+                if ($minutes < 10) $minutes = '0' . $minutes;
+                if ($secondes < 10) $secondes = '0' . $secondes;
 
-				echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;"> Dans ' . $heures . ":" . $minutes . ":" . $secondes . '</span></td>';
-			} else
-				echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . substr($item['originalTime'], 0, 5) . '</span></td>';
+                echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;"> Dans ' . $heures . ":" . $minutes . ":" . $secondes . '</span></td>';
+            } else
+                echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . substr($item['originalTime'], 0, 5) . '</span></td>';
 
-			echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . substr($item['originalDate'], 8, 2) . substr($item['originalDate'], 4, 4) . substr($item['originalDate'], 0, 4) . '</span></td>';
-			echo '<td>' . $present . '</td>';
-			echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $repetition . '</span></td>';
-			//echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $item['id'] . '</span></td>';
-			echo '<td><a class="btn btn-danger deleteReminder" data-id="' . $item['id'] . '"><i class="fas fa-times-circle"></i></a></td>';
-			//$present = '<span class="label label-default" style="font-size : 1em;" title="{{Inactif}}"><i class="fas fa-times-circle"></i></span>';
+            echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . substr($item['originalDate'], 8, 2) . substr($item['originalDate'], 4, 4) . substr($item['originalDate'], 0, 4) . '</span></td>';
+            echo '<td>' . $present . '</td>';
+            echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $repetition . '</span></td>';
+            //echo '<td><span class="label label-'.$couleur.'" style="font-size : 1em; cursor : default;">' . $item['id'] . '</span></td>';
+            echo '<td><a class="btn btn-danger deleteReminder" data-id="' . $item['id'] . '"><i class="fas fa-times-circle"></i></a></td>';
+            //$present = '<span class="label label-default" style="font-size : 1em;" title="{{Inactif}}"><i class="fas fa-times-circle"></i></span>';
 
-			echo '</tr>';
-		}
-		?>
-	</tbody>
-</table>
+            echo '</tr>';
+        }
+        ?>
+        </tbody>
+    </table>
 
-<a class="btn btn-default pull-right refreshAction" data-action="refresh"><i class="fas fa-refresh"></i> {{Rafraichir}}</a>
+    <a class="btn btn-default pull-right refreshAction" data-action="refresh"><i class="fas fa-refresh"></i>
+        {{Rafraichir}}</a>
 
-<script>
-	$('.deleteReminder').off('click').on('click', function() {
-		jeedom.plugin.node.action({
-			action: 'delete',
-			node_id: $(this).attr('data-id'),
-			error: function(error) {
-				//$('#div_alert').showAlert({message: error.message, level: 'danger'});
-				$('#md_modal').dialog('close');
-				$('#md_modal').dialog({
-					title: "{{Rappels / Alarmes}}"
-				});
-				$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+    <script>
+        $('.deleteReminder').off('click').on('click', function () {
+            jeedom.plugin.node.action({
+                action: 'delete',
+                node_id: $(this).attr('data-id'),
+                error: function (error) {
+                    //$('#div_alert').showAlert({message: error.message, level: 'danger'});
+                    $('#md_modal').dialog('close');
+                    $('#md_modal').dialog({
+                        title: "{{Rappels / Alarmes}}"
+                    });
+                    $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
 
-			},
-			success: function(data) {
-				// $('#div_alert').showAlert({message: '{{Action réalisée avec succès}}', level: 'success'});
-				$('#md_modal').dialog('close');
-				$('#md_modal').dialog({
-					title: "{{Rappels / Alarmes}}"
-				});
-				$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
-			}
-		});
-	});
+                },
+                success: function (data) {
+                    // $('#div_alert').showAlert({message: '{{Action réalisée avec succès}}', level: 'success'});
+                    $('#md_modal').dialog('close');
+                    $('#md_modal').dialog({
+                        title: "{{Rappels / Alarmes}}"
+                    });
+                    $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+                }
+            });
+        });
 
-	$('.disableReminder').off('click').on('click', function() {
-		jeedom.plugin.node.action({
-			action: 'disable',
-			node_id: $(this).attr('data-id'),
-			error: function(error) {
-				//$('#div_alert').showAlert({message: error.message, level: 'danger'});
-				$('#md_modal').dialog('close');
-				$('#md_modal').dialog({
-					title: "{{Rappels / Alarmes}}"
-				});
-				$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+        $('.disableReminder').off('click').on('click', function () {
+            jeedom.plugin.node.action({
+                action: 'disable',
+                node_id: $(this).attr('data-id'),
+                error: function (error) {
+                    //$('#div_alert').showAlert({message: error.message, level: 'danger'});
+                    $('#md_modal').dialog('close');
+                    $('#md_modal').dialog({
+                        title: "{{Rappels / Alarmes}}"
+                    });
+                    $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
 
-			},
-			success: function(data) {
-				// $('#div_alert').showAlert({message: '{{Action réalisée avec succès}}', level: 'success'});
-				$('#md_modal').dialog('close');
-				$('#md_modal').dialog({
-					title: "{{Rappels / Alarmes}}"
-				});
-				$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
-			}
-		});
-	});
+                },
+                success: function (data) {
+                    // $('#div_alert').showAlert({message: '{{Action réalisée avec succès}}', level: 'success'});
+                    $('#md_modal').dialog('close');
+                    $('#md_modal').dialog({
+                        title: "{{Rappels / Alarmes}}"
+                    });
+                    $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+                }
+            });
+        });
 
-	$('.enableReminder').off('click').on('click', function() {
-		jeedom.plugin.node.action({
-			action: 'enable',
-			node_id: $(this).attr('data-id'),
-			error: function(error) {
-				//$('#div_alert').showAlert({message: error.message, level: 'danger'});
-				$('#md_modal').dialog('close');
-				$('#md_modal').dialog({
-					title: "{{Rappels / Alarmes}}"
-				});
-				$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+        $('.enableReminder').off('click').on('click', function () {
+            jeedom.plugin.node.action({
+                action: 'enable',
+                node_id: $(this).attr('data-id'),
+                error: function (error) {
+                    //$('#div_alert').showAlert({message: error.message, level: 'danger'});
+                    $('#md_modal').dialog('close');
+                    $('#md_modal').dialog({
+                        title: "{{Rappels / Alarmes}}"
+                    });
+                    $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
 
-			},
-			success: function(data) {
-				// $('#div_alert').showAlert({message: '{{Action réalisée avec succès}}', level: 'success'});
-				$('#md_modal').dialog('close');
-				$('#md_modal').dialog({
-					title: "{{Rappels / Alarmes}}"
-				});
-				$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
-			}
-		});
-	});
+                },
+                success: function (data) {
+                    // $('#div_alert').showAlert({message: '{{Action réalisée avec succès}}', level: 'success'});
+                    $('#md_modal').dialog('close');
+                    $('#md_modal').dialog({
+                        title: "{{Rappels / Alarmes}}"
+                    });
+                    $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+                }
+            });
+        });
 
-	$('.deleteReminder2').off('click').on('click', function() {
-		$('#md_modal').dialog('close');
-		$('#md_modal').dialog({
-			title: "{{Rappels / Alarmes}}"
-		});
-		$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
-	});
+        $('.deleteReminder2').off('click').on('click', function () {
+            $('#md_modal').dialog('close');
+            $('#md_modal').dialog({
+                title: "{{Rappels / Alarmes}}"
+            });
+            $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+        });
 
-	$('.refreshAction[data-action=refresh]').off('click').on('click', function() {
-		$('#md_modal').dialog('close');
-		$('#md_modal').dialog({
-			title: "{{Rappels / Alarmes}}"
-		});
-		$('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
-	});
-</script>
+        $('.refreshAction[data-action=refresh]').off('click').on('click', function () {
+            $('#md_modal').dialog('close');
+            $('#md_modal').dialog({
+                title: "{{Rappels / Alarmes}}"
+            });
+            $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders&id=alexaapi').dialog('open');
+        });
+    </script>
 
 <?php include_file('desktop', 'alexaapi', 'js', 'alexaapi'); ?>

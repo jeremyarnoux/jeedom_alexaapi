@@ -1,16 +1,22 @@
-<div class="cmd" data-type="info" data-version="#version#" data-eqLogic_id="#eqLogic_id#" data-subtype="string" data-cmd_id="#id#" data-cmd_uid="#uid#">
-	<img class="state" src="#state#" width="80px" height="160px">
-	#state#
-	#url#
-	#state#
-	coucou
-	<p><img src="#url#" width="200" height="199"></p>
+<div class="cmd" data-type="info" data-version="#version#" data-eqLogic_id="#eqLogic_id#" data-subtype="string"
+     data-cmd_id="#id#" data-cmd_uid="#uid#">
+    <img class="state" src="#state#" width="80px" height="160px">
+    #state#
+    #url#
+    #state#
+    coucou
+    <p><img src="#url#" width="200" height="199"></p>
 
-	
-	<script>
-		jeedom.cmd.update['#id#'] = function(_options){
-			$('.cmd[data-cmd_id=#id#] .state').attr('src', _options.display_value);
-		}
-		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
-	</script>
+
+    <script>
+        jeedom.cmd.update['#id#'] = function (_options) {
+            $('.cmd[data-cmd_id=#id#] .state').attr('src', _options.display_value);
+        }
+        jeedom.cmd.update['#id#']({
+            display_value: '#state#',
+            valueDate: '#valueDate#',
+            collectDate: '#collectDate#',
+            alertLevel: '#alertLevel#'
+        });
+    </script>
 </div>
