@@ -1,72 +1,81 @@
-<div class="eqLogic eqLogic-widget allowResize  #custom_layout# #eqLogic_class#" data-eqType="#eqType#" data-eqLogic_id="#id#" data-eqLogic_uid="#uid#" data-version="#version#" style="width: #width#;height: #height#;border:#border#;border-radius:#border-radius#;background-color: #background-color#;color: #color#;#style#" data-translate-category="#translate_category#" data-category="#category#" data-tags="#tags#">	
+<div class="eqLogic eqLogic-widget allowResize  #custom_layout# #eqLogic_class#" data-eqType="#eqType#"
+     data-eqLogic_id="#id#" data-eqLogic_uid="#uid#" data-version="#version#"
+     style="width: #width#;height: #height#;border:#border#;border-radius:#border-radius#;background-color: #background-color#;color: #color#;#style#"
+     data-translate-category="#translate_category#" data-category="#category#" data-tags="#tags#">
 
-	<center class="widget-name">
+    <center class="widget-name">
 		<span class="warning" title="#alert_name#">
 			<i class='#alert_icon#'></i>
 		</span>
-		<span class="reportModeVisible" style="display:none;color:white;">#name_display#</span>
-		<a href="#eqLink#" class="reportModeHidden" style="#hideEqLogicName#" title="#name#">#name_display#<span></span></a>
-	</center>
+        <span class="reportModeVisible" style="display:none;color:white;">#name_display#</span>
+        <a href="#eqLink#" class="reportModeHidden" style="#hideEqLogicName#" title="#name#">#name_display#<span></span></a>
+    </center>
 
-<p align=center>#subText1#</p>
-<p align=center><span style="color:red;">#subText2#</span></p>
+    <p align=center>#subText1#</p>
+    <p align=center><span style="color:red;">#subText2#</span></p>
 
-<p>id : <strong>#id#</strong><br>
-uid : <strong>#uid#</strong><br></p>
+    <p>id : <strong>#id#</strong><br>
+        uid : <strong>#uid#</strong><br></p>
 
 
-#url#
-<span class="statusCmd" style="position : absolute;left : 5px; width : 30px;z-index: 1030;"></span>
-  <i class='fas fa-refresh pull-right cursor refresh' style="margin-top: 3px;margin-right: 3px;"></i>
-  <span class="cmd cmd-widget" data-cmd_id="#refresh_id#" style="display:none;"></span>
-  <center class="widget-name"><a href="#eqLink#" style="font-size : 1.5em;#hideEqLogicName#">#name_display# <span style="font-size: 0.85em;position: relative;top:-2px;">#object_name#</span></a></center>
-  <center>
-    <img src="#img_phase#" width="100" title ="#str_phase#" class="ui-sortable-handle"/><br />
-    <span class="cmd ui-sortable-handle" data-type="action" data-subtype="other" data-cmd_id="#start_id#">
-      <a class="btn btn-sm btn-default action cmdName tooltips" style="background-color:#cmdColor# !important;border-color : transparent !important;" title="#str_start#">
+    #url#
+    <span class="statusCmd" style="position : absolute;left : 5px; width : 30px;z-index: 1030;"></span>
+    <i class='fas fa-refresh pull-right cursor refresh' style="margin-top: 3px;margin-right: 3px;"></i>
+    <span class="cmd cmd-widget" data-cmd_id="#refresh_id#" style="display:none;"></span>
+    <center class="widget-name"><a href="#eqLink#" style="font-size : 1.5em;#hideEqLogicName#">#name_display# <span
+            style="font-size: 0.85em;position: relative;top:-2px;">#object_name#</span></a></center>
+    <center>
+        <img src="#img_phase#" width="100" title="#str_phase#" class="ui-sortable-handle"/><br/>
+        <span class="cmd ui-sortable-handle" data-type="action" data-subtype="other" data-cmd_id="#start_id#">
+      <a class="btn btn-sm btn-default action cmdName tooltips"
+         style="background-color:#cmdColor# !important;border-color : transparent !important;" title="#str_start#">
         <span class="fas fa-play" aria-hidden="true"></span>
       </a>
     </span>
-    <span class="cmd ui-sortable-handle" data-type="action" data-subtype="other" data-cmd_id="#stop_id#">
-      <a class="btn btn-sm btn-default action cmdName tooltips" style="background-color:#cmdColor# !important;border-color : transparent !important;" title="#str_stop#">
+        <span class="cmd ui-sortable-handle" data-type="action" data-subtype="other" data-cmd_id="#stop_id#">
+      <a class="btn btn-sm btn-default action cmdName tooltips"
+         style="background-color:#cmdColor# !important;border-color : transparent !important;" title="#str_stop#">
         <span class="fas fa-stop" aria-hidden="true"></span>
       </a>
     </span>
-    <span class="cmd ui-sortable-handle" data-type="action" data-subtype="other" data-cmd_id="#dock_id#">
-      <a class="btn btn-sm btn-default action cmdName tooltips" style="background-color:#cmdColor# !important;border-color : transparent !important;" title="#str_dock#">
+        <span class="cmd ui-sortable-handle" data-type="action" data-subtype="other" data-cmd_id="#dock_id#">
+      <a class="btn btn-sm btn-default action cmdName tooltips"
+         style="background-color:#cmdColor# !important;border-color : transparent !important;" title="#str_dock#">
         <span class="fas fa-home" aria-hidden="true"></span>
       </a>
     </span>
-    <br />
-    <span class="cmd ui-sortable-handle" data-type="action" data-subtype="other" data-cmd_id="#resume_id#">
-      <a class="btn btn-sm btn-default action cmdName tooltips" style="background-color:#cmdColor# !important;border-color : transparent !important;" title="#str_resume#">
+        <br/>
+        <span class="cmd ui-sortable-handle" data-type="action" data-subtype="other" data-cmd_id="#resume_id#">
+      <a class="btn btn-sm btn-default action cmdName tooltips"
+         style="background-color:#cmdColor# !important;border-color : transparent !important;" title="#str_resume#">
         <span class="fas fa-step-forward" aria-hidden="true"></span>
       </a>
     </span>
-    <span class="cmd ui-sortable-handle" data-type="action" data-subtype="other" data-cmd_id="#pause_id#">
-      <a class="btn btn-sm btn-default action cmdName tooltips" style="background-color:#cmdColor# !important;border-color : transparent !important;" title="#str_pause#">
+        <span class="cmd ui-sortable-handle" data-type="action" data-subtype="other" data-cmd_id="#pause_id#">
+      <a class="btn btn-sm btn-default action cmdName tooltips"
+         style="background-color:#cmdColor# !important;border-color : transparent !important;" title="#str_pause#">
         <span class="fas fa-pause" aria-hidden="true"></span>
       </a>
     </span>
-  </center>
-  <script type="text/javascript">
-    $('.eqLogic[data-eqLogic_id=#id#] .refresh').on('click', function () {
-      jeedom.cmd.execute({id: '#refresh_id#'});
-    });
-    $('.cmd[data-cmd_id=#start_id#]').on('click', function () {
-      jeedom.cmd.execute({id: '#start_id#'});
-    });
-    $('.cmd[data-cmd_id=#stop_id#]').on('click', function () {
-      jeedom.cmd.execute({id: '#stop_id#'});
-    });
-    $('.cmd[data-cmd_id=#dock_id#]').on('click', function () {
-      jeedom.cmd.execute({id: '#dock_id#'});
-    });
-    $('.cmd[data-cmd_id=#resume_id#]').on('click', function () {
-      jeedom.cmd.execute({id: '#resume_id#'});
-    });
-    $('.cmd[data-cmd_id=#pause_id#]').on('click', function () {
-      jeedom.cmd.execute({id: '#pause_id#'});
-    });
-</script>
+    </center>
+    <script type="text/javascript">
+        $('.eqLogic[data-eqLogic_id=#id#] .refresh').on('click', function () {
+            jeedom.cmd.execute({id: '#refresh_id#'});
+        });
+        $('.cmd[data-cmd_id=#start_id#]').on('click', function () {
+            jeedom.cmd.execute({id: '#start_id#'});
+        });
+        $('.cmd[data-cmd_id=#stop_id#]').on('click', function () {
+            jeedom.cmd.execute({id: '#stop_id#'});
+        });
+        $('.cmd[data-cmd_id=#dock_id#]').on('click', function () {
+            jeedom.cmd.execute({id: '#dock_id#'});
+        });
+        $('.cmd[data-cmd_id=#resume_id#]').on('click', function () {
+            jeedom.cmd.execute({id: '#resume_id#'});
+        });
+        $('.cmd[data-cmd_id=#pause_id#]').on('click', function () {
+            jeedom.cmd.execute({id: '#pause_id#'});
+        });
+    </script>
 </div>

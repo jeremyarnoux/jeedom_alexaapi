@@ -1,43 +1,52 @@
-<div class="cmd" data-type="info" data-version="#version#" data-eqLogic_id="#eqLogic_id#" data-subtype="string" data-cmd_id="#id#" data-cmd_uid="#uid#">
-<br>
-<table  border="0"  width="202">
-    <tr>
-        <td style="padding: 15px;" ><center><i  class="fa jeedomapp-audiospeak"></i></center></td>
-        <td width="90%">
-		<center><font size="2"><strong class="state"></strong></font></center></td>
+<div class="cmd" data-type="info" data-version="#version#" data-eqLogic_id="#eqLogic_id#" data-subtype="string"
+     data-cmd_id="#id#" data-cmd_uid="#uid#">
+    <br>
+    <table border="0" width="202">
+        <tr>
+            <td style="padding: 15px;">
+                <center><i class="fa jeedomapp-audiospeak"></i></center>
+            </td>
+            <td width="90%">
+                <center><font size="2"><strong class="state"></strong></font></center>
+            </td>
 
-    </tr>
-</table>
-<!--
-<p>id : <strong>#id#</strong><br>
-uid : <strong>#uid#</strong><br>
-name : <strong>#name#</strong><br>
-state : <strong>#state#</strong><br>
-name_display : <strong>#name_display#</strong><br>
-logicalId : <strong>#logicalId#</strong><br>
-version : <strong>#version#</strong><br>
-</p>
--->
-	<script>
-		jeedom.cmd.update['#id#'] = function(_options) {
-			var cmd = $('.cmd[data-cmd_id=#id#]')
-			cmd.attr('title','Date de valeur : '+_options.valueDate+'<br/>Date de collecte : '+_options.collectDate)
-			cmd.find('.state').empty().append(_options.display_value)
-			if(_options.alertLevel){
-				if(_options.alertLevel == 'warning'){
-					cmd.addClass('label label-warning')
-					cmd.attr('data-alertlevel','warning');
-				}else if(_options.alertLevel == 'danger'){
-					cmd.addClass('label label-danger')
-					cmd.attr('data-alertlevel','danger');
-				}else{
-					cmd.removeClass('label label-warning label-danger')
-					cmd.attr('data-alertlevel','none');
-				}
-			}
-		}
-		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'})
-	</script>
+        </tr>
+    </table>
+    <!--
+    <p>id : <strong>#id#</strong><br>
+    uid : <strong>#uid#</strong><br>
+    name : <strong>#name#</strong><br>
+    state : <strong>#state#</strong><br>
+    name_display : <strong>#name_display#</strong><br>
+    logicalId : <strong>#logicalId#</strong><br>
+    version : <strong>#version#</strong><br>
+    </p>
+    -->
+    <script>
+        jeedom.cmd.update['#id#'] = function (_options) {
+            var cmd = $('.cmd[data-cmd_id=#id#]')
+            cmd.attr('title', 'Date de valeur : ' + _options.valueDate + '<br/>Date de collecte : ' + _options.collectDate)
+            cmd.find('.state').empty().append(_options.display_value)
+            if (_options.alertLevel) {
+                if (_options.alertLevel == 'warning') {
+                    cmd.addClass('label label-warning')
+                    cmd.attr('data-alertlevel', 'warning');
+                } else if (_options.alertLevel == 'danger') {
+                    cmd.addClass('label label-danger')
+                    cmd.attr('data-alertlevel', 'danger');
+                } else {
+                    cmd.removeClass('label label-warning label-danger')
+                    cmd.attr('data-alertlevel', 'none');
+                }
+            }
+        }
+        jeedom.cmd.update['#id#']({
+            display_value: '#state#',
+            valueDate: '#valueDate#',
+            collectDate: '#collectDate#',
+            alertLevel: '#alertLevel#'
+        })
+    </script>
 
 
 </div>
