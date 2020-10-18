@@ -220,6 +220,43 @@ CommandAlexa.Speak = function(req,res){
 	res.status(200).json({value: "Send"});	//ne teste pas le résultat//supprimé 16/11/2019
 };
 
+CommandAlexa.DisplayPower = function(req,res){
+
+        res.type('json');
+
+        config.logger('Alexa-API: Lancement /DisplayPower  avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.value, "INFO");
+
+        if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.DisplayPower', 'Missing parameter "device"'));
+        if ('value' in req.query === false)      return res.status(500).json(error(500, req.route.path, 'Alexa.DisplayPower', 'Missing parameter "value"'));
+
+        //Il faut recupérer le deviceAccountID
+        let dev =alexa.find(req.query.device);
+        let deviceAccountId =  dev.deviceAccountId;
+
+
+        let flags = {
+            data: JSON.stringify({value:'"' + req.query.value +'"'}),
+            method: 'PUT'
+        };
+
+        let callback =  function(testErreur){
+                                if (testErreur)
+                                {traiteErreur(testErreur, 'DisplayPower', req.query);
+                                res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.DisplayPower', testErreur.message));
+                                }
+                                else
+                                res.status(200).json({value: "OK"});    //ne teste pas le résultat
+                        };
+
+
+        let url = `/api/v1/devices/${deviceAccountId}/settings/displayPower`;
+
+        alexa.httpsGet (url, callback,flags);
+
+};
+
+
+
 /**** Alexa.Announcement *****
   URL: /announcement?device=?&text=?
     device - String - name of the device
@@ -888,6 +925,7 @@ app.get('/SmarthomeCommand', CommandAlexa.SmarthomeCommand);
 app.get('/querySmarthomeDevices', CommandAlexa.querySmarthomeDevices);
 app.get('/volume', CommandAlexa.Volume);
 app.get('/speak', CommandAlexa.Speak);
+app.get('/DisplayPower', CommandAlexa.DisplayPower);
 app.get('/announcement', CommandAlexa.Announcement);
 app.get('/radio', CommandAlexa.Radio);
 app.get('/push', CommandAlexa.Push);
