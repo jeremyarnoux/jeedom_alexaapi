@@ -223,7 +223,13 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
                 <input class="configKey form-control" data-l1key="numsmartHome"/>
             </div>
         </div>
-    </fieldset>
+		
+        <div class="form-group">
+            <label class="col-lg-4 control-label">{{Nombre d'équipements Fire TV}}</label>
+            <div class="col-lg-1">
+                <input class="configKey form-control" data-l1key="numFireTV"/>
+            </div>
+        </div>    </fieldset>
 </form>
 
 

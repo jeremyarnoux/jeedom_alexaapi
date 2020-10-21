@@ -177,7 +177,7 @@ foreach ($eqLogics as $eqLogic) {
                     <div class="eqLogicThumbnailContainer">
                         <?php
                         $compteNombrePlayeurs = 0;
-                        foreach (alexaapi::listePluginsAlexaArray(false, true, true) as $pluginAlexaUnparUn) {
+                        foreach (alexaapi::listePluginsAlexaArray(false, true, true, true) as $pluginAlexaUnparUn) {
                             //echo $pluginAlexaUnparUn;
                             //$nomPlugin="inconnu";
                             /*if ($pluginAlexaUnparUn['pluginId']=='alexaamazonmusic') $nomPlugin=$pluginAlexaUnparUn['nom'];
@@ -189,7 +189,7 @@ foreach ($eqLogics as $eqLogic) {
                             if ($pluginAlexaUnparUn['actif'] != true) {
                                 echo ' style="filter: grayscale(100%); opacity: 0.35;"';
                             } else
-                                if ($pluginAlexaUnparUn['pluginId'] != 'alexasmarthome') $compteNombrePlayeurs++;
+                                if (($pluginAlexaUnparUn['pluginId'] != 'alexafiretv') && ($pluginAlexaUnparUn['pluginId'] != 'alexasmarthome')) $compteNombrePlayeurs++;
 
                             echo '>';
                             if ($pluginAlexaUnparUn['nb'] != "0") echo '<span class="badge">' . $pluginAlexaUnparUn['nb'] . '</span>';
