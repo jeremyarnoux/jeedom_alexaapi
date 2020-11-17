@@ -174,8 +174,8 @@ if [[ "$npmPrefixSudo" != "/usr" ]] && [[ "$npmPrefixSudo" != "/usr/local" ]]; t
       step 48 "Reset prefix ($npmPrefix) pour npm `sudo whoami`"
       sudo npm config set prefix $npmPrefix
     else
-      step 48 "Reset prefix (/usr) pour npm `sudo whoami`"
-      sudo npm config set prefix /usr
+      step 48 "Reset prefix (/usr/local) pour npm `sudo whoami`"
+      sudo npm config set prefix /usr/local
     fi
   fi  
 else
