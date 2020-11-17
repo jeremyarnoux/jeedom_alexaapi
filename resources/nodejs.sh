@@ -15,7 +15,7 @@ pre
 step 0 "Vérification des droits"
 DIRECTORY="/var/www"
 if [ ! -d "$DIRECTORY" ]; then
-  silent sudo mkdir $DIRECTORY
+	silent sudo mkdir $DIRECTORY
 fi
 silent sudo chown -R www-data $DIRECTORY
 
@@ -45,13 +45,12 @@ if [ -f /media/boot/multiboot/meson64_odroidc2.dtb.linux ]; then
     if [ "$hasRepo" -ne "0" ]; then
       echo "Désactivation de la source repo.jeedom.com !"
       toReAddRepo=1
-      silent sudo apt-add-repository -r "deb http://repo.jeedom.com/odroid/ stable main"
+      sudo apt-add-repository -r "deb http://repo.jeedom.com/odroid/ stable main"
     fi
 fi
 
-
 #prioritize nodesource nodejs
-try sudo bash -c "cat >> /etc/apt/preferences.d/nodesource" << EOL
+sudo bash -c "cat >> /etc/apt/preferences.d/nodesource" << EOL
 Package: nodejs
 Pin: origin deb.nodesource.com
 Pin-Priority: 600
@@ -67,27 +66,40 @@ if [ $? -eq 0 ]; then actual=`nodejs -v`; fi
 echo "Version actuelle : ${actual}"
 arch=`arch`
 
-#jeedom mini and rpi 1 2, 12 does not support arm6l
-if [[ $arch == "armv6l" ]]
-then
-  installVer='8' 	#NodeJS major version to be installed
-  minVer='8'	#min NodeJS major version to be accepted  
-fi
+#jeedom mini and rpi 1 2, NodeJS 12 does not support arm6l
+#if [[ $arch == "armv6l" ]]
+#then
+#  echo "$HR"
+#  echo "== KO == Erreur d'Installation"
+#  echo "$HR"
+#  echo "== ATTENTION Vous possédez une Jeedom mini ou Raspberry zero/1/2 (arm6l) et NodeJS 12 n'y est pas supporté, merci d'utiliser du matériel récent !!!"
+#  exit 1
+#fi
 
 #jessie as libstdc++ > 4.9 needed for nodejs 12
 lsb_release -c | grep jessie
 if [ $? -eq 0 ]
 then
-  installVer='8' 	#NodeJS major version to be installed
-  minVer='8'	#min NodeJS major version to be accepted  
+  today=$(date +%Y%m%d)
+  if [[ "$today" > "20200630" ]]; 
+  then 
+    echo "$HR"
+    echo "== KO == Erreur d'Installation"
+    echo "$HR"
+    echo "== ATTENTION Debian 8 Jessie n'est officiellement plus supportée depuis le 30 juin 2020, merci de mettre à jour votre distribution !!!"
+    exit 1
+  fi
 fi
 
-bits=`getconf LONG_BIT`
-vers=`lsb_release -c | grep stretch | wc -l`
-if { [ "$arch" = "i386" ]; } && [ "$bits" -eq "32" ] && [ "$vers" -eq "1" ]
+bits=$(getconf LONG_BIT)
+vers=$(lsb_release -c | grep stretch | wc -l)
+if { [ "$arch" = "i386" ] || [ "$arch" = "i686" ]; } && [ "$bits" -eq "32" ]
 then 
-  installVer='8' 	#NodeJS major version to be installed
-  minVer='8'	#min NodeJS major version to be accepted  
+  echo "$HR"
+  echo "== KO == Erreur d'Installation"
+  echo "$HR"
+  echo "== ATTENTION Votre système est x86 en 32bits et NodeJS 12 n'y est pas supporté, merci de passer en 64bits !!!"
+  exit 1 
 fi
 
 testVer=`php -r "echo version_compare('${actual}','v${minVer}','>=');"`
@@ -113,13 +125,13 @@ else
 
   if [[ $arch == "armv6l" ]]
   then
-    echo "Raspberry 1, 2 ou zéro détecté, utilisation du paquet v${installVer} pour ${arch}"
-    try wget -nd -nH -nc -np -e robots=off -r -l1 --no-parent -A"node-*-linux-${arch}.tar.gz" https://nodejs.org/download/release/latest-v${installVer}.x/
-    try tar -xvf node-*-linux-${arch}.tar.gz
-    cd node-*-linux-${arch}
-    try sudo cp -R * /usr/local/
+    echo "Jeedom Mini ou Raspberry 1, 2 ou zéro détecté, non supporté mais on essaye l'utilisation du paquet non-officiel v12.19.0 pour armv6l"
+    try wget https://unofficial-builds.nodejs.org/download/release/v12.19.0/node-v12.19.0-linux-armv6l.tar.gz
+    try tar -xvf node-v12.19.0-linux-armv6l.tar.gz
+    cd node-v12.19.0-linux-armv6l
+    try sudo cp -f -R * /usr/local/
     cd ..
-    silent rm -fR node-*-linux-${arch}*
+    silent rm -fR node-v12.19.0-linux-armv6l*
     silent ln -s /usr/local/bin/node /usr/bin/node
     silent ln -s /usr/local/bin/node /usr/bin/nodejs
     #upgrade to recent npm
@@ -133,7 +145,12 @@ else
   silent npm config set prefix ${npmPrefix}
 
   new=`nodejs -v`;
-  echo "Version actuelle : ${new}"
+  echo "Version après install : ${new}"
+  testVerAfter=$(php -r "echo version_compare('${new}','v${minVer}','>=');")
+  if [[ $testVerAfter != "1" ]]
+  then
+    echo "Version non suffisante, relancez les dépendances"
+  fi
 fi
 
 silent type npm
@@ -141,6 +158,28 @@ if [ $? -ne 0 ]; then
   step 45 "Installation de npm car non présent"
   try sudo DEBIAN_FRONTEND=noninteractive apt-get install -y npm  
   try sudo npm install -g npm
+fi
+
+npmPrefix=`npm prefix -g`
+npmPrefixSudo=`sudo npm prefix -g`
+npmPrefixwwwData=`sudo -u www-data npm prefix -g`
+echo -n "[Check Prefix : $npmPrefix and sudo prefix : $npmPrefixSudo and www-data prefix : $npmPrefixwwwData : "
+if [[ "$npmPrefixSudo" != "/usr" ]] && [[ "$npmPrefixSudo" != "/usr/local" ]]; then 
+  echo "[  KO  ]"
+  if [[ "$npmPrefixwwwData" == "/usr" ]] || [[ "$npmPrefixwwwData" == "/usr/local" ]]; then
+    step 48 "Reset prefix ($npmPrefixwwwData) pour npm `sudo whoami`"
+    sudo npm config set prefix $npmPrefixwwwData
+  else
+    if [[ "$npmPrefix" == "/usr" ]] || [[ "$npmPrefix" == "/usr/local" ]]; then
+      step 48 "Reset prefix ($npmPrefix) pour npm `sudo whoami`"
+      sudo npm config set prefix $npmPrefix
+    else
+      step 48 "Reset prefix (/usr) pour npm `sudo whoami`"
+      sudo npm config set prefix /usr
+    fi
+  fi  
+else
+  echo "[  OK  ]"
 fi
 
 step 50 "Nettoyage ancien modules"
