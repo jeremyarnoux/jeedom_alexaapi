@@ -51,10 +51,10 @@ class alexaapi extends eqLogic
         if ($withFireTV) {
             try {
                 $test = plugin::byId('alexafiretv');
-                array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '3914', config::byKey('numFireTV', 'alexaapi')));
+                array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064', config::byKey('numFireTV', 'alexaapi')));
             } catch (Exception $e) {
                 if ($all) {
-                    array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '3914'));
+                    array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064'));
                 }
             }
         }        try {
