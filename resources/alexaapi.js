@@ -220,7 +220,6 @@ CommandAlexa.Speak = function(req,res){
 	res.status(200).json({value: "Send"});	//ne teste pas le résultat//supprimé 16/11/2019
 };
 
-
 CommandAlexa.DisplayPower = function(req,res){
 
         res.type('json');
@@ -925,8 +924,8 @@ app.get('/command', CommandAlexa.Command);
 app.get('/SmarthomeCommand', CommandAlexa.SmarthomeCommand);
 app.get('/querySmarthomeDevices', CommandAlexa.querySmarthomeDevices);
 app.get('/volume', CommandAlexa.Volume);
-app.get('/DisplayPower', CommandAlexa.DisplayPower);
 app.get('/speak', CommandAlexa.Speak);
+app.get('/DisplayPower', CommandAlexa.DisplayPower);
 app.get('/announcement', CommandAlexa.Announcement);
 app.get('/radio', CommandAlexa.Radio);
 app.get('/push', CommandAlexa.Push);
