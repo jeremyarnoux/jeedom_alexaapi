@@ -1014,11 +1014,17 @@ public static function templateWidget(){
             $cas7 = ((!$this->hasCapaorFamilyorType("WHA")) && ($this->getConfiguration('devicetype') != "Player") && ((!$this->hasCapaorFamilyorType("FIRE_TV")) || ($this->hasCapaorFamilyorType("A2JKHJ0PX4J3L3"))) && !$widgetSmarthome && (!$this->hasCapaorFamilyorType("AMAZONMOBILEMUSIC_ANDROID")));
             $cas8 = (($this->hasCapaorFamilyorType("turnOff")) && $widgetSmarthome);
             $cas9 = ($this->hasCapaorFamilyorType("WHA") && $widgetEcho);
+            $cas10 = ($this->hasCapaorFamilyorType("CLOCK_FORMAT_24_HR") && $widgetEcho); // Echo Dot avec Horloge
             $false = false;
 
             // Volume on traite en premier car c'est fonction de WHA
             if ($cas6) self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fas fa-volume-up', null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas6);
             else       self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', false, true, 'fas fa-volume-up', null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas9);
+
+
+			// Pour l'echo avec horloge
+            self::updateCmd($F, 'clockon', 'action', 'other', false, 'Afficher Heure', true, true, 'fas fa-toggle-on', null, null, 'DisplayPower?value=ON', null, null, 80, $cas10);
+            self::updateCmd($F, 'clockoff', 'action', 'other', false, 'Eteindre Heure', true, true, 'fas fa-toggle-off', null, null, 'DisplayPower?value=OFF', null, null, 81, $cas10);
 
             //Anciennes functions a supprimer si elles existent encore
             self::updateCmd($F, 'musicalalarmmusicentity', 'action', 'other', true, 'musicalalarmmusicentity', false, false, null, null, null, 'musicalalarmmusicentity?position=1', 'Musical Alarm Music', null, 1, $false);
@@ -1385,6 +1391,7 @@ class alexaapiCmd extends cmd
                 $request = $this->build_ControledeSliderSelectMessage($_options, 's2960');
                 break;
             case 'SmarthomeCommand':
+            case 'DisplayPower':
                 $request = $this->build_ControledeSliderSelectMessage();
                 break;
             case 'command':
