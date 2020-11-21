@@ -34,7 +34,7 @@ class alexaapi extends eqLogic
         return $liste;
     }
 
-    public static function listePluginsAlexaArray($withAPI = false, $withSmartHome = false, $all = false)
+    public static function listePluginsAlexaArray($withAPI = false, $withSmartHome = false, $all = false, $withFireTV = false)
     {
         $liste = array();
         if ($withAPI) array_push($liste, array("pluginId" => "alexaapi", "nom" => "Alexa-API", "actif" => true));
@@ -48,7 +48,16 @@ class alexaapi extends eqLogic
                 }
             }
         }
-        try {
+        if ($withFireTV) {
+            try {
+                $test = plugin::byId('alexafiretv');
+                array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064', config::byKey('numFireTV', 'alexaapi')));
+            } catch (Exception $e) {
+                if ($all) {
+                    array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064'));
+                }
+            }
+        }        try {
             $test = plugin::byId('alexaamazonmusic');
             array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910', config::byKey('numAudioPlayer', 'alexaapi')));
         } catch (Exception $e) {
@@ -522,7 +531,9 @@ public static function templateWidget(){
             log::add('alexaapi_scan', 'debug', '------------------------------------------------------------------------------');
 
             foreach (self::listePluginsAlexa() as $pluginAlexaUnparUn) {
-                //log::add('alexaapi_scan', 'debug', '*** Détection pour le plugin '.$pluginAlexaUnparUn);
+				
+                log::add('alexaapi_scan', 'debug', '*** Détection pour le plugin '.$pluginAlexaUnparUn);
+				
                 if (in_array("AUDIO_PLAYER", $item['capabilities'])) {
                     $numAudioPlayer++;
                     if ($pluginAlexaUnparUn == 'alexaamazonmusic') {
@@ -575,30 +586,54 @@ public static function templateWidget(){
                     //$numDevices++;
                 }
             }
+                        
 
+			// On teste si Alexa-FireTV est installé et actif
+			$alexaFireTVActif=false;
+			$listePluginsAlexaArray=self::listePluginsAlexaArray(false, false, false, true);
+			if (in_array("alexafiretv", array_column($listePluginsAlexaArray, 'pluginId')))
+			{
+				// Ici Alexa-FireTV installé, on va tester si actif.
+				$keyAlexaFireTV=array_search("alexafiretv", array_column($listePluginsAlexaArray, 'pluginId'));
+				$alexaFireTVActif=$listePluginsAlexaArray[$keyAlexaFireTV]['actif']; // 0=inactif 1 =actif
+			}
+			
+			if (($item['family'] == 'FIRE_TV') && ($alexaFireTVActif))
+			{
+			// On a le plugin Alexa Fire TV présent et activé et la famille est FIRE_TV
+				$device = self::byLogicalId($item['serial'], 'alexafiretv');
+				if (!is_object($device)) {
+					$device = alexafiretv::createNewDevice($item['name'], $item['serial']);
+					$numNewDevices++;
+				}
+				// Update device configuration
+				log::add('alexaapi_scan', 'debug', '*** [Plugin Alexa-Fire TV       ] ->> détection de ' . $device->getName());
+				$numFireTV++;
+			} else {
 
-            // Retireve the device (if already registered in Jeedom)
-            $device = self::byLogicalId($item['serial'], 'alexaapi');
-            if (!is_object($device)) {
-                $device = self::createNewDevice($item['name'], $item['serial']);
-                //$device->save();
-                $numNewDevices++;
-            }
-            // Update device configuration
-            log::add('alexaapi_scan', 'debug', '*** [Plugin Alexa-API       ] ->> détection de ' . $device->getName());
-            $device->setConfiguration('device', $item['name']);
-            $device->setConfiguration('type', $item['type']);
-            $device->setConfiguration('devicetype', "Echo");
-            $device->setConfiguration('family', $item['family']);
-            $device->setConfiguration('members', $item['members']);
-            $device->setConfiguration('capabilities', $item['capabilities']);
-            try {
-                $device->save();
-            } catch (Exception $e) {
-                $device->setName($device->getName() . ' doublon ' . rand(0, 9999));
-                $device->save();
-            }
-            $device->setStatus('online', (($item['online']) ? true : false)); //SetStatus doit être lancé après Save et Save après inutile
+				// Détection des devices d'Alexa-API qui ne sont pas des Fire TV
+				$device = self::byLogicalId($item['serial'], 'alexaapi');
+				if (!is_object($device)) {
+					$device = self::createNewDevice($item['name'], $item['serial']);
+					$numNewDevices++;
+				}
+				// Update device configuration
+				log::add('alexaapi_scan', 'debug', '*** [Plugin Alexa-API       ] ->> détection de ' . $device->getName());
+			}
+				$device->setConfiguration('device', $item['name']);
+				$device->setConfiguration('type', $item['type']);
+				$device->setConfiguration('devicetype', "Echo");
+				$device->setConfiguration('family', $item['family']);
+				$device->setConfiguration('members', $item['members']);
+				$device->setConfiguration('capabilities', $item['capabilities']);
+				try {
+					$device->save();
+				} catch (Exception $e) {
+					$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
+					$device->save();
+				}
+				$device->setStatus('online', (($item['online']) ? true : false)); //SetStatus doit être lancé après Save et Save après inutile
+			
             $numDevices++;
         }
 
@@ -654,9 +689,10 @@ public static function templateWidget(){
 
         log::add('alexaapi_scan', 'debug', '*************************** Fin       du Scan Alexa-API ***********************************');
         config::save("numsmartHome", $numsmartHome, "alexaapi");
+        config::save("numFireTV", $numFireTV, "alexaapi");
         config::save("numAudioPlayer", $numAudioPlayer, "alexaapi");
         config::save("numDevices", $numDevices, "alexaapi");
-        log::add('alexaapi_scan', 'debug', $numAudioPlayer . ' Players / ' . $numsmartHome . ' smartHome/ ' . $numDevices . ' numDevices  -> enregistré dans Config');
+        log::add('alexaapi_scan', 'debug', $numAudioPlayer . ' Players / ' . $numFireTV . ' Fire TV / ' . $numsmartHome . ' smartHome/ ' . $numDevices . ' numDevices  -> enregistré dans Config');
 
         event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
     }
