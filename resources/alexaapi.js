@@ -370,6 +370,37 @@ for (var i = 0; i < 9; i++) {
 	);	
 		
 };
+
+/***** Alexa.textCommand *****
+  URL: /textCommand?device=?&value=?
+    device - String - name of the device
+    value - Integer - Determine the volume level between 0 to 100 (0 is mute and 100 is max)
+*/
+CommandAlexa.textCommand = function(req,res){
+	
+	res.type('json');
+
+
+	config.logger(' {API}    ╔═══════[Lancement /textCommand avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text+'══════════════════════════════════', "INFO");
+	//config.logger(' {API}    ╔══════════════════════[Lancement Serveur]═════════════════════════════════════════════════════════','INFO');
+
+	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.textCommand', 'Missing parameter "device"'));
+	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.textCommand', 'Missing parameter "text"'));
+
+//req.query.text="je suis fatigué";
+	alexa.sendSequenceCommand(req.query.device, 'textCommand', req.query.text, 
+		function(testErreur){
+				if (testErreur) 
+				{traiteErreur(testErreur, 'textCommand', req.query);
+				res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.textCommand', testErreur.message));
+				}
+				else
+				res.status(200).json({value: "OK"});	//ne teste pas le résultat
+			}
+	);	
+		
+};
+
 /***** Alexa.playList *****
   URL: /volume?device=?&value=?
     device - String - name of the device
@@ -924,6 +955,7 @@ app.get('/command', CommandAlexa.Command);
 app.get('/SmarthomeCommand', CommandAlexa.SmarthomeCommand);
 app.get('/querySmarthomeDevices', CommandAlexa.querySmarthomeDevices);
 app.get('/volume', CommandAlexa.Volume);
+app.get('/textCommand', CommandAlexa.textCommand);
 app.get('/speak', CommandAlexa.Speak);
 app.get('/DisplayPower', CommandAlexa.DisplayPower);
 app.get('/announcement', CommandAlexa.Announcement);

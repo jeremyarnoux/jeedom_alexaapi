@@ -1,0 +1,49 @@
+{
+  "playlists": {
+    "Coralie": [
+      {
+        "entryList": null,
+        "playlistId": "a8feaaf9-40a4-4e33-bd4d-b6dd71af85fd",
+        "title": "Coralie",
+        "trackCount": 21,
+        "version": "48"
+      }
+    ],
+    "Lionel": [
+      {
+        "entryList": null,
+        "playlistId": "99c06295-dca8-4b26-a7ad-bdc3b3f10a53",
+        "title": "Lionel",
+        "trackCount": 3,
+        "version": "12"
+      }
+    ],
+    "Manon": [
+      {
+        "entryList": null,
+        "playlistId": "bc045dcb-5621-4b94-80ad-936a81eea963",
+        "title": "Manon",
+        "trackCount": 5,
+        "version": "6"
+      }
+    ],
+    "Mes Likes": [
+      {
+        "entryList": null,
+        "playlistId": "438c677384b940a2b624ba7acdfdf722",
+        "title": "Mes Likes",
+        "trackCount": 0,
+        "version": "10:174701215"
+      }
+    ],
+    "Tabata": [
+      {
+        "entryList": null,
+        "playlistId": "c431e01b-9d44-4b64-ac82-58c6654229f8",
+        "title": "Tabata",
+        "trackCount": 14,
+        "version": "6"
+      }
+    ]
+  }
+}

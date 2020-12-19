@@ -1,0 +1,106 @@
+{
+  "playerInfo": {
+    "hint": null,
+    "infoText": {
+      "header": null,
+      "headerSubtext1": null,
+      "multiLineMode": false,
+      "subText1": "Matt Houston",
+      "subText2": "Viens zouker (Vol. 3 mixed by DJ Wilson)",
+      "title": "Frotte"
+    },
+    "isPlayingInLemur": true,
+    "lemurVolume": {
+      "compositeVolume": {
+        "muted": false,
+        "volume": 77
+      },
+      "memberVolume": {
+        "G0014D0594660EC9": {
+          "muted": false,
+          "volume": 100
+        },
+        "G070RQ13812407G6": {
+          "muted": false,
+          "volume": 100
+        },
+        "G090LF118173117U": {
+          "muted": false,
+          "volume": 63
+        },
+        "G0911W079304113M": {
+          "muted": false,
+          "volume": 47
+        }
+      }
+    },
+    "lyrics": null,
+    "mainArt": {
+      "altText": "Album Art",
+      "artType": "UrlArtSource",
+      "contentType": "image/jpeg",
+      "url": "https://m.media-amazon.com/images/I/81-4SMi7rfL._UL600_.jpg"
+    },
+    "mediaId": "0aca083c-fd2f-4324-8e22-970c05e5e8aa:1",
+    "miniArt": {
+      "altText": "Album Art",
+      "artType": "UrlArtSource",
+      "contentType": "image/jpeg",
+      "url": "https://m.media-amazon.com/images/I/61TTJ7xrSTL._UL256_.jpg"
+    },
+    "miniInfoText": {
+      "header": null,
+      "headerSubtext1": null,
+      "multiLineMode": false,
+      "subText1": "Matt Houston",
+      "subText2": "Amazon Music",
+      "title": "Frotte"
+    },
+    "playbackSource": null,
+    "playingInLemurId": "e8c0d0d753744383bf0af603b49bc154",
+    "progress": {
+      "allowScrubbing": true,
+      "locationInfo": null,
+      "mediaLength": 199,
+      "mediaProgress": 199,
+      "showTiming": true,
+      "visible": true
+    },
+    "provider": {
+      "artOverlay": "PRIME_SASH",
+      "fallbackMainArt": {
+        "altText": null,
+        "artType": "IconArtSource",
+        "iconId": "music-no-art",
+        "iconStyles": null
+      },
+      "providerDisplayName": null,
+      "providerLogo": {
+        "altText": "Amazon Music",
+        "artType": "IconArtSource",
+        "iconId": "amazon-music",
+        "iconStyles": null
+      },
+      "providerName": "Amazon Music"
+    },
+    "quality": null,
+    "queueId": "0aca083c-fd2f-4324-8e22-970c05e5e8aa",
+    "state": "IDLE",
+    "template": null,
+    "transport": {
+      "closedCaptions": null,
+      "layoutType": "MusicTransportLayout",
+      "lyrics": "HIDDEN",
+      "next": "DISABLED",
+      "playPause": "ENABLED",
+      "previous": "ENABLED",
+      "repeat": "ENABLED",
+      "shuffle": "ENABLED"
+    },
+    "upNextItems": null,
+    "volume": {
+      "muted": false,
+      "volume": 0
+    }
+  }
+}

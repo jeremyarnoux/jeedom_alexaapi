@@ -1,0 +1,83 @@
+{
+  "playerInfo": {
+    "hint": null,
+    "infoText": {
+      "header": null,
+      "headerSubtext1": null,
+      "multiLineMode": false,
+      "subText1": "90s Maniacs",
+      "subText2": "90's One Hit Wonders",
+      "title": "Chihuahua"
+    },
+    "isPlayingInLemur": false,
+    "lemurVolume": null,
+    "lyrics": null,
+    "mainArt": {
+      "altText": "Pochette d'album",
+      "artType": "UrlArtSource",
+      "contentType": "image/jpeg",
+      "url": "https://m.media-amazon.com/images/I/81AYWFhE5tL._UL600_.jpg"
+    },
+    "mediaId": "999710bf-2d8e-43d1-8b81-c357b737a97c:1",
+    "miniArt": {
+      "altText": "Pochette d'album",
+      "artType": "UrlArtSource",
+      "contentType": "image/jpeg",
+      "url": "https://m.media-amazon.com/images/I/61N9FeOaNeL._UL256_.jpg"
+    },
+    "miniInfoText": {
+      "header": null,
+      "headerSubtext1": null,
+      "multiLineMode": false,
+      "subText1": "90s Maniacs",
+      "subText2": "Amazon Music",
+      "title": "Chihuahua"
+    },
+    "playbackSource": null,
+    "playingInLemurId": null,
+    "progress": {
+      "allowScrubbing": true,
+      "locationInfo": null,
+      "mediaLength": 182,
+      "mediaProgress": 182,
+      "showTiming": true,
+      "visible": true
+    },
+    "provider": {
+      "artOverlay": "PRIME_SASH",
+      "fallbackMainArt": {
+        "altText": null,
+        "artType": "IconArtSource",
+        "iconId": "music-no-art",
+        "iconStyles": null
+      },
+      "providerDisplayName": null,
+      "providerLogo": {
+        "altText": "Amazon Music",
+        "artType": "IconArtSource",
+        "iconId": "amazon-music",
+        "iconStyles": null
+      },
+      "providerName": "Amazon Music"
+    },
+    "quality": null,
+    "queueId": "999710bf-2d8e-43d1-8b81-c357b737a97c",
+    "state": "IDLE",
+    "template": null,
+    "transport": {
+      "closedCaptions": null,
+      "layoutType": "MusicTransportLayout",
+      "lyrics": "HIDDEN",
+      "next": "DISABLED",
+      "playPause": "ENABLED",
+      "previous": "ENABLED",
+      "repeat": "ENABLED",
+      "shuffle": "ENABLED"
+    },
+    "upNextItems": null,
+    "volume": {
+      "muted": false,
+      "volume": 100
+    }
+  }
+}

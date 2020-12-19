@@ -1,0 +1,83 @@
+{
+  "playerInfo": {
+    "hint": null,
+    "infoText": {
+      "header": null,
+      "headerSubtext1": null,
+      "multiLineMode": false,
+      "subText1": "El Profesor, HUGEL",
+      "subText2": "Bella Ciao (Hugel Remix)",
+      "title": "Bella Ciao (Hugel Remix)"
+    },
+    "isPlayingInLemur": false,
+    "lemurVolume": null,
+    "lyrics": null,
+    "mainArt": {
+      "altText": "Pochette d'album",
+      "artType": "UrlArtSource",
+      "contentType": "image/jpeg",
+      "url": "https://album-art-storage-eu.s3.eu-west-1.amazonaws.com/ea1d0a56287b3d20a1805e65a0887ee5859c69ef2a3bc8a0dcecc86c2819d4be_500x500.jpg?response-content-type=image%2Fjpeg&X-Amz-Security-Token=FwoGZXIvYXdzEMD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDI5agAy2JVUwjSCzoiKCAa9V4JoEp9KXCtia7hJ4M1SUSBGcKG2zl33UCkku7l1%2F5pnoJRIZAXOH9gMaeLPmwEBgaHxO%2FWmFdqubp1B%2FMnhaMGjRw8apn8NAp%2F0Duias4v8R0e1g7kJILXL6tvLb89pPBqJr9RjLOiv%2BQIanXUJ6yQA4%2Fb374ZDP4HLWIDKdDIEonLr2%2FgUyKGcA%2Fa7L1Gyx0g7hqM8X2rZL5zBrXwYTakjeZeyd2PX%2F26yNNlSPyOU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20201219T124004Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86399&X-Amz-Credential=ASIAZZLLX6KM3ZEABJWV%2F20201219%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Signature=eda1d4530df4c28ff7bca01871b7406463554de2b921f9dcd617c65701b8d39c"
+    },
+    "mediaId": "5b357e5b-1907-41bd-a1fb-8d069ee493ef:1",
+    "miniArt": {
+      "altText": "Pochette d'album",
+      "artType": "UrlArtSource",
+      "contentType": "image/jpeg",
+      "url": "https://album-art-storage-eu.s3.eu-west-1.amazonaws.com/ea1d0a56287b3d20a1805e65a0887ee5859c69ef2a3bc8a0dcecc86c2819d4be_48x48.jpg?response-content-type=image%2Fjpeg&X-Amz-Security-Token=FwoGZXIvYXdzEMD%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDI5agAy2JVUwjSCzoiKCAa9V4JoEp9KXCtia7hJ4M1SUSBGcKG2zl33UCkku7l1%2F5pnoJRIZAXOH9gMaeLPmwEBgaHxO%2FWmFdqubp1B%2FMnhaMGjRw8apn8NAp%2F0Duias4v8R0e1g7kJILXL6tvLb89pPBqJr9RjLOiv%2BQIanXUJ6yQA4%2Fb374ZDP4HLWIDKdDIEonLr2%2FgUyKGcA%2Fa7L1Gyx0g7hqM8X2rZL5zBrXwYTakjeZeyd2PX%2F26yNNlSPyOU%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20201219T124004Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86399&X-Amz-Credential=ASIAZZLLX6KM3ZEABJWV%2F20201219%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Signature=6793739e9d76e397a6dc95d2d66f2adb7017bc610ab613014a393061036d37b0"
+    },
+    "miniInfoText": {
+      "header": null,
+      "headerSubtext1": null,
+      "multiLineMode": false,
+      "subText1": "El Profesor, HUGEL",
+      "subText2": "Amazon Music",
+      "title": "Bella Ciao (Hugel Remix)"
+    },
+    "playbackSource": null,
+    "playingInLemurId": null,
+    "progress": {
+      "allowScrubbing": true,
+      "locationInfo": null,
+      "mediaLength": 164,
+      "mediaProgress": 164,
+      "showTiming": true,
+      "visible": true
+    },
+    "provider": {
+      "artOverlay": "PRIME_SASH",
+      "fallbackMainArt": {
+        "altText": null,
+        "artType": "IconArtSource",
+        "iconId": "music-no-art",
+        "iconStyles": null
+      },
+      "providerDisplayName": null,
+      "providerLogo": {
+        "altText": "Amazon Music",
+        "artType": "IconArtSource",
+        "iconId": "amazon-music",
+        "iconStyles": null
+      },
+      "providerName": "Amazon Music"
+    },
+    "quality": null,
+    "queueId": "5b357e5b-1907-41bd-a1fb-8d069ee493ef",
+    "state": "IDLE",
+    "template": null,
+    "transport": {
+      "closedCaptions": null,
+      "layoutType": "MusicTransportLayout",
+      "lyrics": "HIDDEN",
+      "next": "ENABLED",
+      "playPause": "ENABLED",
+      "previous": "ENABLED",
+      "repeat": "ENABLED",
+      "shuffle": "ENABLED"
+    },
+    "upNextItems": null,
+    "volume": {
+      "muted": false,
+      "volume": 63
+    }
+  }
+}

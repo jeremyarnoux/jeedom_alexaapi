@@ -545,7 +545,7 @@ function AlexaCookie() {
                         if (pos !== -1) _options.amazonPage = body.marketPlaceDomainName.substr(pos + 1);
                     }
                     loginData.amazonPage = _options.amazonPage;
-                } else if (error && !_options.amazonPage) {
+                } else if (error && (!_options || !_options.amazonPage)) {
                     callback && callback(error, null);
                     return;
                 } else if (error && !_options.formerRegistrationData.amazonPage && _options.amazonPage) {

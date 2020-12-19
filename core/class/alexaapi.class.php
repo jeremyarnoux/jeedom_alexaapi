@@ -1079,6 +1079,7 @@ public static function templateWidget(){
             self::updateCmd($F, 'turnOff', 'action', 'other', false, 'turnOff', true, true, "far fa-circle", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
 
             self::updateCmd($F, 'command', 'action', 'message', false, 'Command', false, true, "fas fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);
+            self::updateCmd($F, 'textCommand', 'action', 'message', false, 'Parler à Alexa', true, false, null, null, 'alexaapi::message', 'textCommand?text=#message#', null, null, 39, $cas1bis);
             self::updateCmd($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, false, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#', null, null, 40, $cas1bis);
             self::updateCmd($F, 'speaklegacy', 'action', 'message', false, 'Faire parler Alexa (legacy)', false, false, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#&legacy=1', null, null, 43, $cas1bis);
             self::updateCmd($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', true, true, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=1', null, null, 44, $cas1bis);
@@ -1377,6 +1378,7 @@ class alexaapiCmd extends cmd
                 $request = $this->build_ControledeSliderSelectMessage($_options, "53bfa26d-f24c-4b13-97a8-8c3debdf06f0");
                 break;
             case 'speak':
+            case 'textCommand':
             case 'announcement':
             case 'push':
             case 'multiplenext':
@@ -1430,7 +1432,7 @@ class alexaapiCmd extends cmd
 
     private function build_ControledeSliderSelectMessage($_options = array(), $default = "Ceci est un message de test")
     {
-        $cmd = $this->getEqLogic()->getCmd(null, 'volumeinfo');
+       $cmd = $this->getEqLogic()->getCmd(null, 'volumeinfo');
         if (is_object($cmd))
             $lastvolume = $cmd->execCmd();
 
@@ -1444,7 +1446,7 @@ class alexaapiCmd extends cmd
         if (!(isset($_options['select']))) $_options['select'] = "";
         if (!(isset($_options['message']))) $_options['message'] = "";
         if (!(isset($_options['volume']))) $_options['volume'] = "";
-        //log::add('alexaapi_node', 'info', 'xxxxxxxxxxxxx---->_options:'.json_encode($_options));
+        //log::add('alexaapi', 'info', 'xxxxxxxxxxxxx---->_options:'.json_encode($_options));
         // Si on est sur une commande qui utilise volume, on va remettre après execution le volume courant
         if (strstr($request, '&volume=')) $request = $request . '&lastvolume=' . $lastvolume;
         $request = str_replace(
@@ -1452,7 +1454,7 @@ class alexaapiCmd extends cmd
             array($_options['slider'], $_options['select'], urlencode(self::decodeTexteAleatoire($_options['message'])), $_options['volume']),
             $request
         );
-        //log::add('alexaapi_node', 'info', '---->RequestFinale:'.$request);
+        //log::add('alexaapi', 'info', '---->RequestFinale:'.$request);
         return $request;
     }
 
