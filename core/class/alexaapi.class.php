@@ -900,7 +900,7 @@ public static function templateWidget(){
                     $value = $cmd->execute();
                 }
             } catch (Exception $exc) {
-                log::add('alexaapi', 'error', __('Erreur2 pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());
+                log::add('alexaapi', 'warning', __('Erreur pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());
             }
 
             /*
