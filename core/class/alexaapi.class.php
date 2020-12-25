@@ -900,7 +900,7 @@ public static function templateWidget(){
                     $value = $cmd->execute();
                 }
             } catch (Exception $exc) {
-                log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());
+                log::add('alexaapi', 'error', __('Erreur2 pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());
             }
 
             /*
@@ -975,7 +975,7 @@ public static function templateWidget(){
                     //log::add('alexaapi', 'info', 'Enregistre Logical ID :' . $cmd->getLogicalId());
                 }
             } catch (Exception $exc) {
-                log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . ' : ' . $exc->getMessage());
+                log::add('alexaapi', 'error', __('Erreur1 pour ', __FILE__) . ' : ' . $exc->getMessage());
             }
         } else {
             //log::add('alexaapi', 'debug', 'PAS de **'.$LogicalId.'*********************************');
