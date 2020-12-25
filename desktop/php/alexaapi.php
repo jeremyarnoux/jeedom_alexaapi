@@ -312,9 +312,15 @@ foreach ($eqLogics as $eqLogic) {
                                             <select class="eqLogicAttr form-control" data-l1key="object_id">
                                                 <option value="">{{Aucun}}</option>
                                                 <?php
+<<<<<<< HEAD
                                                 foreach (jeeObject::all() as $object) {
                                                     echo '<option value="' . $object->getId() . '">' . $object->getName() . '</option>';
 												}
+=======
+                                                foreach ((jeeObject::buildTree(null, false)) as $object) {
+							echo '<option value="' . $object->getId() . '">' . str_repeat('&nbsp;&nbsp;', $object->getConfiguration('parentNumber')) . $object->getName() . '</option>';
+						}
+>>>>>>> c05e5ceb2d61a1fa083de0487223fe997ca3182b
                                                 ?>
                                             </select>
                                         </div>
