@@ -707,6 +707,7 @@ public static function templateWidget(){
             return;
         }
         $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeDevices");
+        log::add('alexasmarthome_scan', 'debug', 'On récupère : '."http://" . config::byKey('internalAddr') . ":3456/smarthomeDevices");
         $json = json_decode($json, true);
         log::add('alexasmarthome_scan', 'debug', 'json:' . $json);
         foreach ($json as $key => $value) {
@@ -728,21 +729,32 @@ public static function templateWidget(){
                                         log::add('alexasmarthome_scan', 'debug', '							item7:' . json_encode($value7));
                                         log::add('alexasmarthome_scan', 'debug', '							==> applianceId:' . json_encode($value7['applianceId']));
                                         log::add('alexasmarthome_scan', 'debug', '							==> entityId:' . json_encode($value7['entityId']));
+                                        log::add('alexasmarthome_scan', 'debug', '							==> friendlyName:' . json_encode($value7['friendlyName']));
                                         log::add('alexaapi_scan', 'debug', 'smarthomeDevices ==> ' . json_encode($value7['friendlyName']) . '=[' . json_encode($value7['entityId']) . ']');
                                         $Onatrouvelelien = false;
                                         foreach (eqLogic::byType('alexasmarthome', true) as $alexasmarthome) {
                                             if ($alexasmarthome->getLogicalId() == $value7['entityId']) {
                                                 $alexasmarthome->setConfiguration('applianceId', $value7['applianceId']);
-                                                log::add('alexasmarthome_scan', 'info', 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
-                                                log::add('alexasmarthome_scan', 'info', 'Lien de ' . $alexasmarthome->getName() . ' trouvé et mis à jour!!');
-                                                log::add('alexasmarthome_scan', 'info', json_encode($value7['entityId']) . ' <=> ' . json_encode($value7['applianceId']));
-                                                log::add('alexasmarthome_scan', 'info', 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
+                                                log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.$alexasmarthome->getName().']═══════════════════════════════════════════════════════════════════════════');
+                                                log::add('alexasmarthome_scan', 'info', ' ║ Lien entre Alexa-API ('.$alexasmarthome->getName().') et smarHome ('.json_encode($value7['friendlyName']).') trouvé et mis à jour');
+                                                log::add('alexasmarthome_scan', 'info', ' ║ Equipement trouvé et mis à jour');
+												//Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome) 
+                                                log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
+                                                log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
+                                                log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
                                                 $alexasmarthome->save();
                                                 $Onatrouvelelien = true;
                                             }
                                         }
-                                        if (!($Onatrouvelelien))
-                                            log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT UNE RUSTINE ICI!!!!!!!!!!');
+                                        if (!($Onatrouvelelien)) {
+                                                log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.json_encode($value7['friendlyName']).']═══════════════════════════════════════════════════════════════════════════');
+                                                log::add('alexasmarthome_scan', 'info', ' ║ Equipement trouvé mais non intégré.');
+												//Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome) 
+                                                log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
+                                                log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
+                                                log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+                                            //log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT UNE RUSTINE ICI!!!!!!!!!!');
+										}
                                     }
                                 }
                             }
