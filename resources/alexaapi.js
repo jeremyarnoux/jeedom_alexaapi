@@ -689,7 +689,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 		}
 		catch(error) {
 				//config.logger('deviceStates.entity.entityId>NON trouvé sur '+entityType+"/"+req.query.device,'DEBUG');
-				config.logger('{Remote} ║ deviceStates.entity.entityId>NON trouvé sur ['+entityType+"/"+req.query.device+"]",'ERROR');
+				config.logger('{Remote}    ║ deviceStates.entity.entityId>NON trouvé sur ['+entityType+"/"+req.query.device+"]",'ERROR');
 
 		}
 
@@ -711,7 +711,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			}
 			
 		}*/
-		config.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════','ERROR');
+		config.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════','INFO');
 		res.status(200).json(toReturn);
 	});
 
