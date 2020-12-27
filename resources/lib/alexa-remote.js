@@ -47,6 +47,7 @@ class AlexaRemote extends EventEmitter {
         this.cookie = null;
         this.csrf = null;
         this.cookieData = null;
+        this.cookieaSauvegarder = false;
 
         this.baseUrl = alexaserver;
     }
@@ -79,6 +80,7 @@ class AlexaRemote extends EventEmitter {
         }
         this._options.csrf = this.csrf;
         this._options.cookie = this.cookie;
+        this.emit('cookie', this.cookie, this.csrf); // ajout 26/12/2020
     }
 
     init(cookie, callback) {
@@ -130,21 +132,34 @@ class AlexaRemote extends EventEmitter {
                 });
             }
             else {
-                self._options.logger && self._options.logger('{Remote} ╠═══> Cookie OK','DEBUG');
+                self._options.logger && self._options.logger('{Remote} ╠═╦═> Cookie OK','DEBUG');
                 if (self._options.formerRegistrationData) {
+					
+				const dateObject = new Date(self._options.formerRegistrationData.tokenDate);
+				const datesigalou=dateObject.toLocaleString("fr-FR", {day: "2-digit"})+"/"+dateObject.toLocaleString("fr-FR", {month: "2-digit"})+"/"+dateObject.toLocaleString("fr-FR", {year: "numeric"})+" à "+dateObject.toLocaleTimeString("en-US", {hour12: false});
+					
+                self._options.logger && self._options.logger('{Remote} ║ ╠═════> Dernier cookie généré le '+datesigalou,'DEBUG');
                     const tokensValidSince = Date.now() - self._options.formerRegistrationData.tokenDate;
-                    if (tokensValidSince < 24 * 60 * 60 * 1000) {
+                    if (tokensValidSince < 23 * 60 * 60  * 1000) {
+					self._options.logger && self._options.logger('{Remote} ║ ╚═════> donc encore valable, on ne le regénère pas','DEBUG');
+                    //if (tokensValidSince < 24 * 60 * 60 * 1000) {
+						//self._options.logger && self._options.logger('{Remote} ╠══***********************═════> return tokensValidSince='+tokensValidSince,'DEBUG');
                         return callback(null);
                     }
-                    self._options.logger && self._options.logger('Alexa-Remote: former registration data exist, try refresh');
-                    self._options.logger && self._options.logger(JSON.stringify(self._options.formerRegistrationData));
+                    //self._options.logger && self._options.logger('Alexa-Remote: former registration data exist, try refresh');
+					self._options.logger && self._options.logger('{Remote} ║ ╠═════> Anciennes données existent - On tente un rafraîchissement','DEBUG');
+                    self._options.logger && self._options.logger('{Remote} ║ ╚═════> '+JSON.stringify(self._options.formerRegistrationData),'DEBUG');
+					self.cookieaSauvegarder=true;
                     self.refreshCookie(function(err, res) {
                         if (err || !res) {
-                            self._options.logger && self._options.logger('Alexa-Remote: Error from refreshing cookies');
+                            //self._options.logger && self._options.logger('Alexa-Remote: Error from refreshing cookies');
+                self._options.logger && self._options.logger('{Remote} ╠═══════> Rafraîchissement ERREUR cookies','DEBUG');
                             self.cookie = null;
                             return getCookie(callback); // error on refresh
                         }
-                        self.setCookie(res); // update
+                //self._options.logger && self._options.logger('{Remote} ╠══***********************═════> avant','DEBUG');
+						self.setCookie(res); // update
+                //self._options.logger && self._options.logger('{Remote} ╠══***********************═════> après','DEBUG');
                         return callback(null);
                     });
                 }

@@ -21,7 +21,7 @@ var useWsMqtt=true;
 /* Configuration */
 const config = {
 	cookieLocation: __dirname + '/data/alexa-cookie.json',
-	cookieRefreshInterval: 7 * 24 * 60 * 1000,
+	cookieRefreshInterval: 3 * 24 * 60 * 60 * 1000,
 	logger: consoleSigalou,
 	alexaServiceHost: alexaserver,
     useWsMqtt: useWsMqtt, 
@@ -33,6 +33,7 @@ var dernierStartServeur=0;
 // Par sécurité pour détecter un éventuel souci :
 if (!amazonserver) config.logger('Alexa-Config: *********************amazonserver NON DEFINI*********************');
 if (!alexaserver) config.logger('Alexa-Config: *********************alexaserver NON DEFINI*********************');
+		
 
 
 // Speed up calls to hasOwnProperty - Pour le test function isEmpty(obj)
@@ -349,7 +350,6 @@ CommandAlexa.Volume = function(req,res){
 	if ('volume' in req.query) req.query.value=req.query.volume;
 	
 	config.logger(' {API}    ╔═══════[Lancement /Volume avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.value+'══════════════════════════════════', "INFO");
-	//config.logger(' {API}    ╔══════════════════════[Lancement Serveur]═════════════════════════════════════════════════════════','INFO');
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "device"'));
 	if ('value' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "value"'));
@@ -382,7 +382,6 @@ CommandAlexa.textCommand = function(req,res){
 
 
 	config.logger(' {API}    ╔═══════[Lancement /textCommand avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text+'══════════════════════════════════', "INFO");
-	//config.logger(' {API}    ╔══════════════════════[Lancement Serveur]═════════════════════════════════════════════════════════','INFO');
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.textCommand', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.textCommand', 'Missing parameter "text"'));
@@ -2595,7 +2594,12 @@ app.get('/whennextreminderlabel', (req, res) => {
 
 /***** Stop the server *****/
 app.get('/stop', (req, res) => {
-	config.logger(' {API}:      Shuting down','INFO');
+	//config.logger(' {API}:      Shuting down','INFO');
+	config.logger(' {API}               ╔═════════════════════════════════════════════╗','INFO');
+	config.logger(' {API}               ║   Lien au serveur Amazon En COURS D ARRET   ║' ,'INFO');
+	config.logger(' {API}               ╚═════════════════════════════════════════════╝','INFO');
+
+	
 	res.status(200).json({});
 	server.close(() => {
 		process.exit(0);
@@ -2647,10 +2651,9 @@ function startServer() {
 		alexa = null;
 		alexa = new Alexa();
 		config.logger(' ','INFO');
-		config.logger(' {API}    ╔══════════════════════[Lancement Serveur]═════════════════════════════════════════════════════════','INFO');
-		//config.logger('{API}:    ******************** Lancement Serveur ***********************','INFO');
-		
-		alexa.init({
+		config.logger(' {API}    ╔═══════════════════[Lancement du lien au Serveur Amazon]═════════════════════════════════════════════════════════','INFO');
+
+				alexa.init({
 				cookie: config.cookie,
 				logger: config.logger,
 				alexaServiceHost: config.alexaServiceHost,
@@ -2664,34 +2667,39 @@ function startServer() {
 					config.logger("{API}    ║   Souci dans l'initiatlisation du serveur " + err ,'ERROR');
 					config.logger("{API}    ║   ou le serveur " + config.alexaServiceHost + " n'est pas joignable" ,'ERROR');
 					config.logger('{API}    ╚════════════════════════════════════════════════════════════════════════════════════════','ERROR');
-					//config.logger('{API}:    Error while initializing alexa');
-					//config.logger('{API}:    ' + err);
 					process.exit(-1);
 				}
 
+				config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+				config.logger(' {API}    ║   >>>>>>>>>>>>>>>>>>>>>>>>>>>> ' + alexa.cookieaSauvegarder ,'INFO');
+				config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+
+
+
+				//if ((alexa.cookieData) && (alexa.cookieaSauvegarder)) {
 				if (alexa.cookieData) {
-					fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) => {
-						if (err) {
-							config.logger('{API}:    Error while saving the cookie to: ' + config.cookieLocation);
-							config.logger('{API}:    ' + err);
-						}
-						config.logger('{API}    ╠═══> New cookie saved to:' + config.cookieLocation,'DEBUG');
-
-						// Start the server
-						if (server) {
+					if (alexa.cookieaSauvegarder) {
+						fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) => {
+							if (err) {
+								config.logger('{API}:    Error while saving the cookie to: ' + config.cookieLocation);
+								config.logger('{API}:    ' + err);
+							}
+							config.logger('{API}    ╠═══> New cookie saved to:' + config.cookieLocation,'DEBUG');
+						});
+					}
+					// Start the server
+					if (server) {
+						config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+						config.logger(' {API}    ║   Server is already listening on port ' + server.address().port ,'INFO');
+						config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+					} else {
+						server = app.listen(config.listeningPort, () => {
 							config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-							config.logger(' {API}    ║   Server is already listening on port ' + server.address().port ,'INFO');
+							config.logger(' {API}    ║   Server OK listening on port ' + server.address().port ,'INFO');
 							config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-						} else {
-							server = app.listen(config.listeningPort, () => {
-								config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-								config.logger(' {API}    ║   Server OK listening on port ' + server.address().port ,'INFO');
-								config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
 
-							});
-						}
-						//AllerVoirSilYaDesCommandesenFileAttente();
-					});
+						});
+					}
 				}
 			});
 	}
