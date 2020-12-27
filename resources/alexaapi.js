@@ -711,7 +711,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			}
 			
 		}*/
-		config.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════','INFO');
+		config.logger(' {Remote} ╚════════════════════════════════════════════════════════════════════════════════════════','INFO');
 		res.status(200).json(toReturn);
 	});
 
