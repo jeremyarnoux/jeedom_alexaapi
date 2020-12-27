@@ -2670,13 +2670,6 @@ function startServer() {
 					process.exit(-1);
 				}
 
-				config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-				config.logger(' {API}    ║   >>>>>>>>>>>>>>>>>>>>>>>>>>>> ' + alexa.cookieaSauvegarder ,'INFO');
-				config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-
-
-
-				//if ((alexa.cookieData) && (alexa.cookieaSauvegarder)) {
 				if (alexa.cookieData) {
 					if (alexa.cookieaSauvegarder) {
 						fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) => {
