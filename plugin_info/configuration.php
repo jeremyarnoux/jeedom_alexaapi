@@ -46,7 +46,6 @@ $versionJeedom = $return['configuration']['version'];
 </style>
 <legend><i class="icon divers-triangular42"></i> {{Génération manuelle du cookie Amazon}}</legend>
 <center>
-
     <a class="btn btn-success btn-sm bt_startDeamonCookie"> {{Identifiez-vous sur Amazon pour créer le cookie
         d'identification}} </a>
     <a class="btn btn-warning btn-sm bt_identificationCookie2"><i class="fas fa-clock"></i> {{... Attendez la génération
@@ -63,6 +62,7 @@ $versionJeedom = $return['configuration']['version'];
         quand vous avez terminé l'identification}} </a>
     <br><br>
 </center>
+<b>Nota</b><small> : Cette fonctionnalité ne sera utilisée qu'à l'installation du plugin, le plugin prend ensuite en charge la régénèration du cookie.<br>La génération manuelle doit se faire depuis un ordinateur se trouvant sur le même réseau local que votre jeedom. (Pas d'accès à distance)</small> <br>
 <?php //echo '<p align="right"><span class="label label-info">{{Debug Proxy 3457 : }}'. $deamon_info['stateCookies'] .'</span></p>';
 ?> <br/>
 <legend><i class="fas fa-wrench"></i> {{Réparations}}</legend>
@@ -341,6 +341,7 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
     $('.bt_identificationCookie1').hide();
 
     // On appuie sur Le lancement du serveur... on lance "deamonCookieStart" via action=deamonCookieStart dans alexaapi.ajax.php
+	/* Version désactivée le temps de trouver le bug du cookie
     $('.bt_startDeamonCookie').off('click').on('click', function () {
         var textToDisplay = '{{<b>NB : Cette fonctionnalité n\'est disponible que en local, pas à distance !!</b>}}';
         if (window.location.hostname != "<?php echo network::getNetworkAccess('internal', 'ip'); ?>") {
@@ -370,8 +371,28 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
                 });
             }
         });
+    });*/
+    $('.bt_startDeamonCookie').off('click').on('click', function () {
+	clearTimeout(timeout_refreshDeamonInfo);
+    jeedom.plugin.deamonCookieStart(
+    {
+      id : plugin_id,
+      forceRestart: 1,
+      error: function (error)
+      {
+        $('#div_alert').showAlert({message: error.message, level: 'danger'});
+        refreshDeamonInfo();
+        timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
+      },
+      success:function(){
+        refreshDeamonInfo();
+        $('.bt_startDeamonCookie').hide();
+        $('.bt_identificationCookie').show();
+        timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 1000);
+		attendre();
+}
     });
-
+  });
 
     $('.bt_supprimeTouslesDevices').off('click').on('click', function () {
         $('#md_modal').dialog('close');

@@ -140,7 +140,8 @@ class AlexaRemote extends EventEmitter {
 					
                 self._options.logger && self._options.logger('{Remote} ║ ╠═════> Dernier cookie généré le '+datesigalou,'DEBUG');
                     const tokensValidSince = Date.now() - self._options.formerRegistrationData.tokenDate;
-                    if (tokensValidSince < 23 * 60 * 60  * 1000) {
+                    if (tokensValidSince < 5 * 24 * 60 * 60  * 1000) {
+                    //if (tokensValidSince <  1000) { // pour tests sigalou
 					self._options.logger && self._options.logger('{Remote} ║ ╚═════> donc encore valable, on ne le regénère pas','DEBUG');
                     //if (tokensValidSince < 24 * 60 * 60 * 1000) {
 						//self._options.logger && self._options.logger('{Remote} ╠══***********************═════> return tokensValidSince='+tokensValidSince,'DEBUG');

@@ -2679,7 +2679,21 @@ function startServer() {
 							}
 							config.logger('{API}    ╠═══> New cookie saved to:' + config.cookieLocation,'DEBUG');
 						});
-					}
+						
+						//-------------------------------------------------------------------------------------------------
+						// Sauvegarde a supprimer plus tard, pour trouver souci du cookie qui n'est plus valide Sigalou
+						/*
+						var d = new Date();
+						var date_format_str = d.getFullYear().toString() + "-" + ((d.getMonth() + 1).toString().length == 2 ? (d.getMonth() + 1).toString() : "0" + (d.getMonth() + 1).toString()) + "-" + (d.getDate().toString().length == 2 ? d.getDate().toString() : "0" + d.getDate().toString()) + "_" + (d.getHours().toString().length == 2 ? d.getHours().toString() : "0" + d.getHours().toString()) + ":" + ((parseInt(d.getMinutes() / 5) * 5).toString().length == 2 ? (parseInt(d.getMinutes() / 5) * 5).toString() : "0" + (parseInt(d.getMinutes() / 5) * 5).toString()) + ":00";
+						fs.writeFile("/var/www/html/plugins/alexaapi/resources/data/alexa-cookie_"+date_format_str+".json", JSON.stringify(alexa.cookieData), 'utf8', (err) => {
+							config.logger('{API}    ╠═══> Copie du cookie saved to:' + "/var/www/html/plugins/alexaapi/resources/data/alexa-cookie_"+date_format_str+".json",'DEBUG');
+						});								
+						//-------------------------------------------------------------------------------------------------
+						//-------------------------------------------------------------------------------------------------
+						*/
+						
+						
+						}
 					// Start the server
 					if (server) {
 						config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');

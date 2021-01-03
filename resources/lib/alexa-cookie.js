@@ -30,11 +30,11 @@ const defaultUserAgentLinux = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.3
 const defaultAcceptLanguage = 'fr-FR';
 
 const csrfOptions = [
-    '/api/language',
-    '/spa/index.html',
-    '/api/devices-v2/device?cached=false',
-    '/templates/oobe/d-device-pick.handlebars',
-    '/api/strings'
+//    '/api/language', //echec 4
+    '/spa/index.html', //ok 3
+    '/api/devices-v2/device?cached=false', //ok 1
+    '/templates/oobe/d-device-pick.handlebars', //ok 1
+//    '/api/strings' //echec 3
 ];
 
 function AlexaCookie() {
@@ -206,10 +206,20 @@ function AlexaCookie() {
 
     const getCSRFFromCookies = (cookie, _options, callback) => {
         // get CSRF
-        const csrfUrls = csrfOptions;
+        var csrfUrls = csrfOptions;
+
+		function entierAleatoire(min, max)
+		{
+		 return Math.floor(Math.random() * (max - min + 1)) + min;
+		}
 
         function csrfTry() {
-            const path = csrfUrls.shift();
+            //const path = csrfUrls.shift();
+			const max=csrfUrls.length-1
+			var entier = entierAleatoire(0, max);
+//            _options.logger('{Cookie} ║ │ csrf Aleatoire entre 0 et ' + max+' est :'+entier,'DEBUG');
+            const path = csrfUrls[entier];
+//            _options.logger('{Cookie} ║ │ csrf path=' + path,'DEBUG');
             let options = {
                 'host': 'alexa.' + _options.amazonPage,
                 'path': path,
@@ -230,7 +240,10 @@ function AlexaCookie() {
                 cookie = addCookies(cookie, response ? response.headers : null);
                 let ar = /csrf=([^;]+)/.exec(cookie);
                 let csrf = ar ? ar[1] : undefined;
-                _options.logger('{Cookie} ║ │ Result: csrf=' + csrf + ', Cookie=' + cookie,'DEBUG');
+                _options.logger('{Cookie} ║ │ Result: csrf=[' + csrf + '], Cookie=' + cookie,'DEBUG');
+              //  _options.logger('{Cookie} ║ │ Result: csrfUrls.length=' + csrfUrls.length ,'DEBUG');
+	                
+				
                 if (!csrf && csrfUrls.length) {
                     csrfTry();
                     return;
