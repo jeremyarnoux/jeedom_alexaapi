@@ -11,6 +11,7 @@
  * https://github.com/thorsten-gehrig/alexa-remote-control
  * and much enhanced ...
  * Version la plus récente sur : https://github.com/Apollon77/alexa-remote
+ info API timer : https://developer.amazon.com/en-US/docs/alexa/smapi/alexa-timers-api-reference.html
  */
 
 const https = require('https');

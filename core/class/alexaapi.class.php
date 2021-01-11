@@ -3,6 +3,8 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 class alexaapi extends eqLogic
 {
+	/*     * *************************Attributs pour autoriser les onglets Affichage et Disposition****************************** */
+	public static $_widgetPossibility = array('custom' => true, 'custom::layout' => true);
 
     // A supprimer dans quelques temps, tous les listePluginsAlexa sont remplacés par listePluginsAlexaArray
     public static function listePluginsAlexa($withAPI = false, $withSmartHome = false)
