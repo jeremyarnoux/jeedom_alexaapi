@@ -195,10 +195,14 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
 
     function onError(err, req, res) {
         _options.logger && _options.logger('ERROR: ' + err);
-        res.writeHead(500, {
-            'Content-Type': 'text/plain'
-        });
-        res.end('Proxy-Error: ' + err);
+        try {
+            res.writeHead(500, {
+                'Content-Type': 'text/plain'
+            });
+            res.end('Proxy-Error: ' + err);
+        } catch (err) {
+            // ignore
+        }
     }
 
     function replaceHosts(data) {

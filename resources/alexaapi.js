@@ -21,7 +21,7 @@ var useWsMqtt=true;
 /* Configuration */
 const config = {
 	cookieLocation: __dirname + '/data/alexa-cookie.json',
-	cookieRefreshInterval: 7 * 24 * 60 * 1000,
+	cookieRefreshInterval: 3 * 24 * 60 * 60 * 1000,
 	logger: consoleSigalou,
 	alexaServiceHost: alexaserver,
     useWsMqtt: useWsMqtt, 
@@ -33,6 +33,7 @@ var dernierStartServeur=0;
 // Par sécurité pour détecter un éventuel souci :
 if (!amazonserver) config.logger('Alexa-Config: *********************amazonserver NON DEFINI*********************');
 if (!alexaserver) config.logger('Alexa-Config: *********************alexaserver NON DEFINI*********************');
+		
 
 
 // Speed up calls to hasOwnProperty - Pour le test function isEmpty(obj)
@@ -349,7 +350,6 @@ CommandAlexa.Volume = function(req,res){
 	if ('volume' in req.query) req.query.value=req.query.volume;
 	
 	config.logger(' {API}    ╔═══════[Lancement /Volume avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.value+'══════════════════════════════════', "INFO");
-	//config.logger(' {API}    ╔══════════════════════[Lancement Serveur]═════════════════════════════════════════════════════════','INFO');
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "device"'));
 	if ('value' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "value"'));
@@ -370,6 +370,36 @@ for (var i = 0; i < 9; i++) {
 	);	
 		
 };
+
+/***** Alexa.textCommand *****
+  URL: /textCommand?device=?&value=?
+    device - String - name of the device
+    value - Integer - Determine the volume level between 0 to 100 (0 is mute and 100 is max)
+*/
+CommandAlexa.textCommand = function(req,res){
+	
+	res.type('json');
+
+
+	config.logger(' {API}    ╔═══════[Lancement /textCommand avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text+'══════════════════════════════════', "INFO");
+
+	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.textCommand', 'Missing parameter "device"'));
+	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.textCommand', 'Missing parameter "text"'));
+
+//req.query.text="je suis fatigué";
+	alexa.sendSequenceCommand(req.query.device, 'textCommand', req.query.text, 
+		function(testErreur){
+				if (testErreur) 
+				{traiteErreur(testErreur, 'textCommand', req.query);
+				res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.textCommand', testErreur.message));
+				}
+				else
+				res.status(200).json({value: "OK"});	//ne teste pas le résultat
+			}
+	);	
+		
+};
+
 /***** Alexa.playList *****
   URL: /volume?device=?&value=?
     device - String - name of the device
@@ -659,7 +689,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 		}
 		catch(error) {
 				//config.logger('deviceStates.entity.entityId>NON trouvé sur '+entityType+"/"+req.query.device,'DEBUG');
-				config.logger('{Remote} ║ deviceStates.entity.entityId>NON trouvé sur ['+entityType+"/"+req.query.device+"]",'ERROR');
+				config.logger('{Remote}    ║ deviceStates.entity.entityId>NON trouvé sur ['+entityType+"/"+req.query.device+"]",'ERROR');
 
 		}
 
@@ -681,7 +711,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			}
 			
 		}*/
-		config.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════','ERROR');
+		config.logger(' {Remote} ╚════════════════════════════════════════════════════════════════════════════════════════','INFO');
 		res.status(200).json(toReturn);
 	});
 
@@ -924,6 +954,7 @@ app.get('/command', CommandAlexa.Command);
 app.get('/SmarthomeCommand', CommandAlexa.SmarthomeCommand);
 app.get('/querySmarthomeDevices', CommandAlexa.querySmarthomeDevices);
 app.get('/volume', CommandAlexa.Volume);
+app.get('/textCommand', CommandAlexa.textCommand);
 app.get('/speak', CommandAlexa.Speak);
 app.get('/DisplayPower', CommandAlexa.DisplayPower);
 app.get('/announcement', CommandAlexa.Announcement);
@@ -2563,7 +2594,12 @@ app.get('/whennextreminderlabel', (req, res) => {
 
 /***** Stop the server *****/
 app.get('/stop', (req, res) => {
-	config.logger(' {API}:      Shuting down','INFO');
+	//config.logger(' {API}:      Shuting down','INFO');
+	config.logger(' {API}               ╔═════════════════════════════════════════════╗','INFO');
+	config.logger(' {API}               ║   Lien au serveur Amazon En COURS D ARRET   ║' ,'INFO');
+	config.logger(' {API}               ╚═════════════════════════════════════════════╝','INFO');
+
+	
 	res.status(200).json({});
 	server.close(() => {
 		process.exit(0);
@@ -2615,10 +2651,9 @@ function startServer() {
 		alexa = null;
 		alexa = new Alexa();
 		config.logger(' ','INFO');
-		config.logger(' {API}    ╔══════════════════════[Lancement Serveur]═════════════════════════════════════════════════════════','INFO');
-		//config.logger('{API}:    ******************** Lancement Serveur ***********************','INFO');
-		
-		alexa.init({
+		config.logger(' {API}    ╔═══════════════════[Lancement du lien au Serveur Amazon]═════════════════════════════════════════════════════════','INFO');
+
+				alexa.init({
 				cookie: config.cookie,
 				logger: config.logger,
 				alexaServiceHost: config.alexaServiceHost,
@@ -2632,34 +2667,46 @@ function startServer() {
 					config.logger("{API}    ║   Souci dans l'initiatlisation du serveur " + err ,'ERROR');
 					config.logger("{API}    ║   ou le serveur " + config.alexaServiceHost + " n'est pas joignable" ,'ERROR');
 					config.logger('{API}    ╚════════════════════════════════════════════════════════════════════════════════════════','ERROR');
-					//config.logger('{API}:    Error while initializing alexa');
-					//config.logger('{API}:    ' + err);
 					process.exit(-1);
 				}
 
 				if (alexa.cookieData) {
-					fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) => {
-						if (err) {
-							config.logger('{API}:    Error while saving the cookie to: ' + config.cookieLocation);
-							config.logger('{API}:    ' + err);
+					if (alexa.cookieaSauvegarder) {
+						fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) => {
+							if (err) {
+								config.logger('{API}:    Error while saving the cookie to: ' + config.cookieLocation);
+								config.logger('{API}:    ' + err);
+							}
+							config.logger('{API}    ╠═══> New cookie saved to:' + config.cookieLocation,'DEBUG');
+						});
+						
+						//-------------------------------------------------------------------------------------------------
+						// Sauvegarde a supprimer plus tard, pour trouver souci du cookie qui n'est plus valide Sigalou
+						/*
+						var d = new Date();
+						var date_format_str = d.getFullYear().toString() + "-" + ((d.getMonth() + 1).toString().length == 2 ? (d.getMonth() + 1).toString() : "0" + (d.getMonth() + 1).toString()) + "-" + (d.getDate().toString().length == 2 ? d.getDate().toString() : "0" + d.getDate().toString()) + "_" + (d.getHours().toString().length == 2 ? d.getHours().toString() : "0" + d.getHours().toString()) + ":" + ((parseInt(d.getMinutes() / 5) * 5).toString().length == 2 ? (parseInt(d.getMinutes() / 5) * 5).toString() : "0" + (parseInt(d.getMinutes() / 5) * 5).toString()) + ":00";
+						fs.writeFile("/var/www/html/plugins/alexaapi/resources/data/alexa-cookie_"+date_format_str+".json", JSON.stringify(alexa.cookieData), 'utf8', (err) => {
+							config.logger('{API}    ╠═══> Copie du cookie saved to:' + "/var/www/html/plugins/alexaapi/resources/data/alexa-cookie_"+date_format_str+".json",'DEBUG');
+						});								
+						//-------------------------------------------------------------------------------------------------
+						//-------------------------------------------------------------------------------------------------
+						*/
+						
+						
 						}
-						config.logger('{API}    ╠═══> New cookie saved to:' + config.cookieLocation,'DEBUG');
-
-						// Start the server
-						if (server) {
+					// Start the server
+					if (server) {
+						config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+						config.logger(' {API}    ║   Server is already listening on port ' + server.address().port ,'INFO');
+						config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+					} else {
+						server = app.listen(config.listeningPort, () => {
 							config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-							config.logger(' {API}    ║   Server is already listening on port ' + server.address().port ,'INFO');
+							config.logger(' {API}    ║   Server OK listening on port ' + server.address().port ,'INFO');
 							config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-						} else {
-							server = app.listen(config.listeningPort, () => {
-								config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-								config.logger(' {API}    ║   Server OK listening on port ' + server.address().port ,'INFO');
-								config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
 
-							});
-						}
-						//AllerVoirSilYaDesCommandesenFileAttente();
-					});
+						});
+					}
 				}
 			});
 	}

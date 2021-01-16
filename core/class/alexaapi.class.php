@@ -3,6 +3,8 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 class alexaapi extends eqLogic
 {
+	/*     * *************************Attributs pour autoriser les onglets Affichage et Disposition****************************** */
+	public static $_widgetPossibility = array('custom' => true, 'custom::layout' => true);
 
     // A supprimer dans quelques temps, tous les listePluginsAlexa sont remplacés par listePluginsAlexaArray
     public static function listePluginsAlexa($withAPI = false, $withSmartHome = false)
@@ -707,6 +709,7 @@ public static function templateWidget(){
             return;
         }
         $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeDevices");
+        log::add('alexasmarthome_scan', 'debug', 'On récupère : '."http://" . config::byKey('internalAddr') . ":3456/smarthomeDevices");
         $json = json_decode($json, true);
         log::add('alexasmarthome_scan', 'debug', 'json:' . $json);
         foreach ($json as $key => $value) {
@@ -728,21 +731,32 @@ public static function templateWidget(){
                                         log::add('alexasmarthome_scan', 'debug', '							item7:' . json_encode($value7));
                                         log::add('alexasmarthome_scan', 'debug', '							==> applianceId:' . json_encode($value7['applianceId']));
                                         log::add('alexasmarthome_scan', 'debug', '							==> entityId:' . json_encode($value7['entityId']));
+                                        log::add('alexasmarthome_scan', 'debug', '							==> friendlyName:' . json_encode($value7['friendlyName']));
                                         log::add('alexaapi_scan', 'debug', 'smarthomeDevices ==> ' . json_encode($value7['friendlyName']) . '=[' . json_encode($value7['entityId']) . ']');
                                         $Onatrouvelelien = false;
                                         foreach (eqLogic::byType('alexasmarthome', true) as $alexasmarthome) {
                                             if ($alexasmarthome->getLogicalId() == $value7['entityId']) {
                                                 $alexasmarthome->setConfiguration('applianceId', $value7['applianceId']);
-                                                log::add('alexasmarthome_scan', 'info', 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
-                                                log::add('alexasmarthome_scan', 'info', 'Lien de ' . $alexasmarthome->getName() . ' trouvé et mis à jour!!');
-                                                log::add('alexasmarthome_scan', 'info', json_encode($value7['entityId']) . ' <=> ' . json_encode($value7['applianceId']));
-                                                log::add('alexasmarthome_scan', 'info', 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
+                                                log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.$alexasmarthome->getName().']═══════════════════════════════════════════════════════════════════════════');
+                                                log::add('alexasmarthome_scan', 'info', ' ║ Lien entre Alexa-API ('.$alexasmarthome->getName().') et smarHome ('.json_encode($value7['friendlyName']).') trouvé et mis à jour');
+                                                log::add('alexasmarthome_scan', 'info', ' ║ Equipement trouvé et mis à jour');
+												//Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome) 
+                                                log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
+                                                log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
+                                                log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
                                                 $alexasmarthome->save();
                                                 $Onatrouvelelien = true;
                                             }
                                         }
-                                        if (!($Onatrouvelelien))
-                                            log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT UNE RUSTINE ICI!!!!!!!!!!');
+                                        if (!($Onatrouvelelien)) {
+                                                log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.json_encode($value7['friendlyName']).']═══════════════════════════════════════════════════════════════════════════');
+                                                log::add('alexasmarthome_scan', 'info', ' ║ Equipement trouvé mais non intégré.');
+												//Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome) 
+                                                log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
+                                                log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
+                                                log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+                                            //log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT UNE RUSTINE ICI!!!!!!!!!!');
+										}
                                     }
                                 }
                             }
@@ -900,7 +914,7 @@ public static function templateWidget(){
                     $value = $cmd->execute();
                 }
             } catch (Exception $exc) {
-                log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());
+                log::add('alexaapi', 'warning', __('Erreur pour ', __FILE__) . $this->getHumanName() . ' : ' . $exc->getMessage());
             }
 
             /*
@@ -975,7 +989,7 @@ public static function templateWidget(){
                     //log::add('alexaapi', 'info', 'Enregistre Logical ID :' . $cmd->getLogicalId());
                 }
             } catch (Exception $exc) {
-                log::add('alexaapi', 'error', __('Erreur pour ', __FILE__) . ' : ' . $exc->getMessage());
+                log::add('alexaapi', 'error', __('Erreur1 pour ', __FILE__) . ' : ' . $exc->getMessage());
             }
         } else {
             //log::add('alexaapi', 'debug', 'PAS de **'.$LogicalId.'*********************************');
@@ -1079,6 +1093,7 @@ public static function templateWidget(){
             self::updateCmd($F, 'turnOff', 'action', 'other', false, 'turnOff', true, true, "far fa-circle", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
 
             self::updateCmd($F, 'command', 'action', 'message', false, 'Command', false, true, "fas fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);
+            self::updateCmd($F, 'textCommand', 'action', 'message', false, 'Parler à Alexa', true, false, null, null, 'alexaapi::message', 'textCommand?text=#message#', null, null, 39, $cas1bis);
             self::updateCmd($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, false, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#', null, null, 40, $cas1bis);
             self::updateCmd($F, 'speaklegacy', 'action', 'message', false, 'Faire parler Alexa (legacy)', false, false, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#&legacy=1', null, null, 43, $cas1bis);
             self::updateCmd($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', true, true, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=1', null, null, 44, $cas1bis);
@@ -1335,7 +1350,7 @@ class alexaapiCmd extends cmd
             foreach ($this->getConfiguration('infoNameArray') as $LogicalIdCmd) {
                 $cmd = $this->getEqLogic()->getCmd(null, $LogicalIdCmd);
                 if (is_object($cmd)) {
-                    $this->getEqLogic()->checkAndUpdateCmd($LogicalIdCmd, $resultjson[0][$LogicalIdCmd]);
+                    if(array_key_exists('0', $resultjson)){$this->getEqLogic()->checkAndUpdateCmd($LogicalIdCmd, $resultjson[0][$LogicalIdCmd]);}
                     //log::add('alexaapi', 'info', $LogicalIdCmd.' prévu dans infoNameArray de '.$this->getName().' trouvé ! '.$resultjson[0]['whennextmusicalalarminfo'].' OK !');
                 } else {
                     log::add('alexaapi', 'warning', $LogicalIdCmd . ' prévu dans infoNameArray de ' . $this->getName() . ' mais non trouvé ! donc ignoré');
@@ -1377,6 +1392,7 @@ class alexaapiCmd extends cmd
                 $request = $this->build_ControledeSliderSelectMessage($_options, "53bfa26d-f24c-4b13-97a8-8c3debdf06f0");
                 break;
             case 'speak':
+            case 'textCommand':
             case 'announcement':
             case 'push':
             case 'multiplenext':
@@ -1430,7 +1446,7 @@ class alexaapiCmd extends cmd
 
     private function build_ControledeSliderSelectMessage($_options = array(), $default = "Ceci est un message de test")
     {
-        $cmd = $this->getEqLogic()->getCmd(null, 'volumeinfo');
+       $cmd = $this->getEqLogic()->getCmd(null, 'volumeinfo');
         if (is_object($cmd))
             $lastvolume = $cmd->execCmd();
 
@@ -1444,7 +1460,7 @@ class alexaapiCmd extends cmd
         if (!(isset($_options['select']))) $_options['select'] = "";
         if (!(isset($_options['message']))) $_options['message'] = "";
         if (!(isset($_options['volume']))) $_options['volume'] = "";
-        //log::add('alexaapi_node', 'info', 'xxxxxxxxxxxxx---->_options:'.json_encode($_options));
+        //log::add('alexaapi', 'info', 'xxxxxxxxxxxxx---->_options:'.json_encode($_options));
         // Si on est sur une commande qui utilise volume, on va remettre après execution le volume courant
         if (strstr($request, '&volume=')) $request = $request . '&lastvolume=' . $lastvolume;
         $request = str_replace(
@@ -1452,7 +1468,7 @@ class alexaapiCmd extends cmd
             array($_options['slider'], $_options['select'], urlencode(self::decodeTexteAleatoire($_options['message'])), $_options['volume']),
             $request
         );
-        //log::add('alexaapi_node', 'info', '---->RequestFinale:'.$request);
+        //log::add('alexaapi', 'info', '---->RequestFinale:'.$request);
         return $request;
     }
 

@@ -80,6 +80,8 @@ class AlexaWsMqtt extends EventEmitter {
         let initTimeout = null;
 
         this.websocket.on('open', () => {
+			
+			if (! this.websocket) return; // ajouté 26/12/2020
             this._options.logger && this._options.logger('{MQTT}   ║ Open: ' + url,'DEBUG');
             this.connectionActive = false;
 
@@ -171,14 +173,22 @@ class AlexaWsMqtt extends EventEmitter {
 
                 //msg = new Buffer('4D53472030783030303030303635203078306534313465343720662030783030303030303031203078626332666262356620307830303030303036322050494E00000000D1098D8CD1098D8C000000070052006500670075006C0061007246414245', 'hex'); // "MSG 0x00000065 0x0e414e47 f 0x00000001 0xbc2fbb5f 0x00000062 PIN" + 30 + "FABE"
                 msg = this.encodePing();
-                this._options.logger && this._options.logger(' {MQTT}   ║ Send First Ping','INFO');
+				this._options.logger && this._options.logger(' {MQTT}              ╔══════════════════════╗','INFO');
+				this._options.logger && this._options.logger(' {MQTT}              ╠═══> Send First Ping  ║' ,'INFO');
+                //this._options.logger && this._options.logger(' {MQTT}   ║ Send First Ping','INFO');
                 //console.log('SEND: ' + msg.toString('hex'));
                 this.websocket.send(msg);
 
                 this.pingPongInterval = setInterval(() => {
                     //let msg = new Buffer('4D53472030783030303030303635203078306534313465343720662030783030303030303031203078626332666262356620307830303030303036322050494E00000000D1098D8CD1098D8C000000070052006500670075006C0061007246414245', 'hex'); // "MSG 0x00000065 0x0e414e47 f 0x00000001 0xbc2fbb5f 0x00000062 PIN" + 30 + "FABE"
                     let msg = this.encodePing();
-                    this._options.logger && this._options.logger(' {MQTT}   ╠═══> Send Ping','INFO');
+                   // this._options.logger && this._options.logger(' {MQTT}   ╠═══> Send Ping','INFO');
+				this._options.logger && this._options.logger(' {MQTT}              ╔══════════════════════╗','INFO');
+				this._options.logger && this._options.logger(' {MQTT}              ║    Contrôle MQTT     ║' ,'INFO');
+				this._options.logger && this._options.logger(' {MQTT}              ╠═══> Send Ping        ║' ,'INFO');
+					
+					
+					
                     //console.log('SEND: ' + msg.toString('hex'));
                     this.websocket.send(msg);
 
@@ -195,7 +205,9 @@ class AlexaWsMqtt extends EventEmitter {
             const incomingMsg = data.toString('ascii');
             //if (incomingMsg.includes('PON') && incomingMsg.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
             if (message.service === 'FABE' && message.content && message.content.messageType === 'PON' && message.content.payloadData && message.content.payloadData.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
-                this._options.logger && this._options.logger(' {MQTT}   ║<═══ Received Pong','INFO');
+				this._options.logger && this._options.logger(' {MQTT}              ║<═══ Received Pong    ║' ,'INFO');
+				this._options.logger && this._options.logger(' {MQTT}              ╚══════════════════════╝','INFO');
+
                 if (initTimeout) {
                     clearTimeout(initTimeout);
                     initTimeout = null;

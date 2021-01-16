@@ -18,7 +18,7 @@ alexa.init({
   //alexaServiceHost: 'layla.amazon.de', // optional, e.g. "pitangui.amazon.com" for amazon.com, default is "layla.amazon.de"
   alexaServiceHost: alexaserver,
           useWsMqtt: true, // optional, true to use the Websocket/MQTT direct push connection
-        cookieRefreshInterval: 7*24*60*1000 // optional, cookie refresh intervall, set to 0 to disable refresh
+        cookieRefreshInterval: 3*24*60*60*1000 // optional, cookie refresh intervall, set to 0 to disable refresh
 },
 function (err)
 {
