@@ -1350,7 +1350,7 @@ class alexaapiCmd extends cmd
             foreach ($this->getConfiguration('infoNameArray') as $LogicalIdCmd) {
                 $cmd = $this->getEqLogic()->getCmd(null, $LogicalIdCmd);
                 if (is_object($cmd)) {
-                    $this->getEqLogic()->checkAndUpdateCmd($LogicalIdCmd, $resultjson[0][$LogicalIdCmd]);
+                    if(array_key_exists('0', $resultjson)){$this->getEqLogic()->checkAndUpdateCmd($LogicalIdCmd, $resultjson[0][$LogicalIdCmd]);}
                     //log::add('alexaapi', 'info', $LogicalIdCmd.' prévu dans infoNameArray de '.$this->getName().' trouvé ! '.$resultjson[0]['whennextmusicalalarminfo'].' OK !');
                 } else {
                     log::add('alexaapi', 'warning', $LogicalIdCmd . ' prévu dans infoNameArray de ' . $this->getName() . ' mais non trouvé ! donc ignoré');
