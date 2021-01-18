@@ -1063,7 +1063,8 @@ this._options.logger && this._options.logger(obj.headers);
     }
 
     getLists(callback) {
-        this.httpsGet ('/api/namedLists?_=%t', (err, res) => callback && callback(err, res && res.lists));
+		this.httpsGet ('/api/namedLists?_=%t', (err, res) => callback && callback(err, res && res.lists));
+	
 	}
 
     getList(listId, callback) {

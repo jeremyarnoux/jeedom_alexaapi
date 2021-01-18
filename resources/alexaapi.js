@@ -1331,6 +1331,18 @@ CommandAlexa.deviceStatusList = function(req, res) {
 	});
 };
 
+CommandAlexa.lists = function(req, res) {
+	var commandeEnvoyee = req.path.replace("/", "");
+	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	res.type('json');
+	Appel_getLists(function(retourAmazon) {
+		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500);});
+		res.status(200).json(retourAmazon);
+	});
+};
+
 
 /*
 CommandAlexa.doNotDisturb = function(req, res) {
@@ -1432,23 +1444,6 @@ CommandAlexa.activities = function(req, res) {
 	config.logger('{API}    ╠═══> Device : ' + req.query.device, 'DEBUG');
 
 	Appel_getActivities(req.query.device, function(retourAmazon) {
-		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
-		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
-			{if (err) return res.sendStatus(500);});
-		res.status(200).json(retourAmazon);
-	});
-};
-
-CommandAlexa.lists = function(req, res) {
-	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
-	res.type('json');
-
-	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
-		config.logger('{API}    ╠═══> Device : ' + req.query.device, 'DEBUG');
-
-
-	Appel_getLists(req.query.device, function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500);});
@@ -1560,6 +1555,14 @@ function Appel_getDeviceStatusList(callback)
 	callback && callback(res);});
 	}
 	
+function Appel_getLists(callback) 
+	{
+	alexa.getLists((err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}	
+	
+	
+	
 function Appel_Playlists(serialOrName,callback) 
 	{
 	alexa.Playlists(serialOrName,(err, res) => {if (err) return callback && callback();
@@ -1601,12 +1604,10 @@ function Appel_getActivities(serialOrName,callback)
 	alexa.getActivities(serialOrName,(err, res) => {if (err || !res ) return callback && callback();
 	callback && callback(res);});
 	}
+
+
 	
-function Appel_getLists(serialOrName,callback) 
-	{
-	alexa.getLists(serialOrName,(err, res) => {if (err || !res ) return callback && callback();
-	callback && callback(res);});
-	}	
+	
 	// Tous les appels GET
 
 app.get('/wakeWords', CommandAlexa.wakeWords);

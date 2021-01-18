@@ -28,7 +28,7 @@ $masquedevice = true;
 switch ($_GET['json']) {
     case 'activities':
     case 'media':
-    case 'lists':
+  //  case 'lists':
     case 'deviceNotificationState':
     case 'notificationSounds':
     case 'playlists':
@@ -42,11 +42,14 @@ $fichierJson = realpath(dirname(__FILE__)) . "/../../resources/data/" . $partieF
 //echo "Va chercher :" . $fichierJson;
 $texteaAfficher = "Dernière mise à jour : " . date("d F Y H:i:s", filemtime($fichierJson));
 
+   // echo "génération de http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device']."<---";
 
 if (date("U", filemtime($fichierJson)) == "0") {
     $fichierJson = "http://" . config::byKey('internalAddr') . ":3456/" . $commande . "?device=" . $_GET['device'];
+	
+	
     //$fichierJson=@file_get_contents("http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device']);
-    //echo "génération de http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device']."<---";
+   // echo "génération de http://" . config::byKey('internalAddr') . ":3456/".$commande."?device=".$_GET['device']."<---";
     $texteaAfficher = "Dernière mise à jour : à l'instant";
 }
 
