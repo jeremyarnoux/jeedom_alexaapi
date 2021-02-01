@@ -2016,7 +2016,7 @@ return this.parseValue4Notification(notification, value);    }
             limit = 0;
         }
         limit = limit || 2000;
-        this.httpsGet (`/api/behaviors/automations?limit=${limit}`, callback, {
+        this.httpsGet (`/api/behaviors/v2/automations?limit=${limit}`, callback, {
             timeout: 30000
         });    }
 
