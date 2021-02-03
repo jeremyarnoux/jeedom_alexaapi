@@ -76,7 +76,9 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
                 <option value="devicePreferences" <?php if ($_GET['json'] == "devicePreferences") echo "selected" ?>>
                     Préférences
                 </option>
-                <option value="homeGroup" <?php if ($_GET['json'] == "homeGroup") echo "selected" ?>>Home Group</option>
+                <option value="allDeviceVolumes" <?php if ($_GET['json'] == "allDeviceVolumes") echo "selected" ?>>
+                    allDeviceVolumes
+                </option>                <option value="homeGroup" <?php if ($_GET['json'] == "homeGroup") echo "selected" ?>>Home Group</option>
                 <option value="smarthomegroups" <?php if ($_GET['json'] == "smarthomegroups") echo "selected" ?>>
                     Smarthome Groups
                 </option>

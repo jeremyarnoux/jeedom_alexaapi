@@ -447,7 +447,7 @@ public static function templateWidget(){
             //self::checkAuth(); 20/09/2020 on désactive ce test pour voir s'il est utile ou pas
         }
 
-        $autorefreshRR = config::byKey('autorefresh', 'alexaapi', '33 3 * * *');/* boucle qui relance la connexion au serveur*/
+        $autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '33 3 * * *'));/* boucle qui relance la connexion au serveur*/
         $cc = new Cron\CronExpression($autorefreshRR, new Cron\FieldFactory);
         if ($cc->isDue() && $deamon_info['state'] == 'ok') {
             self::restartServeurPHP();
@@ -910,7 +910,7 @@ public static function templateWidget(){
                         //log::add('alexaapi', 'info', 'NON pour '.$cmd->getName());
                         continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
                     }
-                    log::add('alexaapi', 'info', 'OUI pour ' . $cmd->getName());
+                    //log::add('alexaapi', 'info', 'OUI pour ' . $cmd->getName());
                     $value = $cmd->execute();
                 }
             } catch (Exception $exc) {

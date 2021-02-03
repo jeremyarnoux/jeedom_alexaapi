@@ -713,13 +713,13 @@ class AlexaRemote extends EventEmitter {
     getPushedActivities() {
         if (this.activityUpdateRunning || !this.activityUpdateQueue.length) return;
         this.activityUpdateRunning = true;
-        this.getActivities({size: this.activityUpdateQueue.length + 2, filter: false}, (err, res) => {
+        this.getCustomerHistoryRecords({maxRecordSize: this.activityUpdateQueue.length + 2, filter: false}, (err, res) => {
             this.activityUpdateRunning = false;
             if (!err && res) {
 
                 let lastFoundQueueIndex = -1;
                 this.activityUpdateQueue.forEach((entry, queueIndex) => {
-                    const found = res.findIndex(activity => activity.data.id.endsWith('#' + entry.key.entryId) && activity.data.registeredCustomerId === entry.key.registeredUserId);
+                    const found = res.findIndex(activity => activity.data.recordKey.endsWith('#' + entry.key.entryId) && activity.data.customerId === entry.key.registeredUserId);
 
                     if (found === -1) {
                         this._options.logger && this._options.logger('Alexa-Remote: Activity for id ' + entry.key.entryId + ' not found');
@@ -749,7 +749,7 @@ class AlexaRemote extends EventEmitter {
                 }
             }
 
-            if (this.activityUpdateQueue.length) {
+            if (!err && this.activityUpdateQueue.length) {
                 this.activityUpdateTimeout = setTimeout(() => {
                     this.activityUpdateTimeout = null;
                     this.getPushedActivities();
@@ -1496,7 +1496,10 @@ return this.parseValue4Notification(notification, value);    }
             { method: 'POST' });
     }
 
-    getHistory(options, callback) {
+//!!!!!!!!!!!!!!!!!!!!!! remplacé par getCustomerHistoryRecords   
+   getHistory(options, callback) {
+	   			       this._options.logger && this._options.logger('-------------------------------------------------------coucou');
+
         return this.getActivities(options, callback);
     }
     getActivities(options, callback) {
@@ -1569,6 +1572,92 @@ return this.parseValue4Notification(notification, value);    }
             }
         );
     }
+
+    getCustomerHistoryRecords(options, callback) {
+        if (typeof options === 'function') {
+            callback = options;
+            options = {};
+        }
+        this.httpsGet (`https://www.${this._options.amazonPage}/alexa-privacy/apd/rvh/customer-history-records` +
+            `?startTime=${options.startTime || (Date.now() - 24 * 60 * 60 * 1000)}` +
+            `&endTime=${options.endTime || Date.now() + 24 * 60 * 60 * 1000}` +
+            `&recordType=${options.recordType || 'VOICE_HISTORY'}` +
+            `&maxRecordSize=${options.maxRecordSize || 1}`,
+            (err, result) => {
+                if (err || !result) return callback/*.length >= 2*/ && callback(err, result);
+
+                let ret = [];
+                if (result.customerHistoryRecords) {
+                    for (let r = 0; r < result.customerHistoryRecords.length; r++) {
+                        let res = result.customerHistoryRecords[r];
+                        let o = {
+                            data: res
+                        };
+                        const convParts = {};
+                        if (res.voiceHistoryRecordItems && Array.isArray(res.voiceHistoryRecordItems)) {
+                            res.voiceHistoryRecordItems.forEach(item => {
+                                convParts[item.recordItemType] = convParts[item.recordItemType] || [];
+                                convParts[item.recordItemType].push(item);
+                            });
+                            o.conversionDetails = convParts;
+                        }
+
+                        const recordKey = res.recordKey.split('#'); // A3NSX4MMJVG96V#1612297041815#A1RABVCI4QCIKC#G0911W0793360TLG
+
+                        o.deviceType = recordKey[2] || null;
+                        //o.deviceAccountId = res.sourceDeviceIds[i].deviceAccountId || null;
+                        o.creationTimestamp = res.timestamp || null;
+                        //o.activityStatus = res.activityStatus || null; // DISCARDED_NON_DEVICE_DIRECTED_INTENT, SUCCESS, FAIL, SYSTEM_ABANDONED
+
+                        o.deviceSerialNumber = recordKey[3];
+                        if (!this.serialNumbers[o.deviceSerialNumber]) continue;
+                        o.name = this.serialNumbers[o.deviceSerialNumber].accountName;
+                        const dev = this.find(o.deviceSerialNumber);
+                        let wakeWord = (dev && dev.wakeWord) ? dev.wakeWord : null;
+
+                        o.description = {'summary': ''};
+                        if (convParts.CUSTOMER_TRANSCRIPT) {
+                            convParts.CUSTOMER_TRANSCRIPT.forEach(trans => {
+                                let text = trans.transcriptText;
+                                if (wakeWord && text.startsWith(wakeWord)) {
+                                    text = text.substr(wakeWord.length).trim();
+                                }
+                                o.description.summary += text + ', ';
+                            });
+                            o.description.summary = o.description.summary.substring(0, o.description.summary.length - 2).trim();
+                        }
+                        if (convParts.ALEXA_RESPONSE) {
+                            o.alexaResponse = '';
+                            convParts.ALEXA_RESPONSE.forEach(trans => o.alexaResponse += trans.transcriptText + ', ');
+                            o.alexaResponse = o.alexaResponse.substring(0, o.alexaResponse.length - 2).trim();
+                        }
+                        if (options.filter) {
+                            if (!o.description || !o.description.summary.length) continue;
+
+                            if (res.utteranceType === 'WAKE_WORD_ONLY') {
+                                continue;
+                            }
+
+                            switch (o.description.summary) {
+                                case 'stopp':
+                                case 'alexa':
+                                case 'echo':
+                                case 'computer':
+                                case 'amazon':
+                                case ',':
+                                case '':
+                                    continue;
+                            }
+                        }
+
+                        if (o.description.summary || !options.filter) ret.push(o);
+                    }
+                }
+                if (typeof callback === 'function') return callback (err, ret);
+            }
+        );
+    }
+
 
     getAccount(callback) {
         this.httpsGet (`https://alexa-comms-mobile-service.${this._options.amazonPage}/accounts`, callback);
@@ -2137,8 +2226,12 @@ return this.parseValue4Notification(notification, value);    }
         this.httpsGet ('/api/device-preferences?cached=true&_=%t', callback);
     }
 
+    getAllDeviceVolumes(callback) {
+        this.httpsGet ('/api/devices/deviceType/dsn/audio/v1/allDeviceVolumes', callback);
+    }
+	
     getSmarthomeDevices(callback) {
-        this.httpsGet ('/api/phoenix?_=%t', function (err, res) {
+        this.httpsGet ('/api/phoenix?includeRelationships=true&_=%t', function (err, res) {
             if (err || !res || !res.networkDetail) return callback(err, res);
             try {
                 res = JSON.parse(res.networkDetail);
@@ -2452,9 +2545,9 @@ return this.parseValue4Notification(notification, value);    }
 	
 	getHistory2(options,callback) 
 	{
-		this.getHistory(options, (err, res) => 
+		this.getCustomerHistoryRecords(options, (err, res) => 
 		{
-			        //this._options.logger && this._options.logger('coucou'+res);
+			        //this._options.logger && this._options.logger('------------------------999-------------------------------coucou'+options.maxRecordSize);
 
 			if (err || !res || !res || !Array.isArray(res)) return callback && callback();
 			callback && callback(res);
