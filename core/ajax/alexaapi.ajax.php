@@ -119,7 +119,11 @@ try {
             $ret = alexaapi::supprimeTouslesDevices();
             ajax::success($ret);
             break;
-    }
+        case 'supprimeTouslesDevicesSmartHome':
+            $ret = alexaapi::supprimeTouslesDevicesSmartHome();
+            ajax::success($ret);
+            break;    
+	}
     throw new \Exception('Aucune methode correspondante');
 } catch (\Exception $e) {
     ajax::error(displayException($e), $e->getCode());
