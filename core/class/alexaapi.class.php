@@ -745,7 +745,7 @@ public static function templateWidget(){
                     $device->setConfiguration('applianceId', $item['applianceId']);
                     //$device->setConfiguration('icon', $item['icon']['value']);
                     $device->setConfiguration('devicetype', "Smarthome");
-                    $device->setConfiguration('family', $item['applianceTypes']['0']); // faudra voir s'il y a plusieurs types
+                    $device->setConfiguration('typeSmartHome', $item['applianceTypes']['0']); // faudra voir s'il y a plusieurs types
                     //$device->setConfiguration('members', $item['members']);
 					$capabilitiesjson=$item['capabilities'];
 					$capabilities=[];        
@@ -754,7 +754,10 @@ public static function templateWidget(){
 								array_push($capabilities, $value['interfaceName']);
 							}
 					//log::add('alexasmarthome_scan', 'debug', '[capabilities  ] ->> [' . json_encode($capabilities) . "]" . $device->getName());// ou applianceKey
-                    $device->setConfiguration('capabilities', $capabilities);
+                    $device->setConfiguration('capabilitiesSmartHome', $capabilities);
+					$device->setConfiguration('manufacturerName', $item['manufacturerName']);
+					$device->setConfiguration('friendlyDescription', $item['friendlyDescription']);
+
 
 
 
@@ -817,18 +820,37 @@ public static function templateWidget(){
                                                 log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
                                                 log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
                                                 log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+												$alexasmarthome->setConfiguration('manufacturerName', $value7['manufacturerName']);
+												$alexasmarthome->setConfiguration('friendlyDescription', $value7['friendlyDescription']);
+												// Accessible sur le réseau sera : object►applianceNetworkState►reachability donne la valeur REACHABLE
+												$capabilitiesjson=$value7['capabilities'];
+												$capabilities=[];        
+													foreach ($capabilitiesjson as $value) {
+														//log::add('alexasmarthome_scan', 'debug', '[interfaceName  ] ->> [' . $value['interfaceName'] . "]");
+														array_push($capabilities, $value['interfaceName']);
+													}
+												//log::add('alexasmarthome_scan', 'debug', '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%[capabilities] ->> [' . json_encode($capabilities) . "]" . $alexasmarthome->getName());// ou applianceKey
+												$alexasmarthome->setConfiguration('capabilitiesSmartHome', $capabilities);
+												//$alexasmarthome->setConfiguration('capabilitiesSmartHome', "coucou");
+												//$capabilitiesrecup=$alexasmarthome->getConfiguration('capabilities');
+												//$alexasmarthome->setConfiguration('capabilitiesSmartHome', $capabilitiesrecup);
+												
+												
+												$alexasmarthome->setConfiguration('typeSmartHome', $value7['applianceTypes']['0']); // faudra voir s'il y a plusieurs types
+
+												
                                                 $alexasmarthome->save();
                                                 $Onatrouvelelien = true;
                                             }
                                         }
                                         if (!($Onatrouvelelien)) {
                                                 log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.json_encode($value7['friendlyName']).']═══════════════════════════════════════════════════════════════════════════');
-                                                log::add('alexasmarthome_scan', 'info', ' ║ Equipement trouvé mais non intégré.');
+                                                log::add('alexasmarthome_scan', 'info', ' ║ Equipement ajouté.');
 												//Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome)
                                                 log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
                                                 log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
                                                 log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
-                                            log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT AJOUTER UN DEVICE !!!!!!!!!!');
+                                            //log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT AJOUTER UN DEVICE !!!!!!!!!!');
 											self::ajouteAmazonSmartHome($value7);
 										}
                                     }
