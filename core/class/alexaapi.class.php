@@ -412,7 +412,7 @@ public static function templateWidget(){
 		//$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexasmarthome', true);
 		
 	//	foreach (self::listePluginsAlexa(false, true) as $pluginAlexaUnparUn) {
-            foreach (eqLogic::byType('alexasmarthome', true) as $eqLogic) {
+            foreach (eqLogic::byType('alexasmarthome', false) as $eqLogic) {
 					//log::add('alexasmarthome_scan', 'debug', 'TEST---------->>>>> ' . $eqLogic->getName());
                 $eqLogic->remove();
             }
