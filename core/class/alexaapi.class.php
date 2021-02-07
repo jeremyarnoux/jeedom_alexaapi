@@ -540,7 +540,7 @@ public static function templateWidget(){
         log::add('alexaapi_scan', 'debug', '*************************** Lancement du Scan Alexa-API ***********************************');
         // --- Mise à jour des Amazon Echo
         event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
-        //$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
+        $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
 		//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         $json = json_decode($json, true);
         $numDevices = 0;
