@@ -755,7 +755,9 @@ public static function templateWidget(){
 							}
 					//log::add('alexasmarthome_scan', 'debug', '[capabilities  ] ->> [' . json_encode($capabilities) . "]" . $device->getName());// ou applianceKey
                     $device->setConfiguration('capabilitiesSmartHome', $capabilities);
-					$device->setConfiguration('manufacturerName', $item['manufacturerName']);
+					$manufacturerName=$item['manufacturerName'];
+					if ($manufacturerName=="Amazon Inc.") $manufacturerName="Amazon";
+					$device->setConfiguration('manufacturerName', $manufacturerName);
 					$device->setConfiguration('friendlyDescription', $item['friendlyDescription']);
 
 
@@ -820,7 +822,9 @@ public static function templateWidget(){
                                                 log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
                                                 log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
                                                 log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
-												$alexasmarthome->setConfiguration('manufacturerName', $value7['manufacturerName']);
+												$manufacturerName=$value7['manufacturerName'];
+												if ($manufacturerName=="Amazon Inc.") $manufacturerName="Amazon";
+												$alexasmarthome->setConfiguration('manufacturerName', $manufacturerName);
 												$alexasmarthome->setConfiguration('friendlyDescription', $value7['friendlyDescription']);
 												// Accessible sur le réseau sera : object►applianceNetworkState►reachability donne la valeur REACHABLE
 												$capabilitiesjson=$value7['capabilities'];
@@ -866,6 +870,7 @@ public static function templateWidget(){
                 }
             }
         }
+	alexasmarthome::metAjourFabriquantsDesactives();	
     }
 
     private static function createNewDevice($deviceName, $deviceSerial)
