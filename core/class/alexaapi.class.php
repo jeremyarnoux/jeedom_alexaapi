@@ -43,7 +43,9 @@ class alexaapi extends eqLogic
         if ($withSmartHome) {
             try {
                 $test = plugin::byId('alexasmarthome');
-                array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914', config::byKey('numsmartHome', 'alexaapi')));
+				$eqLogics = eqLogic::byType($test->getId());
+                //array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914', config::byKey('numsmartHome', 'alexaapi')));
+                array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914', count($eqLogics)));
             } catch (Exception $e) {
                 if ($all) {
                     array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914'));
@@ -53,15 +55,20 @@ class alexaapi extends eqLogic
         if ($withFireTV) {
             try {
                 $test = plugin::byId('alexafiretv');
-                array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064', config::byKey('numFireTV', 'alexaapi')));
+				$eqLogics = eqLogic::byType($test->getId());
+                //array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064', config::byKey('numFireTV', 'alexaapi')));
+                array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064', count($eqLogics)));
             } catch (Exception $e) {
                 if ($all) {
                     array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064'));
                 }
             }
-        }        try {
-            $test = plugin::byId('alexaamazonmusic');
-            array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910', config::byKey('numAudioPlayer', 'alexaapi')));
+        }        
+			try {
+			$test = plugin::byId('alexaamazonmusic');
+			$eqLogics = eqLogic::byType($test->getId());
+            //array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910', config::byKey('numAudioPlayer', 'alexaapi')));
+            array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910', intval(count($eqLogics)/2)));
         } catch (Exception $e) {
             if ($all) {
                 array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910'));
@@ -69,7 +76,9 @@ class alexaapi extends eqLogic
         }
         try {
             $test = plugin::byId('alexadeezer');
-            array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911', config::byKey('numAudioPlayer', 'alexaapi')));
+			$eqLogics = eqLogic::byType($test->getId());
+            //array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911', config::byKey('numAudioPlayer', 'alexaapi')));
+            array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911', intval(count($eqLogics)/2)));
         } catch (Exception $e) {
             if ($all) {
                 array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911'));
@@ -77,7 +86,9 @@ class alexaapi extends eqLogic
         }
         try {
             $test = plugin::byId('alexaspotify');
-            array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913', config::byKey('numAudioPlayer', 'alexaapi')));
+			$eqLogics = eqLogic::byType($test->getId());
+            //array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913', config::byKey('numAudioPlayer', 'alexaapi')));
+            array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913', intval(count($eqLogics)/2)));
         } catch (Exception $e) {
             if ($all) {
                 array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913'));

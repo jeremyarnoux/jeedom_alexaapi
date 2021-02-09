@@ -22,6 +22,7 @@ const AlexaWsMqtt = require('./alexa-wsmqtt.js');
 const { v1: uuidv1 } = require('uuid');
 const EventEmitter = require('events');
 const request = require('request');
+const zlib = require('zlib');
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
@@ -121,7 +122,7 @@ class AlexaRemote extends EventEmitter {
         function getCookie(callback) {
             if (!self.cookie) {
 				self._options.logger && self._options.logger('{Remote} ║ No cookie given, generate one !!!!!!!!!! ','DEBUG');
-                //self._options.logger && self._options.logger('Alexa-Remote: No cookie given, generate one');
+                //self._options.logger && self._options.logger('{Remote} ║ No cookie given, generate one');
                 self._options.cookieJustCreated = true;
                 self.generateCookie(self._options.email, self._options.password, function(err, res) {
                     if (!err && res) {
@@ -815,7 +816,7 @@ class AlexaRemote extends EventEmitter {
         });
     }
 
-    httpsGetCall(path, callback, flags = {}) {
+    httpsGetCall2(path, callback, flags = {}) {
 		
 var host=this.baseUrl;
 var pathQuery=null;
@@ -924,7 +925,7 @@ this._options.logger && this._options.logger(obj.headers);
 	*/	
 		
 		let req = https.request(options, (res) => {
-        //console.log(res);
+        console.log(res);
             let body  = '';
         //this._options.logger && this._options.logger('DEBUG1');
 		
@@ -1012,6 +1013,155 @@ this._options.logger && this._options.logger(obj.headers);
             req.write(flags.data);
         req.end();
     }
+
+    httpsGetCall(path, callback, flags = {}) {
+
+        const handleResponse = (err, res, body) => {
+            if (err || !body) { // Method 'DELETE' may return HTTP STATUS 200 without body
+                this._options.logger && this._options.logger('{Remote} ║ Response: No body','DEBUG');
+                return typeof res.statusCode === 'number' && res.statusCode >= 200 && res.statusCode < 300 ? callback(null, {'success': true}) : callback(new Error('no body'), null);
+            }
+
+            let ret;
+            try {
+                ret = JSON.parse(body);
+            } catch (e) {
+                if (typeof res.statusCode === 'number' && res.statusCode >= 500 && res.statusCode < 510) {
+                    this._options.logger && this._options.logger('{Remote} ║ Response: Status: ' + res.statusCode,'DEBUG');
+                    callback(new Error('no body'), null);
+                    callback = null;
+                    return;
+                }
+
+                this._options.logger && this._options.logger('{Remote} ║ Response: No/Invalid JSON : ' + body,'DEBUG');
+                callback && callback(new Error('no JSON'), body);
+                callback = null;
+                return;
+            }
+
+            this._options.logger && this._options.logger('{Remote} ║ Response: ' + JSON.stringify(ret),'DEBUG');
+            callback(null, ret);
+            callback = null;
+        };
+
+        let options = {
+            host: flags.host || this.baseUrl,
+            path: '',
+            method: 'GET',
+            timeout: flags.timeout || 10000,
+            headers: {
+                'User-Agent' : this._options.userAgent,
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Referer': `https://alexa.${this._options.amazonPage}/spa/index.html`,
+                'Origin': `https://alexa.${this._options.amazonPage}`,
+                //'Content-Type': 'application/json',
+                //'Connection': 'keep-alive',
+                'csrf' : this.csrf,
+                'Cookie' : this.cookie,
+                'Accept-Encoding': 'gzip,deflate'
+            }
+        };
+
+        path = path.replace(/[\n ]/g, '');
+        if (!path.startsWith('/')) {
+            path = path.replace(/^https:\/\//, '');
+            //let ar = path.match(/^([^\/]+)(\/.*$)/);
+            let ar = path.match(/^([^\/]+)([\/]*.*$)/);
+            options.host = ar[1];
+            path = ar[2];
+        } else {
+            options.host = this.baseUrl;
+        }
+        let time = new Date().getTime();
+        path = path.replace(/%t/g, time);
+
+        options.path = path;
+        options.method = flags.method? flags.method : flags.data ? 'POST' : 'GET';
+
+        if (flags.headers) Object.keys(flags.headers).forEach(n => {
+            options.headers [n] = flags.headers[n];
+        });
+
+        const logOptions = JSON.parse(JSON.stringify(options));
+        delete logOptions.headers.Cookie;
+        delete logOptions.headers.csrf;
+        delete logOptions.headers['Accept-Encoding'];
+        delete logOptions.headers['User-Agent'];
+        delete logOptions.headers['Content-Type'];
+        delete logOptions.headers.Referer;
+        delete logOptions.headers.Origin;
+        this._options.logger && this._options.logger('{Remote} ║ Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT' || options.method === 'DELETE') ? ' and data=' + flags.data : ''),'DEBUG');
+
+        let req;
+        let responseReceived = false;
+        try {
+            req = https.request(options, (res) => {
+                const chunks = [];
+
+                res.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
+
+                res.on('end', () => {
+                    responseReceived = true;
+                    if (typeof callback === 'function') {
+                        const resBuffer = Buffer.concat(chunks);
+                        const encoding = res.headers['content-encoding'];
+                        if (encoding === 'gzip') {
+                            zlib.gunzip(resBuffer, (err, decoded) => {
+                                handleResponse(err, res, decoded && decoded.toString());
+                            });
+                        } else if (encoding === 'deflate') {
+                            zlib.inflate(resBuffer, (err, decoded) => {
+                                handleResponse(err, res, decoded && decoded.toString());
+                            });
+                        } else {
+                            handleResponse(null, res, resBuffer.toString());
+                        }
+                    }
+                });
+            });
+        } catch(err) {
+            this._options.logger && this._options.logger('{Remote} ║ Response: Exception: ' + err,'DEBUG');
+            if (typeof callback === 'function'/* && callback.length >= 2*/) {
+                callback (err, null);
+                callback = null;
+            }
+            return;
+        }
+
+        req.on('error', (e) => {
+            this._options.logger && this._options.logger('{Remote} ║ Response: Error: ' + e,'DEBUG');
+            if (!responseReceived && typeof callback === 'function'/* && callback.length >= 2*/) {
+                callback (e, null);
+                callback = null;
+            }
+        });
+
+        req.on('timeout', () => {
+            if (!responseReceived && typeof callback === 'function'/* && callback.length >= 2*/) {
+                this._options.logger && this._options.logger('{Remote} ║ Response: Timeout','DEBUG');
+                callback (new Error('Timeout'), null);
+                callback = null;
+            }
+        });
+
+        req.on('close', () => {
+            if (!responseReceived && typeof callback === 'function'/* && callback.length >= 2*/) {
+                this._options.logger && this._options.logger('{Remote} ║ Response: Closed','DEBUG');
+                callback (new Error('Connection Closed'), null);
+                callback = null;
+            }
+        });
+
+        if (flags && flags.data) {
+            req.write(flags.data);
+        }
+
+        req.end();
+    }
+
+
 
 /// Public
     checkAuthentication(callback) {
@@ -2327,10 +2477,13 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     querySmarthomeDevices(applicanceIds, entityType, callback) {
+				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevicesxxxxxxxxxxxxxxx ','DEBUG');
+
         if (typeof entityType === 'function') {
             callback = entityType;
             entityType = 'APPLIANCE'; // other value 'GROUP'
         }
+				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices-1xxxxxxxxxxxxxxx ','DEBUG');
 
         let reqArr = [];
         if (!Array.isArray(applicanceIds)) applicanceIds = [applicanceIds];
@@ -2340,6 +2493,7 @@ return this.parseValue4Notification(notification, value);    }
                 'entityType': entityType
             });
         }
+				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices-2xxxxxxxxxxxxxxx ','DEBUG');
 
         let flags = {
             method: 'POST',
@@ -2347,7 +2501,11 @@ return this.parseValue4Notification(notification, value);    }
                 'stateRequests': reqArr
             })
         };
+				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices-3xxxxxxxxxxxxxxx '+JSON.stringify(flags),'DEBUG');
+
         this.httpsGet (`/api/phoenix/state`, callback, flags);
+				
+				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices-3xxxxxxxxxxxxxxx '+JSON.stringify(flags),'DEBUG');
         /*
         {
             'stateRequests': [
@@ -2627,7 +2785,10 @@ return this.parseValue4Notification(notification, value);    }
 
 	querySmarthomeDevices2(applicanceIds, entityType, callback) 
 	{
-		this.querySmarthomeDevices(applicanceIds, entityType,(err, res) => 
+		//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices2xxxxxxxxxxxxxxx ','DEBUG');
+	
+
+	this.querySmarthomeDevices(applicanceIds, entityType,(err, res) => 
 		{
 		if (err || !res || !res.deviceStates || !Array.isArray(res.deviceStates)) return callback && callback();
 			//callback && callback(res.deviceStates); on enlève deicestates pour avoir les erreurs

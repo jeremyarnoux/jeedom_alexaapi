@@ -598,7 +598,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 							entityType="APPLIANCE";
 							
     //executeSmarthomeDeviceAction(entityIds, parameters, entityType, callback) {
-	config.logger(' {API}    ╔═══════[Lancement /querySmarthomeDevices avec paramètres -> device: ' + req.query.device+'req.query.entityType: ' + req.query.entityType+ ' req.query.type: ' + req.query.type, 'INFO');
+	config.logger(' {API}    ╔═══════[Lancement /querySmarthomeDevices avec paramètres !-> device: ' + req.query.device+'req.query.entityType: ' + req.query.entityType+ ' req.query.type: ' + req.query.type, 'INFO');
 	//config.logger(' {API}    >>>>>>>>>>Debug:' + JSON.stringify(req.query), 'INFO');
 		
 
@@ -631,18 +631,23 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 				//config.logger('Souci, le serveur Amazon est bien disponible ? Erreur sur '+entityType+"/"+req.query.device,'DEBUG');
 				config.logger('{Remote} ║ Souci, le serveur Amazon est bien disponible ? Erreur sur : ['+entityType+"/"+req.query.device+"]",'ERROR');
 		}			
+		//config.logger('deviceStatesErrors>'+JSON.stringify(deviceStatesErrors),'DEBUG');
 		//config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
 		//config.logger('>entity>'+JSON.stringify(deviceStates."0"),'DEBUG');
 		var toReturn = [];
 		try {
 
+			//config.logger('1','DEBUG');
+		//config.logger('deviceStatesErrors>'+JSON.stringify(deviceStatesErrors),'DEBUG');
 			
 			if (JSON.stringify(deviceStates[0]) === undefined) {
+			//config.logger('2','DEBUG');
 			//config.logger('0>'+JSON.stringify(errors[0]),'DEBUG');
 			//config.logger('--->'+JSON.stringify(errors),'DEBUG');
 			//config.logger('--0->'+JSON.stringify(errors[0]),'DEBUG');
 				//config.logger('{Remote} : !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!','DEBUG');
 				config.logger('{Remote} ║ Il y a une erreur sur la communication le device : [['+JSON.stringify(errors[0]['code'])+"]]",'DEBUG');
+			//config.logger('1','DEBUG');
 			
 				toReturn.push({
 					'entityType': entityType,
@@ -653,9 +658,11 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 					'error': JSON.stringify(errors[0]['code'])
 
 				});			
+			//config.logger('20','DEBUG');
 			
 			}
 			else {
+			//config.logger('3','DEBUG');
 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			//config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG'); // provoque souci
 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -689,7 +696,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 		}
 		catch(error) {
 				//config.logger('deviceStates.entity.entityId>NON trouvé sur '+entityType+"/"+req.query.device,'DEBUG');
-				config.logger('{Remote}    ║ deviceStates.entity.entityId>NON trouvé sur ['+entityType+"/"+req.query.device+"]",'ERROR');
+				//config.logger('{Remote}   ║ deviceStates.entity.entityId>NON trouvé sur ['+entityType+"/"+req.query.device+"]",'ERROR');
 
 		}
 
@@ -711,6 +718,11 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			}
 			
 		}*/
+	
+		if (toReturn == "") {
+			toReturn.push("vide");
+		}
+		
 		config.logger(' {Remote} ╚════════════════════════════════════════════════════════════════════════════════════════','INFO');
 		res.status(200).json(toReturn);
 	});
