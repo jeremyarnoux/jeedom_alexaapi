@@ -735,9 +735,9 @@ public static function templateWidget(){
     public static function ajouteAmazonSmartHome($item)
     { // Permet d'ajouter un device non détecté par le scan (type un thermomètre)
 
-        log::add('alexasmarthome_scan', 'debug', "************************************Ajout d'un device smartHome non détecté par le scan ***********************************");
+        //log::add('alexasmarthome_scan', 'debug', "************************************Ajout d'un device smartHome non détecté par le scan ***********************************");
         //$json = json_decode($json, true);
-        log::add('alexasmarthome_scan', 'debug', 'json:' . json_encode($item));
+        //log::add('alexasmarthome_scan', 'debug', 'json:' . json_encode($item));
 		
 		
 		                    // Retireve the device (if already registered in Jeedom)
@@ -784,7 +784,7 @@ public static function templateWidget(){
                         $device->save();
                     }
 					
-        log::add('alexasmarthome_scan', 'debug', "************************************FIN Ajout d'un device smartHome non détecté par le scan ***********************************");
+        //log::add('alexasmarthome_scan', 'debug', "************************************FIN Ajout d'un device smartHome non détecté par le scan ***********************************");
 					
     }
 
@@ -835,6 +835,7 @@ public static function templateWidget(){
                                                 log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
 												$manufacturerName=$value7['manufacturerName'];
 												if ($manufacturerName=="Amazon Inc.") $manufacturerName="Amazon";
+												if ($manufacturerName=="FREEBOX") $manufacturerName="Freebox";
 												$alexasmarthome->setConfiguration('manufacturerName', $manufacturerName);
 												$alexasmarthome->setConfiguration('friendlyDescription', $value7['friendlyDescription']);
 												// Accessible sur le réseau sera : object►applianceNetworkState►reachability donne la valeur REACHABLE
