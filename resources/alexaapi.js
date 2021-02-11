@@ -598,7 +598,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 							entityType="APPLIANCE";
 							
     //executeSmarthomeDeviceAction(entityIds, parameters, entityType, callback) {
-	config.logger(' {API}    ╔═══════[Lancement /querySmarthomeDevices avec paramètres -> device: ' + req.query.device+'req.query.entityType: ' + req.query.entityType+ ' req.query.type: ' + req.query.type, 'INFO');
+	config.logger(' {API}    ╔═══════[Lancement /querySmarthomeDevices avec paramètres !-> device: ' + req.query.device+'req.query.entityType: ' + req.query.entityType+ ' req.query.type: ' + req.query.type, 'INFO');
 	//config.logger(' {API}    >>>>>>>>>>Debug:' + JSON.stringify(req.query), 'INFO');
 		
 
@@ -631,18 +631,23 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 				//config.logger('Souci, le serveur Amazon est bien disponible ? Erreur sur '+entityType+"/"+req.query.device,'DEBUG');
 				config.logger('{Remote} ║ Souci, le serveur Amazon est bien disponible ? Erreur sur : ['+entityType+"/"+req.query.device+"]",'ERROR');
 		}			
+		//config.logger('deviceStatesErrors>'+JSON.stringify(deviceStatesErrors),'DEBUG');
 		//config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
 		//config.logger('>entity>'+JSON.stringify(deviceStates."0"),'DEBUG');
 		var toReturn = [];
 		try {
 
+			//config.logger('1','DEBUG');
+		//config.logger('deviceStatesErrors>'+JSON.stringify(deviceStatesErrors),'DEBUG');
 			
 			if (JSON.stringify(deviceStates[0]) === undefined) {
+			//config.logger('2','DEBUG');
 			//config.logger('0>'+JSON.stringify(errors[0]),'DEBUG');
 			//config.logger('--->'+JSON.stringify(errors),'DEBUG');
 			//config.logger('--0->'+JSON.stringify(errors[0]),'DEBUG');
 				//config.logger('{Remote} : !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!','DEBUG');
 				config.logger('{Remote} ║ Il y a une erreur sur la communication le device : [['+JSON.stringify(errors[0]['code'])+"]]",'DEBUG');
+			//config.logger('1','DEBUG');
 			
 				toReturn.push({
 					'entityType': entityType,
@@ -653,9 +658,11 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 					'error': JSON.stringify(errors[0]['code'])
 
 				});			
+			//config.logger('20','DEBUG');
 			
 			}
 			else {
+			//config.logger('3','DEBUG');
 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			//config.logger('0>'+JSON.stringify(deviceStates[0]),'DEBUG'); // provoque souci
 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -689,7 +696,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 		}
 		catch(error) {
 				//config.logger('deviceStates.entity.entityId>NON trouvé sur '+entityType+"/"+req.query.device,'DEBUG');
-				config.logger('{Remote}    ║ deviceStates.entity.entityId>NON trouvé sur ['+entityType+"/"+req.query.device+"]",'ERROR');
+				//config.logger('{Remote}   ║ deviceStates.entity.entityId>NON trouvé sur ['+entityType+"/"+req.query.device+"]",'ERROR');
 
 		}
 
@@ -711,6 +718,11 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			}
 			
 		}*/
+	
+		if (toReturn == "") {
+			toReturn.push("vide");
+		}
+		
 		config.logger(' {Remote} ╚════════════════════════════════════════════════════════════════════════════════════════','INFO');
 		res.status(200).json(toReturn);
 	});
@@ -1235,6 +1247,18 @@ CommandAlexa.devicePreferences = function(req, res) {
 	});
 };
 
+CommandAlexa.allDeviceVolumes = function(req, res) {
+	var commandeEnvoyee = req.path.replace("/", "");
+	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	res.type('json');
+	Appel_getAllDeviceVolumes(function(retourAmazon) {
+		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500);});
+		res.status(200).json(retourAmazon);
+	});
+};
+
 CommandAlexa.smarthomeBehaviourActionDefinitions = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
 	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
@@ -1324,6 +1348,18 @@ CommandAlexa.deviceStatusList = function(req, res) {
 	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getDeviceStatusList(function(retourAmazon) {
+		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
+		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
+			{if (err) return res.sendStatus(500);});
+		res.status(200).json(retourAmazon);
+	});
+};
+
+CommandAlexa.lists = function(req, res) {
+	var commandeEnvoyee = req.path.replace("/", "");
+	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	res.type('json');
+	Appel_getLists(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500);});
@@ -1439,23 +1475,6 @@ CommandAlexa.activities = function(req, res) {
 	});
 };
 
-CommandAlexa.lists = function(req, res) {
-	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
-	res.type('json');
-
-	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
-		config.logger('{API}    ╠═══> Device : ' + req.query.device, 'DEBUG');
-
-
-	Appel_getLists(req.query.device, function(retourAmazon) {
-		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
-		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
-			{if (err) return res.sendStatus(500);});
-		res.status(200).json(retourAmazon);
-	});
-};
-
 CommandAlexa.deviceNotificationState = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
 	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
@@ -1480,11 +1499,15 @@ function Appel_getWakeWords(callback)
 	callback && callback(res);});
 	}
 	
-
-	
 function Appel_getDevicePreferences(callback) 
 	{
 	alexa.getDevicePreferences((err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}
+	
+function Appel_getAllDeviceVolumes(callback) 
+	{
+	alexa.getAllDeviceVolumes((err, res) => {if (err) return callback && callback();
 	callback && callback(res);});
 	}
 	
@@ -1496,7 +1519,8 @@ function Appel_getMusicProviders(callback)
 	
 function Appel_getHistory(callback) 
 	{
-	alexa.getHistory((err, res) => {if (err) return callback && callback();
+	//!!!!!!!!!!! remplacé alexa.getHistory((err, res) => {if (err) return callback && callback();
+	alexa.getCustomerHistoryRecords((err, res) => {if (err) return callback && callback();
 	callback && callback(res);});
 	}
 	
@@ -1560,6 +1584,14 @@ function Appel_getDeviceStatusList(callback)
 	callback && callback(res);});
 	}
 	
+function Appel_getLists(callback) 
+	{
+	alexa.getLists((err, res) => {if (err) return callback && callback();
+	callback && callback(res);});
+	}	
+	
+	
+	
 function Appel_Playlists(serialOrName,callback) 
 	{
 	alexa.Playlists(serialOrName,(err, res) => {if (err) return callback && callback();
@@ -1601,12 +1633,10 @@ function Appel_getActivities(serialOrName,callback)
 	alexa.getActivities(serialOrName,(err, res) => {if (err || !res ) return callback && callback();
 	callback && callback(res);});
 	}
+
+
 	
-function Appel_getLists(serialOrName,callback) 
-	{
-	alexa.getLists(serialOrName,(err, res) => {if (err || !res ) return callback && callback();
-	callback && callback(res);});
-	}	
+	
 	// Tous les appels GET
 
 app.get('/wakeWords', CommandAlexa.wakeWords);
@@ -1616,6 +1646,7 @@ app.get('/bluetooth', CommandAlexa.Bluetooth);
 app.get('/notificationSounds', CommandAlexa.notificationSounds);
 app.get('/activities', CommandAlexa.activities);
 app.get('/devicePreferences', CommandAlexa.devicePreferences);
+app.get('/allDeviceVolumes', CommandAlexa.allDeviceVolumes);
 app.get('/homeGroup', CommandAlexa.homeGroup);
 app.get('/smarthomeDevices', CommandAlexa.smarthomeDevices);
 app.get('/smarthomeBehaviourActionDefinitions', CommandAlexa.smarthomeBehaviourActionDefinitions);
@@ -1662,14 +1693,14 @@ app.get('/history', (req, res) => {
 	res.type('json');
 
 
-	if ('size' in req.query === false)
-		req.query.size = 5;
-	if ('offset' in req.query === false)
-		req.query.offset = 1;
+	if ('maxRecordSize' in req.query === false)
+		req.query.maxRecordSize = 5;
+	if ('recordType' in req.query === false)
+		req.query.recordType = 'VOICE_HISTORY';
 
 	const options = {
-		size: req.query.size,
-		offset: req.query.offset
+		maxRecordSize: req.query.maxRecordSize,
+		recordType: req.query.recordType
 	};
 
 	alexa.getHistory2(options, function(devices) {

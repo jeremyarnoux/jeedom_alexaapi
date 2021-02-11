@@ -55,7 +55,7 @@ else
 	$size=$_GET['size'];
 $json=file_get_contents("http://" . config::byKey('internalAddr') . ":3456/history?size=".$size);
 */
-$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/history?size=50");
+$json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/history?maxRecordSize=20");
 //file_put_contents($data_path, $json);
 $json = json_decode($json, true);
 //echo "****"."http://" . config::byKey('internalAddr') . ":3456/history?size=".$size."****";

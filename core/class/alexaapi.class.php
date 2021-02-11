@@ -43,7 +43,9 @@ class alexaapi extends eqLogic
         if ($withSmartHome) {
             try {
                 $test = plugin::byId('alexasmarthome');
-                array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914', config::byKey('numsmartHome', 'alexaapi')));
+				$eqLogics = eqLogic::byType($test->getId());
+                //array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914', config::byKey('numsmartHome', 'alexaapi')));
+                array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914', count($eqLogics)));
             } catch (Exception $e) {
                 if ($all) {
                     array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914'));
@@ -53,15 +55,20 @@ class alexaapi extends eqLogic
         if ($withFireTV) {
             try {
                 $test = plugin::byId('alexafiretv');
-                array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064', config::byKey('numFireTV', 'alexaapi')));
+				$eqLogics = eqLogic::byType($test->getId());
+                //array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064', config::byKey('numFireTV', 'alexaapi')));
+                array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064', count($eqLogics)));
             } catch (Exception $e) {
                 if ($all) {
                     array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064'));
                 }
             }
-        }        try {
-            $test = plugin::byId('alexaamazonmusic');
-            array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910', config::byKey('numAudioPlayer', 'alexaapi')));
+        }        
+			try {
+			$test = plugin::byId('alexaamazonmusic');
+			$eqLogics = eqLogic::byType($test->getId());
+            //array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910', config::byKey('numAudioPlayer', 'alexaapi')));
+            array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910', intval(count($eqLogics)/2)));
         } catch (Exception $e) {
             if ($all) {
                 array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910'));
@@ -69,7 +76,9 @@ class alexaapi extends eqLogic
         }
         try {
             $test = plugin::byId('alexadeezer');
-            array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911', config::byKey('numAudioPlayer', 'alexaapi')));
+			$eqLogics = eqLogic::byType($test->getId());
+            //array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911', config::byKey('numAudioPlayer', 'alexaapi')));
+            array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911', intval(count($eqLogics)/2)));
         } catch (Exception $e) {
             if ($all) {
                 array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911'));
@@ -77,7 +86,9 @@ class alexaapi extends eqLogic
         }
         try {
             $test = plugin::byId('alexaspotify');
-            array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913', config::byKey('numAudioPlayer', 'alexaapi')));
+			$eqLogics = eqLogic::byType($test->getId());
+            //array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913', config::byKey('numAudioPlayer', 'alexaapi')));
+            array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913', intval(count($eqLogics)/2)));
         } catch (Exception $e) {
             if ($all) {
                 array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913'));
@@ -404,7 +415,28 @@ public static function templateWidget(){
         }
         self::scanAmazonAlexa();
     }
-
+	
+    public static function supprimeTouslesDevicesSmartHome()
+    {
+//$test = plugin::byId('alexasmarthome');
+        
+		//$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexasmarthome', true);
+		
+	//	foreach (self::listePluginsAlexa(false, true) as $pluginAlexaUnparUn) {
+            foreach (eqLogic::byType('alexasmarthome', false) as $eqLogic) {
+					//log::add('alexasmarthome_scan', 'debug', 'TEST---------->>>>> ' . $eqLogic->getName());
+                $eqLogic->remove();
+            }
+        }
+      /*  event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Suppression en cours ...', __FILE__)));
+        foreach (self::listePluginsAlexa(true, true) as $pluginAlexaUnparUn) {
+            foreach (eqLogic::byType(plugin::byId($pluginAlexaUnparUn)->getId()) as $eqLogic) {
+                $eqLogic->remove();
+            }
+        }*/
+        //self::scanAmazonAlexa();
+ //   }
+	
     public static function cron($_eqlogic_id = null)
     {
         // Toutes les minutes, on cherche les players en lecture et on les actualise
@@ -447,7 +479,7 @@ public static function templateWidget(){
             //self::checkAuth(); 20/09/2020 on désactive ce test pour voir s'il est utile ou pas
         }
 
-        $autorefreshRR = config::byKey('autorefresh', 'alexaapi', '33 3 * * *');/* boucle qui relance la connexion au serveur*/
+        $autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '33 3 * * *'));/* boucle qui relance la connexion au serveur*/
         $cc = new Cron\CronExpression($autorefreshRR, new Cron\FieldFactory);
         if ($cc->isDue() && $deamon_info['state'] == 'ok') {
             self::restartServeurPHP();
@@ -520,6 +552,7 @@ public static function templateWidget(){
         // --- Mise à jour des Amazon Echo
         event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
         $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
+		//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         $json = json_decode($json, true);
         $numDevices = 0;
         $numNewDevices = 0;
@@ -699,6 +732,62 @@ public static function templateWidget(){
         event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
     }
 
+    public static function ajouteAmazonSmartHome($item)
+    { // Permet d'ajouter un device non détecté par le scan (type un thermomètre)
+
+        //log::add('alexasmarthome_scan', 'debug', "************************************Ajout d'un device smartHome non détecté par le scan ***********************************");
+        //$json = json_decode($json, true);
+        //log::add('alexasmarthome_scan', 'debug', 'json:' . json_encode($item));
+		
+		
+		                    // Retireve the device (if already registered in Jeedom)
+                    $device = alexasmarthome::byLogicalId($item['entityId'], 'alexasmarthome');
+
+                    if (!is_object($device)) {
+                        $device = alexasmarthome::createNewDevice($item['friendlyName'], $item['entityId']);
+                        $numNewDevices++;
+						log::add('alexasmarthome_scan', 'debug', 'Ajout sup de [' . $item['entityId'] . "]" );// ou applianceKey
+                    }
+                    log::add('alexaapi_scan', 'debug', '[Plugin AlexasmartHome  ] ->> détection2 de [' . $item['entityId'] . "]" . $device->getName());// ou applianceKey
+
+                    //$device->setConfiguration('device', $item['displayName']);
+                    //$device->setConfiguration('type', $item['description']); a voir si on utilise ou pas descriotion
+                    $device->setConfiguration('type', $item['deviceType']);
+                    $device->setConfiguration('applianceId', $item['applianceId']);
+                    //$device->setConfiguration('icon', $item['icon']['value']);
+                    $device->setConfiguration('devicetype', "Smarthome");
+                    $device->setConfiguration('typeSmartHome', $item['applianceTypes']['0']); // faudra voir s'il y a plusieurs types
+                    //$device->setConfiguration('members', $item['members']);
+					$capabilitiesjson=$item['capabilities'];
+					$capabilities=[];        
+					        foreach ($capabilitiesjson as $value) {
+								//log::add('alexasmarthome_scan', 'debug', '[interfaceName  ] ->> [' . $value['interfaceName'] . "]");
+								array_push($capabilities, $value['interfaceName']);
+							}
+					//log::add('alexasmarthome_scan', 'debug', '[capabilities  ] ->> [' . json_encode($capabilities) . "]" . $device->getName());// ou applianceKey
+                    $device->setConfiguration('capabilitiesSmartHome', $capabilities);
+					$manufacturerName=$item['manufacturerName'];
+					if ($manufacturerName=="Amazon Inc.") $manufacturerName="Amazon";
+					$device->setConfiguration('manufacturerName', $manufacturerName);
+					$device->setConfiguration('friendlyDescription', $item['friendlyDescription']);
+
+
+
+
+
+
+
+                    try {
+                        $device->save();
+                    } catch (Exception $e) {
+                        $device->setName($device->getName() . ' doublon ' . rand(0, 9999));
+                        $device->save();
+                    }
+					
+        //log::add('alexasmarthome_scan', 'debug', "************************************FIN Ajout d'un device smartHome non détecté par le scan ***********************************");
+					
+    }
+
     public static function scanAmazonSmartHome()
     { // Permet de faire le lien entre entityId et applianceId
 
@@ -744,18 +833,41 @@ public static function templateWidget(){
                                                 log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
                                                 log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
                                                 log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+												$manufacturerName=$value7['manufacturerName'];
+												if ($manufacturerName=="Amazon Inc.") $manufacturerName="Amazon";
+												if ($manufacturerName=="FREEBOX") $manufacturerName="Freebox";
+												$alexasmarthome->setConfiguration('manufacturerName', $manufacturerName);
+												$alexasmarthome->setConfiguration('friendlyDescription', $value7['friendlyDescription']);
+												// Accessible sur le réseau sera : object►applianceNetworkState►reachability donne la valeur REACHABLE
+												$capabilitiesjson=$value7['capabilities'];
+												$capabilities=[];        
+													foreach ($capabilitiesjson as $value) {
+														//log::add('alexasmarthome_scan', 'debug', '[interfaceName  ] ->> [' . $value['interfaceName'] . "]");
+														array_push($capabilities, $value['interfaceName']);
+													}
+												//log::add('alexasmarthome_scan', 'debug', '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%[capabilities] ->> [' . json_encode($capabilities) . "]" . $alexasmarthome->getName());// ou applianceKey
+												$alexasmarthome->setConfiguration('capabilitiesSmartHome', $capabilities);
+												//$alexasmarthome->setConfiguration('capabilitiesSmartHome', "coucou");
+												//$capabilitiesrecup=$alexasmarthome->getConfiguration('capabilities');
+												//$alexasmarthome->setConfiguration('capabilitiesSmartHome', $capabilitiesrecup);
+												
+												
+												$alexasmarthome->setConfiguration('typeSmartHome', $value7['applianceTypes']['0']); // faudra voir s'il y a plusieurs types
+
+												
                                                 $alexasmarthome->save();
                                                 $Onatrouvelelien = true;
                                             }
                                         }
                                         if (!($Onatrouvelelien)) {
                                                 log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.json_encode($value7['friendlyName']).']═══════════════════════════════════════════════════════════════════════════');
-                                                log::add('alexasmarthome_scan', 'info', ' ║ Equipement trouvé mais non intégré.');
+                                                log::add('alexasmarthome_scan', 'info', ' ║ Equipement ajouté.');
 												//Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome)
                                                 log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
                                                 log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
                                                 log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
-                                            //log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT UNE RUSTINE ICI!!!!!!!!!!');
+                                            //log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT AJOUTER UN DEVICE !!!!!!!!!!');
+											self::ajouteAmazonSmartHome($value7);
 										}
                                     }
                                 }
@@ -770,6 +882,7 @@ public static function templateWidget(){
                 }
             }
         }
+	alexasmarthome::metAjourFabriquantsDesactives();	
     }
 
     private static function createNewDevice($deviceName, $deviceSerial)
@@ -910,7 +1023,7 @@ public static function templateWidget(){
                         //log::add('alexaapi', 'info', 'NON pour '.$cmd->getName());
                         continue; // si le lancement n'est pas prévu, ça va au bout de la boucle foreach
                     }
-                    log::add('alexaapi', 'info', 'OUI pour ' . $cmd->getName());
+                    //log::add('alexaapi', 'info', 'OUI pour ' . $cmd->getName());
                     $value = $cmd->execute();
                 }
             } catch (Exception $exc) {

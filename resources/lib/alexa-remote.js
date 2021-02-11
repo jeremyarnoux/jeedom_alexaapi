@@ -22,6 +22,7 @@ const AlexaWsMqtt = require('./alexa-wsmqtt.js');
 const { v1: uuidv1 } = require('uuid');
 const EventEmitter = require('events');
 const request = require('request');
+const zlib = require('zlib');
 
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
@@ -121,7 +122,7 @@ class AlexaRemote extends EventEmitter {
         function getCookie(callback) {
             if (!self.cookie) {
 				self._options.logger && self._options.logger('{Remote} ║ No cookie given, generate one !!!!!!!!!! ','DEBUG');
-                //self._options.logger && self._options.logger('Alexa-Remote: No cookie given, generate one');
+                //self._options.logger && self._options.logger('{Remote} ║ No cookie given, generate one');
                 self._options.cookieJustCreated = true;
                 self.generateCookie(self._options.email, self._options.password, function(err, res) {
                     if (!err && res) {
@@ -713,13 +714,13 @@ class AlexaRemote extends EventEmitter {
     getPushedActivities() {
         if (this.activityUpdateRunning || !this.activityUpdateQueue.length) return;
         this.activityUpdateRunning = true;
-        this.getActivities({size: this.activityUpdateQueue.length + 2, filter: false}, (err, res) => {
+        this.getCustomerHistoryRecords({maxRecordSize: this.activityUpdateQueue.length + 2, filter: false}, (err, res) => {
             this.activityUpdateRunning = false;
             if (!err && res) {
 
                 let lastFoundQueueIndex = -1;
                 this.activityUpdateQueue.forEach((entry, queueIndex) => {
-                    const found = res.findIndex(activity => activity.data.id.endsWith('#' + entry.key.entryId) && activity.data.registeredCustomerId === entry.key.registeredUserId);
+                    const found = res.findIndex(activity => activity.data.recordKey.endsWith('#' + entry.key.entryId) && activity.data.customerId === entry.key.registeredUserId);
 
                     if (found === -1) {
                         this._options.logger && this._options.logger('Alexa-Remote: Activity for id ' + entry.key.entryId + ' not found');
@@ -749,7 +750,7 @@ class AlexaRemote extends EventEmitter {
                 }
             }
 
-            if (this.activityUpdateQueue.length) {
+            if (!err && this.activityUpdateQueue.length) {
                 this.activityUpdateTimeout = setTimeout(() => {
                     this.activityUpdateTimeout = null;
                     this.getPushedActivities();
@@ -815,7 +816,7 @@ class AlexaRemote extends EventEmitter {
         });
     }
 
-    httpsGetCall(path, callback, flags = {}) {
+    httpsGetCall2(path, callback, flags = {}) {
 		
 var host=this.baseUrl;
 var pathQuery=null;
@@ -924,7 +925,7 @@ this._options.logger && this._options.logger(obj.headers);
 	*/	
 		
 		let req = https.request(options, (res) => {
-        //console.log(res);
+        console.log(res);
             let body  = '';
         //this._options.logger && this._options.logger('DEBUG1');
 		
@@ -1013,6 +1014,155 @@ this._options.logger && this._options.logger(obj.headers);
         req.end();
     }
 
+    httpsGetCall(path, callback, flags = {}) {
+
+        const handleResponse = (err, res, body) => {
+            if (err || !body) { // Method 'DELETE' may return HTTP STATUS 200 without body
+                this._options.logger && this._options.logger('{Remote} ║ Response: No body','DEBUG');
+                return typeof res.statusCode === 'number' && res.statusCode >= 200 && res.statusCode < 300 ? callback(null, {'success': true}) : callback(new Error('no body'), null);
+            }
+
+            let ret;
+            try {
+                ret = JSON.parse(body);
+            } catch (e) {
+                if (typeof res.statusCode === 'number' && res.statusCode >= 500 && res.statusCode < 510) {
+                    this._options.logger && this._options.logger('{Remote} ║ Response: Status: ' + res.statusCode,'DEBUG');
+                    callback(new Error('no body'), null);
+                    callback = null;
+                    return;
+                }
+
+                this._options.logger && this._options.logger('{Remote} ║ Response: No/Invalid JSON : ' + body,'DEBUG');
+                callback && callback(new Error('no JSON'), body);
+                callback = null;
+                return;
+            }
+
+            this._options.logger && this._options.logger('{Remote} ║ Response: ' + JSON.stringify(ret),'DEBUG');
+            callback(null, ret);
+            callback = null;
+        };
+
+        let options = {
+            host: flags.host || this.baseUrl,
+            path: '',
+            method: 'GET',
+            timeout: flags.timeout || 10000,
+            headers: {
+                'User-Agent' : this._options.userAgent,
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Referer': `https://alexa.${this._options.amazonPage}/spa/index.html`,
+                'Origin': `https://alexa.${this._options.amazonPage}`,
+                //'Content-Type': 'application/json',
+                //'Connection': 'keep-alive',
+                'csrf' : this.csrf,
+                'Cookie' : this.cookie,
+                'Accept-Encoding': 'gzip,deflate'
+            }
+        };
+
+        path = path.replace(/[\n ]/g, '');
+        if (!path.startsWith('/')) {
+            path = path.replace(/^https:\/\//, '');
+            //let ar = path.match(/^([^\/]+)(\/.*$)/);
+            let ar = path.match(/^([^\/]+)([\/]*.*$)/);
+            options.host = ar[1];
+            path = ar[2];
+        } else {
+            options.host = this.baseUrl;
+        }
+        let time = new Date().getTime();
+        path = path.replace(/%t/g, time);
+
+        options.path = path;
+        options.method = flags.method? flags.method : flags.data ? 'POST' : 'GET';
+
+        if (flags.headers) Object.keys(flags.headers).forEach(n => {
+            options.headers [n] = flags.headers[n];
+        });
+
+        const logOptions = JSON.parse(JSON.stringify(options));
+        delete logOptions.headers.Cookie;
+        delete logOptions.headers.csrf;
+        delete logOptions.headers['Accept-Encoding'];
+        delete logOptions.headers['User-Agent'];
+        delete logOptions.headers['Content-Type'];
+        delete logOptions.headers.Referer;
+        delete logOptions.headers.Origin;
+        this._options.logger && this._options.logger('{Remote} ║ Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT' || options.method === 'DELETE') ? ' and data=' + flags.data : ''),'DEBUG');
+
+        let req;
+        let responseReceived = false;
+        try {
+            req = https.request(options, (res) => {
+                const chunks = [];
+
+                res.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
+
+                res.on('end', () => {
+                    responseReceived = true;
+                    if (typeof callback === 'function') {
+                        const resBuffer = Buffer.concat(chunks);
+                        const encoding = res.headers['content-encoding'];
+                        if (encoding === 'gzip') {
+                            zlib.gunzip(resBuffer, (err, decoded) => {
+                                handleResponse(err, res, decoded && decoded.toString());
+                            });
+                        } else if (encoding === 'deflate') {
+                            zlib.inflate(resBuffer, (err, decoded) => {
+                                handleResponse(err, res, decoded && decoded.toString());
+                            });
+                        } else {
+                            handleResponse(null, res, resBuffer.toString());
+                        }
+                    }
+                });
+            });
+        } catch(err) {
+            this._options.logger && this._options.logger('{Remote} ║ Response: Exception: ' + err,'DEBUG');
+            if (typeof callback === 'function'/* && callback.length >= 2*/) {
+                callback (err, null);
+                callback = null;
+            }
+            return;
+        }
+
+        req.on('error', (e) => {
+            this._options.logger && this._options.logger('{Remote} ║ Response: Error: ' + e,'DEBUG');
+            if (!responseReceived && typeof callback === 'function'/* && callback.length >= 2*/) {
+                callback (e, null);
+                callback = null;
+            }
+        });
+
+        req.on('timeout', () => {
+            if (!responseReceived && typeof callback === 'function'/* && callback.length >= 2*/) {
+                this._options.logger && this._options.logger('{Remote} ║ Response: Timeout','DEBUG');
+                callback (new Error('Timeout'), null);
+                callback = null;
+            }
+        });
+
+        req.on('close', () => {
+            if (!responseReceived && typeof callback === 'function'/* && callback.length >= 2*/) {
+                this._options.logger && this._options.logger('{Remote} ║ Response: Closed','DEBUG');
+                callback (new Error('Connection Closed'), null);
+                callback = null;
+            }
+        });
+
+        if (flags && flags.data) {
+            req.write(flags.data);
+        }
+
+        req.end();
+    }
+
+
+
 /// Public
     checkAuthentication(callback) {
         this.httpsGetCall ('/api/bootstrap?version=0', function (err, res) {
@@ -1063,7 +1213,8 @@ this._options.logger && this._options.logger(obj.headers);
     }
 
     getLists(callback) {
-        this.httpsGet ('/api/namedLists?_=%t', (err, res) => callback && callback(err, res && res.lists));
+		this.httpsGet ('/api/namedLists?_=%t', (err, res) => callback && callback(err, res && res.lists));
+	
 	}
 
     getList(listId, callback) {
@@ -1495,7 +1646,10 @@ return this.parseValue4Notification(notification, value);    }
             { method: 'POST' });
     }
 
-    getHistory(options, callback) {
+//!!!!!!!!!!!!!!!!!!!!!! remplacé par getCustomerHistoryRecords   
+   getHistory(options, callback) {
+	   			       this._options.logger && this._options.logger('-------------------------------------------------------coucou');
+
         return this.getActivities(options, callback);
     }
     getActivities(options, callback) {
@@ -1568,6 +1722,92 @@ return this.parseValue4Notification(notification, value);    }
             }
         );
     }
+
+    getCustomerHistoryRecords(options, callback) {
+        if (typeof options === 'function') {
+            callback = options;
+            options = {};
+        }
+        this.httpsGet (`https://www.${this._options.amazonPage}/alexa-privacy/apd/rvh/customer-history-records` +
+            `?startTime=${options.startTime || (Date.now() - 24 * 60 * 60 * 1000)}` +
+            `&endTime=${options.endTime || Date.now() + 24 * 60 * 60 * 1000}` +
+            `&recordType=${options.recordType || 'VOICE_HISTORY'}` +
+            `&maxRecordSize=${options.maxRecordSize || 1}`,
+            (err, result) => {
+                if (err || !result) return callback/*.length >= 2*/ && callback(err, result);
+
+                let ret = [];
+                if (result.customerHistoryRecords) {
+                    for (let r = 0; r < result.customerHistoryRecords.length; r++) {
+                        let res = result.customerHistoryRecords[r];
+                        let o = {
+                            data: res
+                        };
+                        const convParts = {};
+                        if (res.voiceHistoryRecordItems && Array.isArray(res.voiceHistoryRecordItems)) {
+                            res.voiceHistoryRecordItems.forEach(item => {
+                                convParts[item.recordItemType] = convParts[item.recordItemType] || [];
+                                convParts[item.recordItemType].push(item);
+                            });
+                            o.conversionDetails = convParts;
+                        }
+
+                        const recordKey = res.recordKey.split('#'); // A3NSX4MMJVG96V#1612297041815#A1RABVCI4QCIKC#G0911W0793360TLG
+
+                        o.deviceType = recordKey[2] || null;
+                        //o.deviceAccountId = res.sourceDeviceIds[i].deviceAccountId || null;
+                        o.creationTimestamp = res.timestamp || null;
+                        //o.activityStatus = res.activityStatus || null; // DISCARDED_NON_DEVICE_DIRECTED_INTENT, SUCCESS, FAIL, SYSTEM_ABANDONED
+
+                        o.deviceSerialNumber = recordKey[3];
+                        if (!this.serialNumbers[o.deviceSerialNumber]) continue;
+                        o.name = this.serialNumbers[o.deviceSerialNumber].accountName;
+                        const dev = this.find(o.deviceSerialNumber);
+                        let wakeWord = (dev && dev.wakeWord) ? dev.wakeWord : null;
+
+                        o.description = {'summary': ''};
+                        if (convParts.CUSTOMER_TRANSCRIPT) {
+                            convParts.CUSTOMER_TRANSCRIPT.forEach(trans => {
+                                let text = trans.transcriptText;
+                                if (wakeWord && text.startsWith(wakeWord)) {
+                                    text = text.substr(wakeWord.length).trim();
+                                }
+                                o.description.summary += text + ', ';
+                            });
+                            o.description.summary = o.description.summary.substring(0, o.description.summary.length - 2).trim();
+                        }
+                        if (convParts.ALEXA_RESPONSE) {
+                            o.alexaResponse = '';
+                            convParts.ALEXA_RESPONSE.forEach(trans => o.alexaResponse += trans.transcriptText + ', ');
+                            o.alexaResponse = o.alexaResponse.substring(0, o.alexaResponse.length - 2).trim();
+                        }
+                        if (options.filter) {
+                            if (!o.description || !o.description.summary.length) continue;
+
+                            if (res.utteranceType === 'WAKE_WORD_ONLY') {
+                                continue;
+                            }
+
+                            switch (o.description.summary) {
+                                case 'stopp':
+                                case 'alexa':
+                                case 'echo':
+                                case 'computer':
+                                case 'amazon':
+                                case ',':
+                                case '':
+                                    continue;
+                            }
+                        }
+
+                        if (o.description.summary || !options.filter) ret.push(o);
+                    }
+                }
+                if (typeof callback === 'function') return callback (err, ret);
+            }
+        );
+    }
+
 
     getAccount(callback) {
         this.httpsGet (`https://alexa-comms-mobile-service.${this._options.amazonPage}/accounts`, callback);
@@ -2015,7 +2255,7 @@ return this.parseValue4Notification(notification, value);    }
             limit = 0;
         }
         limit = limit || 2000;
-        this.httpsGet (`/api/behaviors/automations?limit=${limit}`, callback, {
+        this.httpsGet (`/api/behaviors/v2/automations?limit=${limit}`, callback, {
             timeout: 30000
         });    }
 
@@ -2136,8 +2376,12 @@ return this.parseValue4Notification(notification, value);    }
         this.httpsGet ('/api/device-preferences?cached=true&_=%t', callback);
     }
 
+    getAllDeviceVolumes(callback) {
+        this.httpsGet ('/api/devices/deviceType/dsn/audio/v1/allDeviceVolumes', callback);
+    }
+	
     getSmarthomeDevices(callback) {
-        this.httpsGet ('/api/phoenix?_=%t', function (err, res) {
+        this.httpsGet ('/api/phoenix?includeRelationships=true&_=%t', function (err, res) {
             if (err || !res || !res.networkDetail) return callback(err, res);
             try {
                 res = JSON.parse(res.networkDetail);
@@ -2233,10 +2477,13 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     querySmarthomeDevices(applicanceIds, entityType, callback) {
+				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevicesxxxxxxxxxxxxxxx ','DEBUG');
+
         if (typeof entityType === 'function') {
             callback = entityType;
             entityType = 'APPLIANCE'; // other value 'GROUP'
         }
+				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices-1xxxxxxxxxxxxxxx ','DEBUG');
 
         let reqArr = [];
         if (!Array.isArray(applicanceIds)) applicanceIds = [applicanceIds];
@@ -2246,6 +2493,7 @@ return this.parseValue4Notification(notification, value);    }
                 'entityType': entityType
             });
         }
+				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices-2xxxxxxxxxxxxxxx ','DEBUG');
 
         let flags = {
             method: 'POST',
@@ -2253,7 +2501,11 @@ return this.parseValue4Notification(notification, value);    }
                 'stateRequests': reqArr
             })
         };
+				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices-3xxxxxxxxxxxxxxx '+JSON.stringify(flags),'DEBUG');
+
         this.httpsGet (`/api/phoenix/state`, callback, flags);
+				
+				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices-3xxxxxxxxxxxxxxx '+JSON.stringify(flags),'DEBUG');
         /*
         {
             'stateRequests': [
@@ -2451,9 +2703,9 @@ return this.parseValue4Notification(notification, value);    }
 	
 	getHistory2(options,callback) 
 	{
-		this.getHistory(options, (err, res) => 
+		this.getCustomerHistoryRecords(options, (err, res) => 
 		{
-			        //this._options.logger && this._options.logger('coucou'+res);
+			        //this._options.logger && this._options.logger('------------------------999-------------------------------coucou'+options.maxRecordSize);
 
 			if (err || !res || !res || !Array.isArray(res)) return callback && callback();
 			callback && callback(res);
@@ -2533,7 +2785,10 @@ return this.parseValue4Notification(notification, value);    }
 
 	querySmarthomeDevices2(applicanceIds, entityType, callback) 
 	{
-		this.querySmarthomeDevices(applicanceIds, entityType,(err, res) => 
+		//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices2xxxxxxxxxxxxxxx ','DEBUG');
+	
+
+	this.querySmarthomeDevices(applicanceIds, entityType,(err, res) => 
 		{
 		if (err || !res || !res.deviceStates || !Array.isArray(res.deviceStates)) return callback && callback();
 			//callback && callback(res.deviceStates); on enlève deicestates pour avoir les erreurs

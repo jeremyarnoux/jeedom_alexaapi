@@ -17,6 +17,18 @@
   color: #fff;
   background-color: #28a745;
 }
+.badge-purple {
+  color: #fff;
+  background-color: #563d7c;
+}
+.badge-info {
+  color: #fff;
+  background-color: #17a2b8;
+}
+.badge-beige {
+  color: #fff;
+  background-color: #949463;
+}
 .badge-danger {
   color: #fff;
   background-color: #dc3545;
