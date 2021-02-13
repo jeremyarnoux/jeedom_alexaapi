@@ -771,20 +771,13 @@ public static function templateWidget(){
 					$device->setConfiguration('manufacturerName', $manufacturerName);
 					$device->setConfiguration('friendlyDescription', $item['friendlyDescription']);
 
-
-
-
-
-
-
-                    try {
-                        $device->save();
-                    } catch (Exception $e) {
-                        $device->setName($device->getName() . ' doublon ' . rand(0, 9999));
-                        $device->save();
-                    }
-					
-        //log::add('alexasmarthome_scan', 'debug', "************************************FIN Ajout d'un device smartHome non détecté par le scan ***********************************");
+					try {
+						$device->save();
+					} catch (Exception $e) {
+						$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
+						$device->save();
+					}
+			
 					
     }
 
