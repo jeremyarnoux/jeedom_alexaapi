@@ -225,7 +225,7 @@ CommandAlexa.DisplayPower = function(req,res){
 
         res.type('json');
 
-        config.logger('Alexa-API: Lancement /DisplayPower  avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.value, "INFO");
+	config.logger(' {API}    ╔═══════[Lancement /DisplayPower  avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.value, "INFO");
 
         if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.DisplayPower', 'Missing parameter "device"'));
         if ('value' in req.query === false)      return res.status(500).json(error(500, req.route.path, 'Alexa.DisplayPower', 'Missing parameter "value"'));
