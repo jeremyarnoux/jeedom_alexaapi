@@ -490,6 +490,7 @@ public static function templateWidget(){
         if ($r->isDue() && $deamon_info['state'] == 'ok') {
             $eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
             config::save("listRoutinesProchain", time() + 960, "alexaapi");
+                //log::add('alexaapi_node', 'debug', 'Prochain CRON calé à : '.time() + 960);
             foreach ($eqLogics as $alexaapi) {
                 //log::add('alexaapi_node', 'debug', 'CRON Refresh: '.$alexaapi->getName());
                 $alexaapi->refresh();
