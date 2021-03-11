@@ -795,7 +795,7 @@ class AlexaRemote extends EventEmitter {
         }
         this.checkAuthentication((authenticated, err) => {
             if (authenticated) {
-                this._options.logger && this._options.logger('Alexa-Remote: Authentication check successfull');
+                //this._options.logger && this._options.logger('Alexa-Remote: Authentication check successfull');
                 this.lastAuthCheck = new Date().getTime();
                 return this.httpsGetCall(path, callback, flags);
             }
@@ -960,7 +960,7 @@ this._options.logger && this._options.logger(obj.headers);
                 {
                     if (!body)
                     {
-						this._options.logger && this._options.logger(' {Remote} ║ Response(3): '+resstatusMessage, "INFO");
+						this._options.logger && this._options.logger('{Remote} ║ Response(3): '+resstatusMessage, "INFO");
                         
 						if (resstatusCode=="200") // C'est OK
                         return callback && callback(null, null);
@@ -1019,6 +1019,7 @@ this._options.logger && this._options.logger(obj.headers);
         const handleResponse = (err, res, body) => {
             if (err || !body) { // Method 'DELETE' may return HTTP STATUS 200 without body
                 this._options.logger && this._options.logger('{Remote} ║ Response: No body','DEBUG');
+                this._options.logger && this._options.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','DEBUG');
                 return typeof res.statusCode === 'number' && res.statusCode >= 200 && res.statusCode < 300 ? callback(null, {'success': true}) : callback(new Error('no body'), null);
             }
 

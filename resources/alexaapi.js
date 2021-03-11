@@ -137,7 +137,7 @@ function forEachDevices(nameOrSerial, callback) {
 
 function LancementCommande(commande, req) 
 {
-	config.logger(' {API}    ╔═══════[Lancement /'+commande, "INFO");
+	config.logger('{API}    ╔═══════[Lancement /'+commande, "INFO");
 
 }
 
@@ -145,7 +145,7 @@ CommandAlexa.query = function(req,res){
 	
 	res.type('json');
 	
-	//config.logger(' {API}    ╔═══════[Lancement /query');
+	//config.logger('{API}    ╔═══════[Lancement /query');
 	config.logger('VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
 	config.logger('VVVVVVVVVVVVVVVVVVVVVVVV--- R E Q U E T E U R ---VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
 	config.logger('VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV');
@@ -175,7 +175,7 @@ CommandAlexa.checkAuth = function(req,res){
 	
 	res.type('json');
 	
-config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');	
+config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');	
 
 	alexa.checkAuthentication(function(auth) {
 		res.status(200).json({
@@ -195,7 +195,7 @@ CommandAlexa.Speak = function(req,res){
 	
 	res.type('json');
 	
-	config.logger(' {API}    ╔═══════[Lancement /Speak avec paramètres -> device:' + req.query.device+'/text:' + req.query.text +'/ssml:' + req.query.ssml  +'/jingle:' + req.query.jingle +'/volume:'+ req.query.volume +'/lastvolume:' + req.query.lastvolume, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement /Speak avec paramètres -> device:' + req.query.device+'/text:' + req.query.text +'/ssml:' + req.query.ssml  +'/jingle:' + req.query.jingle +'/volume:'+ req.query.volume +'/lastvolume:' + req.query.lastvolume, 'INFO');
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Speak', 'Missing parameter "text"'));
@@ -225,7 +225,7 @@ CommandAlexa.DisplayPower = function(req,res){
 
         res.type('json');
 
-	config.logger(' {API}    ╔═══════[Lancement /DisplayPower  avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.value, "INFO");
+	config.logger('{API}    ╔═══════[Lancement /DisplayPower  avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.value, "INFO");
 
         if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.DisplayPower', 'Missing parameter "device"'));
         if ('value' in req.query === false)      return res.status(500).json(error(500, req.route.path, 'Alexa.DisplayPower', 'Missing parameter "value"'));
@@ -267,7 +267,7 @@ CommandAlexa.Announcement = function(req,res){
 	
 	res.type('json');
 	
-	config.logger(' {API}    ╔═══════[Lancement /Announcement avec paramètres -> device:' + req.query.device+'/text:' + req.query.text +'/volume:' + req.query.volume +'/lastvolume:' + req.query.lastvolume);
+	config.logger('{API}    ╔═══════[Lancement /Announcement avec paramètres -> device:' + req.query.device+'/text:' + req.query.text +'/volume:' + req.query.volume +'/lastvolume:' + req.query.lastvolume);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Announcement', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Announcement', 'Missing parameter "text"'));
@@ -318,7 +318,7 @@ CommandAlexa.Radio = function(req,res){
 	if ('device' in req.query === false)  return res.status(500).json(error(500, req.route.path, 'Alexa.Radio', 'Missing parameter "device"'));
 	if ('station' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Radio', 'Missing parameter "station"'));
 	
-	config.logger(' {API}    ╔═══════[Lancement /Radio avec paramètres -> device: ' + req.query.device+' & station: ' + req.query.station);
+	config.logger('{API}    ╔═══════[Lancement /Radio avec paramètres -> device: ' + req.query.device+' & station: ' + req.query.station);
 
 	// Suppression de la boucle des serial, en effet, si on envoi sur un groupe, la radio fonctionne en multiroom
 	//boucleSurSerials_setTunein(req);
@@ -349,7 +349,7 @@ CommandAlexa.Volume = function(req,res){
 	//Quand Volume est lancé par une autre fonction, la valeur du volume n'est pas value mais volume
 	if ('volume' in req.query) req.query.value=req.query.volume;
 	
-	config.logger(' {API}    ╔═══════[Lancement /Volume avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.value+'══════════════════════════════════', "INFO");
+	config.logger('{API}    ╔═══════[Lancement /Volume avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.value+'══════════════════════════════════', "INFO");
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "device"'));
 	if ('value' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Volume', 'Missing parameter "value"'));
@@ -381,7 +381,7 @@ CommandAlexa.textCommand = function(req,res){
 	res.type('json');
 
 
-	config.logger(' {API}    ╔═══════[Lancement /textCommand avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text+'══════════════════════════════════', "INFO");
+	config.logger('{API}    ╔═══════[Lancement /textCommand avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text+'══════════════════════════════════', "INFO");
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.textCommand', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.textCommand', 'Missing parameter "text"'));
@@ -409,7 +409,7 @@ CommandAlexa.playList = function(req,res){
 	
 	res.type('json');
 
-	config.logger(' {API}    ╔═══════[Lancement /playList avec paramètres -> device: ' + req.query.device+' & playlist: ' + req.query.playlist);
+	config.logger('{API}    ╔═══════[Lancement /playList avec paramètres -> device: ' + req.query.device+' & playlist: ' + req.query.playlist);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.playList', 'Missing parameter "device"'));
 	if ('playlist' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.playList', 'Missing parameter "playlist"'));
@@ -435,7 +435,7 @@ CommandAlexa.playMusicTrack = function(req,res){
 	
 	res.type('json');
 
-	config.logger(' {API}    ╔═══════[Lancement /playMusicTrack avec paramètres -> device: ' + req.query.device+' & trackId: ' + req.query.trackId);
+	config.logger('{API}    ╔═══════[Lancement /playMusicTrack avec paramètres -> device: ' + req.query.device+' & trackId: ' + req.query.trackId);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.playMusicTrack', 'Missing parameter "device"'));
 	if ('trackId' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.playMusicTrack', 'Missing parameter "trackId"'));
@@ -462,7 +462,7 @@ CommandAlexa.playMusicTrack = function(req,res){
 CommandAlexa.Command = function(req,res){
 	res.type('json');
 
-	config.logger(' {API}    ╔═══════[Lancement /Command avec paramètres -> device: ' + req.query.device+' & command: ' + req.query.command);
+	config.logger('{API}    ╔═══════[Lancement /Command avec paramètres -> device: ' + req.query.device+' & command: ' + req.query.command);
 
 	if ('device' in req.query === false)  return res.status(500).json(error(500, req.route.path, 'Alexa.Command', 'Missing parameter "device"'));
 	if ('command' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Command', 'Missing parameter "command"'));
@@ -507,7 +507,7 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 	
 		res.type('json');
 
-	config.logger(' {API}    ╔═══════[Lancement /SmarthomeCommand avec paramètres -> device: ' + req.query.device+' & command: ' + req.query.command);
+	config.logger('{API}    ╔═══════[Lancement /SmarthomeCommand avec paramètres -> device: ' + req.query.device+' & command: ' + req.query.command);
 
 	if ('device' in req.query === false)  return res.status(500).json(error(500, req.route.path, 'Alexa.SmarthomeCommand', 'Missing parameter "device"'));
 	if ('command' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.SmarthomeCommand', 'Missing parameter "command"'));
@@ -598,8 +598,8 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 							entityType="APPLIANCE";
 							
     //executeSmarthomeDeviceAction(entityIds, parameters, entityType, callback) {
-	config.logger(' {API}    ╔═══════[Lancement /querySmarthomeDevices avec paramètres !-> device: ' + req.query.device+'req.query.entityType: ' + req.query.entityType+ ' req.query.type: ' + req.query.type, 'INFO');
-	//config.logger(' {API}    >>>>>>>>>>Debug:' + JSON.stringify(req.query), 'INFO');
+	config.logger('{API}    ╔═══════[Lancement /querySmarthomeDevices avec paramètres !-> device: ' + req.query.device+'req.query.entityType: ' + req.query.entityType+ ' req.query.type: ' + req.query.type, 'INFO');
+	//config.logger('{API}    >>>>>>>>>>Debug:' + JSON.stringify(req.query), 'INFO');
 		
 
 		/*
@@ -723,7 +723,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			toReturn.push("vide");
 		}
 		
-		config.logger(' {Remote} ╚════════════════════════════════════════════════════════════════════════════════════════','INFO');
+		config.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════','INFO');
 		res.status(200).json(toReturn);
 	});
 
@@ -843,7 +843,7 @@ CommandAlexa.Push = function(req,res){
 	
 	res.type('json');
 	
-	config.logger(' {API}    ╔═══════[Lancement /Push avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text);
+	config.logger('{API}    ╔═══════[Lancement /Push avec paramètres -> device: ' + req.query.device+' & text: ' + req.query.text);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.Push', 'Missing parameter "device"'));
 	if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.Push', 'Missing parameter "text"'));
@@ -863,7 +863,7 @@ CommandAlexa.MultipleNext = function(req,res){
 	
 	res.type('json');
 	
-	config.logger(' {API}    ╔═══════[Lancement /MultipleNext avec paramètres -> device: ' + req.query.device+' & nb: ' + req.query.text);
+	config.logger('{API}    ╔═══════[Lancement /MultipleNext avec paramètres -> device: ' + req.query.device+' & nb: ' + req.query.text);
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.MultipleNext', 'Missing parameter "device"'));
 	//if ('text' in req.query === false)	 return res.status(500).json(error(500, req.route.path, 'Alexa.MultipleNext', 'Missing parameter "text"'));
@@ -989,7 +989,7 @@ CommandAlexa.Routine = function(req,res){
 	LancementCommande("Routine",req);
 	
 	
-		//config.logger(' {API}    ╔═══════[Lancement /Routine avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.routine);
+		//config.logger('{API}    ╔═══════[Lancement /Routine avec paramètres -> device: ' + req.query.device+' & value: ' + req.query.routine);
 
 	
 	res.type('json');
@@ -1134,7 +1134,7 @@ app.get('/alarm', (req, res) => {
 */
 
 app.get('/devices', (req, res) => {
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 	alexa.getDevices(function(devices) {
@@ -1175,7 +1175,7 @@ app.get('/devices', (req, res) => {
 
 CommandAlexa.wakeWords = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getWakeWords(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1189,7 +1189,7 @@ CommandAlexa.wakeWords = function(req, res) {
 
 CommandAlexa.musicProviders = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getMusicProviders(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1201,7 +1201,7 @@ CommandAlexa.musicProviders = function(req, res) {
 
 CommandAlexa.discoverSmarthomeDevice = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_discoverSmarthomeDevice(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1213,7 +1213,7 @@ CommandAlexa.discoverSmarthomeDevice = function(req, res) {
 
 CommandAlexa.historyFull = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getHistory(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1225,7 +1225,7 @@ CommandAlexa.historyFull = function(req, res) {
 
 CommandAlexa.devicesFull = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	alexa.getDevices(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1237,7 +1237,7 @@ CommandAlexa.devicesFull = function(req, res) {
 
 CommandAlexa.devicePreferences = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getDevicePreferences(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1249,7 +1249,7 @@ CommandAlexa.devicePreferences = function(req, res) {
 
 CommandAlexa.allDeviceVolumes = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getAllDeviceVolumes(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1261,7 +1261,7 @@ CommandAlexa.allDeviceVolumes = function(req, res) {
 
 CommandAlexa.smarthomeBehaviourActionDefinitions = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getSmarthomeBehaviourActionDefinitions(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1273,7 +1273,7 @@ CommandAlexa.smarthomeBehaviourActionDefinitions = function(req, res) {
 
 CommandAlexa.smarthomeGroups = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getSmarthomeGroups(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1285,7 +1285,7 @@ CommandAlexa.smarthomeGroups = function(req, res) {
 
 CommandAlexa.smarthomeEntities = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getSmarthomeEntities(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1297,7 +1297,7 @@ CommandAlexa.smarthomeEntities = function(req, res) {
 
 CommandAlexa.homeGroup = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getHomeGroup(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1309,7 +1309,7 @@ CommandAlexa.homeGroup = function(req, res) {
 
 CommandAlexa.smarthomeDevices = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getSmarthomeDevices(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1321,7 +1321,7 @@ CommandAlexa.smarthomeDevices = function(req, res) {
 
 CommandAlexa.remindersFull = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getNotifications(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1333,7 +1333,7 @@ CommandAlexa.remindersFull = function(req, res) {
 
 CommandAlexa.carts = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getCards(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1345,7 +1345,7 @@ CommandAlexa.carts = function(req, res) {
 
 CommandAlexa.deviceStatusList = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getDeviceStatusList(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1357,7 +1357,7 @@ CommandAlexa.deviceStatusList = function(req, res) {
 
 CommandAlexa.lists = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getLists(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1371,7 +1371,7 @@ CommandAlexa.lists = function(req, res) {
 /*
 CommandAlexa.doNotDisturb = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	Appel_getDoNotDisturb(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';
@@ -1384,7 +1384,7 @@ CommandAlexa.doNotDisturb = function(req, res) {
 
 CommandAlexa.media = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
@@ -1400,7 +1400,7 @@ CommandAlexa.media = function(req, res) {
 
 CommandAlexa.playerInfo = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');	
+config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');	
 	res.type('json');
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
@@ -1445,7 +1445,7 @@ CommandAlexa.notificationSounds = function(req, res) {
 
 CommandAlexa.Playlists = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
 	config.logger('{API}    ╠═══> Device : ' + req.query.device, 'DEBUG');
@@ -1461,7 +1461,7 @@ CommandAlexa.Playlists = function(req, res) {
 
 CommandAlexa.activities = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
@@ -1477,7 +1477,7 @@ CommandAlexa.activities = function(req, res) {
 
 CommandAlexa.deviceNotificationState = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger(' {API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
@@ -1669,7 +1669,7 @@ app.get('/playmusictrack', CommandAlexa.playMusicTrack);
 
 app.get('/getvolume', (req, res) => {
 	res.type('json');
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 
 	if ('device' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.getVolume', 'Missing parameter "device"'));
@@ -1689,7 +1689,7 @@ app.get('/getvolume', (req, res) => {
 });
 
 app.get('/history', (req, res) => {
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 
@@ -1731,7 +1731,7 @@ app.get('/history', (req, res) => {
 
 */
 app.get('/routines', (req, res) => {
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path, 'INFO');
 	res.type('json');
 
 	//config.logger('{API}: type of devices : '+typeof devices);
@@ -1882,7 +1882,7 @@ app.get('/routines', (req, res) => {
 
 */
 app.get('/reminders', (req, res) => {
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 	//config.logger('{API}: (reminders) Lancement','DEBUG');
@@ -1928,7 +1928,7 @@ app.get('/reminders', (req, res) => {
 
 */
 app.get('/deleteallalarms', (req, res) => {
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 	alexa.getNotifications2(function(notifications) {
@@ -2014,7 +2014,7 @@ app.get('/deleteallalarms', (req, res) => {
 
 */
 app.get('/whennextalarm', (req, res) => {
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 	alexa.getNotifications2(function(notifications) {
@@ -2103,7 +2103,7 @@ app.get('/whennextalarm', (req, res) => {
 
 */
 app.get('/updateallalarms', (req, res) => {
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 	// c'était pour générer la liste des devices
@@ -2261,7 +2261,7 @@ function ajouteZero(n){
 
 */
 app.get('/whennextmusicalalarm', (req, res) => {
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 	alexa.getNotifications2(function(notifications) {
@@ -2358,7 +2358,7 @@ app.get('/whennextmusicalalarm', (req, res) => {
 
 */
 app.get('/musicalalarmmusicentity', (req, res) => {
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 	alexa.getNotifications2(function(notifications) {
@@ -2454,7 +2454,7 @@ app.get('/musicalalarmmusicentity', (req, res) => {
 
 */
 app.get('/whennextreminder', (req, res) => {
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 
@@ -2544,7 +2544,7 @@ app.get('/whennextreminder', (req, res) => {
 
 */
 app.get('/whennextreminderlabel', (req, res) => {
-	config.logger(' {API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 
@@ -2625,10 +2625,10 @@ app.get('/whennextreminderlabel', (req, res) => {
 
 /***** Stop the server *****/
 app.get('/stop', (req, res) => {
-	//config.logger(' {API}:      Shuting down','INFO');
-	config.logger(' {API}               ╔═════════════════════════════════════════════╗','INFO');
-	config.logger(' {API}               ║   Lien au serveur Amazon En COURS D ARRET   ║' ,'INFO');
-	config.logger(' {API}               ╚═════════════════════════════════════════════╝','INFO');
+	//config.logger('{API}:      Shuting down','INFO');
+	config.logger('{API}               ╔═════════════════════════════════════════════╗','INFO');
+	config.logger('{API}               ║   Lien au serveur Amazon En COURS D ARRET   ║' ,'INFO');
+	config.logger('{API}               ╚═════════════════════════════════════════════╝','INFO');
 
 	
 	res.status(200).json({});
@@ -2682,7 +2682,7 @@ function startServer() {
 		alexa = null;
 		alexa = new Alexa();
 		config.logger(' ','INFO');
-		config.logger(' {API}    ╔═══════════════════[Lancement du lien au Serveur Amazon]═════════════════════════════════════════════════════════','INFO');
+		config.logger('{API}    ╔═══════════════════[Lancement du lien au Serveur Amazon]═════════════════════════════════════════════════════════','INFO');
 
 				alexa.init({
 				cookie: config.cookie,
@@ -2727,14 +2727,14 @@ function startServer() {
 						}
 					// Start the server
 					if (server) {
-						config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-						config.logger(' {API}    ║   Server is already listening on port ' + server.address().port ,'INFO');
-						config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+						config.logger('{API}    ║   Server is already listening on port ' + server.address().port ,'INFO');
+						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
 					} else {
 						server = app.listen(config.listeningPort, () => {
-							config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-							config.logger(' {API}    ║   Server OK listening on port ' + server.address().port ,'INFO');
-							config.logger(' {API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+							config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+							config.logger('{API}    ║   Server OK listening on port ' + server.address().port ,'INFO');
+							config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
 
 						});
 					}
