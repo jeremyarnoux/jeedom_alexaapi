@@ -1591,19 +1591,9 @@ class alexaapiCmd extends cmd
 		// https://developer.amazon.com/en-US/docs/alexa/custom-skills/ask-soundlibrary.html
 		// https://developer.amazon.com/en-US/docs/alexa/custom-skills/speechcon-reference-interjections-french.html
 		$_text= preg_replace("~#([^/#\[\]]+/[^/#\[\]]+)#~i",'<audio src="soundbank://soundlibrary/$1" />',$_text);
+		$_text= preg_replace("~#([^/#\[\]]+/[^/#\[\]]+/[^/#\[\]]+)#~i",'<audio src="soundbank://soundlibrary/$1" />',$_text);
 		$return= preg_replace("~#([^/#\[\]]+)#~i",'<say-as interpret-as="interjection">$1</say-as>',$_text);
-	
-		//log::add('alexaapi', 'info', 'coucou1'.$_text);
-		//$_text;
-		// par exemple : <audio src="soundbank://soundlibrary/animals/amzn_sfx_bear_groan_roar_01"/>
-		//$return=preg_replace("#(.*/.*)#",'<audio src="soundbank://soundlibrary/$1"/>',$_text);
-		//$return=preg_replace("#(.*)#",'$1',$_text); SIGALOU
-		//$return = preg_replace("/#(.+\/.+)#/i",'<audio src="soundbank://soundlibrary/$1" />"',$_text);
-		//preg_match('#(.+)#isU', $_text, $matches);
-//$return = var_dump($matches);
-		
-       // log::add('alexaapi', 'info', '---->return:'.$return);
-       // log::add('alexaapi', 'info', 'coucou');
+
 
         if (strpos($_text, '|') !== false && strpos($_text, '[') !== false && strpos($_text, ']') !== false) {
             $replies = interactDef::generateTextVariant($_text);
