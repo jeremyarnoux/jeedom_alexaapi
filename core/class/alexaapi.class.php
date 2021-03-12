@@ -1566,7 +1566,11 @@ class alexaapiCmd extends cmd
         if (!(isset($_options['slider']))) $_options['slider'] = "";
         if (!(isset($_options['select']))) $_options['select'] = "";
         if (!(isset($_options['message']))) $_options['message'] = "";
+        if ((!(isset($_options['volume']))) || ($_options['volume']="#volume#")) $_options['volume'] = ""; //2eme partie du test : Rustine pour supprimer un volume qui serait resté sur #volume# sur un scénario
+        log::add('alexaapi_node', 'info', '---->!!!!!!!!!!!!!!!!!!!!!!!:'.$_options['volume']);
+		
         if (!(isset($_options['volume']))) $_options['volume'] = "";
+		
         //log::add('alexaapi', 'info', 'xxxxxxxxxxxxx---->_options:'.json_encode($_options));
         // Si on est sur une commande qui utilise volume, on va remettre après execution le volume courant
         if (strstr($request, '&volume=')) $request = $request . '&lastvolume=' . $lastvolume;
@@ -1587,7 +1591,7 @@ class alexaapiCmd extends cmd
 
     public static function decodeTexteAleatoire($_text)
     {
-		// Pour le décodage des interjection et de la librairie de sons
+		// Pour le décodage des interjections et de la librairie de sons
 		// https://developer.amazon.com/en-US/docs/alexa/custom-skills/ask-soundlibrary.html
 		// https://developer.amazon.com/en-US/docs/alexa/custom-skills/speechcon-reference-interjections-french.html
 		$_text= preg_replace("~#([^/#\[\]]+/[^/#\[\]]+)#~i",'<audio src="soundbank://soundlibrary/$1" />',$_text);
