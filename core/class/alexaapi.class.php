@@ -1566,8 +1566,8 @@ class alexaapiCmd extends cmd
         if (!(isset($_options['slider']))) $_options['slider'] = "";
         if (!(isset($_options['select']))) $_options['select'] = "";
         if (!(isset($_options['message']))) $_options['message'] = "";
-        if ((!(isset($_options['volume']))) || ($_options['volume']="#volume#")) $_options['volume'] = ""; //2eme partie du test : Rustine pour supprimer un volume qui serait resté sur #volume# sur un scénario
-        log::add('alexaapi_node', 'info', '---->!!!!!!!!!!!!!!!!!!!!!!!:'.$_options['volume']);
+        if ((!(isset($_options['volume']))) || ($_options['volume']=="#volume#")) $_options['volume'] = ""; //2eme partie du test : Rustine pour supprimer un volume qui serait resté sur #volume# sur un scénario
+        //log::add('alexaapi_node', 'info', '---->!!!!!!!!!!!!!!!!!!!!!!!:'.$_options['volume']);
 		
         if (!(isset($_options['volume']))) $_options['volume'] = "";
 		
