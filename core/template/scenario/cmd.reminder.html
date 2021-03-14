@@ -1,54 +1,43 @@
-<link rel="stylesheet" href="plugins/alexaapi/desktop/css/bootstrap-datetimepicker.css">
 <div class="input-group input-group-sm" style="width: 100%; padding-top: 1px">
-    <span class="input-group-addon roundedLeft" id="basic-addon1" style="width: 100px">Quoi</span>
-    <textarea class="message expressionAttr form-control ta_autosize" data-l1key="options" data-l2key="message"
-              rows="1" style="resize:vertical;" data-cmd_id="#id#" data-uid="#uid#">#message#</textarea>
+    <span class="input-group-addon" id="basic-addon1" style="width: 100px">Quoi</span>
+    <textarea class="message expressionAttr form-control ta_autosize" data-l1key="options" data-l2key="message" rows="1"
+              style="resize:vertical;" data-cmd_id="#id#" data-uid="#uid#">#message#</textarea>
 
 </div>
 
 <div class="input-group input-group-sm" style="width: 50%">
-    <span class="input-group-addon roundedLeft" id="basic-addon1" style="width: 100px">Quand</span>
-    <input type="text" id="datetimepicker-reminder" class="form-control slider expressionAttr input-sm"
-           data-l1key="options" data-l2key="when" value="#when#" data-cmd_id="#id#" data-uid="#uid#"/>
-    <span class="input-group-btn roundedRight">
-            <span class="btn btn-default roundedRight fas fa-calendar-alt"></span>
-      </span>
+    <span class="input-group-addon" id="basic-addon1" style="width: 100px">Quand</span>
+    <input class="slider expressionAttr form-control input-sm" data-l1key="options" data-l2key="when" value="#when#"
+           data-cmd_id="#id#" data-uid="#uid#"/><small>&nbsp;&nbsp; <B>Format</B> : YYYY-MM-DD HH24:MI:SS</small>
 </div>
 
 <div class="input-group input-group-sm" style="width: 100%">
-    <span class="input-group-addon roundedLeft" id="basic-addon1" style="width: 100px">Répétition</span>
-    <select class="form-control input-sm expressionAttr roundedRight" data-l1key="options" data-l2key="select" data-cmd_id="#id#"
+    <span class="input-group-addon" id="basic-addon1" style="width: 100px">Répétition</span>
+    <select class="form-control input-sm expressionAttr" data-l1key="options" data-l2key="select" data-cmd_id="#id#"
             data-uid="#uid#">
         <option value="">Ne jamais répéter</option>
+
         <option value="P1D">Tous les jours</option>
+
         <option value="XXXX-WD">En semaine</option>
+
         <option value="XXXX-WE">Week-ends</option>
+
         <option value="XXXX-WXX-1">Chaque lundi</option>
+
         <option value="XXXX-WXX-2">Chaque mardi</option>
+
         <option value="XXXX-WXX-3">Chaque mercredi</option>
+
         <option value="XXXX-WXX-4">Chaque jeudi</option>
+
         <option value="XXXX-WXX-5">Chaque vendredi</option>
+
         <option value="XXXX-WXX-6">Chaque samedi</option>
+
         <option value="XXXX-WXX-7">Chaque dimanche</option>
     </select>
     <script>
         $('.expressionAttr[data-uid=#uid#][data-l1key=options][data-l2key=select]').value('#select#');
-        $.include(['plugins/alexaapi/desktop/js/bootstrap-datetimepicker.js'], function () {
-        });
-        $.include(['plugins/alexaapi/desktop/js/bootstrap-datetimepicker-fr.js'], function () {
-        });
-        $(function () {
-            $('#datetimepicker-reminder').datetimepicker({
-                setDate: new Date(),
-                use24hours: true,
-                format: 'yyyy-mm-dd hh:ii:ss',
-                language: 'fr',
-                stepSecond: '10',
-                todayBtn: true,
-            });
-            $('.fa-calendar').click(function () {
-                $("#datetimepicker-reminder").focus();
-            });
-        });
     </script>
 </div>

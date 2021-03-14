@@ -1,19 +1,30 @@
 {
-	"id" : "alexaapi",
-	"name" : "Alexa - API",
-	"description" : "Plugin pour interface Alexa",
-	"licence" : "AGPL",
-	"author" : "Sigalou",
-	"require" : "3.3.24",
-	"version": "0.0.1",
-	"changelog" : "http://jeedom.sigalou-domotique.fr/alexa-api-changelog",
-	"forum_link" : "https://community.jeedom.com/tags/plugin-alexaapi",
-	"documentation" : "http://jeedom.sigalou-domotique.fr/alexa-api-documentation",
-	"category" : "communication",
-  "hasDependency" : 1,
-  "hasOwnDeamon" : 1,
-	"language" : ["fr_FR","en_US"],
-	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile","v4"],
-	"maxDependancyInstallTime" : 45
+  "id": "alexasmarthome",
+  "name": "Alexa - SmartHome",
+  "description": "Le plugin a été totalement refondu et relooké pour accepter les équipements que détecte l’application Alexa. Le lien mis en place par les plugins entre Jeedom et le serveur Amazon permet de remonter les états des équipements et de leur envoyer des commandes. Le lien entre le serveur Amazon (Alexa) et les équipements est quant à lui assuré par les skills de chaque fabriquant (Xiaomi, SmartLife, Tuya, Netatmo, Wemo, Somfy, eWelink,…) ce qui rend les possibilités totalement infinies.",
+  "licence": "AGPL",
+  "author": "Sigalou",
+  "require": "3.3.24",
+  "version": "0.0.1",
+  "changelog": "http://jeedom.sigalou-domotique.fr/alexa-amazon-smarthome-changelog",
+  "forum_link": "https://community.jeedom.com/tags/plugin-alexasmarthome",
+  "documentation": "http://jeedom.sigalou-domotique.fr/alexa-amazon-smarthome-documentation",
+  "category": "devicecommunication",
+  "hasDependency": 0,
+  "hasOwnDeamon": 0,
+  "language": [
+    "fr_FR",
+    "en_US"
+  ],
+  "compatibility": [
+    "miniplus",
+    "smart",
+    "rpi",
+    "docker",
+    "diy",
+    "mobile",
+    "v4"
+  ],
+  "maxDependancyInstallTime": 0
 }
 

@@ -19,7 +19,7 @@ if (!isConnect('admin')) {
     throw new Exception('401 Unauthorized');
 }
 /*
-	DEPLACE DANS 	public static function ScanAmazonAlexa($_logical_id = null, $_exclusion = 0) de core class alexaapi.class.php
+	DEPLACE DANS 	public static function ScanAmazonAlexa($_logical_id = null, $_exclusion = 0) de core class alexasmarthome.class.php
 
 $json=file_get_contents("http://192.168.0.21:3456/devices");
 $json = json_decode($json,true);
@@ -35,24 +35,24 @@ foreach($json as $item)
 						$online = $item['online'];
 
 
-		$alexaapi = alexaapi::byLogicalId($serial, 'alexaapi');
-		if (!is_object($alexaapi)) {
-			$alexaapi = new alexaapi();
-			$alexaapi->setName($device);
-			$alexaapi->setLogicalId($serial); 
-			$alexaapi->setEqType_name('alexaapi');
-			$alexaapi->setIsEnable(1);
-			$alexaapi->setIsVisible(1);
+		$alexasmarthome = alexasmarthome::byLogicalId($serial, 'alexasmarthome');
+		if (!is_object($alexasmarthome)) {
+			$alexasmarthome = new alexasmarthome();
+			$alexasmarthome->setName($device);
+			$alexasmarthome->setLogicalId($serial); 
+			$alexasmarthome->setEqType_name('alexasmarthome');
+			$alexasmarthome->setIsEnable(1);
+			$alexasmarthome->setIsVisible(1);
 		}
-		$alexaapi->setConfiguration('serial',$serial); 
-		$alexaapi->setConfiguration('device',$device);
-		$alexaapi->setConfiguration('type',$type);
-		$alexaapi->setStatus('online',$online);
-		$alexaapi->save();
+		$alexasmarthome->setConfiguration('serial',$serial); 
+		$alexasmarthome->setConfiguration('device',$device);
+		$alexasmarthome->setConfiguration('type',$type);
+		$alexasmarthome->setStatus('online',$online);
+		$alexasmarthome->save();
  }
 */
 
-$eqLogics = alexaapi::byType('alexaapi');
+$eqLogics = alexasmarthome::byType('alexasmarthome');
 ?>
 <table class="table table-condensed tablesorter" id="table_healthNetwork">
     <thead>
@@ -62,7 +62,7 @@ $eqLogics = alexaapi::byType('alexaapi');
         <th>{{Device}}</th>
         <th>{{Serial}}</th>
         <th>{{Type}}</th>
-        <th>{{Présent *}}</th>
+        <th>{{Présent}}</th>
         <th>{{Date création}}</th>
     </tr>
     </thead>
@@ -74,13 +74,13 @@ $eqLogics = alexaapi::byType('alexaapi');
             $present = 1;
         }
         if ($present == 1) {
-            $present = '<span class="label label-success" style="font-size : 1em;" title="{{Présent}}"><i class="fas fa-check-circle"></i></span>';
+            $present = '<span class="label label-success" style="font-size : 1em;" title="{{Présent}}"><i class="fa fa-check-circle"></i></span>';
         } else {
-            $present = '<span class="label label-danger" style="font-size : 1em;" title="{{Absent}}"><i class="fas fa-times-circle"></i></span>';
+            $present = '<span class="label label-danger" style="font-size : 1em;" title="{{Absent}}"><i class="fa fa-times-circle"></i></span>';
         }
 
         if ((strstr($eqLogic->getName(), "Alexa Apps")))
-            $present = '<span class="label label-warning" style="font-size : 1em;" title="{{Inconnu}}"><i class="fas fa-question-circle"></i></span>';
+            $present = '<span class="label label-warning" style="font-size : 1em;" title="{{Inconnu}}"><i class="fa fa-question-circle"></i></span>';
 
         echo '<tr><td><a href="' . $eqLogic->getLinkToConfiguration() . '" style="text-decoration: none;">' . $eqLogic->getHumanName(true) . '</a></td>';
         echo '<td><span class="label label-info" style="font-size : 1em; cursor : default;">' . $eqLogic->getId() . '</span></td>';
@@ -93,4 +93,3 @@ $eqLogics = alexaapi::byType('alexaapi');
     ?>
     </tbody>
 </table>
-* Pour actualiser la colonne <B>Présent</B>, Faites un <B>Scan</B> sur l'écran précédent.
