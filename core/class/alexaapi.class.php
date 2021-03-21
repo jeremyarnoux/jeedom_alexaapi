@@ -479,11 +479,15 @@ public static function templateWidget(){
             //self::checkAuth(); 20/09/2020 on désactive ce test pour voir s'il est utile ou pas
         }
 
-        $autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '33 3 * * *'));/* boucle qui relance la connexion au serveur*/
-        $cc = new Cron\CronExpression($autorefreshRR, new Cron\FieldFactory);
-        if ($cc->isDue() && $deamon_info['state'] == 'ok') {
-            self::restartServeurPHP();
-        }
+		//Relance non obligatoire depuis la stabilité du cookie. Déconseillé, ajout de la condition "réservé aux utilisateurs expérimentés" Modif Sigalou 21/03/2021
+        if (config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0") {
+			//$autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '33 3 * * *'));/* boucle qui relance la connexion au serveur*/
+			$autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '51 20 31 01 0 2021'));/* Par défaut désactivé également Modif Sigalou 21/03/2021*/
+			$cc = new Cron\CronExpression($autorefreshRR, new Cron\FieldFactory);
+			if ($cc->isDue() && $deamon_info['state'] == 'ok') {
+				self::restartServeurPHP();
+			}
+		}
 
         $r = new Cron\CronExpression('*/16 * * * *', new Cron\FieldFactory); // boucle refresh
         //		$r = new Cron\CronExpression('* * * * *', new Cron\FieldFactory);// boucle refresh
@@ -1413,6 +1417,26 @@ class alexaapiCmd extends cmd
             $this->getEqLogic()->refresh();
             return;
         }
+		
+		// Protection du sommeil
+		if (config::byKey('dodo', 'alexaapi', 0) != "0") {
+			$debut=config::byKey('dododebut', 'alexaapi', 22);	
+			$fin=config::byKey('dodofin', 'alexaapi', 7);		
+			$maintenant=date("H");								
+			if ($fin<$debut) {
+				$fin=$fin+24;
+				if ($maintenant<$fin) $maintenant=$maintenant+24;
+			}
+			if (($maintenant>=$debut) && ($maintenant<$fin)) {
+                                                log::add('alexaapi', 'info', ' ╔══════════════════════[Opion Protection du sommeil ACTIVEE de '.config::byKey('dododebut', 'alexaapi', 22).'h à '.config::byKey('dodofin', 'alexaapi', 7).'h]═══════════════════════════════════════════════════════════════════════════');
+                                                log::add('alexaapi', 'info', ' ║ Commande annulée');
+                                                log::add('alexaapi', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+			return;
+			}
+		}
+
+		
+		
 
         $request = $this->buildRequest($_options);
         log::add('alexaapi', 'info', 'Envoi de ' . $request); //Request : http://192.168.0.21:3456/volume?value=50&device=G090LF118173117U

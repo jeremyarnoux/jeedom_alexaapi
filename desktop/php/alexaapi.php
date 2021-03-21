@@ -222,7 +222,7 @@ foreach ($eqLogics as $eqLogic) {
             }
 
 
-            if (((config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0")) && (log::getLogLevel('alexaapi') < 200)) :
+            if (config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0") :
                 ?>
                 <!-- Début de la liste des objets -->
                 <legend><i class="fas fa-table"></i> {{Outils Utilisateurs expérimentés}}</legend>
