@@ -184,14 +184,14 @@ foreach ($eqLogics as $eqLogic) {
                           if ($pluginAlexaUnparUn=='alexadeezer') $nomPlugin='Deezer';
                           if ($pluginAlexaUnparUn=='alexaspotify') $nomPlugin='Spotify';*/
                             //eqLogicDisplayCard cursor prem
-                            echo '<div style="position: relative;" class="cursor eqLogicAction logoSecondary"';
+                            echo '<div class="cursor eqLogicAction logoSecondary" style="position: relative;';
 
                             if ($pluginAlexaUnparUn['actif'] != true) {
-                                echo ' style="filter: grayscale(100%); opacity: 0.35;"';
+                                echo ' filter: grayscale(70%); opacity: 0.35;';
                             } else
                                 if (($pluginAlexaUnparUn['pluginId'] != 'alexafiretv') && ($pluginAlexaUnparUn['pluginId'] != 'alexasmarthome')) $compteNombrePlayeurs++;
 
-                            echo '>';
+                            echo '">';
                             if ($pluginAlexaUnparUn['nb'] != "0") echo '<span class="badge">' . $pluginAlexaUnparUn['nb'] . '</span>';
                             echo '<a href="';
 

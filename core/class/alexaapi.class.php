@@ -38,7 +38,8 @@ class alexaapi extends eqLogic
 
     public static function listePluginsAlexaArray($withAPI = false, $withSmartHome = false, $all = false, $withFireTV = false)
     {
-        $liste = array();
+        //log::add('alexaapi', 'debug', 'Test  : listePluginsAlexaArray');
+		$liste = array();
         if ($withAPI) array_push($liste, array("pluginId" => "alexaapi", "nom" => "Alexa-API", "actif" => true));
         if ($withSmartHome) {
             try {
@@ -100,6 +101,8 @@ class alexaapi extends eqLogic
     public static function listePluginsAlexaArray_controle($pluginId = "", $plugin = "inconnu", $idMarket = "3910", $nb = "0")
     {
         $valeurs = array();
+		        //log::add('alexaapi', 'debug', 'Test  : listePluginsAlexaArray_controle' . $pluginId.$idMarket);
+
         try {
             $valeurs = array(
                 "pluginId" => $pluginId,
@@ -119,6 +122,8 @@ class alexaapi extends eqLogic
                 "actif" => false
             );
         }
+		//log::add('alexaapi', 'debug', 'Test1  : listePluginsAlexaArray_controle' . $pluginId.":".plugin::byId($pluginId)->isActive());
+		//log::add('alexaapi', 'debug', 'Test2  : listePluginsAlexaArray_controle' . $pluginId.":".plugin::byId($pluginId)->getName());
         //	array_push($liste, $valeurs);
         return $valeurs;
     }
@@ -1428,10 +1433,10 @@ class alexaapiCmd extends cmd
 				if ($maintenant<$fin) $maintenant=$maintenant+24;
 			}
 			if (($maintenant>=$debut) && ($maintenant<$fin)) {
-                                                log::add('alexaapi', 'info', ' ╔══════════════════════[Opion Protection du sommeil ACTIVEE de '.config::byKey('dododebut', 'alexaapi', 22).'h à '.config::byKey('dodofin', 'alexaapi', 7).'h]═══════════════════════════════════════════════════════════════════════════');
-                                                log::add('alexaapi', 'info', ' ║ Commande annulée');
-                                                log::add('alexaapi', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
-			return;
+				log::add('alexaapi', 'info', ' ╔══════════════════════[Opion Protection du sommeil ACTIVEE de '.config::byKey('dododebut', 'alexaapi', 22).'h à '.config::byKey('dodofin', 'alexaapi', 7).'h]═══════════════════════════════════════════════════════════════════════════');
+				log::add('alexaapi', 'info', ' ║ Commande annulée');
+				log::add('alexaapi', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+				return;
 			}
 		}
 
