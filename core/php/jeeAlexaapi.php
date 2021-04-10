@@ -146,6 +146,10 @@ switch ($nom) {
             if ($alexaapieqlogic->getConfiguration('interactionjeedom') == 1) {
                 $demandeinteract = $result['description']['summary'];
                 if (strpos($demandeinteract, 'jacques dit') === false && $demandeinteract != "alexa") {
+					
+					$demandeinteract=str_replace("cinquante", "50", $demandeinteract);
+
+					
                     log::add('alexaapi', 'debug', 'Interaction demande : ' . $demandeinteract);
 
                     $parameters['plugin'] = 'alexaapi';
