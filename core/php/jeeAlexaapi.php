@@ -138,9 +138,8 @@ switch ($nom) {
             //metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "PLAYER", $result['deviceSerialNumber']);
             //metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true , "ECHO", $result['deviceSerialNumber']);
             // Modif Thibaut
-			$interactioninfo=str_replace("cinquante", "50", $result['description']['summary']);
-            metAJour("Interaction", $interactioninfo, 'interactioninfo', true, "PLAYER", $result['deviceSerialNumber']);
-            metAJour("Interaction", $interactioninfo, 'interactioninfo', true, "ECHO", $result['deviceSerialNumber']);
+            metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true, "PLAYER", $result['deviceSerialNumber']);
+            metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true, "ECHO", $result['deviceSerialNumber']);
 
             $alexaapieqlogic = eqLogic::byLogicalId($result['deviceSerialNumber'], 'alexaapi');
             log::add('alexaapi', 'debug', 'Interaction ' . $alexaapieqlogic->getConfiguration('interactionjeedom') == 1);
