@@ -113,6 +113,21 @@ switch ($nom) {
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "PLAYER", $result['deviceSerialNumber']);
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "ECHO", $result['deviceSerialNumber']);
 		
+		
+/*					$demandeinteract ="ceci est un test qui contien vingt-deux et qu'il faut extraire";
+					$demandeinteract ="ceci est un test qui contien vingt deux et qu'il faut extraire";
+					$enchiffres=enchiffres($demandeinteract);
+					if ($enchiffres != 0) {
+                    log::add('alexaapi', 'debug', 'Nombre détecté : ' . $enchiffres);
+					$enlettres=enlettres($enchiffres);
+					$enlettres=str_replace("-", " ", $enlettres);					
+
+					$demandeinteract=str_replace($enlettres, $enchiffres, $demandeinteract);					
+                    log::add('alexaapi', 'debug', 'remplace ' . $enlettres. " par ". $enchiffres);
+					} else 
+                    log::add('alexaapi', 'debug', 'Pas de nombre détecté dans' .$demandeinteract);
+
+                    log::add('alexaapi', 'debug', 'Interaction demandée : ' . $demandeinteract);*/		
         break;
     case 'ws-notification-change': //changement d'une alarme/rappel
         log::add('alexaapi_node', 'info', 'Alexa-jee: notificationVersion: ' . $result['notificationVersion']);
@@ -154,14 +169,18 @@ switch ($nom) {
                 if (strpos($demandeinteract, 'jacques dit') === false && $demandeinteract != "alexa") {
 					
 					
-					//$demandeinteract ="ceci est un test qui contien cinquante et qu'il faut extraire";
+					//$demandeinteract ="ceci est un test qui contien vingt-deux et qu'il faut extraire";
+					//$demandeinteract ="ceci est un test qui contien vingt deux et qu'il faut extraire";
 					$enchiffres=enchiffres($demandeinteract);
 					if ($enchiffres != 0) {
                     log::add('alexaapi', 'debug', 'Nombre détecté : ' . $enchiffres);
-					$demandeinteract=str_replace(enlettres($enchiffres), $enchiffres, $demandeinteract);					
+					$enlettres=enlettres($enchiffres);
+					$enlettres=str_replace("-", " ", $enlettres);					
+
+					$demandeinteract=str_replace($enlettres, $enchiffres, $demandeinteract);					
+                    log::add('alexaapi', 'debug', 'remplace ' . $enlettres. " par ". $enchiffres);
 					} else 
                     log::add('alexaapi', 'debug', 'Pas de nombre détecté dans' .$demandeinteract);
-				
 
                     log::add('alexaapi', 'debug', 'Interaction demandée : ' . $demandeinteract);
 
