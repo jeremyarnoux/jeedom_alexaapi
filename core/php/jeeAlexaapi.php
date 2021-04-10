@@ -18,6 +18,11 @@
 
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 
+include_once('nec.php');
+include_once('nel.php');
+
+
+
 
 if (!jeedom::apiAccess(init('apikey'), 'alexaapi')) {
     echo __('Vous n\'êtes pas autorisé à effectuer cette action', __FILE__);
@@ -107,6 +112,7 @@ switch ($nom) {
     case 'ws-volume-change':
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "PLAYER", $result['deviceSerialNumber']);
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "ECHO", $result['deviceSerialNumber']);
+		
         break;
     case 'ws-notification-change': //changement d'une alarme/rappel
         log::add('alexaapi_node', 'info', 'Alexa-jee: notificationVersion: ' . $result['notificationVersion']);
@@ -147,10 +153,17 @@ switch ($nom) {
                 $demandeinteract = $result['description']['summary'];
                 if (strpos($demandeinteract, 'jacques dit') === false && $demandeinteract != "alexa") {
 					
-					$demandeinteract=str_replace("cinquante", "50", $demandeinteract);
-
 					
-                    log::add('alexaapi', 'debug', 'Interaction demande : ' . $demandeinteract);
+					//$demandeinteract ="ceci est un test qui contien cinquante et qu'il faut extraire";
+					$enchiffres=enchiffres($demandeinteract);
+					if ($enchiffres != 0) {
+                    log::add('alexaapi', 'debug', 'Nombre détecté : ' . $enchiffres);
+					$demandeinteract=str_replace(enlettres($enchiffres), $enchiffres, $demandeinteract);					
+					} else 
+                    log::add('alexaapi', 'debug', 'Pas de nombre détecté dans' .$demandeinteract);
+				
+
+                    log::add('alexaapi', 'debug', 'Interaction demandée : ' . $demandeinteract);
 
                     $parameters['plugin'] = 'alexaapi';
                     $reply = interactQuery::tryToReply(trim($demandeinteract), $parameters);
@@ -502,6 +515,7 @@ function metAJourBluetooth($serialdevice, $audioPlayerState, $alexaapi2, $alexaa
 
 }
 	*/
+	
 ?>
 
 
