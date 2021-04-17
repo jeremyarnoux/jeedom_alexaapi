@@ -1646,7 +1646,7 @@ app.get('/bluetooth', CommandAlexa.Bluetooth);
 app.get('/notificationSounds', CommandAlexa.notificationSounds);
 app.get('/activities', CommandAlexa.activities);
 app.get('/devicePreferences', CommandAlexa.devicePreferences);
-app.get('/allDeviceVolumes', CommandAlexa.allDeviceVolumes);
+app.get('/allDeviceVolumes', CommandAlexa.allDeviceVolumes); //http://192.168.1.21:3456/allDeviceVolumes affiche tous les volumes, à voir l'utilité !
 app.get('/homeGroup', CommandAlexa.homeGroup);
 app.get('/smarthomeDevices', CommandAlexa.smarthomeDevices);
 app.get('/smarthomeBehaviourActionDefinitions', CommandAlexa.smarthomeBehaviourActionDefinitions);

@@ -166,9 +166,13 @@ public static function templateWidget(){
             'replace' => array("#_desktop_width_#" => "100", "#_mobile_width_#" => "50", "#hide_name#" => "whidden")
         );
         $return['action']['slider']['volume'] = array(
+            'template' => 'nooSlider',
+            'replace' => array("#displayedValues#" => "0,20,40,60,80,100", "#step#" => "10", "#width#" => "200", "#height#" => "50", "#handleSize#" => "15", "#cursorLeftPos#" => "75", "#cursorTopPos#" => "88")
+        );/*
+        $return['action']['slider']['volume'] = array(
             'template' => 'bouton',
             'replace' => array("#hide_name#" => "hidden", "#step#" => "10")
-        );
+        );*/
         $return['info']['string']['state'] = array(
             'template' => 'tmplmultistate_alexaapi',
             'replace' => array("#hide_name#" => "hidden", "#hide_state#" => "hidden", "#marge_gauche#" => "5px", "#marge_haut#" => "-15px"),

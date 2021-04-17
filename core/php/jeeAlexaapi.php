@@ -188,7 +188,7 @@ switch ($nom) {
                     $reply = interactQuery::tryToReply(trim($demandeinteract), $parameters);
                     log::add('alexaapi', 'debug', 'Interaction ' . print_r($reply, true));
                     if ($reply['reply'] != "Désolé je n'ai pas compris" && $reply['reply'] != "Désolé je n'ai pas compris la demande" && $reply['reply'] != "Désolé je ne comprends pas la demande" && $reply['reply'] != "Je ne comprends pas" && $reply['reply'] != "ceci est un message de test" && $reply['reply'] != "" && $reply['reply'] != " ") {
-                        log::add('alexaapi', 'debug', "La reponse : " . $reply['reply'] . " est valide je vous l'ai donc renvoyée");
+                        log::add('alexaapi', 'debug', "La reponse : " . $reply['reply'] . " et valide je vous l'ai donc renvoyée");
                         $cmd = $alexaapieqlogic->getCmd('action', 'speak');
                         $option = array('message' => $reply['reply']);
                         $cmd->execute($option);
