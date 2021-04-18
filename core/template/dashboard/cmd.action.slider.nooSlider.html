@@ -53,17 +53,13 @@
 
                     let firstLoad = 0;
                     // Récupération des paramètres
-                    let type = 'button', orientation = 'horiz', width = 'auto', height = 'auto',
-                        min = 0, max = 100, step = 1,
+                    let type = 'button', orientation = 'horiz', width = '200', height = '50',
+                        min = 0, max = 100, 
                         minRange = min, maxRange = max,
                         paddingStart = 0.1, paddingEnd = 0.1,
                         fixedHandle = false,
                         handleZoom = 1,
-                        handleSize = 0.3,
 			            cursorColor = 'white',
-                        cursorLeftPos = '40%',
-                        cursorTopPos = '40%',
-                        displayedValues = '',
                         centerValue = null, // (min+max)/2,
                         leftColor = '#ff0000', rightColor = '#00ff00',
                         addPlus = false,
@@ -73,7 +69,14 @@
                         imageHeight = 40,
                         visibleRuler = true,
                         flipped = false,
-                        animationDelay = 100;
+                        animationDelay = 100,
+					// Variables modifiées par Sigalou
+                        handleSize = '0.15',
+                        cursorLeftPos = '50%',
+                        cursorTopPos = '90%',
+						step = 10,
+                        displayedValues = ["0","20","40","60","80","100"];
+					
 
                     // Chargement du style d'affichage
                     type = ('#type#' != '#' + 'type#') ? "#type#" : type;
@@ -96,7 +99,6 @@
                     cursorColor = ('#cursorColor#' != '#' + 'cursorColor#') ? "#cursorColor#" : cursorColor;
                     cursorLeftPos = (isNaN(parseFloat('#cursorLeftPos#'))) ? cursorLeftPos : (parseFloat('#cursorLeftPos#') + '%');
                     cursorTopPos = (isNaN(parseFloat('#cursorTopPos#'))) ? cursorTopPos : (parseFloat('#cursorTopPos#') + '%');
-
                     centerValue = (displayedValues == '') ? null : ((isNaN(parseFloat('#centerValue#'))) ? null : (parseFloat('#centerValue#')));
                     leftColor = (centerValue == null) ? '' : (('#leftColor#' != '#' + 'leftColor#') ? "#leftColor#" : leftColor);
                     rightColor = (centerValue == null) ? '' : (('#rightColor#' != '#' + 'rightColor#') ? "#rightColor#" : rightColor);
@@ -173,7 +175,7 @@
 
                         onCreate: function (event) {
                             if (type == 'button') {
-								console.log ("function onCreate");
+								//console.log ("function onCreate");
                                 // ajout du libellé pour affichage de la valeur courante
                                 $(event.currentTarget).nextAll(".handle").append("<label>");
                             }
@@ -181,7 +183,7 @@
                         onChange: function (event, value) {
                             if (type == 'button') {
                                 // mise à jour du libellé
-								console.log ("function onChange value: "+value+" firstLoad: "+firstLoad);
+								//console.log ("function onChange value: "+value+" firstLoad: "+firstLoad);
                                 var $labelElement = $(event.currentTarget).nextAll(".handle").children("label");
                                 $labelElement.addClass("libelle#id#");
                                 $labelElement.text(value < 0 ? value : ((value > 0 ? addPlus : '') + value));
@@ -189,15 +191,15 @@
 
                             if (immediateChange) {
                                 // mise à jour Jeedom
-								console.log ("immediateChange");
+								//console.log ("immediateChange");
                                 jeedom.cmd.execute({ id: '#id#', value: { slider: value } });
                             }
                         },
                         onFinalChange: function (event, value) {
-						console.log ("function onFinalChange :"+value+" firstLoad: "+firstLoad);
+						//console.log ("function onFinalChange :"+value+" firstLoad: "+firstLoad);
                             if (!immediateChange && firstLoad > 1) {
                                 // mise à jour Jeedom
-								console.log ("Mise à jour de la valeur par jeedom.cmd.execute :"+value);
+								//console.log ("Mise à jour de la valeur par jeedom.cmd.execute :"+value);
                                 jeedom.cmd.execute({ id: '#id#', value: { slider: value } });
                             }
                             firstLoad<2 && firstLoad++;

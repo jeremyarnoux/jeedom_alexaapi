@@ -166,13 +166,12 @@ public static function templateWidget(){
             'replace' => array("#_desktop_width_#" => "100", "#_mobile_width_#" => "50", "#hide_name#" => "whidden")
         );
         $return['action']['slider']['volume'] = array(
-            'template' => 'nooSlider',
-            'replace' => array("#displayedValues#" => "0,20,40,60,80,100", "#step#" => "10", "#width#" => "200", "#height#" => "50", "#handleSize#" => "15", "#cursorLeftPos#" => "75", "#cursorTopPos#" => "88")
-        );/*
-        $return['action']['slider']['volume'] = array(
+            'template' => 'nooSlider'
+        );
+        $return['action']['slider']['volume_legacy'] = array(
             'template' => 'bouton',
             'replace' => array("#hide_name#" => "hidden", "#step#" => "10")
-        );*/
+        );
         $return['info']['string']['state'] = array(
             'template' => 'tmplmultistate_alexaapi',
             'replace' => array("#hide_name#" => "hidden", "#hide_state#" => "hidden", "#marge_gauche#" => "5px", "#marge_haut#" => "-15px"),
@@ -1152,7 +1151,7 @@ public static function templateWidget(){
             $false = false;
 
             // Volume on traite en premier car c'est fonction de WHA
-            if ($cas6) self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', true, true, 'fas fa-volume-up', null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas6);
+            if ($cas6) self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', true, true, null, null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas6);
             else       self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', false, true, 'fas fa-volume-up', null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas9);
 
 
