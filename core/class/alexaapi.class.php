@@ -1156,6 +1156,8 @@ public static function templateWidget(){
             if ($cas6) self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', true, true, null, null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas6);
             else       self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', false, true, 'fas fa-volume-up', null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas9);
 
+            self::updateCmd($F, 'allDeviceVolumes', 'action', 'other', false, 'Actualise tous les volumes', false, true, 'fas fa-sync', null, null, 'allDeviceVolumes', null, null, 80, $cas9);
+
 
 			// Pour l'echo avec horloge
             self::updateCmd($F, 'clockon', 'action', 'other', false, 'Afficher Heure', true, true, 'fas fa-toggle-on', null, null, 'DisplayPower?value=ON', null, null, 80, $cas10);
@@ -1193,7 +1195,7 @@ public static function templateWidget(){
             self::updateCmd($F, 'volume60', 'action', 'other', false, '60', true, true, null, null, null, 'volume?value=60', null, null, 4, $cas9);
             self::updateCmd($F, 'volume80', 'action', 'other', false, '80', true, true, null, null, null, 'volume?value=80', null, null, 5, $cas9);
             self::updateCmd($F, 'volume100', 'action', 'other', false, '100', true, true, null, null, null, 'volume?value=100', null, null, 6, $cas9);
-            self::updateCmd($F, 'volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fas fa-volume-up', null, null, null, null, null, 28, $cas6);
+            self::updateCmd($F, 'volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fas fa-volume-up', null, null, null, null, null, 28, $cas5);
             self::updateCmd($F, 'whennextalarminfo', 'info', 'string', false, 'Prochaine Alarme', true, false, null, null, 'alexaapi::alarm', null, null, null, 29, $cas2);
             self::updateCmd($F, 'whennextmusicalalarminfo', 'info', 'string', false, 'Prochaine Alarme Musicale', true, false, null, null, 'alexaapi::alarmmusical', null, null, null, 30, $cas2);
             self::updateCmd($F, 'musicalalarmmusicentityinfo', 'info', 'string', false, 'Musical Alarm Music', true, false, 'loisir-musical7', null, 'alexaapi::alarmmusicalmusic', null, null, null, 31, $cas2);
@@ -1487,6 +1489,8 @@ class alexaapiCmd extends cmd
             $value = $resultjson['value'];
         }
 
+		if (isset($resultjson['volumes'])) self::decodeTousLesVolumes($resultjson['volumes']); //Lancé dans le cas de la commande allDeviceVolumes
+
         if (($this->getType() == 'action') && (is_array($this->getConfiguration('infoNameArray')))) {
             foreach ($this->getConfiguration('infoNameArray') as $LogicalIdCmd) {
                 $cmd = $this->getEqLogic()->getCmd(null, $LogicalIdCmd);
@@ -1507,9 +1511,30 @@ class alexaapiCmd extends cmd
                 log::add('alexaapi', 'warning', $LogicalIdCmd . ' prévu dans infoName de ' . $this->getName() . ' mais non trouvé ! donc ignoré');
             }
         }
-        return true;
+ 
+ return true;
     }
 
+    private function decodeTousLesVolumes($_resultjson = array())
+	{
+		foreach ($_resultjson as $equip) {
+			//log::add('alexaapi', 'info', 'equip:'.json_encode($equip));
+			//log::add('alexaapi', 'info', 'dsn:'.$equip['dsn']);
+			
+						foreach (eqLogic::byType('alexaapi') as $eqLogic) {
+						//log::add('alexaapi', 'info', 'eqlogic::'.$eqLogic->getLogicalId());
+						
+						if ($eqLogic->getLogicalId()==$equip['dsn']) {
+							log::add('alexaapi', 'info', '-----!!!!!!!!! Trouvé :'.$equip['dsn'].' son volume est de '.$equip['speakerVolume']);
+							$eqLogic->checkAndUpdateCmd('volumeinfo', $equip['speakerVolume']);
+						}
+						
+							}
+            }
+		
+
+		
+	}
 
     private function buildRequest($_options = array())
     {
@@ -1549,6 +1574,7 @@ class alexaapiCmd extends cmd
                 break;
             case 'SmarthomeCommand':
             case 'DisplayPower':
+            case 'allDeviceVolumes':
                 $request = $this->build_ControledeSliderSelectMessage();
                 break;
             case 'command':
@@ -1577,11 +1603,12 @@ class alexaapiCmd extends cmd
                 $request = '';
                 break;
         }
-        //log::add('alexaapi_debug', 'debug', '----RequestFinale:'.$request);
+        //log::add('alexaapi', 'debug', '!!!!----RequestFinale:'.$request);
         $request = scenarioExpression::setTags($request);
         if (trim($request) == '') throw new Exception(__('Commande inconnue ou requête vide : ', __FILE__) . print_r($this, true));
         $device = str_replace("_player", "", $this->getEqLogic()->getConfiguration('serial'));
-        return 'http://' . config::byKey('internalAddr') . ':3456/' . $request . '&device=' . $device;
+		if ($request =="allDeviceVolumes") return 'http://' . config::byKey('internalAddr') . ':3456/' . $request; // cas particulier pour cette commande
+			else return 'http://' . config::byKey('internalAddr') . ':3456/' . $request . '&device=' . $device;
     }
 
 

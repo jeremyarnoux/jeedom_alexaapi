@@ -257,7 +257,6 @@ CommandAlexa.DisplayPower = function(req,res){
 };
 
 
-
 /**** Alexa.Announcement *****
   URL: /announcement?device=?&text=?
     device - String - name of the device
@@ -1249,7 +1248,7 @@ CommandAlexa.devicePreferences = function(req, res) {
 
 CommandAlexa.allDeviceVolumes = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee, 'INFO');
 	res.type('json');
 	Appel_getAllDeviceVolumes(function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'.json';

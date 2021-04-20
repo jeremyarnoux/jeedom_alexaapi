@@ -3,6 +3,17 @@
 /* jshint strict: false */
 /* jslint node: true */
 /* jslint esversion: 6 */
+  
+
+// Source : https://github.com/Apollon77/alexa-remote/blob/master/alexa-wsmqtt.js
+/**
+ * partly based on Amazon Alexa Remote Control (PLAIN shell)
+ * http://blog.loetzimmer.de/2017/10/amazon-alexa-hort-auf-die-shell-echo.html AND on
+ * https://github.com/thorsten-gehrig/alexa-remote-control
+ * and much enhanced ...
+ * Version la plus récente sur : https://github.com/Apollon77/alexa-remote
+ */
+
 const WebSocket = require('ws');
 const EventEmitter = require('events');
 
@@ -10,14 +21,16 @@ class AlexaWsMqtt extends EventEmitter {
 
     constructor(options, cookie) {
         super();
+		
 
         this._options = options;
+//console.log('8888888888888888888888888888888888888 Alexa-MQTT: options :'+JSON.stringify(options));
         this.stop = false;
         let serialArr = null;
         this.cookie = cookie;
         if (cookie) serialArr = cookie.match(/ubid-[a-z]+=([^;]+);/);
         if (!serialArr || !serialArr[1]) {
-            this._options.logger && this._options.logger('{MQTT}   ║ Cookie incomplete : ' + JSON.stringify(serialArr) ,'DEBUG');
+            this._options.logger && this._options.logger('{MQTT}   ║ Cookie incomplete : ' + JSON.stringify(serialArr), "ERROR");
             return undefined;
         }
         this.accountSerial = serialArr[1];
@@ -32,6 +45,7 @@ class AlexaWsMqtt extends EventEmitter {
     }
 
     connect() {
+		//console.log('8888888888888888888888888888888888888 Alexa-MQTT: connect');
         const urlTime = Date.now();
         let amazonPage = '.' + this._options.amazonPage;
         if (amazonPage === '.amazon.com') amazonPage = '-js.amazon.com'; // Special Handling for US!
@@ -41,8 +55,6 @@ class AlexaWsMqtt extends EventEmitter {
                 {
                     'perMessageDeflate': true,
                     'protocolVersion': 13,
-
-                    'timeout': 5000,
 
                     'headers': {
                         'Connection': 'keep-alive, Upgrade',
@@ -67,10 +79,29 @@ class AlexaWsMqtt extends EventEmitter {
         let msgCounter = 0;
         let initTimeout = null;
 
-        const onWebsocketClose = (code, reason) => {
+        this.websocket.on('open', () => {
+			
+			if (! this.websocket) return; // ajouté 26/12/2020
+            this._options.logger && this._options.logger('{MQTT}   ║ Open: ' + url,'DEBUG');
+            this.connectionActive = false;
+
+            initTimeout = setTimeout(() => {
+                this._options.logger && this._options.logger('{MQTT}   ║ Initialization not done within 30s', "ERROR");
+
+                this.websocket.close();
+            }, 30000);
+
+            // tell Tuning Service that we support "A:H" protocol = AlphaPrococol
+            const msg = Buffer.from('0x99d4f71a 0x0000001d A:HTUNE');
+            //console.log('SEND: ' + msg.toString('ascii'));
+            this._options.logger && this._options.logger('{MQTT}   ║ Initialization Msg 1 sent','INFO');
+            this.websocket.send(msg);
+        });
+
+        this.websocket.on('close', (code, reason) => {
             this.websocket = null;
             this.connectionActive = false;
-            this._options.logger && this._options.logger('{MQTT}   ║ Close: ' + code + ': ' + reason ,'DEBUG');
+            this._options.logger && this._options.logger('{MQTT}   ║ Close: ' + code + ': ' + reason,  "WARNING");
             if (initTimeout) {
                 clearTimeout(initTimeout);
                 initTimeout = null;
@@ -84,7 +115,7 @@ class AlexaWsMqtt extends EventEmitter {
                 this.pongTimeout = null;
             }
             if (code === 4001 && reason.startsWith('before - Could not find any')) { // code = 40001, reason = "before - Could not find any vali"
-                this._options.logger && this._options.logger('{MQTT}   ║ Cookie invalid!' ,'DEBUG');
+                this._options.logger && this._options.logger('{MQTT}   ║ Cookie invalid!', "ERROR");
                 this.emit('disconnect', false, 'Cookie invalid');
                 return;
             }
@@ -92,72 +123,37 @@ class AlexaWsMqtt extends EventEmitter {
             if (this.errorRetryCounter > 100) {
                 this.emit('disconnect', false, 'Too many failed retries. Check cookie and data');
                 return;
-            } else {
-                this.errorRetryCounter++;
             }
-
-            let retryDelay = Math.min(60, (this.errorRetryCounter * 5) + 5);
-            this._options.logger && this._options.logger('{MQTT}   ║ Retry Connection in ' + retryDelay + 's' ,'DEBUG');
+            let retryDelay = this.errorRetryCounter * 5 + 5;
+            if (retryDelay > 60) retryDelay = 60;
+            this._options.logger && this._options.logger('{MQTT}   ║ Retry Connection in ' + retryDelay + 's', "WARNING");
             this.emit('disconnect', true, 'Retry Connection in ' + retryDelay + 's');
-            this.reconnectTimeout && clearTimeout(this.reconnectTimeout);
             this.reconnectTimeout = setTimeout(() => {
                 this.reconnectTimeout = null;
                 this.connect();
             }, retryDelay * 1000);
-        };
-
-        initTimeout = setTimeout(() => {
-            this._options.logger && this._options.logger('{MQTT}   ║ Initialization not done within 30s' ,'DEBUG');
-            try {
-                this.websocket && this.websocket.close();
-            } catch (err) {
-                //just make sure
-            }
-            if (this.websocket || !this.reconnectTimeout) { // seems no close was emmitted so far?!
-                onWebsocketClose();
-            }
-        }, 30000);
-
-        this.websocket.on('open', () => {
-            if (! this.websocket) return;
-            if (this.stop) {
-                this.websocket.close();
-                return;
-            }
-            this._options.logger && this._options.logger('{MQTT}   ║ Open: ' + url ,'DEBUG');
-            this.connectionActive = false;
-
-            // tell Tuning Service that we support "A:H" protocol = AlphaPrococol
-            const msg = Buffer.from('0x99d4f71a 0x0000001d A:HTUNE');
-            //console.log('SEND: ' + msg.toString('ascii'));
-            this._options.logger && this._options.logger('{MQTT}   ║ Initialization Msg 1 sent' ,'DEBUG');
-            if (this.websocket.readyState !== 1 /* OPEN */) return;
-            this.websocket.send(msg);
         });
 
-        this.websocket.on('close', onWebsocketClose);
-
         this.websocket.on('error', (error) => {
-            this._options.logger && this._options.logger('{MQTT}   ║ Error: ' + error ,'DEBUG');
+            this._options.logger && this._options.logger('{MQTT}   ║ Error: ' + error, "ERROR");
             this.emit('error', error);
             this.websocket && this.websocket.terminate();
         });
 
         this.websocket.on('unexpected-response', (request, response) => {
-            this._options.logger && this._options.logger('{MQTT}   ║ Unexpected Response: ' + response ,'DEBUG');
+            this._options.logger && this._options.logger('{MQTT}   ║ Unexpected Response: ' + JSON.stringify(response), "ERROR");
         });
 
         this.websocket.on('message', (data) => {
-            if (!this.websocket || this.websocket.readyState !== 1 /* OPEN */) return;
             let message = this.parseIncomingMessage(data);
-            if (msgCounter === 0) { // initialization
+				if (msgCounter === 0) { // initialization
                 if (message.content.protocolName) {
                     if (message.content.protocolName !== 'A:H') {
-                        this._options.logger && this._options.logger('{MQTT}   ║ Server requests unknown protocol: ' + message.content.protocolName ,'DEBUG');
+                        this._options.logger && this._options.logger('{MQTT}   ║ Server requests unknown protocol: ' + message.content.protocolName, "ERROR");
                     }
                 }
                 else {
-                    this._options.logger && this._options.logger('{MQTT}   ║ Unexpected Response: ' + JSON.stringify(message) ,'DEBUG');
+                    this._options.logger && this._options.logger('{MQTT}   ║ Unexpected Response: ' + JSON.stringify(message), "ERROR");
                 }
                 let msg = Buffer.from('0xa6f6a951 0x0000009c {"protocolName":"A:H","parameters":{"AlphaProtocolHandler.receiveWindowSize":"16","AlphaProtocolHandler.maxFragmentSize":"16000"}}TUNE');
                 //console.log('SEND: ' + msg.toString('ascii'));
@@ -166,32 +162,39 @@ class AlexaWsMqtt extends EventEmitter {
                 msg = this.encodeGWHandshake();
                 //console.log('SEND: ' + msg.toString('ascii'));
                 this.websocket.send(msg);
-                this._options.logger && this._options.logger('{MQTT}   ║ Initialization Msg 2+3 sent' ,'DEBUG');
+                this._options.logger && this._options.logger('{MQTT}   ║ Initialization Msg 2+3 sent','INFO');
             }
             else if (msgCounter === 1) {
                 //let msg = new Buffer('MSG 0x00000362 0x0e414e46 f 0x00000001 0xf904b9f5 0x00000109 GWM MSG 0x0000b479 0x0000003b urn:tcomm-endpoint:device:deviceType:0:deviceSerialNumber:0 0x00000041 urn:tcomm-endpoint:service:serviceName:DeeWebsiteMessagingService {"command":"REGISTER_CONNECTION"}FABE');
                 let msg = this.encodeGWRegister();
-                this._options.logger && this._options.logger('{MQTT}   ║ Initialization Msg 4 (Register Connection) sent' ,'DEBUG');
+                this._options.logger && this._options.logger('{MQTT}   ║ Initialization Msg 4 (Register Connection) sent','INFO');
                 //console.log('SEND: ' + msg.toString('ascii'));
                 this.websocket.send(msg);
 
                 //msg = new Buffer('4D53472030783030303030303635203078306534313465343720662030783030303030303031203078626332666262356620307830303030303036322050494E00000000D1098D8CD1098D8C000000070052006500670075006C0061007246414245', 'hex'); // "MSG 0x00000065 0x0e414e47 f 0x00000001 0xbc2fbb5f 0x00000062 PIN" + 30 + "FABE"
                 msg = this.encodePing();
-                this._options.logger && this._options.logger('{MQTT}   ║ Send First Ping' ,'DEBUG');
+				this._options.logger && this._options.logger('{MQTT}              ╔══════════════════════╗','INFO');
+				this._options.logger && this._options.logger('{MQTT}              ╠═══> Send First Ping  ║' ,'INFO');
+                //this._options.logger && this._options.logger('{MQTT}   ║ Send First Ping','INFO');
                 //console.log('SEND: ' + msg.toString('hex'));
                 this.websocket.send(msg);
 
                 this.pingPongInterval = setInterval(() => {
-                    if (!this.websocket) return;
                     //let msg = new Buffer('4D53472030783030303030303635203078306534313465343720662030783030303030303031203078626332666262356620307830303030303036322050494E00000000D1098D8CD1098D8C000000070052006500670075006C0061007246414245', 'hex'); // "MSG 0x00000065 0x0e414e47 f 0x00000001 0xbc2fbb5f 0x00000062 PIN" + 30 + "FABE"
                     let msg = this.encodePing();
-                    this._options.logger && this._options.logger('{MQTT}   ║ Send Ping' ,'DEBUG');
+                   // this._options.logger && this._options.logger('{MQTT}   ╠═══> Send Ping','INFO');
+				this._options.logger && this._options.logger('{MQTT}              ╔══════════════════════╗','INFO');
+				this._options.logger && this._options.logger('{MQTT}              ║    Contrôle MQTT     ║' ,'INFO');
+				this._options.logger && this._options.logger('{MQTT}              ╠═══> Send Ping        ║' ,'INFO');
+					
+					
+					
                     //console.log('SEND: ' + msg.toString('hex'));
                     this.websocket.send(msg);
 
                     this.pongTimeout = setTimeout(() => {
                         this.pongTimeout = null;
-                        this._options.logger && this._options.logger('{MQTT}   ║ No Pong received after 30s' ,'DEBUG');
+                        this._options.logger && this._options.logger('{MQTT}   ║ No Pong received after 30s', "WARNING");
                         this.websocket && this.websocket.close();
                     }, 30000);
                 }, 180000);
@@ -202,12 +205,15 @@ class AlexaWsMqtt extends EventEmitter {
             const incomingMsg = data.toString('ascii');
             //if (incomingMsg.includes('PON') && incomingMsg.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
             if (message.service === 'FABE' && message.content && message.content.messageType === 'PON' && message.content.payloadData && message.content.payloadData.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
-                this._options.logger && this._options.logger('{MQTT}   ║ Received Pong' ,'DEBUG');
+				this._options.logger && this._options.logger('{MQTT}              ║<═══ Received Pong    ║' ,'INFO');
+				this._options.logger && this._options.logger('{MQTT}              ╚══════════════════════╝','INFO');
+
                 if (initTimeout) {
                     clearTimeout(initTimeout);
                     initTimeout = null;
                     this._options.logger && this._options.logger('{MQTT}   ║ Initialization completed','INFO');
                     this._options.logger && this._options.logger('{MQTT}   ╚═══════════════════════════════════════════════════════════════════════════════','INFO');
+
                     this.emit('connect');
                 }
                 if (this.pongTimeout) {
@@ -217,17 +223,16 @@ class AlexaWsMqtt extends EventEmitter {
                 this.connectionActive = true;
                 return;
             }
-            else if (message.content && message.content.payload) {
+            else if (message.content.payload) {
                 let command = message.content.payload.command;
                 let payload = message.content.payload.payload;
 
-                //this._options.logger && this._options.logger('{MQTT}   ║ Command ' + command + ': ' + JSON.stringify(payload, null, 4));
+                //this._options.logger && this._options.logger('{MQTT}   ╠═══> Command --{' + command + '}-- : ' + JSON.stringify(payload, null, 4),'DEBUG');
                 this._options.logger && this._options.logger('{MQTT}   ╠═══> Command --{' + command + '}-- : détail désactivé' ,'DEBUG');
-
                 this.emit('command', command, payload);
                 return;
             }
-            this._options.logger && this._options.logger('{MQTT}   ║ Unknown Data (' + msgCounter + '): ' + incomingMsg ,'DEBUG');
+            this._options.logger && this._options.logger('{MQTT}   ║ Unknown Data (' + msgCounter + '): ' + incomingMsg, "ERROR");
             this.emit('unknown', incomingMsg);
         });
     }
@@ -364,6 +369,8 @@ class AlexaWsMqtt extends EventEmitter {
     }
 
     parseIncomingMessage(data) {
+						//this._options.logger && this._options.logger('{MQTT}   ║ ENTER------------------------------------: ' );
+
         function readHex(index, length) {
             let str = data.toString('ascii', index, index + length);
             if (str.startsWith('0x')) str = str.substr(2);
@@ -476,17 +483,9 @@ class AlexaWsMqtt extends EventEmitter {
     }
 
     disconnect() {
-        if (this.reconnectTimeout) {
-            clearTimeout(this.reconnectTimeout);
-            this.reconnectTimeout = null;
-        }
-        this.stop = true;
         if (!this.websocket) return;
-        try {
-            this.websocket.close();
-        } catch (e) {
-            this._options.logger && this._options.logger('{MQTT}   ║ Disconnect error: ' +e ,'DEBUG');
-        }
+        this.stop = true;
+        this.websocket.close();
     }
 }
 
