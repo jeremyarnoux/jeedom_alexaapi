@@ -1517,6 +1517,19 @@ class alexaapiCmd extends cmd
 
     private function decodeTousLesVolumes($_resultjson = array())
 	{
+					
+	//$listePluginsAlexaArray=self::listePluginsAlexaArray(false, false, false, true);
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		foreach ($_resultjson as $equip) {
 			//log::add('alexaapi', 'info', 'equip:'.json_encode($equip));
 			//log::add('alexaapi', 'info', 'dsn:'.$equip['dsn']);
