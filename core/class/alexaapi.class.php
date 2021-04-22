@@ -148,7 +148,11 @@ public static function templateWidget(){
             'template' => 'tmplicon',
             'replace' => array("#_icon_off_#" => "<i class='fas fa-redo' style='opacity:0.3'></i>", "#_icon_on_#" => "<i class='fas fa-redo'></i>", "#hide_name#" => "hidden", "#message_disable#" => "1")
         );
-        $return['action']['other']['shuffle'] = array(
+        $return['info']['binary']['isMutedinfo'] = array(
+            'template' => 'isMutedinfo',
+            'replace' => array("#_icon_on_#" => "<i class='icon jeedomapp-audiomute icon_orange'></i>", "#_icon_off_#" => "<i class=''></i>", "#hide_name#" => "hidden", "#message_disable#" => "1")
+        );      
+		$return['action']['other']['shuffle'] = array(
             'template' => 'tmplicon',
             'replace' => array("#_icon_off_#" => "<i class='fas fa-random fa-ld' style='opacity:0.3'></i>", "#_icon_on_#" => "<i class='fas fa-random fa-ld'></i>", "#hide_name#" => "hidden", "#message_disable#" => "1")
         );
@@ -178,8 +182,8 @@ public static function templateWidget(){
             'test' => array(
                 array(
                     'operation' => "#value# == 'PLAYING'", 'state_light' => "<img src='plugins/alexaapi/core/img/playing.png'  title ='" . __('Playing', __FILE__) . "'>",
-                    'state_dark' => "<img src='plugins/alexaapi/core/img/playing.png' title ='" . __('En charge', __FILE__) . "'>"
-                ),
+                    'state_dark' => "<img src='plugins/alexaapi/core/img/playing.png' title ='" . __('En charge', __FILE__) . "'>"),
+					
                 array('operation' => "#value# != 'PLAYING'", 'state_light' => "<img src='plugins/alexaapi/core/img/paused.png' title ='" . __('En Pause', __FILE__) . "'>")
             )
         );
@@ -1196,6 +1200,7 @@ public static function templateWidget(){
             self::updateCmd($F, 'volume80', 'action', 'other', false, '80', true, true, null, null, null, 'volume?value=80', null, null, 5, $cas9);
             self::updateCmd($F, 'volume100', 'action', 'other', false, '100', true, true, null, null, null, 'volume?value=100', null, null, 6, $cas9);
             self::updateCmd($F, 'volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fas fa-volume-up', null, null, null, null, null, 28, $cas5);
+            self::updateCmd($F, 'isMutedinfo', 'info', 'binary', false, 'Muet Info', false, false, 'fas fa-volume-up', null, 'alexaapi::isMutedinfo', null, null, null, 29, $cas5);
             self::updateCmd($F, 'whennextalarminfo', 'info', 'string', false, 'Prochaine Alarme', true, false, null, null, 'alexaapi::alarm', null, null, null, 29, $cas2);
             self::updateCmd($F, 'whennextmusicalalarminfo', 'info', 'string', false, 'Prochaine Alarme Musicale', true, false, null, null, 'alexaapi::alarmmusical', null, null, null, 30, $cas2);
             self::updateCmd($F, 'musicalalarmmusicentityinfo', 'info', 'string', false, 'Musical Alarm Music', true, false, 'loisir-musical7', null, 'alexaapi::alarmmusicalmusic', null, null, null, 31, $cas2);
@@ -1333,46 +1338,85 @@ public static function templateWidget(){
     // https://github.com/NextDom/NextDom/wiki/Ajout-d%27un-template-a-votre-plugin
     // https://jeedom.github.io/documentation/dev/fr_FR/widget_plugin
 
-    public function toHtml($_version = 'dashboard')
+	public function toHtml($_version = 'dashboard') 
     {
-        $replace = $this->preToHtml($_version);
-        //log::add('alexaapi_widget','debug','************Début génération Widget de '.$replace['#logicalId#']);
-        $typeWidget = "alexaapi";
+		$replace = $this->preToHtml($_version);
+		if (!is_array($replace)) {
+			return $replace;
+		}
+		$_version = jeedom::versionAlias($_version);
 
-        $typeWidget = $this->getLogicalId();
-        //if ((substr($replace['#logicalId#'], -7)) == "_player") $typeWidget = "alexaapi_player";
-        //if ((substr($replace['#logicalId#'], -9)) == "_playlist") $typeWidget = "alexaapi_playlist";
-        if ($typeWidget != "alexaapi_playlist") return parent::toHtml($_version);
-        //log::add('alexaapi_widget','debug',$typeWidget.'************Début génération Widget de '.$replace['#name#']);
-        if (!is_array($replace)) {
-            return $replace;
-        }
-        $version = jeedom::versionAlias($_version);
-        if ($this->getDisplay('hideOn' . $version) == 1) {
-            return '';
-        }
-        foreach ($this->getCmd('info') as $cmd) {
-            //log::add('alexaapi_widget','debug',$typeWidget.'dans boucle génération Widget');
-            $replace['#' . $cmd->getLogicalId() . '_history#'] = '';
-            $replace['#' . $cmd->getLogicalId() . '_id#'] = $cmd->getId();
-            $replace['#' . $cmd->getLogicalId() . '#'] = $cmd->execCmd();
-            $replace['#' . $cmd->getLogicalId() . '_collect#'] = $cmd->getCollectDate();
-            if ($cmd->getLogicalId() == 'encours') {
-                $replace['#thumbnail#'] = $cmd->getDisplay('icon');
-            }
-            if ($cmd->getIsHistorized() == 1) {
-                $replace['#' . $cmd->getLogicalId() . '_history#'] = 'history cursor';
-            }
-        }
-        $replace['#height#'] = '800';
-        if ($typeWidget == "alexaapi_playlist") {
-            if ("#playlistName#" != "") {
-                $replace['#name_display#'] = '#playlistName#';
-            }
-        }
-        //log::add('alexaapi_widget','debug',$typeWidget.'***************************************************************************Fin génération Widget');
-        return $this->postToHtml($_version, template_replace($replace, getTemplate('core', $version, $typeWidget, 'alexaapi')));
-    }
+        log::add('alexaapi','debug','************Début génération du Widget de '.$this->getName());
+		switch ($this->getDisplay('layout::' . $_version)) {
+			case 'table':
+			$replace['#eqLogic_class#'] = 'eqLogic_layout_table';
+			$table = self::generateHtmlTable($this->getDisplay('layout::'.$_version.'::table::nbLine', 1), $this->getDisplay('layout::'.$_version.'::table::nbColumn', 1), $this->getDisplay('layout::'.$_version.'::table::parameters'));
+			$br_before = 0;
+			foreach ($this->getCmd(null, null, true) as $cmd) {
+				if (isset($replace['#refresh_id#']) && $cmd->getId() == $replace['#refresh_id#']) {
+					continue;
+				}
+				$tag = '#cmd::' . $this->getDisplay('layout::'.$_version.'::table::cmd::' . $cmd->getId() . '::line', 1) . '::' . $this->getDisplay('layout::'.$_version.'::table::cmd::' . $cmd->getId() . '::column', 1) . '#';
+				if ($br_before == 0 && $cmd->getDisplay('forceReturnLineBefore', 0) == 1) {
+					$table['tag'][$tag] .= '<br/>';
+				}
+				$table['tag'][$tag] .= $cmd->toHtml($_version, '');
+				$br_before = 0;
+				if ($cmd->getDisplay('forceReturnLineAfter', 0) == 1) {
+					$table['tag'][$tag] .= '<br/>';
+					$br_before = 1;
+				}
+			}
+			$replace['#cmd#'] = template_replace($table['tag'], $table['html']);
+			break;
+
+			default:
+			$replace['#eqLogic_class#'] = 'eqLogic_layout_default';
+			$cmd_html = '';
+			$br_before = 0;
+			$isMutedPresent=false;
+			foreach ($this->getCmd(null, null, true) as $cmd) {
+				//$replace['#mute#'] = "";
+				if ($cmd->getLogicalId() == "isMutedinfo") {	
+				log::add('alexaapi','debug','**************************************************>>>'.$cmd->toHtml($_version, ''));
+				$replace['#mute#'] = $cmd->toHtml($_version, '');
+				$isMutedPresent=true;
+				continue;	// Pour désactiver l'icone de isMuted 		
+				}
+				
+				if (isset($replace['#refresh_id#']) && $cmd->getId() == $replace['#refresh_id#']) {
+					continue;
+				}
+				if ($_version == 'dashboard' && $br_before == 0 && $cmd->getDisplay('forceReturnLineBefore', 0) == 1) {
+					$cmd_html .= '<br/>';
+				}
+				$cmd_html .= $cmd->toHtml($_version, '');
+				$br_before = 0;
+				if ($_version == 'dashboard' && $cmd->getDisplay('forceReturnLineAfter', 0) == 1) {
+					$cmd_html .= '<br/>';
+					$br_before = 1;
+				}
+				
+//if ($cmd->getLogicalId() == "isMutedinfo") log::add('alexaapi','debug','**************************************************-->'.$cmd->getValue());
+
+//$replace['#mute#'] = "fas fa-volume-mute";
+	//log::add('alexaapi','debug','--Début génération du Widget de *'.$cmd->getLogicalId().'*');
+				
+				
+			}
+			if (!$isMutedPresent) $replace['#mute#'] = "";
+			$replace['#cmd#'] = $cmd_html;
+			break;
+		}
+
+			//$replace['#mute#'] = "fas fa-volume-mute";
+
+
+		$html = template_replace($replace, getTemplate('core', $_version, 'eqLogic','alexaapi'));
+		return $html;
+		}
+
+
 }
 
 class alexaapiCmd extends cmd

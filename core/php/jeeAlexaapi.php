@@ -39,15 +39,16 @@ $chaineRecuperee = file_get_contents("php://input");
 $nom = $_GET["nom"];
 log::add('alexaapi', 'debug', 'Réception données sur jeeAlexaapi [' . $nom . ']');
 log::add('alexaapi_mqtt', 'info', " -------------------------------------------------------------------------------------------------------------");
-log::add('alexaapi_widget', 'info', " -------------------------------------------------------------------------------------------------------------");
+//log::add('alexaapi_widget', 'info', " -------------------------------------------------------------------------------------------------------------");
 
 log::add('alexaapi_mqtt', 'debug', "chaineRecuperee: " . $chaineRecuperee);
+
 
 $debut = strpos($chaineRecuperee, "{");
 $fin = strrpos($chaineRecuperee, "}");
 $longeur = 1 + intval($fin) - intval($debut);
 $chaineRecupereeCorrigee = substr($chaineRecuperee, $debut, $longeur);
-log::add('alexaapi_mqtt', 'debug', "->" . $chaineRecupereeCorrigee);
+//log::add('alexaapi_mqtt', 'debug', "->" . $chaineRecupereeCorrigee);
 
 /*if ($nom !="commandesEnErreur") {
     $chaineRecupereeCorrigee=str_replace ("[", "", $chaineRecupereeCorrigee);
@@ -112,7 +113,8 @@ switch ($nom) {
     case 'ws-volume-change':
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "PLAYER", $result['deviceSerialNumber']);
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "ECHO", $result['deviceSerialNumber']);
-		
+        metAJour("isMutedinfo", $result['isMuted'], 'isMutedinfo', false, "PLAYER", $result['deviceSerialNumber']);
+        metAJour("isMutedinfo", $result['isMuted'], 'isMutedinfo', false, "ECHO", $result['deviceSerialNumber']);
 		
 /*					$demandeinteract ="ceci est un test qui contien vingt-deux et qu'il faut extraire";
 					$demandeinteract ="ceci est un test qui contien vingt deux et qu'il faut extraire";

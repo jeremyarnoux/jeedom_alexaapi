@@ -50,7 +50,7 @@
 
             $.include(['plugins/alexaapi/core/template/dashboard/cmd.action.slider.nooSlider/rsSliderLens.js'],
                 function () {
-
+					console.log (jeedom.widgets.getThemeImg("#_img_light_on_#","#_img_dark_on_#"));
                     let firstLoad = 0;
                     // Récupération des paramètres
                     let type = 'button', orientation = 'horiz', width = '200', height = '50',
@@ -60,8 +60,9 @@
                         fixedHandle = false,
                         handleZoom = 1,
 			            cursorColor = 'white',
-                        centerValue = null, // (min+max)/2,
-                        leftColor = '#ff0000', rightColor = '#00ff00',
+                        centerValue =(min+max)/2,
+                        leftColor = jeedom.widgets.getThemeImg("#a19a9a","#6a6c6f"),
+                        rightColor = leftColor,
                         addPlus = false,
                         immediateChange = false,
                         images = '',
@@ -73,10 +74,11 @@
 					// Variables modifiées par Sigalou
                         handleSize = '0.15',
                         cursorLeftPos = '50%',
-                        cursorTopPos = '90%',
+                        cursorTopPos = '88%',
 						step = 10,
                         displayedValues = ["0","20","40","60","80","100"];
 					
+								console.log ("coucou0"+leftColor+"--");
 
                     // Chargement du style d'affichage
                     type = ('#type#' != '#' + 'type#') ? "#type#" : type;
@@ -99,9 +101,9 @@
                     cursorColor = ('#cursorColor#' != '#' + 'cursorColor#') ? "#cursorColor#" : cursorColor;
                     cursorLeftPos = (isNaN(parseFloat('#cursorLeftPos#'))) ? cursorLeftPos : (parseFloat('#cursorLeftPos#') + '%');
                     cursorTopPos = (isNaN(parseFloat('#cursorTopPos#'))) ? cursorTopPos : (parseFloat('#cursorTopPos#') + '%');
-                    centerValue = (displayedValues == '') ? null : ((isNaN(parseFloat('#centerValue#'))) ? null : (parseFloat('#centerValue#')));
-                    leftColor = (centerValue == null) ? '' : (('#leftColor#' != '#' + 'leftColor#') ? "#leftColor#" : leftColor);
-                    rightColor = (centerValue == null) ? '' : (('#rightColor#' != '#' + 'rightColor#') ? "#rightColor#" : rightColor);
+                    //centerValue = (displayedValues == '') ? null : ((isNaN(parseFloat('#centerValue#'))) ? null : (parseFloat('#centerValue#')));
+                    //leftColor = (centerValue == null) ? '' : (('#leftColor#' != '#' + 'leftColor#') ? "#leftColor#" : leftColor);
+                    //rightColor = (centerValue == null) ? '' : (('#rightColor#' != '#' + 'rightColor#') ? "#rightColor#" : rightColor);
                     addPlus = (isNaN(parseFloat('#addPlus#'))) ? '' : ((parseFloat('#addPlus#') == 1) ? '+' : '');
                     immediateChange = (isNaN(parseFloat('#immediateChange#'))) ? false : (parseFloat('#immediateChange#') == 1);
                     images = ('#images#' != '#' + 'images#') ? "#images#" : images;
@@ -109,6 +111,7 @@
                     imageHeight = (isNaN(parseFloat('#imageHeight#'))) ? imageHeight : parseFloat('#imageHeight#');
                     flipped = (isNaN(parseFloat('#flipped#'))) ? false : (parseFloat('#flipped#') == 1);
                     animationDelay = (isNaN(parseFloat('#animationDelay#'))) ? animationDelay : parseFloat('#animationDelay#');
+								console.log ("coucou1"+leftColor+"--");
 
                     switch (type) {
                         case 'image':
@@ -167,6 +170,8 @@
                                     return (value > 0) ? addPlus + value : value;
                                 },
                                 onCustomAttrs: function (event, value) {
+																console.log ("coucou3"+leftColor+"--"+value+"?="+centerValue);
+
                                     if (leftColor !='' && value < centerValue) return { style: 'fill:' + leftColor };
                                     if (leftColor !='' && value > centerValue) return { style: 'fill:' + rightColor };
                                 }
@@ -362,7 +367,7 @@
             }
 
             .sliderlens svg>path {
-                stroke: rgba(186, 186, 186, 0.6);
+                stroke: #a6a6a6;
             }
 
             .sliderlens svg>g>text {
