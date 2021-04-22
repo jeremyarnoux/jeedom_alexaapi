@@ -1346,7 +1346,7 @@ public static function templateWidget(){
 		}
 		$_version = jeedom::versionAlias($_version);
 
-        log::add('alexaapi','debug','************Début génération du Widget de '.$this->getName());
+        //log::add('alexaapi','debug','************Début génération du Widget de '.$this->getName());
 		switch ($this->getDisplay('layout::' . $_version)) {
 			case 'table':
 			$replace['#eqLogic_class#'] = 'eqLogic_layout_table';
@@ -1378,7 +1378,7 @@ public static function templateWidget(){
 			foreach ($this->getCmd(null, null, true) as $cmd) {
 				//$replace['#mute#'] = "";
 				if ($cmd->getLogicalId() == "isMutedinfo") {	
-				log::add('alexaapi','debug','**************************************************>>>'.$cmd->toHtml($_version, ''));
+				//log::add('alexaapi','debug','**************************************************>>>'.$cmd->toHtml($_version, ''));
 				$replace['#mute#'] = $cmd->toHtml($_version, '');
 				$isMutedPresent=true;
 				continue;	// Pour désactiver l'icone de isMuted 		
