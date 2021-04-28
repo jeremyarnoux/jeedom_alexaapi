@@ -1,7 +1,7 @@
 !
 function(m, f) {
     "use strict";
-
+console.log ("Lancementtttttttttttttttttt");
     function i(b, $) {
         var g = {
                 $wrapper: null,
@@ -9,17 +9,20 @@ function(m, f) {
                 tabindexAttr: null,
                 autofocusable: !1,
                 initSvgOutsideHandle: function() {
-                    var e = {
+  console.log ("initSvgOutsideHandle");
+                  var e = {
                         left: (S.isFixedHandle ? S.isHoriz ? 100 * p.fixedHandleRelPos : 50 : 0) + "%",
                         top: (S.isFixedHandle ? S.isHoriz ? 50 : 100 * p.fixedHandleRelPos : 0) + "%"
                     };
                     S.isFixedHandle ? b.css(S.isHoriz ? "height" : "width", (S.isHoriz ? u.height : u.width) + "px") : e.height = e.width = "100%", this.$svg = v.createSvg(this.width, this.height).css(e), $.ruler.visible && v.renderSvg(this.$svg, this.width, this.height), b.triggerHandler("customRuler.rsSliderLens", [this.$svg, this.width, this.height, 1, !1, v.createSvgDom]), this.$svg.prependTo(this.$wrapper), b.css("visibility", "hidden")
                 },
                 initSize: function(e) {
+  console.log ("initSize");
                     var n = e || b;
                     e === f && ("auto" !== $.width && "auto" !== $.height || "inline" !== n.css("display") || n.css("display", "inline-block"), this.width = ("auto" === $.width ? n.width() : $.width) || 150, this.height = ("auto" === $.height ? n.height() : $.height) || 50), e === f && S.isFixedHandle && !S.hasRuler || ((0 === n.width() || "auto" !== $.width || e !== f && S.isHoriz) && n.width(this.width), 0 !== n.height() && "auto" === $.height && (e === f || S.isHoriz) || n.height(this.height)), e === f ? S.isHoriz = "auto" === $.orientation ? this.width >= this.height : "vert" !== $.orientation : S.isFixedHandle && !S.hasRuler && (S.isHoriz ? n.height(this.height * $.handle.zoom) : n.width(this.width * $.handle.zoom))
                 },
                 init: function() {
+  console.log ("initg");
                     this.tabindexAttr = b.attr("tabindex"), this.autofocusable = b.attr("autofocus"), this.style = b.attr("style"), S.isFixedHandle = !1 !== $.fixedHandle, S.isFixedHandle ? p.fixedHandleRelPos = !0 === $.fixedHandle ? .5 : $.flipped ? 1 - $.fixedHandle : $.fixedHandle : p.fixedHandleRelPos = 0, this.initSize(), S.hasRuler || (b.css(S.isHoriz ? "width" : "height", "auto"), this.initSize(), S.isFixedHandle && (S.isHoriz ? b.css("line-height", this.height * $.handle.zoom + "px") : b.css("width", this.width * $.handle.zoom + "px")));
                     var e = b.css("position"),
                         n = b.position(),
@@ -48,6 +51,7 @@ function(m, f) {
                     return $.flipped ? S.isHoriz ? "left" : "top" : S.isHoriz ? "right" : "bottom"
                 },
                 init: function() {
+  console.log ("inito");
                     var e, n = {
                             display: "inline-block",
                             position: "absolute"
@@ -69,9 +73,11 @@ function(m, f) {
                     S.isFixedHandle ? (a[S.isHoriz ? "width" : "height"] = Math.round(g[S.isHoriz ? "width" : "height"] * (1 - $.paddingStart - $.paddingEnd)) + "px", a[S.isHoriz ? "left" : "top"] = 100 * p.fixedHandleRelPos + "%") : (a[this.getPropMin()] = 100 * $.paddingStart + "%", a[this.getPropMax()] = 100 * $.paddingEnd + "%"), this.$rangeWrapper = m("<div>").css(n).css(a).addClass($.style.classRange), S.hasRuler || this.$rangeWrapper.hide(), $.range.type && "hidden" !== $.range.type && (this.$range = m("<div>").css(n).css(t), this.$rangeWrapper.append(this.$range)), S.canDragRange && this.$rangeWrapper.addClass($.style.classRangeDraggable)
                 },
                 appendToDOM: function(e) {
+  console.log ("appendToDOM");
                     e ? o.$rangeWrapper.insertBefore(p.$elem1st) : o.$rangeWrapper.appendTo(g.$wrapper), u.$elemRange1st && u.$elemRange1st.appendTo(p.$elem1st), u.$elemRange2nd && u.$elemRange2nd.appendTo(p.$elem2nd)
                 },
                 doUpdate: function(e, n, a, t, s) {
+  console.log ("doUpdate");
                     if (a) switch ($.range.type) {
                         case "min":
                             t && a.css(o.getPropMax(), ($.flipped ? e : 100 - e) + "%");
@@ -85,6 +91,7 @@ function(m, f) {
                     }
                 },
                 update: function(e, n) {
+  console.log ("update");
                     o.doUpdate(e, n, o.$range, !S.doubleHandles || !$.flipped && n || $.flipped && !n, !S.doubleHandles || $.flipped && n || !$.flipped && !n)
                 }
             },
@@ -108,16 +115,20 @@ function(m, f) {
                     }
                 },
                 initClone: function() {
+  console.log ("initCloneu");
                     this.$elem1st = b.clone().css("transform-origin", "0 0").css(this.getRelativePosition()).removeAttr("tabindex autofocus id"), S.isHoriz ? S.isFixedHandle && (this.$elem1st.css("top", ""), S.hasRuler || this.$elem1st.css("line-height", g.height + "px")) : S.isFixedHandle || S.hasRuler || this.$elem1st.css("width", g.width * $.handle.zoom + "px"), S.doubleHandles && (this.$elem2nd = this.$elem1st.clone().css(S.isHoriz ? "left" : "top", ""))
                 },
                 initSvgHandle: function() {
+  console.log ("initSvgHandleu");
                     return g.initSvgOutsideHandle(), this.$elem1st = v.createSvg(this.width, this.height).css(this.getRelativePosition()), $.ruler.visible && v.renderSvg(this.$elem1st, this.width, this.height, !v.areTheSame($.handle.zoom, 1)), b.triggerHandler("customRuler.rsSliderLens", [this.$elem1st, this.width, this.height, $.handle.zoom, !0, v.createSvgDom]), S.doubleHandles && (this.$elem2nd = this.$elem1st.clone().css(S.isHoriz ? "left" : "top", "")), !0
                 },
                 init: function() {
+  console.log ("initu");
                     this.width = g.width * $.handle.zoom, this.height = g.height * $.handle.zoom, S.hasRuler ? this.initSvgHandle() : this.initClone()
                 },
                 resizeUpdate: function() {
-                    S.updateTicksStep();
+    console.log ("resizeUpdateu");
+                  S.updateTicksStep();
                     var e = g.$wrapper.width(),
                         n = g.$wrapper.height();
                     S.isFixedHandle || u.$elem1st.add(u.$elem2nd).css({
@@ -130,6 +141,7 @@ function(m, f) {
                     return t[S.isHoriz ? "width" : "height"] = Math.round((S.isHoriz ? n : a) * (1 - $.paddingStart - $.paddingEnd) * $.handle.zoom) + "px", t[S.isHoriz ? "left" : "top"] = S.doubleHandles ? e ? "100%" : "0%" : "50%", t[S.isHoriz ? "height" : "width"] = S.isFixedHandle ? $.range.size * u[S.isHoriz ? "height" : "width"] + "px" : 100 * $.range.size + "%", (e && u.$elemRange1st ? u.$elemRange1st : !e && u.$elemRange2nd ? u.$elemRange2nd : o.$rangeWrapper.clone()).css(t)
                 },
                 initRanges: function(e, n) {
+    console.log ("initRangesu");
                     if (e === f && (e = g.width), n === f && (n = g.height), this.$elemRange1st = u.createMagnifRange(!0, e, n), S.doubleHandles) switch (this.$elemRange2nd = u.createMagnifRange(!1, e, n), $.range.type) {
                         case "min":
                             ($.flipped ? this.$elemRange1st : this.$elemRange2nd).empty();
@@ -163,6 +175,7 @@ function(m, f) {
                     esc: 27
                 },
                 init: function() {
+    console.log ("initp");
                     var e = {
                         display: "inline-block",
                         overflow: "hidden",
@@ -172,12 +185,14 @@ function(m, f) {
                     S.isHoriz ? (e.width = 100 * $.handle.size + "%", S.isFixedHandle ? (e.left = 100 * this.fixedHandleRelPos + "%", e.top = 0, e.bottom = 0, e.transform = "translateX(-50%)") : (e.top = 100 * $.handle.pos + "%", e.height = 100 * ("zoom" === $.handle.otherSize ? $.handle.zoom : $.handle.otherSize) + "%", e.transform = "translate(-" + (S.doubleHandles ? 100 : 50) + "%, -50%)")) : (e.height = 100 * $.handle.size + "%", S.isFixedHandle ? (e.top = 100 * this.fixedHandleRelPos + "%", e.left = 0, e.right = 0, e.transform = "translateY(-50%)") : (e.left = 100 * $.handle.pos + "%", e.width = 100 * ("zoom" === $.handle.otherSize ? $.handle.zoom : $.handle.otherSize) + "%", e.transform = "translate(-50%, -" + (S.doubleHandles ? 100 : 50) + "%)")), this.$elem1st = u.$elem1st.wrap("<div>").parent().addClass(S.doubleHandles ? $.style.classHandle1 : $.style.classHandle).css(e), this.bindTabEvents(!0), S.doubleHandles && (this.$elem2nd = u.$elem2nd.wrap("<div>").parent().addClass($.style.classHandle2).css(e).css("transform", "translate" + (S.isHoriz ? "Y(-50%)" : "X(-50%)")), this.bindTabEvents(!1))
                 },
                 bindTabEvents: function(e) {
+    console.log ("bindTabEventsp");
                     var n;
                     (g.tabindexAttr || S.isInputTypeRange) && $.enabled && (n = function() {
                         p.$elem2nd.attr("tabindex", g.tabindexAttr || 0).bind("focusin.rsSliderLens", h.gotFocus2nd).bind("focusout.rsSliderLens", h.loseFocus)
                     }, e || e === f ? (b.removeAttr("tabindex"), this.$elem1st.attr("tabindex", g.tabindexAttr || 0).bind("focusin.rsSliderLens", h.gotFocus1st).bind("focusout.rsSliderLens", h.loseFocus), g.autofocusable && (b.removeAttr("autofocus"), this.$elem1st.attr("autofocus", "autofocus")), e === f && this.$elem2nd && n()) : n())
                 },
                 unbindTabEvents: function() {
+    console.log ("unbindTabEventsp");
                     !g.tabindexAttr && !S.isInputTypeRange || $.enabled || (this.$elem1st.add(this.$elem2nd).removeAttr("tabindex autofocus").unbind("focusout.rsSliderLens", h.loseFocus), this.$elem1st.unbind("focusin.rsSliderLens", h.gotFocus1st), this.$elem2nd && this.$elem2nd.unbind("focusin.rsSliderLens", h.gotFocus2nd))
                 },
                 navigate: function(e, n, a, t, s, r) {
@@ -185,6 +200,7 @@ function(m, f) {
                     h.$animObj || (i = S.currValue[S.doubleHandles && h.$handle !== p.$elem1st ? 1 : 0], e = S.isStepDefined ? Math.round((i + n - $.min) / $.step) * $.step + $.min : i + e / S.ticksStep, s !== f && (e < s[0] && (e = s[0]), e > s[1] && (e = s[1])), e < $.min && (e = $.min), e > $.max && (e = $.max), h.gotoAnim(i, e, a, t, r))
                 },
                 keydown: function(e) {
+    console.log ("keydownp");
                     var n = [S.isRangeFromToDefined ? S.getCurrValue($.range.type[$.flipped ? 1 : 0]) : $.min, S.isRangeFromToDefined ? S.getCurrValue($.range.type[$.flipped ? 0 : 1]) : $.max];
                     if (n[0] = (!S.doubleHandles || h.$handle === p.$elem1st ? n : S.currValue)[0], n[1] = (S.doubleHandles && h.$handle === p.$elem1st ? S.currValue : n)[1], function() {
                             switch (e.which) {
@@ -245,6 +261,8 @@ function(m, f) {
                     }
                 },
                 onMouseWheel: function(e) {
+					    console.log ("onMouseWheelp");
+
                     var n, a, t;
                     $.enabled && !v.isAlmostZero($.step) && (n = {
                         x: 0,
@@ -267,6 +285,7 @@ function(m, f) {
                     return null
                 },
                 onSetter: function(e, n, a) {
+					    console.log ("onSetter");
                     var t, s, r;
                     switch (n) {
                         case "enabled":
@@ -282,15 +301,19 @@ function(m, f) {
                     return c.onGetter(e, n)
                 },
                 onResizeUpdate: function() {
+					    console.log ("onResizeUpdate");
                     u.resizeUpdate()
                 },
                 onChange: function(e, n, a) {
+					    console.log ("onChangec");
                     $.onChange && $.onChange(e, n, a)
                 },
                 onCreate: function(e) {
+					    console.log ("onCreatec");
                     $.onCreate && $.onCreate(e)
                 },
                 onDestroy: function() {
+					    console.log ("onDestroyc");
                     b.add(g.$wrapper).add(g.$canvas).add(o.$rangeWrapper).add(p.$elem1st).add(p.$elem2nd).unbind("DOMMouseScroll.rsSliderLens mousewheel.rsSliderLens", p.onMouseWheel), b.unbind("getter.rsSliderLens", c.onGetter).unbind("setter.rsSliderLens", c.onSetter).unbind("resizeUpdate.rsSliderLens", c.onResizeUpdate).unbind("change.rsSliderLens", c.onChange).unbind("finalchange.rsSliderLens", c.onFinalChange).unbind("create.rsSliderLens", c.onCreate).unbind("destroy.rsSliderLens", c.onDestroy).unbind("customLabel.rsSliderLens", c.onCustomLabel).unbind("customLabelAttrs.rsSliderLens", c.onCustomLabelAttrs).unbind("customRuler.rsSliderLens", c.onCustomRuler), g.$wrapper.unbind("mousedown.rsSliderLens touchstart.rsSliderLens", h.startDrag).unbind("mouseup.rsSliderLens touchend.rsSliderLens", h.stopDrag), o.$rangeWrapper.unbind("mousedown.rsSliderLens touchstart.rsSliderLens", h.startDrag), o.$range && o.$range.unbind("mousedown.rsSliderLens touchstart.rsSliderLens", l.startDrag), m(document).unbind("keydown.rsSliderLens", p.keydown).unbind("keyup.rsSliderLens", p.keyup).unbind("mousemove.rsSliderLens touchmove.rsSliderLens", S.isHoriz ? h.dragHoriz : h.dragVert).unbind("mouseup.rsSliderLens touchend.rsSliderLens", h.stopDragFromDoc).unbind("mousemove.rsSliderLens touchmove.rsSliderLens", l.drag), p.$elem1st.unbind("focusin.rsSliderLens", h.gotFocus1st).unbind("focusout.rsSliderLens", h.loseFocus).unbind("mousedown.rsSliderLens touchstart.rsSliderLens", h.startDrag).unbind("mousedown.rsSliderLens touchstart.rsSliderLens", h.startDragFromHandle1st), p.$elem2nd && p.$elem2nd.unbind("focusin.rsSliderLens", h.gotFocus2nd).unbind("focusout.rsSliderLens", h.loseFocus).unbind("mousedown.rsSliderLens touchstart.rsSliderLens", h.startDragFromHandle2nd), g.$canvas && g.$canvas.remove(), o.$rangeWrapper.remove(), p.$elem1st.remove(), p.$elem2nd && p.$elem2nd.remove(), g.$svg && g.$svg.remove(), g.style ? b.attr("style", g.style) : b.removeAttr("style"), g.tabindexAttr && b.attr("tabindex", g.tabindexAttr), b.unwrap()
                 },
                 onCustomLabel: function(e, n) {
@@ -305,11 +328,13 @@ function(m, f) {
                 finalChangeValueFirst: null,
                 finalChangeValueSecond: null,
                 processFinalChange: function(e) {
+					    console.log ("processFinalChangec");
                     var n = e !== f ? e : S.isFixedHandle || h.$handle === p.$elem1st,
                         e = S.getCurrValue(S.currValue[n ? 0 : 1]);
                     n ? e !== c.finalChangeValueFirst && (b.triggerHandler("finalchange.rsSliderLens", [e, !0]), c.finalChangeValueFirst = e) : e !== c.finalChangeValueSecond && (b.triggerHandler("finalchange.rsSliderLens", [e, !1]), c.finalChangeValueSecond = e)
                 },
                 onFinalChange: function(e, n, a) {
+					    console.log ("onFinalChangec");
 					//console.log ("Dans JS1");
                     $.onFinalChange && $.onFinalChange(e, n, a)
 					//console.log ("Dans JS2");

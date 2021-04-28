@@ -361,10 +361,13 @@ for (var i = 0; i < 9; i++) {
 		function(testErreur){
 				if (testErreur) 
 				{traiteErreur(testErreur, 'volume', req.query);
+				//config.logger('{API}    ERREUR ', "INFO");
 				res.status(500).json(error(500, req.route, 'Alexa.DeviceControls.Volume', testErreur.message));
 				}
-				else
+				else {
+				//config.logger('{API}    pAS ERREUR ', "INFO");
 				res.status(200).json({value: "OK"});	//ne teste pas le résultat
+				}
 			}
 	);	
 		
@@ -468,7 +471,7 @@ CommandAlexa.Command = function(req,res){
 	
 	// suppression de la boucle des serial
 	//boucleSurSerials_sendCommand(req);
-	config.logger('{API}:    *******************************************');
+	//config.logger('{API}:    *******************************************');
 
 			alexa.sendCommand(req.query.device, req.query.command, req.query.value,
 				function(testErreur){
@@ -1391,6 +1394,10 @@ CommandAlexa.media = function(req, res) {
 
 	Appel_getMedia(req.query.device, function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		if(typeof JSON.stringify(retourAmazon, null, 2) == "undefined") {
+			config.logger('{API}    ╠═══> Réponse est undefined - A voir pourquoi ?!', 'DEBUG');
+			return res.sendStatus(500);
+			}		
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500);});
 		res.status(200).json(retourAmazon);
@@ -1407,6 +1414,10 @@ config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+'
 
 	Appel_getPlayerInfo(req.query.device, function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		if(typeof JSON.stringify(retourAmazon, null, 2) == "undefined") {
+			config.logger('{API}    ╠═══> Réponse est undefined - A voir pourquoi ?!', 'DEBUG');
+			return res.sendStatus(500);
+			}		
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500);});
 		res.status(200).json(retourAmazon);
@@ -2760,11 +2771,11 @@ if (err)
 		//config.logger('{API}: ******************************************************************');
 
 		if (err.message == "Connexion Close") {
-			config.logger("Alexa-API: Connexion Close détectée et donc relance du lien au serveur Amazon", 'WARNING');
+			config.logger("{API}    ╠═══>Connexion Close détectée et donc relance du lien au serveur Amazon", 'WARNING');
 			startServer();
 		}
 		else if (err.message == "Unauthorized") {
-			config.logger("Alexa-API: Unauthorized détecté et donc relance du lien au serveur Amazon", 'WARNING');
+			config.logger("{API}    ╠═══>Unauthorized détecté et donc relance du lien au serveur Amazon", 'WARNING');
 			startServer();
 		}		
 		//else
@@ -2778,18 +2789,27 @@ if (err)
 										queryEnErreur: queryEnErreur,
 										listeCommandesEnErreur: commandesEnErreur
 									});
-				config.logger("Alexa-API: "+commandesEnErreur.length+" commandes en erreur: "+JSON.stringify(commandesEnErreur)+" query: "+JSON.stringify(queryEnErreur), 'WARNING');
+				config.logger("{API}    ╠═══>"+commandesEnErreur.length+" commandes en erreur: "+JSON.stringify(commandesEnErreur)+" query: "+JSON.stringify(queryEnErreur), 'WARNING');
+			} else {
+		config.logger("{API}    ╠═══>Traitement de l'erreur (2ème tour): "+err+" sur les commandes: "+JSON.stringify(commandesEnErreur)+" Query: "+JSON.stringify(queryEnErreur), 'ERROR');
+		config.logger("{API}    ╠═══>ICI IL FAUDRAIT RELANCER LE LIEN SERVEUR", 'ERROR');
 			}
+				
+			
 		}
 		else if (typeof (commandesEnErreur) == "string") {
-		config.logger("Alexa-API: "+err+" Command: "+commandesEnErreur+" Query: "+JSON.stringify(queryEnErreur), 'ERROR');
+		config.logger("{API}    ╠═══>"+err+" Command: "+commandesEnErreur+" Query: "+JSON.stringify(queryEnErreur), 'ERROR');
 			if (!(queryEnErreur.replay)) { // si c'est pas défini c'est que c'est le premier essai, donc on rejoue
 					httpPost('commandesEnErreur', {
 										queryEnErreur: queryEnErreur,
 										listeCommandesEnErreur: commandesEnErreur
 									});
-				config.logger("Alexa-API: commande en erreur: "+commandesEnErreur+" query: "+JSON.stringify(queryEnErreur), 'WARNING');
+				config.logger("{API}    ╠═══>commande en erreur: "+commandesEnErreur+" query: "+JSON.stringify(queryEnErreur), 'WARNING');
+			} else {
+		config.logger("{API}    ╠═══>Traitement de l'erreur (2ème tour): "+err+" sur la commande: "+JSON.stringify(commandesEnErreur)+" Query: "+JSON.stringify(queryEnErreur), 'ERROR');
+		config.logger("{API}    ╠═══>ICI IL FAUDRAIT RELANCER LE LIEN SERVEUR", 'ERROR');
 			}
+				
 		}	
 		//config.logger('{API}: ******************************************************************');
 		//config.logger('{API}: ******************************************************************');

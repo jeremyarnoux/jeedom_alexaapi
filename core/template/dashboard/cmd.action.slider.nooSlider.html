@@ -50,7 +50,8 @@
 
             $.include(['plugins/alexaapi/core/template/dashboard/cmd.action.slider.nooSlider/rsSliderLens.js'],
                 function () {
-					console.log (jeedom.widgets.getThemeImg("#_img_light_on_#","#_img_dark_on_#"));
+					console.log ("Lancement");
+					//console.log (jeedom.widgets.getThemeImg("#_img_light_on_#","#_img_dark_on_#"));
                     let firstLoad = 0;
                     // Récupération des paramètres
                     let type = 'button', orientation = 'horiz', width = '200', height = '50',
@@ -78,10 +79,8 @@
 						step = 10,
                         displayedValues = ["0","20","40","60","80","100"];
 					
-								console.log ("coucou0"+leftColor+"--");
 
                     // Chargement du style d'affichage
-                    type = ('#type#' != '#' + 'type#') ? "#type#" : type;
                     orientation = ('#orientation#' != '#' + 'orientation#') ? "#orientation#" : orientation;
                     orientation = (orientation == 'vertical' || orientation == 'verticale' || orientation == 'vert') ? 'vert' : 'horiz';
                     width = ('#width#' != '#' + 'width#') ? "#width#" : width;
@@ -111,35 +110,16 @@
                     imageHeight = (isNaN(parseFloat('#imageHeight#'))) ? imageHeight : parseFloat('#imageHeight#');
                     flipped = (isNaN(parseFloat('#flipped#'))) ? false : (parseFloat('#flipped#') == 1);
                     animationDelay = (isNaN(parseFloat('#animationDelay#'))) ? animationDelay : parseFloat('#animationDelay#');
-								console.log ("coucou1"+leftColor+"--");
+								//console.log ("coucou1"+leftColor+"--");
 
-                    switch (type) {
-                        case 'image':
-                        case 'images':
-                            // images
-                            $("#nooSlider#id#").remove();
-                            $cmd#id# = $("#nooSpan#id#");
-                            let imagesList = images.split(',');
-                            let imagesLenth = imagesList.length;
-                            let imgContent = "";
-                            for (i = 0; i < imagesLenth; i++) {
-                                imgContent += '<img src="' + 'data/customTemplates/dashboard/cmd.action.slider.nooSlider/' + imagesList[i] + '" width="' + imageWidth + '" height="' + imageHeight + '">';
-                            }
-                            //width = (imageWidth+2) * imagesLenth;
-                            //height = imageHeight;
-                            max = imagesLenth - 1;
-                            step = 1;
-                            visibleRuler = false;
-                            $cmd#id#.html(imgContent);
-                            break;
-                        default:
+                    //switch (type) {
                             // button
                             $("#nooSpan#id#").remove();
                             $cmd#id# = $("#nooSlider#id#");
                             document.documentElement.style.setProperty('--color-cursor#id#', cursorColor);
                             document.documentElement.style.setProperty('--left-pos-cursor#id#', cursorLeftPos);
                             document.documentElement.style.setProperty('--top-pos-cursor#id#', cursorTopPos);
-                    }
+
 
                     $cmd#id#.rsSliderLens({
                         orientation: orientation,
@@ -170,7 +150,7 @@
                                     return (value > 0) ? addPlus + value : value;
                                 },
                                 onCustomAttrs: function (event, value) {
-																console.log ("coucou3"+leftColor+"--"+value+"?="+centerValue);
+																//console.log ("coucou3"+leftColor+"--"+value+"?="+centerValue);
 
                                     if (leftColor !='' && value < centerValue) return { style: 'fill:' + leftColor };
                                     if (leftColor !='' && value > centerValue) return { style: 'fill:' + rightColor };
@@ -180,7 +160,7 @@
 
                         onCreate: function (event) {
                             if (type == 'button') {
-								//console.log ("function onCreate");
+								console.log ("function onCreate");
                                 // ajout du libellé pour affichage de la valeur courante
                                 $(event.currentTarget).nextAll(".handle").append("<label>");
                             }
@@ -188,7 +168,7 @@
                         onChange: function (event, value) {
                             if (type == 'button') {
                                 // mise à jour du libellé
-								//console.log ("function onChange value: "+value+" firstLoad: "+firstLoad);
+								console.log ("function onChange value: "+value+" firstLoad: "+firstLoad);
                                 var $labelElement = $(event.currentTarget).nextAll(".handle").children("label");
                                 $labelElement.addClass("libelle#id#");
                                 $labelElement.text(value < 0 ? value : ((value > 0 ? addPlus : '') + value));
@@ -196,12 +176,12 @@
 
                             if (immediateChange) {
                                 // mise à jour Jeedom
-								//console.log ("immediateChange");
+								console.log ("immediateChange");
                                 jeedom.cmd.execute({ id: '#id#', value: { slider: value } });
                             }
                         },
                         onFinalChange: function (event, value) {
-						//console.log ("function onFinalChange :"+value+" firstLoad: "+firstLoad);
+						console.log ("function onFinalChange :"+value+" firstLoad: "+firstLoad+" - "+immediateChange);
                             if (!immediateChange && firstLoad > 1) {
                                 // mise à jour Jeedom
 								//console.log ("Mise à jour de la valeur par jeedom.cmd.execute :"+value);
@@ -215,6 +195,7 @@
 
             jeedom.cmd.update['#id#'] = function (_options) {
                 let valeur = is_numeric(_options.display_value) ? parseFloat(_options.display_value) : parseFloat(_options.display_value);
+				console.log ("function jeedom.cmd.update ***");
                 $cmd#id#.rsSliderLens('option', 'value', valeur);
             }
             jeedom.cmd.update['#id#']({ display_value: '#state#', valueDate: '#valueDate#', collectDate: '#collectDate#' });

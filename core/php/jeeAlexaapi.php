@@ -67,6 +67,13 @@ if (!is_array($result)) {
     die();
 
 }
+
+if (!isset($result['deviceSerialNumber'])) {
+    log::add('alexaapi', 'debug', 'Trame dans jeeAlexaapi sans aucun deviceSerialNumber... à voir pourquoi, trame ignorée.');
+    die();
+}
+
+
 //log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialNumber']);
 $logical_id = $result['deviceSerialNumber'] . "_player";
 

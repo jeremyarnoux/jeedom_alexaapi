@@ -910,7 +910,7 @@ this._options.logger && this._options.logger(obj.headers);
 	
 	
 	
-        this._options.logger && this._options.logger('{Remote} ║ Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? ' and data=' + flags.data : ''),'DEBUG');
+        this._options.logger && this._options.logger('{Remote} ║ Envoi de la requète avec ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? ' and data=' + flags.data : ''),'DEBUG');
 //	}	
 	    //this._options.logger && this._options.logger('{Remote} ║ >>>>> ' + JSON.stringify(options)+"<<<<" );
 	    //this._options.logger && this._options.logger('{Remote} ║ >>>>> ' + options+"<<<<" );
@@ -1018,8 +1018,9 @@ this._options.logger && this._options.logger(obj.headers);
 
         const handleResponse = (err, res, body) => {
             if (err || !body) { // Method 'DELETE' may return HTTP STATUS 200 without body
-                this._options.logger && this._options.logger('{Remote} ║ Response: No body','DEBUG');
-                this._options.logger && this._options.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','DEBUG');
+               // this._options.logger && this._options.logger('{Remote} ║ Response: No body','DEBUG'); Pour éviter les remarques sur No Body
+                this._options.logger && this._options.logger('{Remote} ║ Réponse: Succès (statusCode:'+res.statusCode+")",'DEBUG');
+                this._options.logger && this._options.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','INFO');
                 return typeof res.statusCode === 'number' && res.statusCode >= 200 && res.statusCode < 300 ? callback(null, {'success': true}) : callback(new Error('no body'), null);
             }
 
@@ -1040,7 +1041,9 @@ this._options.logger && this._options.logger(obj.headers);
                 return;
             }
 
-            this._options.logger && this._options.logger('{Remote} ║ Response: ' + JSON.stringify(ret),'DEBUG');
+                this._options.logger && this._options.logger('{Remote} ║ Réponse: ' + JSON.stringify(ret),'DEBUG');
+               // this._options.logger && this._options.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','DEBUG');
+
             callback(null, ret);
             callback = null;
         };
