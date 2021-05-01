@@ -44,15 +44,16 @@
         <div class="cmdName">#name_display#</div>
     </div>
     <div id="nooSliderContainer#id#">
-        <span id="nooSpan#id#" tabIndex="0"> </span>
-        <input id="nooSlider#id#" type="range">
+        <span id="nooSpan#id#" tabIndex="0" value="#state#"> </span>
+        <input id="nooSlider#id#" type="range" value="#state#">
         <script>
-
-            $.include(['plugins/alexaapi/core/template/dashboard/cmd.action.slider.nooSlider/rsSliderLens.js'],
+            var updateByEvent#id# = false;
+            var updateByWidget#id# = false;
+            $.include(['plugins/alexaapi/core/template/dashboard/cmd.action.slider.nooSliderAlexa/rsSliderLens.js'],
                 function () {
-					console.log ("Lancement");
+					//console.log ("Lancement");
 					//console.log (jeedom.widgets.getThemeImg("#_img_light_on_#","#_img_dark_on_#"));
-                    let firstLoad = 0;
+                    let firstLoad = false;
                     // Récupération des paramètres
                     let type = 'button', orientation = 'horiz', width = '200', height = '50',
                         min = 0, max = 100, 
@@ -153,14 +154,14 @@
 																//console.log ("coucou3"+leftColor+"--"+value+"?="+centerValue);
 
                                     if (leftColor !='' && value < centerValue) return { style: 'fill:' + leftColor };
-                                    if (leftColor !='' && value > centerValue) return { style: 'fill:' + rightColor };
+                                    if (rightColor !='' && value > centerValue) return { style: 'fill:' + rightColor };
                                 }
                             }
                         },
 
                         onCreate: function (event) {
                             if (type == 'button') {
-								console.log ("function onCreate");
+								//console.log ("function onCreate");
                                 // ajout du libellé pour affichage de la valeur courante
                                 $(event.currentTarget).nextAll(".handle").append("<label>");
                             }
@@ -168,7 +169,7 @@
                         onChange: function (event, value) {
                             if (type == 'button') {
                                 // mise à jour du libellé
-								console.log ("function onChange value: "+value+" firstLoad: "+firstLoad);
+								//console.log ("function onChange value: "+value+" firstLoad: "+firstLoad);
                                 var $labelElement = $(event.currentTarget).nextAll(".handle").children("label");
                                 $labelElement.addClass("libelle#id#");
                                 $labelElement.text(value < 0 ? value : ((value > 0 ? addPlus : '') + value));
@@ -176,29 +177,36 @@
 
                             if (immediateChange) {
                                 // mise à jour Jeedom
-								console.log ("immediateChange");
+								//console.log ("immediateChange");
                                 jeedom.cmd.execute({ id: '#id#', value: { slider: value } });
                             }
                         },
                         onFinalChange: function (event, value) {
-						console.log ("function onFinalChange :"+value+" firstLoad: "+firstLoad+" - "+immediateChange);
-                            if (!immediateChange && firstLoad > 1) {
+							//console.log ("### Enter function onFinalChange : value="+ value +", firstLoad="+firstLoad + ", updateByEvent#id#=" + updateByEvent#id#);
+                            if (!immediateChange && firstLoad && !updateByEvent#id#) {
                                 // mise à jour Jeedom
-								//console.log ("Mise à jour de la valeur par jeedom.cmd.execute :"+value);
+                                updateByWidget#id# = true;
+								//console.log ("### onFinalChange :: Mise à jour de la valeur par jeedom.cmd.execute :"+value);
                                 jeedom.cmd.execute({ id: '#id#', value: { slider: value } });
                             }
-                            firstLoad<2 && firstLoad++;
+                            firstLoad = true;
+                          	updateByEvent#id# = false;
                         }
                     });
 
                 });
 
             jeedom.cmd.update['#id#'] = function (_options) {
-                let valeur = is_numeric(_options.display_value) ? parseFloat(_options.display_value) : parseFloat(_options.display_value);
-				console.log ("function jeedom.cmd.update ***");
-                $cmd#id#.rsSliderLens('option', 'value', valeur);
+				//if (!updateByWidget#id#) {
+                    let valeur = is_numeric(_options.display_value) ? parseFloat(_options.display_value) : parseFloat(_options.display_value);
+                    //console.log ("### Enter function jeedom.cmd.update ***");
+                	updateByEvent#id# = !updateByWidget#id#;
+                    //console.log ("### after update flag : updateByEvent#id#=" + updateByEvent#id#);
+              		$cmd#id#.rsSliderLens('option', 'value', valeur);
+                //}
             }
-            jeedom.cmd.update['#id#']({ display_value: '#state#', valueDate: '#valueDate#', collectDate: '#collectDate#' });
+            //console.log("### Call jeedom.cmd.update");
+          	//jeedom.cmd.update['#id#']({ display_value: '#state#', valueDate: '#valueDate#', collectDate: '#collectDate#' });
 
         </script>
 

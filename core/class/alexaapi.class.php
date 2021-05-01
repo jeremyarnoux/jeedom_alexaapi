@@ -170,7 +170,7 @@ public static function templateWidget(){
             'replace' => array("#_desktop_width_#" => "100", "#_mobile_width_#" => "50", "#hide_name#" => "whidden")
         );
         $return['action']['slider']['volume'] = array(
-            'template' => 'nooSlider'
+            'template' => 'nooSliderAlexa'
         );
         $return['action']['slider']['volume_legacy'] = array(
             'template' => 'bouton',
