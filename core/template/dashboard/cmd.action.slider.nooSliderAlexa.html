@@ -201,6 +201,7 @@
                     let valeur = is_numeric(_options.display_value) ? parseFloat(_options.display_value) : parseFloat(_options.display_value);
                     //console.log ("### Enter function jeedom.cmd.update ***");
                 	updateByEvent#id# = !updateByWidget#id#;
+					updateByWidget#id# = false;
                     //console.log ("### after update flag : updateByEvent#id#=" + updateByEvent#id#);
               		$cmd#id#.rsSliderLens('option', 'value', valeur);
                 //}
