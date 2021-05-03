@@ -2684,22 +2684,28 @@ fs.readFile(config.cookieLocation, 'utf8', (err, data) => {
 
 });
 
-function startServer() {
+function startServer(force=false) {
 
-	if ((Date.now()-dernierStartServeur)>20000)
+	if (force||(Date.now()-dernierStartServeur)>20000)
 	{
 		dernierStartServeur=Date.now();
 		alexa = null;
 		alexa = new Alexa();
-		config.logger(' ','INFO');
-		config.logger('{API}    ╔═══════════════════[Lancement du lien au Serveur Amazon]═════════════════════════════════════════════════════════','INFO');
+		let lancerOuPasMQTT=false;
+		if (force) 	config.logger('{API}    ╠═══════════════════[Relance du lien au Serveur Amazon (avec nouveau cookie)]═════════════════════════════════════════════════════════','INFO');
+		else {
+					config.logger(' ','INFO');
+					config.logger('{API}    ╔═══════════════════[Lancement du lien au Serveur Amazon]═════════════════════════════════════════════════════════','INFO');
+					lancerOuPasMQTT=config.useWsMqtt;
+		}
+					
 
 				alexa.init({
 				cookie: config.cookie,
 				logger: config.logger,
 				alexaServiceHost: config.alexaServiceHost,
 				cookieRefreshInterval: config.cookieRefreshInterval,
-				useWsMqtt: config.useWsMqtt
+				useWsMqtt: lancerOuPasMQTT
 			},
 			(err) => {
 				// Unable to init alexa
@@ -2719,6 +2725,8 @@ function startServer() {
 								config.logger('{API}:    ' + err);
 							}
 							config.logger('{API}    ╠═══> New cookie saved to:' + config.cookieLocation,'DEBUG');
+							config.logger("{API}    ╠═══> On doit relancer l'initialisation avec le nouveau Cookie",'DEBUG');
+							startServer(true);
 						});
 						
 						//-------------------------------------------------------------------------------------------------
@@ -2738,18 +2746,29 @@ function startServer() {
 					// Start the server
 					if (server) {
 						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-						config.logger('{API}    ║   Server is already listening on port ' + server.address().port ,'INFO');
-						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+						config.logger('{API}    ║   Le lien vers le serveur Amazon est bien lancé sur le port ' + server.address().port ,'INFO');
+						config.logger('{API}    ╚════════════════════════════════════════════════════════════════════════════════════════','INFO');
 					} else {
 						server = app.listen(config.listeningPort, () => {
 							config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-							config.logger('{API}    ║   Server OK listening on port ' + server.address().port ,'INFO');
+							config.logger('{API}    ║   Activation du port ' + server.address().port ,'INFO');
 							config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+								//server.close(() => {
+								//server = app.listen(config.listeningPort);
+								//});
 
 						});
 					}
+				} else {
+						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+						config.logger('{API}    ║   Ne devrait jamais arriver !! On a pas de cookieData' ,'INFO');
+						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
 				}
+					
+					
+				
 			});
+			
 	}
 	else
 	{

@@ -55,6 +55,7 @@ class AlexaRemote extends EventEmitter {
     }
 
     setCookie(_cookie) {
+		
         if (!_cookie) return;
         if (typeof _cookie === 'string') {
             this.cookie = _cookie;
@@ -144,7 +145,9 @@ class AlexaRemote extends EventEmitter {
                     const tokensValidSince = Date.now() - self._options.formerRegistrationData.tokenDate;
                     //if (tokensValidSince < 5 * 24 * 60 * 60  * 1000) {
                     if (tokensValidSince < 24 * 60 * 60  * 1000) { // Pour revenir à ce que fait Appollon77
-					self._options.logger && self._options.logger('{Remote} ║ ╚═════> donc encore valable, on ne le regénère pas','DEBUG');
+               //     if (tokensValidSince < 1 *60 * 1000 ) { // Pour revenir à ce que fait Appollon77
+					self._options.logger && self._options.logger('{Remote} ║ ╠═════> donc encore valable, on ne le regénère pas','DEBUG');
+                    self._options.logger && self._options.logger('{Remote} ║ ╚═════> '+JSON.stringify(self._options.formerRegistrationData),'DEBUG');
                     //if (tokensValidSince < 24 * 60 * 60 * 1000) {
 						//self._options.logger && self._options.logger('{Remote} ╠══***********************═════> return tokensValidSince='+tokensValidSince,'DEBUG');
                         return callback(null);
@@ -215,6 +218,7 @@ class AlexaRemote extends EventEmitter {
                 });
             });
         });
+
     }
     prepare(callback) {
         this.getAccount((err, result) => {
@@ -782,6 +786,7 @@ class AlexaRemote extends EventEmitter {
     }
 
     httpsGet(noCheck, path, callback, flags = {}) {
+        //this._options.logger && this._options.logger('Alexa-Remote: LANCEMENT httpsGet');
         if (typeof noCheck !== 'boolean') {
             flags = callback;
             callback = path;
@@ -790,6 +795,7 @@ class AlexaRemote extends EventEmitter {
         }
         // bypass check because set or last check done before less then 10 mins
         if (noCheck || (new Date().getTime() - this.lastAuthCheck) < 600000) {
+        //if (noCheck || (new Date().getTime() - this.lastAuthCheck) < 1) {
             //this._options.logger && this._options.logger('Alexa-Remote: No authentication check needed (time elapsed ' + (new Date().getTime() - this.lastAuthCheck) + ')');
             return this.httpsGetCall(path, callback, flags);
         }
@@ -1019,7 +1025,8 @@ this._options.logger && this._options.logger(obj.headers);
         const handleResponse = (err, res, body) => {
             if (err || !body) { // Method 'DELETE' may return HTTP STATUS 200 without body
                // this._options.logger && this._options.logger('{Remote} ║ Response: No body','DEBUG'); Pour éviter les remarques sur No Body
-                this._options.logger && this._options.logger('{Remote} ║ Réponse: Succès (statusCode:'+res.statusCode+")",'DEBUG');
+                this._options.logger && this._options.logger('{Remote} ║ Réponse: statusCode:'+res.statusCode,'DEBUG');
+                this._options.logger && this._options.logger('{Remote} ║ Réponse: headers:'+JSON.stringify(res.headers),'DEBUG');
                 this._options.logger && this._options.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','INFO');
                 return typeof res.statusCode === 'number' && res.statusCode >= 200 && res.statusCode < 300 ? callback(null, {'success': true}) : callback(new Error('no body'), null);
             }
