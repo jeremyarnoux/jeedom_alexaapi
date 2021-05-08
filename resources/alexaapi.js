@@ -563,8 +563,16 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 					'brightness': req.query.brightness
 				});
 
-	}							
+	} else if (parameters.action == "setTargetTemperature") {
 
+        parameters={'action': parameters.action,"targetTemperature.value":req.query.targetTemperature,"targetTemperature.scale":"celsius"};
+		toReturn.push({
+					'device': req.query.device,
+					'command': parameters.action,
+					'setTargetTemperature': req.query.targetTemperature
+				});
+
+	}	
 							
     //executeSmarthomeDeviceAction(entityIds, parameters, entityType, callback) {
 		
@@ -663,6 +671,9 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			//config.logger('20','DEBUG');
 			
 			}
+			
+			
+			
 			else {
 			//config.logger('3','DEBUG');
 			// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
