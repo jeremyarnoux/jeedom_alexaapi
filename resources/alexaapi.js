@@ -565,11 +565,42 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 
 	} else if (parameters.action == "setTargetTemperature") {
 
-        parameters={'action': parameters.action,"targetTemperature.value":req.query.targetTemperature,"targetTemperature.scale":"celsius"};
+       		parameters={'action': parameters.action,"targetTemperature.value":req.query.targetTemperature,"targetTemperature.scale":"celsius"};
+		
 		toReturn.push({
 					'device': req.query.device,
 					'command': parameters.action,
 					'setTargetTemperature': req.query.targetTemperature
+				});
+
+	} else if (parameters.action == "setThermostatMode") {
+
+        	parameters={'action': 'setThermostatMode',"thermostatMode.value":req.query.thermostatMode};
+		
+		toReturn.push({
+					'device': req.query.device,
+					'command': parameters.action,
+					'thermostatMode': req.query.thermostatMode
+				});
+
+	} else if (parameters.action == "Fan.Speed") {
+
+       		parameters={'instance': parameters.action,'action': 'setRangeValue','rangeValue': {'value':req.query.rangeValue,'unitOfMeasure':''}};
+ 
+		toReturn.push({
+					'device': req.query.device,
+					'command': req.query.action,
+					'rangeValue': req.query.rangeValue
+				});
+
+	}  else if (parameters.action == "Blind.Lift") {
+ 
+      		parameters={'instance': parameters.action,'action': 'setRangeValue','rangeValue': {'value':req.query.rangeValue,'unitOfMeasure':'Alexa.Unit.Percent'}};
+ 
+		toReturn.push({
+					'device': req.query.device,
+					'command': req.query.action,
+					'rangeValue': req.query.rangeValue
 				});
 
 	}	
