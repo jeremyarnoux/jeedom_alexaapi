@@ -132,7 +132,7 @@ else
     try sudo npm install -g npm
   else
     echo "Utilisation du dépot officiel"
-    curl -sL https://deb.nodesource.com/setup_${installVer}.x | try sudo -E bash -
+    curl -fsSL https://deb.nodesource.com/setup_${installVer}.x | try sudo -E bash -
     try sudo DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs 
   fi
   
