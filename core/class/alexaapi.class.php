@@ -881,7 +881,7 @@ public static function templateWidget(){
 										}
 										if (json_encode($value7['applianceId']) != json_encode($value7['mergedApplianceIds']['0'])) {
                                                 log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.json_encode($value7['friendlyName']).']═══════════════════════════════════════════════════════════════════════════');
-                                                log::add('alexasmarthome_scan', 'info', ' ║ ' . json_encode($value7['applianceId']) <═> json_encode($value7['mergedApplianceIds']['0']));
+                                                log::add('alexasmarthome_scan', 'info', ' ║ ' . json_encode($value7['applianceId']).' <═> '.json_encode($value7['mergedApplianceIds']['0']));
                                                 log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
                                             //log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT AJOUTER UN DEVICE !!!!!!!!!!');
 											self::ajouteAmazonSmartHome($value7['mergedApplianceIds']['0']);
