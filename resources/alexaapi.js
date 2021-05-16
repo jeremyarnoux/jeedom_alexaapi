@@ -2929,6 +2929,6 @@ function error(status, source, title, detail) {
 		'detail': detail
 	};
 
-	config.logger('{API}: ' + title + ': ' + detail);
+	config.logger('{API}: ' + title + ': ' + detail,'DEBUG');
 	return error;
 }
