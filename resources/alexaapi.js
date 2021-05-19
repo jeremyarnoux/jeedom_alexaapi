@@ -570,7 +570,7 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 		toReturn.push({
 					'device': req.query.device,
 					'command': parameters.action,
-					'setTargetTemperature': req.query.targetTemperature
+					'targetSetpoint': req.query.targetTemperature
 				});
 
 	} else if (parameters.action == "setThermostatMode") {
