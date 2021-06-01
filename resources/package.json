@@ -24,6 +24,8 @@
     "express": "^4.17.1",
     "alexa-cookie2": "^3.4.3",
     "extend": "^3.0.2",
+	"uuid": "^8.3.2",
+	"ws": "^7.4.6",
     "http-proxy-middleware": "^2.0.0",
     "http-proxy-response-rewrite": "0.0.1",
     "https": "^1.0.0",
