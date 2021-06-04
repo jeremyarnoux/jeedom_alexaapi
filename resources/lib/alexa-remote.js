@@ -866,11 +866,13 @@ flags=	flagsQuery;
                 'User-Agent' : this._options.userAgent,
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Referer': `https://${this.baseUrl}/spa/index.html`,
+            	'Accept': 'application/json', //ajout 04/06/21
                 'Origin': `https://${this.baseUrl}`,
                 //'Content-Type': 'application/json',
                 //'Connection': 'keep-alive', // new
                 'csrf' : this.csrf,
-                'Cookie' : this.cookie
+                'Cookie' : this.cookie,
+                'Accept-Encoding': 'gzip,deflate' //ajout 04/06/21
             }
         };
 
@@ -902,6 +904,7 @@ if (methodQuery!= null) options.method=methodQuery;
         delete logOptions.headers.csrf;
         delete logOptions.headers['User-Agent'];
         delete logOptions.headers['Content-Type'];
+        delete logOptions.headers['Accept'];
         delete logOptions.headers.Referer;
         delete logOptions.headers.Origin;
 	
@@ -1064,6 +1067,7 @@ this._options.logger && this._options.logger(obj.headers);
                 'User-Agent' : this._options.userAgent,
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Referer': `https://alexa.${this._options.amazonPage}/spa/index.html`,
+                'Accept': 'application/json',  //ajout 04/06/21
                 'Origin': `https://alexa.${this._options.amazonPage}`,
                 //'Content-Type': 'application/json',
                 //'Connection': 'keep-alive',
@@ -1099,6 +1103,7 @@ this._options.logger && this._options.logger(obj.headers);
         delete logOptions.headers['Accept-Encoding'];
         delete logOptions.headers['User-Agent'];
         delete logOptions.headers['Content-Type'];
+        delete logOptions.headers['Accept'];
         delete logOptions.headers.Referer;
         delete logOptions.headers.Origin;
         this._options.logger && this._options.logger('{Remote} ║ Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT' || options.method === 'DELETE') ? ' and data=' + flags.data : ''),'DEBUG');
