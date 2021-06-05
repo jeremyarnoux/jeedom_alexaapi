@@ -18,11 +18,6 @@
 
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 
-include_once('nec.php');
-include_once('nel.php');
-
-
-
 
 if (!jeedom::apiAccess(init('apikey'), 'alexaapi')) {
     echo __('Vous n\'êtes pas autorisé à effectuer cette action', __FILE__);
@@ -39,16 +34,15 @@ $chaineRecuperee = file_get_contents("php://input");
 $nom = $_GET["nom"];
 log::add('alexaapi', 'debug', 'Réception données sur jeeAlexaapi [' . $nom . ']');
 log::add('alexaapi_mqtt', 'info', " -------------------------------------------------------------------------------------------------------------");
-//log::add('alexaapi_widget', 'info', " -------------------------------------------------------------------------------------------------------------");
+log::add('alexaapi_widget', 'info', " -------------------------------------------------------------------------------------------------------------");
 
 log::add('alexaapi_mqtt', 'debug', "chaineRecuperee: " . $chaineRecuperee);
-
 
 $debut = strpos($chaineRecuperee, "{");
 $fin = strrpos($chaineRecuperee, "}");
 $longeur = 1 + intval($fin) - intval($debut);
 $chaineRecupereeCorrigee = substr($chaineRecuperee, $debut, $longeur);
-//log::add('alexaapi_mqtt', 'debug', "->" . $chaineRecupereeCorrigee);
+log::add('alexaapi_mqtt', 'debug', "->" . $chaineRecupereeCorrigee);
 
 /*if ($nom !="commandesEnErreur") {
     $chaineRecupereeCorrigee=str_replace ("[", "", $chaineRecupereeCorrigee);
@@ -67,13 +61,6 @@ if (!is_array($result)) {
     die();
 
 }
-
-if (!isset($result['deviceSerialNumber'])) {
-    log::add('alexaapi', 'debug', 'Trame dans jeeAlexaapi sans aucun deviceSerialNumber... à voir pourquoi, trame ignorée.');
-    die();
-}
-
-
 //log::add('alexaapi_mqtt', 'debug',  'deviceSerialNumber:'.$result['deviceSerialNumber']);
 $logical_id = $result['deviceSerialNumber'] . "_player";
 
@@ -120,23 +107,6 @@ switch ($nom) {
     case 'ws-volume-change':
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "PLAYER", $result['deviceSerialNumber']);
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "ECHO", $result['deviceSerialNumber']);
-        metAJour("isMutedinfo", $result['isMuted'], 'isMutedinfo', false, "PLAYER", $result['deviceSerialNumber']);
-        metAJour("isMutedinfo", $result['isMuted'], 'isMutedinfo', false, "ECHO", $result['deviceSerialNumber']);
-		
-/*					$demandeinteract ="ceci est un test qui contien vingt-deux et qu'il faut extraire";
-					$demandeinteract ="ceci est un test qui contien vingt deux et qu'il faut extraire";
-					$enchiffres=enchiffres($demandeinteract);
-					if ($enchiffres != 0) {
-                    log::add('alexaapi', 'debug', 'Nombre détecté : ' . $enchiffres);
-					$enlettres=enlettres($enchiffres);
-					$enlettres=str_replace("-", " ", $enlettres);					
-
-					$demandeinteract=str_replace($enlettres, $enchiffres, $demandeinteract);					
-                    log::add('alexaapi', 'debug', 'remplace ' . $enlettres. " par ". $enchiffres);
-					} else 
-                    log::add('alexaapi', 'debug', 'Pas de nombre détecté dans' .$demandeinteract);
-
-                    log::add('alexaapi', 'debug', 'Interaction demandée : ' . $demandeinteract);*/		
         break;
     case 'ws-notification-change': //changement d'une alarme/rappel
         log::add('alexaapi_node', 'info', 'Alexa-jee: notificationVersion: ' . $result['notificationVersion']);
@@ -176,28 +146,13 @@ switch ($nom) {
             if ($alexaapieqlogic->getConfiguration('interactionjeedom') == 1) {
                 $demandeinteract = $result['description']['summary'];
                 if (strpos($demandeinteract, 'jacques dit') === false && $demandeinteract != "alexa") {
-					
-					
-					//$demandeinteract ="ceci est un test qui contien vingt-deux et qu'il faut extraire";
-					//$demandeinteract ="ceci est un test qui contien vingt deux et qu'il faut extraire";
-					$enchiffres=enchiffres($demandeinteract);
-					if ($enchiffres != 0) {
-                    log::add('alexaapi', 'debug', 'Nombre détecté : ' . $enchiffres);
-					$enlettres=enlettres($enchiffres);
-					$enlettres=str_replace("-", " ", $enlettres);					
-
-					$demandeinteract=str_replace($enlettres, $enchiffres, $demandeinteract);					
-                    log::add('alexaapi', 'debug', 'remplace ' . $enlettres. " par ". $enchiffres);
-					} else 
-                    log::add('alexaapi', 'debug', 'Pas de nombre détecté dans' .$demandeinteract);
-
-                    log::add('alexaapi', 'debug', 'Interaction demandée : ' . $demandeinteract);
+                    log::add('alexaapi', 'debug', 'Interaction demande : ' . $demandeinteract);
 
                     $parameters['plugin'] = 'alexaapi';
                     $reply = interactQuery::tryToReply(trim($demandeinteract), $parameters);
                     log::add('alexaapi', 'debug', 'Interaction ' . print_r($reply, true));
                     if ($reply['reply'] != "Désolé je n'ai pas compris" && $reply['reply'] != "Désolé je n'ai pas compris la demande" && $reply['reply'] != "Désolé je ne comprends pas la demande" && $reply['reply'] != "Je ne comprends pas" && $reply['reply'] != "ceci est un message de test" && $reply['reply'] != "" && $reply['reply'] != " ") {
-                        log::add('alexaapi', 'debug', "La reponse : " . $reply['reply'] . " et valide je vous l'ai donc renvoyée");
+                        log::add('alexaapi', 'debug', "La reponse : " . $reply['reply'] . " est valide je vous l'ai donc renvoyée");
                         $cmd = $alexaapieqlogic->getCmd('action', 'speak');
                         $option = array('message' => $reply['reply']);
                         $cmd->execute($option);
@@ -543,7 +498,6 @@ function metAJourBluetooth($serialdevice, $audioPlayerState, $alexaapi2, $alexaa
 
 }
 	*/
-	
 ?>
 
 

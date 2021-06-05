@@ -55,7 +55,6 @@ class AlexaRemote extends EventEmitter {
     }
 
     setCookie(_cookie) {
-		
         if (!_cookie) return;
         if (typeof _cookie === 'string') {
             this.cookie = _cookie;
@@ -116,7 +115,7 @@ class AlexaRemote extends EventEmitter {
             delete this._options.refreshCookieInterval;
         }
         if (this._options.cookieRefreshInterval !== 0) {
-            this._options.cookieRefreshInterval = this._options.cookieRefreshInterval || 4 * 24 * 60 * 60 * 1000; // Auto Refresh after 4 days
+            this._options.cookieRefreshInterval = this._options.cookieRefreshInterval || 7*24*60*60*1000; // Auto Refresh after 7 days
         }
 
         const self = this;
@@ -143,11 +142,9 @@ class AlexaRemote extends EventEmitter {
 					
                 self._options.logger && self._options.logger('{Remote} ║ ╠═════> Dernier cookie généré le '+datesigalou,'DEBUG');
                     const tokensValidSince = Date.now() - self._options.formerRegistrationData.tokenDate;
-                    //if (tokensValidSince < 5 * 24 * 60 * 60  * 1000) {
-                    if (tokensValidSince < 24 * 60 * 60  * 1000) { // Pour revenir à ce que fait Appollon77
-               //     if (tokensValidSince < 1 *60 * 1000 ) { // Pour revenir à ce que fait Appollon77
-					self._options.logger && self._options.logger('{Remote} ║ ╠═════> donc encore valable, on ne le regénère pas','DEBUG');
-                    self._options.logger && self._options.logger('{Remote} ║ ╚═════> '+JSON.stringify(self._options.formerRegistrationData),'DEBUG');
+                    if (tokensValidSince < 5 * 24 * 60 * 60  * 1000) {
+                    //if (tokensValidSince <  1000) { // pour tests sigalou
+					self._options.logger && self._options.logger('{Remote} ║ ╚═════> donc encore valable, on ne le regénère pas','DEBUG');
                     //if (tokensValidSince < 24 * 60 * 60 * 1000) {
 						//self._options.logger && self._options.logger('{Remote} ╠══***********************═════> return tokensValidSince='+tokensValidSince,'DEBUG');
                         return callback(null);
@@ -218,7 +215,6 @@ class AlexaRemote extends EventEmitter {
                 });
             });
         });
-
     }
     prepare(callback) {
         this.getAccount((err, result) => {
@@ -786,7 +782,6 @@ class AlexaRemote extends EventEmitter {
     }
 
     httpsGet(noCheck, path, callback, flags = {}) {
-        //this._options.logger && this._options.logger('Alexa-Remote: LANCEMENT httpsGet');
         if (typeof noCheck !== 'boolean') {
             flags = callback;
             callback = path;
@@ -795,13 +790,12 @@ class AlexaRemote extends EventEmitter {
         }
         // bypass check because set or last check done before less then 10 mins
         if (noCheck || (new Date().getTime() - this.lastAuthCheck) < 600000) {
-        //if (noCheck || (new Date().getTime() - this.lastAuthCheck) < 1) {
             //this._options.logger && this._options.logger('Alexa-Remote: No authentication check needed (time elapsed ' + (new Date().getTime() - this.lastAuthCheck) + ')');
             return this.httpsGetCall(path, callback, flags);
         }
         this.checkAuthentication((authenticated, err) => {
             if (authenticated) {
-                //this._options.logger && this._options.logger('Alexa-Remote: Authentication check successfull');
+                this._options.logger && this._options.logger('Alexa-Remote: Authentication check successfull');
                 this.lastAuthCheck = new Date().getTime();
                 return this.httpsGetCall(path, callback, flags);
             }
@@ -916,7 +910,7 @@ this._options.logger && this._options.logger(obj.headers);
 	
 	
 	
-        this._options.logger && this._options.logger('{Remote} ║ Envoi de la requète avec ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? ' and data=' + flags.data : ''),'DEBUG');
+        this._options.logger && this._options.logger('{Remote} ║ Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT') ? ' and data=' + flags.data : ''),'DEBUG');
 //	}	
 	    //this._options.logger && this._options.logger('{Remote} ║ >>>>> ' + JSON.stringify(options)+"<<<<" );
 	    //this._options.logger && this._options.logger('{Remote} ║ >>>>> ' + options+"<<<<" );
@@ -966,7 +960,7 @@ this._options.logger && this._options.logger(obj.headers);
                 {
                     if (!body)
                     {
-						this._options.logger && this._options.logger('{Remote} ║ Response(3): '+resstatusMessage, "INFO");
+						this._options.logger && this._options.logger(' {Remote} ║ Response(3): '+resstatusMessage, "INFO");
                         
 						if (resstatusCode=="200") // C'est OK
                         return callback && callback(null, null);
@@ -1024,10 +1018,7 @@ this._options.logger && this._options.logger(obj.headers);
 
         const handleResponse = (err, res, body) => {
             if (err || !body) { // Method 'DELETE' may return HTTP STATUS 200 without body
-               // this._options.logger && this._options.logger('{Remote} ║ Response: No body','DEBUG'); Pour éviter les remarques sur No Body
-                this._options.logger && this._options.logger('{Remote} ║ Réponse: statusCode:'+res.statusCode,'DEBUG');
-                this._options.logger && this._options.logger('{Remote} ║ Réponse: headers:'+JSON.stringify(res.headers),'DEBUG');
-                this._options.logger && this._options.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','INFO');
+                this._options.logger && this._options.logger('{Remote} ║ Response: No body','DEBUG');
                 return typeof res.statusCode === 'number' && res.statusCode >= 200 && res.statusCode < 300 ? callback(null, {'success': true}) : callback(new Error('no body'), null);
             }
 
@@ -1048,9 +1039,7 @@ this._options.logger && this._options.logger(obj.headers);
                 return;
             }
 
-                this._options.logger && this._options.logger('{Remote} ║ Réponse: ' + JSON.stringify(ret),'DEBUG');
-               // this._options.logger && this._options.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','DEBUG');
-
+            this._options.logger && this._options.logger('{Remote} ║ Response: ' + JSON.stringify(ret),'DEBUG');
             callback(null, ret);
             callback = null;
         };

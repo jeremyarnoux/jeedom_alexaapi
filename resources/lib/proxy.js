@@ -5,16 +5,23 @@
 /* jslint esversion: 6 */
 "use strict";
 
+/**
+ * partly based on Amazon Alexa Remote Control (PLAIN shell)
+ * http://blog.loetzimmer.de/2017/10/amazon-alexa-hort-auf-die-shell-echo.html AND on
+ * https://github.com/thorsten-gehrig/alexa-remote-control
+ * and much enhanced ...
+ * Version la plus récente sur : https://github.com/Apollon77/alexa-cookie/tree/master/lib
+ */
+
 const modifyResponse = require('http-proxy-response-rewrite');
 const express = require('express');
-const proxy = require('http-proxy-middleware').createProxyMiddleware;
+const proxy = require('http-proxy-middleware');
 const querystring = require('querystring');
 const cookieTools = require('cookie');
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 
-const FORMERDATA_STORE_VERSION = 4;
+const FORMERDATA_STORE_VERSION = 2;
 
 function addCookies(Cookie, headers) {
     if (!headers || !headers['set-cookie']) return Cookie;
@@ -57,11 +64,9 @@ function customStringify(v, func, intent) {
 function initAmazonProxy(_options, callbackCookie, callbackListening) {
     const initialCookies = {};
 
-    const formerDataStorePath = _options.formerDataStorePath || path.join(__dirname, 'formerDataStore.json');
-    let formerDataStoreValid = false;
     if (!_options.formerRegistrationData) {
         try {
-            if (fs.existsSync(formerDataStorePath)) {
+            if (fs.existsSync(path.join(__dirname, 'formerDataStore.json'))) {
                 const formerDataStore = JSON.parse(fs.readFileSync(path.join(__dirname, 'formerDataStore.json'), 'utf8'));
                 if (typeof formerDataStore === 'object' && formerDataStore.storeVersion === FORMERDATA_STORE_VERSION) {
                     _options.formerRegistrationData = _options.formerRegistrationData || {};
@@ -69,7 +74,6 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
                     _options.formerRegistrationData['map-md'] = _options.formerRegistrationData['map-md'] || formerDataStore['map-md'];
                     _options.formerRegistrationData.deviceId = _options.formerRegistrationData.deviceId || formerDataStore.deviceId;
                     _options.logger && _options.logger('Proxy Init: loaded temp data store ass fallback former data');
-                    formerDataStoreValid = true;
                 }
             }
         } catch (_err) {
@@ -99,11 +103,11 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
     }
 
     let deviceId = '';
-    if (!_options.formerRegistrationData || !_options.formerRegistrationData.deviceId || !formerDataStoreValid) {
-        const buf = Buffer.alloc(16); // 16 random bytes
-        const bufHex = crypto.randomFillSync(buf).toString('hex').toUpperCase(); // convert into hex = 32x 0-9A-F
-        deviceId = Buffer.from(bufHex).toString('hex'); // convert into hex = 64 chars that are hex of hex id
-        deviceId += '23413249564c5635564d32573831';
+    if (!_options.formerRegistrationData || !_options.formerRegistrationData.deviceId) {
+        for (let i = 0; i < 3; i++) {
+            deviceId += Math.floor(Math.random() * 9).toString();
+        }
+        deviceId += '34c4643374c3541464b';
     }
     else {
         _options.logger && _options.logger('Proxy Init: reuse deviceId from former data');
@@ -117,7 +121,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             'map-md': initialCookies['map-md'],
             'frc': initialCookies.frc
         };
-        fs.writeFileSync(formerDataStorePath, JSON.stringify(formerDataStore), 'utf8');
+        fs.writeFileSync(path.join(__dirname, 'formerDataStore.json'), JSON.stringify(formerDataStore), 'utf8');
     }
     catch (_err) {
         // ignore
@@ -359,8 +363,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
 
     app.use(myProxy);
     app.get('/cookie-success', function(req, res) {
-        //res.send('<b>Amazon Alexa Cookie successfully retrieved. You can close the browser.</b>');
-		res.send('<center><img src="http://jeedom.sigalou-domotique.fr/wp-content/uploads/2020/07/poucegauche.png" width="400" height="490"><br><br><b>Bravo !!! Le Cookie Amazon Alexa a été généré.</b><br>Vous pouvez fermer cette fenêtre.</b><br><br><img src="http://jeedom.sigalou-domotique.fr/wp-content/uploads/2020/07/sigaloupetit.png" width="50" height="76">');
+        res.send('<center><img src="http://jeedom.sigalou-domotique.fr/wp-content/uploads/2020/07/poucegauche.png" width="400" height="490"><br><br><b>Bravo !!! Le Cookie Amazon Alexa a été généré.</b><br>Vous pouvez fermer cette fenêtre.</b><br><br><img src="http://jeedom.sigalou-domotique.fr/wp-content/uploads/2020/07/sigaloupetit.png" width="50" height="76">');
     });
     let server = app.listen(_options.proxyPort, _options.proxyListenBind, function() {
         _options.logger && _options.logger('Alexa-Cookie: Proxy-Server listening on port ' + server.address().port);

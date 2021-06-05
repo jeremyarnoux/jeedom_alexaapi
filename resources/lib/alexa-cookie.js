@@ -147,9 +147,9 @@ function AlexaCookie() {
         _options.amazonPage = _options.amazonPage || defaultAmazonPage;
         if (_options.formerRegistrationData && _options.formerRegistrationData.amazonPage) _options.amazonPage = _options.formerRegistrationData.amazonPage;
 
-		_options.logger('{Cookie} ║ ┌────────────────────────────────────────────────────────────────────────────────────────────────────','INFO');
-		_options.logger('{Cookie} ║ │        Récupération du Cookie Amazon   ' ,'INFO');
- 		_options.logger('{Cookie} ║ ├────────────────────────────────────────────────────────────────────────────────────────────────────','INFO');
+		_options.logger(' {Cookie} ║ ┌────────────────────────────────────────────────────────────────────────────────────────────────────','INFO');
+		_options.logger(' {Cookie} ║ │        Récupération du Cookie Amazon   ' ,'INFO');
+ 		_options.logger(' {Cookie} ║ ├────────────────────────────────────────────────────────────────────────────────────────────────────','INFO');
        _options.logger('{Cookie} ║ │ Use as Login-Amazon-URL: ' + _options.amazonPage,'DEBUG');
 
         _options.baseAmazonPage = _options.baseAmazonPage || 'amazon.com';
@@ -587,7 +587,7 @@ function AlexaCookie() {
                         loginData.csrf = resData.csrf;
                         delete loginData.accessToken;
                         _options.logger('{Cookie} ║ │ Final Registraton Result: ' + JSON.stringify(loginData),'DEBUG');
-						_options.logger('{Cookie} ║ └────────────────────────────────────────────────────────────────────────────────────────────────────','INFO');
+						_options.logger(' {Cookie} ║ └────────────────────────────────────────────────────────────────────────────────────────────────────','INFO');
 
                         callback && callback(null, loginData);
                     });

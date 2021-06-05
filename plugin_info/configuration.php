@@ -132,29 +132,27 @@ $versionJeedom = $return['configuration']['version'];
     </fieldset>
 </form>
 
-<?php if (config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0") :?>
-				<form class="form-horizontal">
-					<fieldset>
-						<legend><i class="fas fa-server"></i> {{Option Lien serveur}}</legend>
 
-						<div class="form-group">
-							<label class="col-sm-4 control-label">{{Relance de l'identification au serveur}}</label>
-							<div class="col-lg-2">
-								<div class="input-group">
-									<input type="text" class="configKey form-control" data-l1key="autorefresh"
-										   placeholder="33 3 * * *"/>
-									<span class="input-group-btn">
-										<a class="btn btn-success btn-sm " id="bt_cronGenerator"><i class="fas fa-question-circle"></i></a>
-									</span>
-								</div>
-							</div>
-						</div>
-						</div>
-					</fieldset>
-				</form>
-				<?php
-    endif; 
-				
+<form class="form-horizontal">
+    <fieldset>
+        <legend><i class="fas fa-server"></i> {{Option Lien serveur}}</legend>
+
+        <div class="form-group">
+            <label class="col-sm-4 control-label">{{Relance de l'identification au serveur}}</label>
+            <div class="col-lg-2">
+                <div class="input-group">
+                    <input type="text" class="configKey form-control" data-l1key="autorefresh"
+                           placeholder="33 3 * * *"/>
+                    <span class="input-group-btn">
+						<a class="btn btn-success btn-sm " id="bt_cronGenerator"><i class="fas fa-question-circle"></i></a>
+					</span>
+                </div>
+            </div>
+        </div>
+        </div>
+    </fieldset>
+</form>
+<?php
 $foundSelect = false;
 if (config::byKey("listRoutines", "alexaapi", "") != '') {
     $listRoutines = '';
@@ -200,31 +198,6 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
     </fieldset>
 </form>
 
-<form class="form-horizontal">
-    <fieldset>
-        <legend><i class="fas fa-bed"></i> {{Protection du sommeil}}</legend>
-        <div class="form-group">
-            <label class="col-lg-4 control-label">{{Activer le silence la nuit}}</label>
-            <div class="col-lg-3">
-                <input type="checkbox" class="configKey" data-l1key="dodo"/>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="col-sm-4 control-label">{{Heure de début (22 par défaut)}}</label>
-            <div class="col-lg-1">
-                <input class="configKey form-control" data-l1key="dododebut" placeholder="{{22}}"/>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label class="col-lg-4 control-label">{{Heure de fin (07 par défaut)}}</label>
-            <div class="col-lg-1">
-                <input class="configKey form-control" data-l1key="dodofin" placeholder="{{07}}"/>
-            </div>
-        </div>
-    </fieldset>
-</form>
 
 <script>
     $("#bt_saveUpdateRoutines").on('click', function (event) {

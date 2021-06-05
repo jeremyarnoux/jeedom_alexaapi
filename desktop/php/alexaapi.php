@@ -131,7 +131,7 @@ foreach ($eqLogics as $eqLogic) {
                             //	if (($eqLogic->getConfiguration('devicetype') != "Smarthome") && ($eqLogic->getConfiguration('devicetype') != "Player") && ($eqLogic->getConfiguration('devicetype') != "PlayList")) {
 
                             $opacity = ($eqLogic->getIsEnable()) ? '' : ' disableCard';
-                            echo '<div style="position: relative;" class="eqLogicDisplayCard cursor prem ' . $opacity . '" data-eqLogic_id="' . $eqLogic->getId() . '" >';
+                            echo '<div class="eqLogicDisplayCard cursor prem ' . $opacity . '" data-eqLogic_id="' . $eqLogic->getId() . '" >';
 
                             $datetimecreation = new DateTime($eqLogic->getConfiguration('createtime'));
                             $datetimeaujourdhui = new DateTime(date('Y-m-d'));
@@ -184,14 +184,14 @@ foreach ($eqLogics as $eqLogic) {
                           if ($pluginAlexaUnparUn=='alexadeezer') $nomPlugin='Deezer';
                           if ($pluginAlexaUnparUn=='alexaspotify') $nomPlugin='Spotify';*/
                             //eqLogicDisplayCard cursor prem
-                            echo '<div class="cursor eqLogicAction logoSecondary" style="position: relative;';
+                            echo '<div class="cursor eqLogicAction logoSecondary"';
 
                             if ($pluginAlexaUnparUn['actif'] != true) {
-                                echo ' filter: grayscale(70%); opacity: 0.35;';
+                                echo ' style="filter: grayscale(100%); opacity: 0.35;"';
                             } else
                                 if (($pluginAlexaUnparUn['pluginId'] != 'alexafiretv') && ($pluginAlexaUnparUn['pluginId'] != 'alexasmarthome')) $compteNombrePlayeurs++;
 
-                            echo '">';
+                            echo '>';
                             if ($pluginAlexaUnparUn['nb'] != "0") echo '<span class="badge">' . $pluginAlexaUnparUn['nb'] . '</span>';
                             echo '<a href="';
 
@@ -222,7 +222,7 @@ foreach ($eqLogics as $eqLogic) {
             }
 
 
-            if (config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0") :
+            if (((config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0")) && (log::getLogLevel('alexaapi') < 200)) :
                 ?>
                 <!-- Début de la liste des objets -->
                 <legend><i class="fas fa-table"></i> {{Outils Utilisateurs expérimentés}}</legend>
