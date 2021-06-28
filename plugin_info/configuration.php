@@ -28,7 +28,7 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 
 // Ajouté pour le serveur Cookies 11/07/2020
 $plugin = plugin::byId('alexaapi');
-$deamon_info = $plugin->deamon_info();
+$deamon_info = $plugin->deamon_info()
 
 
 //log::add('alexaapi', 'debug', 'Test de config::byKey dans config: ' . config::byKey('amazonserver','alexaapi'));
