@@ -35,7 +35,7 @@ try {
             $cmd = 'kill $(ps aux | grep "/initCookie.js" | awk \'{print $2}\')';
             log::add('alexaapi', 'debug', '---- Kill initCookie.js: ' . $cmd);
             $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
-            $cmd = 'nice -n 19 nodejs ' . $sensor_path . '/initCookie.js ' . config::byKey('internalAddr');
+            $cmd = 'nice -n 19 node ' . $sensor_path . '/initCookie.js ' . config::byKey('internalAddr');
             log::add('alexaapi', 'debug', '---- Lancement démon Alexa-API-Cookie sur port 3457 : ' . $cmd);
             $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
             if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
