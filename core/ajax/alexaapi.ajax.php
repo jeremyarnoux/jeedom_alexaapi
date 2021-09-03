@@ -111,8 +111,7 @@ try {
             alexaapi::deamon_info();
             ajax::success();
             break;
-        case 'reinstall
-	':
+        case 'reinstallNodeJS':
             $ret = alexaapi::reinstallNodeJS();
             ajax::success($ret);
             break;
