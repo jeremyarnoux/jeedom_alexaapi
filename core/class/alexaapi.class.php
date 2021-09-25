@@ -1629,7 +1629,7 @@ class alexaapiCmd extends cmd
                 $request = $this->build_ControledeSliderSelectMessage($_options, "");
                 break;
             case 'playmusictrack':
-                $request = $this->build_ControledeSliderSelectMessage($_options, "53bfa26d-f24c-4b13-97a8-8c3debdf06f0");
+                $request = $this->build_ControledeSliderSelectMessage($_options, "Imagine");
                 break;
             case 'speak':
             case 'textCommand':
@@ -1644,7 +1644,7 @@ class alexaapiCmd extends cmd
                 $request = $this->build_ControleWhenTextRecurring($now, "Ceci est un essai", $_options);
                 break;
             case 'radio':
-                $request = $this->build_ControledeSliderSelectMessage($_options, 's2960');
+                $request = $this->build_ControledeSliderSelectMessage($_options, 'France Info');
                 break;
             case 'SmarthomeCommand':
             case 'DisplayPower':
