@@ -30,6 +30,9 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 $plugin = plugin::byId('alexaapi');
 $deamon_info = $plugin->deamon_info();
 
+$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
+
+
 
 //log::add('alexaapi', 'debug', 'Test de config::byKey dans config: ' . config::byKey('amazonserver','alexaapi'));
 
@@ -61,8 +64,8 @@ $versionJeedom = $return['configuration']['version'];
     <a class="btn btn-default btn-sm bt_identificationCookie1"><i class="fas fa-spinner fa-spin"></i> {{Cliquez ici
         quand vous avez terminé l'identification}} </a>
     <br><br>
-</center>
-<b>Nota</b><small> : Cette fonctionnalité ne sera utilisée qu'à l'installation du plugin, le plugin prend ensuite en charge la régénèration du cookie.<br>La génération manuelle doit se faire depuis un ordinateur se trouvant sur le même réseau local que votre jeedom. (Pas d'accès à distance)</small> <br>
+</center><center>
+<b>Nota</b><small> : Cette fonctionnalité ne sera utilisée qu'à l'installation du plugin, le plugin prend ensuite en charge la régénèration du cookie.<br>La génération manuelle doit se faire depuis un ordinateur se trouvant sur le même réseau local que votre jeedom. (Pas d'accès à distance)</small></center> <br>
 <?php //echo '<p align="right"><span class="label label-info">{{Debug Proxy 3457 : }}'. $deamon_info['stateCookies'] .'</span></p>';
 ?> <br/>
 <legend><i class="fas fa-wrench"></i> {{Réparations}}</legend>
@@ -154,7 +157,9 @@ $versionJeedom = $return['configuration']['version'];
 				</form>
 				<?php
     endif; 
-				
+
+
+			
 $foundSelect = false;
 if (config::byKey("listRoutines", "alexaapi", "") != '') {
     $listRoutines = '';
@@ -199,6 +204,32 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
         </div>
     </fieldset>
 </form>
+
+<form class="form-horizontal">
+    <fieldset>        
+	<legend><i class="fas fa-bed"></i> {{Appareil par défaut}}</legend>
+	
+		<div class="form-group">
+            <label class="col-lg-4 control-label">{{Choisir l'appareil par défaut}}</label>
+            <div class="col-lg-3">
+                <select id="sel_object" class="configKey form-control" data-l1key="defaultDevice">
+                    <option value="">{{Aucun}}</option>
+                    <?php
+                    foreach ($eqLogics as $object) {
+                        echo '<option value="' . $object->getConfiguration('serial') . '">' . $object->getName() . '</option>';
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+		
+		
+ <center><small>L'appareil défini ici est celui qui annoncera les soucis ou qui sera utilisé par défaut. Choisir celui qui est dans la pièce de vie. Eviter les Fire TV, groupes ...</small></center> <br>   
+
+
+    </fieldset>
+</form>
+
 
 <form class="form-horizontal">
     <fieldset>
