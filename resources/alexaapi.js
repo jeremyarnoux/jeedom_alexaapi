@@ -222,26 +222,27 @@ CommandAlexa.Speak = function(req,res){
     var NBmots;
   	var TABdecoupePoint;
   	var TABdecoupeVirgule;
+	const LimiteAlexa = 250;
   
-if (TXTchaine.length < 250)	{				
+if (TXTchaine.length < LimiteAlexa)	{				
     Commands.push({command: SpeakouAnnouncement, value: req.query.text});
 }
 else {										
         TABdecoupePoint = req.query.text.split(". "); // on met chaque phrase separer d'un point dans dans des element d'un tableau
         for(var i = 0; i < TABdecoupePoint.length; i++) { //on decoupe le texte au niveau des point
             Decoupe = TABdecoupePoint[i];
-            if (Decoupe.length < 250) {                //si c'est assez petit on dit les morceaux
+            if (Decoupe.length < LimiteAlexa) {                //si c'est assez petit on dit les morceaux
                 Commands.push({command: SpeakouAnnouncement, value: Decoupe});
             }
             else {
                 TABdecoupeVirgule = Decoupe.split(", ");     // sinon si c'est encore trop long on decoupe au virgules
                 for(var ii = 0; ii < TABdecoupeVirgule.length; ii++) { 
                     Decoupe = TABdecoupeVirgule[ii];
-                    if (Decoupe.length < 250) {              // si c'est assez court on dit les morceaux
+                    if (Decoupe.length < LimiteAlexa) {              // si c'est assez court on dit les morceaux
                         Commands.push({command: SpeakouAnnouncement, value: Decoupe});
                     }
                     else{																// sinon decoupage au nombre de mot
-                        Nbparties = parseInt(Decoupe.length / 250) +1;  // on determine en combien de morceaux on prend 1 morceau de marge car le nombre de caractere differe d'un mot a l'autre
+                        Nbparties = parseInt(Decoupe.length / LimiteAlexa) +1;  // on determine en combien de morceaux on prend 1 morceau de marge car le nombre de caractere differe d'un mot a l'autre
                         TABdecoupe = Decoupe.split(" "); // on met chaque mot dans dans des element d'un tableau
 						NBmots = TABdecoupe.length; //on determine le nombre de mots dans la phrase
                                                                                 
