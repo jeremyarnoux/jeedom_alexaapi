@@ -216,13 +216,12 @@ CommandAlexa.Speak = function(req,res){
 	if (test) 									Commands.push({command: 'volume', value: req.query.volume});
   
     var TXTchaine = req.query.text; 
-	var Nbparties;
   	var Decoupe;
   	var TABdecoupe;
     var NBmots;
   	var TABdecoupePoint;
   	var TABdecoupeVirgule;
-	const LimiteAlexa = 250;
+  	const LimiteAlexa = 250;
   
 if (TXTchaine.length < LimiteAlexa)	{				
     Commands.push({command: SpeakouAnnouncement, value: req.query.text});
@@ -242,28 +241,25 @@ else {
                         Commands.push({command: SpeakouAnnouncement, value: Decoupe});
                     }
                     else{																// sinon decoupage au nombre de mot
-                        Nbparties = parseInt(Decoupe.length / LimiteAlexa) +2;  // on determine en combien de morceaux on prend 1 morceau de marge car le nombre de caractere differe d'un mot a l'autre
                         TABdecoupe = Decoupe.split(" "); // on met chaque mot dans dans des element d'un tableau
 						NBmots = TABdecoupe.length; //on determine le nombre de mots dans la phrase
                                                                                 
-                        var TXTdebut = 0;   //debut 1er mot de la 1ere phrase
-                        var TXTsuiteInit = parseInt(NBmots / Nbparties)-1; //ont determine le dernier mot de la 1ere phrase
-                        var TXTsuite = TXTsuiteInit; //on sauvegarde le nombre de mot par morceau
+
                         var TXTfin = NBmots-1; // on determine le numero du dernier mot de la derniere phrase
                         var Phrase = '';
-      
-                        for(var x = Nbparties; x > -1; x--) {                   // autant de boucle que de morceau
-                            for(var xx = TXTdebut; xx <= TXTsuite; xx ++){         //autant de boucle que de mot par morceau
-                                 Phrase = Phrase + " " + TABdecoupe[xx];	//on construit le premier morceau mot par mot
+                      	
+                            for(var xx = 0; xx <= TXTfin; xx ++){         //autant de boucle que de mot
+                                 
+                              if ( (Phrase.length + TABdecoupe[xx].length) < LimiteAlexa )
+                              Phrase = Phrase + " " + TABdecoupe[xx];	//on construit le premier morceau mot par mot jusqu'a la limite
+                              else{
+                              	Commands.push({command: SpeakouAnnouncement, value: Phrase})
+                                Phrase = TABdecoupe[xx];
+                              }
                             }
-                            TXTdebut = TXTsuite + 1;				//le mot suivant le dernier mot du morceau precedent devient le 1er mot du morceau suivant
-                            if (x > 1) TXTsuite = TXTsuite + TXTsuiteInit;          //on dermine le dernier mot de la boucle suivant (nombr ed emot deja prononcé + le nombre de mot par morceau) sauf si dernier morceau
-                            else TXTsuite = TXTfin;                                     // dernier morceau le dernier mot est le dernier mot de la phrase initial                 
-                            
-         
-                          	Commands.push({command: SpeakouAnnouncement, value: Phrase}); // je prononce la phase de mon morceau
-                        	Phrase = "";
-                       } 
+     
+                          	Commands.push({command: SpeakouAnnouncement, value: Phrase}); // je prononce le dernier morceau
+                       
                     }
                 }
             }
