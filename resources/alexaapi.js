@@ -242,7 +242,7 @@ else {
                         Commands.push({command: SpeakouAnnouncement, value: Decoupe});
                     }
                     else{																// sinon decoupage au nombre de mot
-                        Nbparties = parseInt(Decoupe.length / LimiteAlexa) +1;  // on determine en combien de morceaux on prend 1 morceau de marge car le nombre de caractere differe d'un mot a l'autre
+                        Nbparties = parseInt(Decoupe.length / LimiteAlexa) +2;  // on determine en combien de morceaux on prend 1 morceau de marge car le nombre de caractere differe d'un mot a l'autre
                         TABdecoupe = Decoupe.split(" "); // on met chaque mot dans dans des element d'un tableau
 						NBmots = TABdecoupe.length; //on determine le nombre de mots dans la phrase
                                                                                 
