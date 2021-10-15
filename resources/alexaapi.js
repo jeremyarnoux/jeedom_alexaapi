@@ -250,7 +250,7 @@ else {
               	if ( (Phrase2.length + TABdecoupe[i].length) < LimiteAlexa ){  //si le precedent morceau + le nouveau ca ne depaase pas la limite
                 	if (i < TABdecoupe.length /*-1*/ ){
                       
-                      if (TABdecoupe[i+1].length < LimiteAlexa){
+                      if ((i < TABdecoupe.length -1) && (TABdecoupe[i+1].length < LimiteAlexa)){
                       	Phrase2 = Phrase2 + TABdecoupe[i] + ",";	//on construit les bloc separé par des virgules
                       }else{ 
                       	Phrase2 = Phrase2 + TABdecoupe[i] + ".";
