@@ -219,7 +219,7 @@ CommandAlexa.Speak = function(req,res){
   	var TABdecoupeMot;
   	var TABdecoupe;
     var NBmots;
-  	const LimiteAlexa = 25;
+  	const LimiteAlexa = 250;
   	var Phrase2 = '';
   	var Phrase = '';
   
