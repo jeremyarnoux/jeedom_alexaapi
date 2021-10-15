@@ -227,7 +227,7 @@ if (TXTchaine.length <= LimiteAlexa)	{
     Commands.push({command: SpeakouAnnouncement, value: req.query.text});
 }
 else {	
-		TABdecoupe = req.query.text.split(/[;,.—]+/); // on met chaque phrase separer d'une ponctuation dans des elements d'un tableau  
+		TABdecoupe = req.query.text.split(/[;:!,.—]+/); // on met chaque phrase separer d'une ponctuation dans des elements d'un tableau  
 		for(var i = 0; i < TABdecoupe.length ; i++) {  //on parcourt chaque morceau
   			if (TABdecoupe[i].length > LimiteAlexa) {  //si l'element est trop grand au decoupe au niveau des mots
               	Phrase2 ='';
