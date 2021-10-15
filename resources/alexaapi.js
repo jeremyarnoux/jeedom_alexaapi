@@ -215,11 +215,11 @@ CommandAlexa.Speak = function(req,res){
   	
 	if (test) 									Commands.push({command: 'volume', value: req.query.volume});
   
-    	var TXTchaine = req.query.text; 
+    var TXTchaine = req.query.text; 
   	var TABdecoupeMot;
   	var TABdecoupe;
-    	var NBmots;
-  	const LimiteAlexa = 250;
+    var NBmots;
+  	const LimiteAlexa = 25;
   	var Phrase2 = '';
   	var Phrase = '';
   
@@ -227,7 +227,7 @@ if (TXTchaine.length <= LimiteAlexa)	{
     Commands.push({command: SpeakouAnnouncement, value: req.query.text});
 }
 else {	
-		TABdecoupe = req.query.text.split(/[;:!,.—]+/); // on met chaque phrase separer d'une ponctuation dans des elements d'un tableau  
+		TABdecoupe = req.query.text.split(/[;,.—]+/); // on met chaque phrase separer d'une ponctuation dans des elements d'un tableau  
 		for(var i = 0; i < TABdecoupe.length ; i++) {  //on parcourt chaque morceau
   			if (TABdecoupe[i].length > LimiteAlexa) {  //si l'element est trop grand au decoupe au niveau des mots
               	Phrase2 ='';
@@ -245,33 +245,34 @@ else {
                 
             }else{  //si c'est pas trop grand alors on regarde le morceau
               	if ( Phrase != '' && ((Phrase.length + TABdecoupe[i].length )  < LimiteAlexa) ){   //traiement s'il reste un mocreau decoupé mot a mot
-                  Phrase2 = Phrase + ',' + TABdecoupe[i] ;   
+                  Phrase2 = Phrase + "," + TABdecoupe[i] ;   
                 }
               	if ( (Phrase2.length + TABdecoupe[i].length) < LimiteAlexa ){  //si le precedent morceau + le nouveau ca ne depaase pas la limite
-                	if (i < TABdecoupe.length - 1 ){
-                      Phrase2 = Phrase2 + TABdecoupe[i] + ",";	//on construit les bloc separé par des virgules
+                	if (i < TABdecoupe.length /*-1*/ ){
+                      
+                      if (TABdecoupe[i+1].length < LimiteAlexa){
+                      	Phrase2 = Phrase2 + TABdecoupe[i] + ",";	//on construit les bloc separé par des virgules
+                      }else{ 
+                      	Phrase2 = Phrase2 + TABdecoupe[i] + ".";
+                      if ((Phrase2 != '') && (i < TABdecoupe.length -1 )) Commands.push({command: SpeakouAnnouncement, value: Phrase2});
+                    }
                     }else{ 
-                      Phrase2 = Phrase2 + TABdecoupe[i] ; //on construit les bloc separé par des point
+                      	Phrase2 = Phrase2 + TABdecoupe[i]; //on construit les bloc separé par des point
+                      if ((Phrase2 != '') && (i == TABdecoupe.length -1 )) Commands.push({command: SpeakouAnnouncement, value: Phrase2});
                     }
                 }else{   //sinon si c'est trop grand je prononce la phrase d'avant et je garde le morceau actuel pour le prochain passage
-                      if ((Phrase2 != '') && (i != 0) && ( i != TABdecoupe.length - 1 )) Commands.push({command: SpeakouAnnouncement, value: Phrase2}); //cas particlier
+                      if ((Phrase2 != '') && (Phrase == '') && ( i < TABdecoupe.length )) Commands.push({command: SpeakouAnnouncement, value: Phrase2}); //ne plus toucher - 
                       
                       if (Phrase == '') {
-                        Phrase2 = TABdecoupe[i];
+                        Phrase2 = TABdecoupe[i] + ",";
                       }
                 }
-                
             }
-         if ((Phrase2 != '') && (i == 0 )){
-           Commands.push({command: SpeakouAnnouncement, value: Phrase2}); //cas particlier
-           Phrase2 = TABdecoupe[i+1];
-         }
-         if ((Phrase2 != '') && (i == (TABdecoupe.length - 1 ) )) Commands.push({command: SpeakouAnnouncement, value: Phrase2});//cas particlier
+         if ((Phrase2 != '')  && (i == (TABdecoupe.length - 1 ) )) Commands.push({command: SpeakouAnnouncement, value: Phrase2});//dernier morceau
         }
   		 
   		
 } 
-  
 	if (('lastvolume' in req.query === true) && test) 	Commands.push({command: 'volume', value: req.query.lastvolume});
 	
 	boucleSurSerials_sendMultiSequenceCommand(req, Commands);
