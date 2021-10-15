@@ -215,57 +215,62 @@ CommandAlexa.Speak = function(req,res){
   	
 	if (test) 									Commands.push({command: 'volume', value: req.query.volume});
   
-    var TXTchaine = req.query.text; 
-  	var Decoupe;
+    	var TXTchaine = req.query.text; 
+  	var TABdecoupeMot;
   	var TABdecoupe;
-    var NBmots;
-  	var TABdecoupePoint;
-  	var TABdecoupeVirgule;
+    	var NBmots;
   	const LimiteAlexa = 250;
+  	var Phrase2 = '';
+  	var Phrase = '';
   
-if (TXTchaine.length < LimiteAlexa)	{				
+if (TXTchaine.length <= LimiteAlexa)	{				
     Commands.push({command: SpeakouAnnouncement, value: req.query.text});
 }
-else {										
-        TABdecoupePoint = req.query.text.split(". "); // on met chaque phrase separer d'un point dans dans des element d'un tableau
-        for(var i = 0; i < TABdecoupePoint.length; i++) { //on decoupe le texte au niveau des point
-            Decoupe = TABdecoupePoint[i];
-            if (Decoupe.length < LimiteAlexa) {                //si c'est assez petit on dit les morceaux
-                Commands.push({command: SpeakouAnnouncement, value: Decoupe});
-            }
-            else {
-                TABdecoupeVirgule = Decoupe.split(", ");     // sinon si c'est encore trop long on decoupe au virgules
-                for(var ii = 0; ii < TABdecoupeVirgule.length; ii++) { 
-                    Decoupe = TABdecoupeVirgule[ii];
-                    if (Decoupe.length < LimiteAlexa) {              // si c'est assez court on dit les morceaux
-                        Commands.push({command: SpeakouAnnouncement, value: Decoupe});
-                    }
-                    else{																// sinon decoupage au nombre de mot
-                        TABdecoupe = Decoupe.split(" "); // on met chaque mot dans dans des element d'un tableau
-						NBmots = TABdecoupe.length; //on determine le nombre de mots dans la phrase
-                                                                                
-
-                        var TXTfin = NBmots-1; // on determine le numero du dernier mot de la derniere phrase
-                        var Phrase = '';
-                      	
-                            for(var xx = 0; xx <= TXTfin; xx ++){         //autant de boucle que de mot
-                                 
-                              if ( (Phrase.length + TABdecoupe[xx].length) < LimiteAlexa )
-                              Phrase = Phrase + " " + TABdecoupe[xx];	//on construit le premier morceau mot par mot jusqu'a la limite
-                              else{
-                              	Commands.push({command: SpeakouAnnouncement, value: Phrase})
-                                Phrase = TABdecoupe[xx];
+else {	
+		TABdecoupe = req.query.text.split(/[;,.—]+/); // on met chaque phrase separer d'une ponctuation dans des elements d'un tableau  
+		for(var i = 0; i < TABdecoupe.length ; i++) {  //on parcourt chaque morceau
+  			if (TABdecoupe[i].length > LimiteAlexa) {  //si l'element est trop grand au decoupe au niveau des mots
+              	Phrase2 ='';
+				TABdecoupeMot = TABdecoupe[i].split(" "); // on met chaque mot du moceau un tableau
+				NBmots = TABdecoupeMot.length; //on determine le nombre de mots dans la phrase
+              	for(var xx = 0; xx < NBmots; xx ++){         //autant de boucle que de mot par morceau  
+                  				if ( (Phrase.length + TABdecoupeMot[xx].length) < LimiteAlexa ){
+                              Phrase = Phrase + " " + TABdecoupeMot[xx];	//on construit le premier morceau mot par mot
+                              }else{
+                              	if (Phrase != '') Commands.push({command: SpeakouAnnouncement, value: Phrase});
+                                Phrase = TABdecoupeMot[xx];
                               }
-                            }
-     
-                          	Commands.push({command: SpeakouAnnouncement, value: Phrase}); // je prononce le dernier morceau
-                       
-                    }
+                 }
+              	if ((Phrase != '') && (i == TABdecoupe.length -1 )) Commands.push({command: SpeakouAnnouncement, value: Phrase});
+                
+            }else{  //si c'est pas trop grand alors on regarde le morceau
+              	if ( Phrase != '' && ((Phrase.length + TABdecoupe[i].length )  < LimiteAlexa) ){   //traiement s'il reste un mocreau decoupé mot a mot
+                  Phrase2 = Phrase + ',' + TABdecoupe[i] ;   
                 }
+              	if ( (Phrase2.length + TABdecoupe[i].length) < LimiteAlexa ){  //si le precedent morceau + le nouveau ca ne depaase pas la limite
+                	if (i < TABdecoupe.length - 1 ){
+                      Phrase2 = Phrase2 + TABdecoupe[i] + ",";	//on construit les bloc separé par des virgules
+                    }else{ 
+                      Phrase2 = Phrase2 + TABdecoupe[i] ; //on construit les bloc separé par des point
+                    }
+                }else{   //sinon si c'est trop grand je prononce la phrase d'avant et je garde le morceau actuel pour le prochain passage
+                      if ((Phrase2 != '') && (i != 0) && ( i != TABdecoupe.length - 1 )) Commands.push({command: SpeakouAnnouncement, value: Phrase2}); //cas particlier
+                      
+                      if (Phrase == '') {
+                        Phrase2 = TABdecoupe[i];
+                      }
+                }
+                
             }
+         if ((Phrase2 != '') && (i == 0 )){
+           Commands.push({command: SpeakouAnnouncement, value: Phrase2}); //cas particlier
+           Phrase2 = TABdecoupe[i+1];
+         }
+         if ((Phrase2 != '') && (i == (TABdecoupe.length - 1 ) )) Commands.push({command: SpeakouAnnouncement, value: Phrase2});//cas particlier
         }
-
-}
+  		 
+  		
+} 
   
 	if (('lastvolume' in req.query === true) && test) 	Commands.push({command: 'volume', value: req.query.lastvolume});
 	
