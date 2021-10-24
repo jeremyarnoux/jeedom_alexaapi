@@ -168,7 +168,8 @@ function enlettres_par3($par3)
   break;
  case 8:
   if ($NEL['huitante'] === false) {
-   if ($par2 == 80) $nom_par2 = 'quatre-vingts';
+   //if ($par2 == 80) $nom_par2 = 'quatre-vingts'; Corrigé car le S posait un souci avec les intéractions Alexa 09/21 - Sigalou
+   if ($par2 == 80) $nom_par2 = 'quatre-vingt';
    else $nom_par2 = 'quatre-vingt-' . $NEL['1-99'][$par2 - 80];
   }
   break;

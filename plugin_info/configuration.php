@@ -207,7 +207,7 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
 
 <form class="form-horizontal">
     <fieldset>        
-	<legend><i class="fas fa-bed"></i> {{Appareil par défaut}}</legend>
+	<legend><i class="fas fa-wrench"></i> {{Appareil par défaut}}</legend>
 	
 		<div class="form-group">
             <label class="col-lg-4 control-label">{{Choisir l'appareil par défaut}}</label>

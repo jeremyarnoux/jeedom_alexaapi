@@ -1252,7 +1252,7 @@ public static function templateWidget(){
             self::updateCmd($F, 'reminder', 'action', 'message', false, 'Envoyer un rappel', true, false, null, null, 'alexaapi::message', 'reminder?text=#message#&when=#when#&recurring=#recurring#', null, null, 79, $cas3);
 
             self::updateCmd($F, 'onLine', 'info', 'binary', false, "En ligne", false, true, null, null, null, null, null, null, 99, true); //ajouté aout 2020
-            self::updateCmd($F, 'speaking', 'info', 'binary', false, "Speaking", false, true, null, null, null, null, null, null, 99, $cas1bis); //ajouté sept 21
+            //self::updateCmd($F, 'speaking', 'info', 'binary', false, "Speaking", false, true, null, null, null, null, null, null, 99, $cas1bis); //ajouté sept 21
 
 
             $volinfo = $this->getCmd(null, 'volumeinfo');
@@ -1614,11 +1614,11 @@ class alexaapiCmd extends cmd
             $arguments = "";
         }
 		// On va tranformer les commandes qui ne passent plus suite aux modifs d'Amazon en commande "Parler à Alexa"
-        log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>command>>>>>>>>>>>>>>>>>>>>>>>'.$command);		
-        log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>json_encode_options>>>>>>>>>>>>>>>>>>>>>>'.json_encode($_options));		
-        log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>json_encodejson_encode_options>>>>>>>>>>>>>>>>>>>>>>'.json_encode(json_encode($_options)));		
-        log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>_options[select]>>>>>>>>>>>>>>>>>>>>>>'.$_options['select']);		
-        log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>_options[message]>>>>>>>>>>>>>>>>>>>>>>'.$_options['message']);		
+       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>command>>>>>>>>>>>>>>>>>>>>>>>'.$command);		
+       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>json_encode_options>>>>>>>>>>>>>>>>>>>>>>'.json_encode($_options));		
+       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>json_encodejson_encode_options>>>>>>>>>>>>>>>>>>>>>>'.json_encode(json_encode($_options)));		
+       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>_options[select]>>>>>>>>>>>>>>>>>>>>>>'.$_options['select']);		
+       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>_options[message]>>>>>>>>>>>>>>>>>>>>>>'.$_options['message']);		
 		
         switch ($command) {
             case 'volume':
