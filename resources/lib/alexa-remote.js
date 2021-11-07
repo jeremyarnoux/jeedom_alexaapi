@@ -144,7 +144,8 @@ class AlexaRemote extends EventEmitter {
 					
                 self._options.logger && self._options.logger('{Remote} ║ ╠═════> Dernier cookie généré le '+datesigalou,'DEBUG');
                     const tokensValidSince = Date.now() - self._options.formerRegistrationData.tokenDate;
-                    if (tokensValidSince < 5 * 24 * 60 * 60  * 1000) {
+                    //if (tokensValidSince < 5 * 24 * 60 * 60  * 1000) { modif 07/11/2021
+					if (tokensValidSince < 24 * 60 * 60 * 1000 && self._options.macDms) {
                     //if (tokensValidSince <  1000) { // pour tests sigalou
 					self._options.logger && self._options.logger('{Remote} ║ ╚═════> donc encore valable, on ne le regénère pas','DEBUG');
                     //if (tokensValidSince < 24 * 60 * 60 * 1000) {
@@ -403,7 +404,7 @@ class AlexaRemote extends EventEmitter {
         //this.alexaWsMqtt = new AlexaWsMqtt(this._options, this.cookie); 07/11/2021
 		this.alexaWsMqtt = new AlexaWsMqtt(this._options, this.cookie, this.macDms);
         if (!this.alexaWsMqtt) return;
-
+        this._options.logger && this._options.logger('Alexa-Remote: Initialize WS-MQTT Push Connection');
         this.activityUpdateQueue = [];
         this.activityUpdateNotFoundCounter = 0;
         this.activityUpdateTimeout = null;
@@ -744,7 +745,7 @@ class AlexaRemote extends EventEmitter {
                 if (lastFoundQueueIndex === -1) {
                     this._options.logger && this._options.logger('Alexa-Remote: No activities from stored ' + this.activityUpdateQueue.length + ' entries found in queue (' + this.activityUpdateNotFoundCounter + ')');
                     this.activityUpdateNotFoundCounter++;
-                    if (this.activityUpdateNotFoundCounter > 2) {
+                    if (this.activityUpdateNotFoundCounter > 5) {
                         this._options.logger && this._options.logger('Alexa-Remote: Reset expected activities');
                         this.activityUpdateQueue = [];
                         this.activityUpdateNotFoundCounter = 0;
@@ -761,7 +762,7 @@ class AlexaRemote extends EventEmitter {
                 this.activityUpdateTimeout = setTimeout(() => {
                     this.activityUpdateTimeout = null;
                     this.getPushedActivities();
-                }, 200);
+                }, 300);
 
             }
 
@@ -910,7 +911,7 @@ if (methodQuery!= null) options.method=methodQuery;
         delete logOptions.headers.Accept;
         delete logOptions.headers.Referer;
         delete logOptions.headers.Origin;
-	
+	    //delete logOptions.headers['x-amzn-alexa-app'];
 /*const obj = JSON.parse(JSON.stringify(options));
 
 
@@ -1072,7 +1073,7 @@ this._options.logger && this._options.logger(obj.headers);
                 'Referer': `https://alexa.${this._options.amazonPage}/spa/index.html`,
                 'Accept': 'application/json',  //ajout 04/06/21
                 'Origin': `https://alexa.${this._options.amazonPage}`,
-                'x-amzn-alexa-app': 'eyJ2ZXJzaW9uIjoiMS4wIiwiYXBwSWQiOiJhbXpuMS5hcHBsaWNhdGlvbi40NTc4NmVlMDliMDI0YTA4YTY5OGQzMGIwYWQzMTAzNyJ9', //07/11/2021
+                //'x-amzn-alexa-app': 'eyJ2ZXJzaW9uIjoiMS4wIiwiYXBwSWQiOiJhbXpuMS5hcHBsaWNhdGlvbi40NTc4NmVlMDliMDI0YTA4YTY5OGQzMGIwYWQzMTAzNyJ9', //07/11/2021 resupprimé 
                 //'Content-Type': 'application/json',
                 //'Connection': 'keep-alive',
                 'csrf' : this.csrf,
@@ -1221,14 +1222,14 @@ this._options.logger && this._options.logger(obj.headers);
 
     getMedia(serialOrName, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         this.httpsGet (`/api/media/state?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
     }
 
     getPlayerInfo(serialOrName, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         this.httpsGet (`/api/np/player?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
     }
@@ -1625,7 +1626,7 @@ return this.parseValue4Notification(notification, value);    }
     // alarm volume
     getDeviceNotificationState(serialOrName, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         this.httpsGet (`/api/device-notification-state/${dev.deviceType}/${dev.softwareVersion}/${dev.serialNumber}&_=%t`, callback);
     }
@@ -1654,7 +1655,7 @@ return this.parseValue4Notification(notification, value);    }
             contentType = 'station';
         }
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         this.httpsGet (`/api/tunein/queue-and-play
            ?deviceSerialNumber=${dev.serialNumber}
@@ -1893,7 +1894,7 @@ return this.parseValue4Notification(notification, value);    }
 
     connectBluetooth(serialOrName, btAddress, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         let flags = {
             data: JSON.stringify({ bluetoothDeviceAddress: btAddress}),
@@ -1904,7 +1905,7 @@ return this.parseValue4Notification(notification, value);    }
 
     disconnectBluetooth(serialOrName, btAddress, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         let flags = {
             //data: JSON.stringify({ bluetoothDeviceAddress: btAddress}),
@@ -1915,7 +1916,7 @@ return this.parseValue4Notification(notification, value);    }
 
     setDoNotDisturb(serialOrName, enabled, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         let flags = {
             data: JSON.stringify({
@@ -1928,7 +1929,8 @@ return this.parseValue4Notification(notification, value);    }
         this.httpsGet (`/api/dnd/status`, callback, flags);
     }
 
-    find(serialOrName, callback) {
+    //find(serialOrName, callback) { 07/11/2021
+    find(serialOrName) {
         if (typeof serialOrName === 'object') return serialOrName;
         if (!serialOrName) return null;
         let dev = this.serialNumbers[serialOrName];
@@ -1941,7 +1943,7 @@ return this.parseValue4Notification(notification, value);    }
 
     setAlarmVolume(serialOrName, volume, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         let flags = {
             data: JSON.stringify ({
@@ -1960,7 +1962,7 @@ return this.parseValue4Notification(notification, value);    }
     }
     sendMessage(serialOrName, command, value, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         const commandObj = { contentFocusClientId: null };
         switch (command) {
@@ -2007,10 +2009,18 @@ return this.parseValue4Notification(notification, value);    }
         }
         let deviceSerialNumber = 'ALEXA_CURRENT_DSN';
         let deviceType= 'ALEXA_CURRENT_DEVICE_TYPE';
+		let deviceOwnerCustomerId = 'ALEXA_CUSTOMER_ID';//07112021
         if (serialOrName && !Array.isArray(serialOrName)) {
             const currDevice = this.find(serialOrName);
-            deviceSerialNumber = currDevice.serialNumber;
-            deviceType = currDevice.deviceType;
+        //    deviceSerialNumber = currDevice.serialNumber;07112021
+        //    deviceType = currDevice.deviceType;
+			
+			 if (currDevice) {//07112021
+                deviceSerialNumber = currDevice.serialNumber;
+                deviceType = currDevice.deviceType;
+                deviceOwnerCustomerId = currDevice.deviceOwnerCustomerId;
+            }
+			
         }
         const seqNode = {
             '@type': 'com.amazon.alexa.behaviors.model.OpaquePayloadOperationNode',
@@ -2018,7 +2028,7 @@ return this.parseValue4Notification(notification, value);    }
                 'deviceType': deviceType,
                 'deviceSerialNumber': deviceSerialNumber,
                 'locale': 'ALEXA_CURRENT_LOCALE',
-                'customerId':'ALEXA_CUSTOMER_ID'
+                'customerId': deviceOwnerCustomerId
             }
         };
         switch (command) {
@@ -2178,7 +2188,7 @@ return this.parseValue4Notification(notification, value);    }
                     }
                 ];
                 seqNode.operationPayload.target = {
-                    "customerId": "ALEXA_CUSTOMER_ID",
+                    "customerId": deviceOwnerCustomerId,
                     "devices": [
                         {
                             "deviceSerialNumber": deviceSerialNumber,
@@ -2237,7 +2247,7 @@ return this.parseValue4Notification(notification, value);    }
 
     sendSequenceCommand(serialOrName, command, value, callback) {
         let dev = this.find(Array.isArray(serialOrName) ? serialOrName[0] : serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         if (typeof value === 'function') {
             callback = value;
@@ -2302,9 +2312,12 @@ return this.parseValue4Notification(notification, value);    }
 
     playMusicProvider(serialOrName, providerId, searchPhrase, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
-        if (searchPhrase === '') return callback && callback(new Error ('Searchphrase empty', null));
-
+     //   if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
+      //  if (searchPhrase === '') return callback && callback(new Error ('Searchphrase empty', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
+        if (searchPhrase === '') return callback && callback(new Error('Searchphrase empty'), null);
+		
+		
         const operationPayload = {
             'deviceType': dev.deviceType,
             'deviceSerialNumber': dev.serialNumber,
@@ -2452,7 +2465,7 @@ return this.parseValue4Notification(notification, value);    }
 
     renameDevice(serialOrName, newName, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         let o = {
             accountName: newName,
@@ -2609,7 +2622,7 @@ return this.parseValue4Notification(notification, value);    }
 
     unpaireBluetooth(serialOrName, btAddress, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         let flags = {
             method: 'POST',
@@ -2623,7 +2636,7 @@ return this.parseValue4Notification(notification, value);    }
 
     deleteDevice(serialOrName, callback) {
         let dev = this.find(serialOrName, callback);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         let flags = {
             method: 'DELETE',
@@ -2638,7 +2651,7 @@ return this.parseValue4Notification(notification, value);    }
 	
     getNotificationSounds(serialOrName, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         this.httpsGet (`/api/notification/sounds?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&softwareVersion=${dev.softwareVersion}&screenWidth=1392&_=%t`, callback);
     }
@@ -2688,7 +2701,7 @@ return this.parseValue4Notification(notification, value);    }
 	// Liste les Playlists
     Playlists(serialOrName, callback) {
 		let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 		this.httpsGet (`/api/cloudplayer/playlists?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&mediaOwnerCustomerId=${dev.deviceOwnerCustomerId}&_=%t`, callback);
    }
    
@@ -2696,7 +2709,7 @@ return this.parseValue4Notification(notification, value);    }
    //http://192.168.0.21:3456/playlist?playlist=a8feaaf9-40a4-4e33-bd4d-b6dd71af85fd&device=G0911W079304113M
     playList(serialOrName, _playlistId, callback) {
 		let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 		
 		//JSON='{"contentToken":"music:'$(echo '["music/tuneIn/stationId","'${STATIONID}'"]|{"previousPageId":"TuneIn_SEARCH"}'| base64 -w 0| base64 -w 0 )'"}'
         let flags = {
@@ -2718,7 +2731,7 @@ return this.parseValue4Notification(notification, value);    }
    //http://192.168.0.21:3456/playmusictrack?trackId=53bfa26d-f24c-4b13-97a8-8c3debdf06f0&device=G0911W079304113M
     playMusicTrack(serialOrName, _trackId, callback) {
 		let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 		
         let flags = {
             data: JSON.stringify({
@@ -2768,7 +2781,7 @@ return this.parseValue4Notification(notification, value);    }
 	
     setList(serialOrName, listType, value, callback) {
         let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         let o = {
             type: listType,
