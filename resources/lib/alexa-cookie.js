@@ -365,7 +365,7 @@ function AlexaCookie() {
                             }
                             if (_options.setupProxy) {
                                 if (proxyServer) {
-                                    errMessage += ` You can try to get the cookie manually by opening http://${_options.proxyOwnIp}:${_options.proxyPort}/ with your browser.`;
+                                    errMessage += ` 1You can try to get the cookie manually by opening http://${_options.proxyOwnIp}:${_options.proxyPort}/ with your browser.`;
                                 } else {
                                     amazonProxy.initAmazonProxy(_options, prepareResult,
                                         (server) => {
@@ -376,9 +376,9 @@ function AlexaCookie() {
                                             if (!_options.proxyPort || _options.proxyPort === 0) {
                                                 _options.proxyPort = proxyServer.address().port;
                                             }
-                                            errMessage += ` You can try to get the cookie manually by opening http://${_options.proxyOwnIp}:${_options.proxyPort}/ with your browser.`;
-                                            callback && callback(new Error(errMessage), null);
-                                        }
+                                            errMessage += ` 2You can try to get the cookie manually by opening http://${_options.proxyOwnIp}:${_options.proxyPort}/ with your browser.`;
+                                            callback && callback(new Error(errMessage), null); 
+                                      }
                                     );
                                     return;
                                 }
@@ -400,7 +400,8 @@ function AlexaCookie() {
                 if (!_options.proxyPort || _options.proxyPort === 0) {
                     _options.proxyPort = proxyServer.address().port;
                 }
-                const errMessage = `You can try to get the cookie manually by opening http://${_options.proxyOwnIp}:${_options.proxyPort}/ with your browser.`;
+                //const errMessage = `3You can try to get the cookie manually by opening http://${_options.proxyOwnIp}:${_options.proxyPort}/ with your browser.`;
+                const errMessage = ` La génération automatique n'a pas fonctionné (ce qui est normal lors d'une génération manuelle), vérifiez toutefois que cette adresse est bien une adresse locale de votre réseau :${_options.proxyOwnIp} et que le port utilisé est bien 3457 :${_options.proxyPort}, sinon vérifiez la configuration réseau de Jeedom (Réglages/Système/Configuration/Réseau/Accès interne) et assurez vous d'avoir jeedom sur le port 80 et d'être connecté sur le même réseau local (pas à distance).`;
                 callback && callback(new Error(errMessage), null);
             });
         }
@@ -426,7 +427,7 @@ function AlexaCookie() {
             }
             deviceSerial = deviceSerialBuffer.toString('hex');
         } else {
-            _options.logger('{Cookie} ║ │ Proxy Init: reuse deviceSerial from former data','DEBUG');
+            _options.logger('{Proxy}  ║ │ reuse deviceSerial from former data','DEBUG');
             deviceSerial = _options.formerRegistrationData.deviceSerial;
         }
         loginData.deviceSerial = deviceSerial;

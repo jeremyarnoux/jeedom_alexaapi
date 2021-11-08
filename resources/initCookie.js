@@ -7,8 +7,8 @@ var fs = require('fs');
 const amazonserver = process.argv[3];
 const alexaserver = process.argv[4];
 
-console.log('Alexa-Config - Lancement de '+ __filename );
-console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!' );
+//console.log('Alexa-Config - Lancement de '+ __filename );
+//console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!' );
 
 
 alexa.init({
@@ -31,12 +31,16 @@ function (err)
 {
   if (err)
   {
-    console.log('initCookie - ' + err);
+    //console.log('iCooki - 1' + err);
+	console.log ('{iCooki} ╠════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+    console.log ('{iCooki} ║ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    console.log ('{iCooki} ║ Attention :' + err);
+	console.log ('{iCooki} ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
     return; // Wait next call
   }
   
- console.log('Alexa-Config (initCookie.js): amazonserver=' + amazonserver );
- console.log('Alexa-Config (initCookie.js): alexaserver=' + alexaserver );
+ //console.log('Alexa-Config (iCooki.js): amazonserver=' + amazonserver );
+ //console.log('Alexa-Config (iCooki.js): alexaserver=' + alexaserver );
  //console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! cookieData.macDms=' + alexa.cookieData.macDms);
 
   if (!alexa.cookieData)
@@ -45,17 +49,18 @@ function (err)
 
 
  
- console.log ('initCookie - Cookie successfully retrieved from Amazon');
+ console.log ('{iCooki} ║ Cookie récupéré avec succès sur Amazon');
   fs.writeFile(cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) =>
   {
     if (err)
     {
-      console.log('initCookie - Error while saving the cookie to: ' + cookieLocation);
-      console.log('initCookie - ' + err);
+      console.log('iCooki - Error while saving the cookie to: ' + cookieLocation);
+      console.log('iCooki - ' + err);
       process.exit();
     }
 
-    console.log ('initCookie - Cookie saved to:' + cookieLocation);
+    console.log ('{iCooki} ║ Cookie enregistré dans :' + cookieLocation);
+	console.log ('{iCooki} ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
     process.exit();
   });
 });

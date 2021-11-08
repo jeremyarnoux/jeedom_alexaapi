@@ -2848,7 +2848,7 @@ function startServer(force=false) {
 					if (server) {
 						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
 						config.logger('{API}    ║   Le lien vers le serveur Amazon est bien lancé sur le port ' + server.address().port ,'INFO');
-						config.logger('{API}    ╚════════════════════════════════════════════════════════════════════════════════════════','INFO');
+						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
 					} else {
 						server = app.listen(config.listeningPort, () => {
 							config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');

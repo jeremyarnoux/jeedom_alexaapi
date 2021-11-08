@@ -250,7 +250,7 @@ class AlexaWsMqtt extends EventEmitter {
                 // tell Tuning Service that we support "A:H" protocol = AlphaPrococol
                 const msg = Buffer.from('0x99d4f71a 0x0000001d A:HTUNE');
                 //console.log('SEND: ' + msg.toString('ascii'));
-                this._options.logger && this._options.logger('{MQTT}   ║ A:H Initialization Msg 1 sent'  ,'INFO');
+                this._options.logger && this._options.logger('{MQTT}   ║ A:H Initialization Msg 1 sent'  ,'DEBUG');
                 if (this.websocket.readyState !== 1 /* OPEN */) return;
                 this.websocket.send(msg);
             }
@@ -272,31 +272,31 @@ class AlexaWsMqtt extends EventEmitter {
             if (!this.websocket || this.websocket.readyState !== 1 /* OPEN */) {
                 return;
             }
-            this._options.logger && this._options.logger('{MQTT}   ║ Incoming RAW message: ' + data.toString('hex')  ,'INFO');
+            this._options.logger && this._options.logger('{MQTT}   ║ Incoming RAW message: ' + data.toString('hex')  ,'DEBUG');
             let message = this.parseIncomingMessage(data);
-            this._options.logger && this._options.logger('{MQTT}   ║ Incoming message: ' + JSON.stringify(message)  ,'INFO');
+            this._options.logger && this._options.logger('{MQTT}   ║ Incoming message: ' + JSON.stringify(message)  ,'DEBUG');
 
             if (msgCounter === 0) { // initialization
                 if (message.content.protocolName) {
                     this.protocolName = message.content.protocolName;
                     if (this.protocolName !== 'A:H' && this.protocolName !== 'A:F') {
-                        this._options.logger && this._options.logger('{MQTT}   ║ Server requests unknown protocol: ' + this.protocolName  ,'INFO');
+                        this._options.logger && this._options.logger('{MQTT}   ║ Server requests unknown protocol: ' + this.protocolName  ,'DEBUG');
                     }
                 }
                 else {
-                    this._options.logger && this._options.logger('{MQTT}   ║ Unexpected Response: ' + JSON.stringify(message)  ,'INFO');
+                    this._options.logger && this._options.logger('{MQTT}   ║ Unexpected Response: ' + JSON.stringify(message)  ,'DEBUG');
                     this.protocolName = this.macDms ? 'A:F' : 'A:H';
                 }
-                this._options.logger && this._options.logger('{MQTT}   ║ Detected protocol ' + this.protocolName  ,'INFO');
+                this._options.logger && this._options.logger('{MQTT}   ║ Detected protocol ' + this.protocolName  ,'DEBUG');
 
                 let msg;
                 if (this.protocolName === 'A:F') { // A:F
                     msg = Buffer.from('0xfe88bc52 0x0000009c {"protocolName":"A:F","parameters":{"AlphaProtocolHandler.receiveWindowSize":"16","AlphaProtocolHandler.maxFragmentSize":"16000"}}TUNE');
                     await this.sendWs(msg);
-                   this._options.logger && this._options.logger('{MQTT}   ║ A:F Initialization Msg 2 sent: ' + msg.toString('hex')  ,'INFO');
+                   this._options.logger && this._options.logger('{MQTT}   ║ A:F Initialization Msg 2 sent: ' + msg.toString('hex')  ,'DEBUG');
                     await this.wait(50);
                     msg = this.encodeGWRegisterAF();
-                   this._options.logger && this._options.logger('{MQTT}   ║ A:F Initialization Msg 3 (Register Connection) sent: ' + msg.toString('hex')  ,'INFO');
+                   this._options.logger && this._options.logger('{MQTT}   ║ A:F Initialization Msg 3 (Register Connection) sent: ' + msg.toString('hex')  ,'DEBUG');
                     //console.log('SEND: ' + msg.toString('ascii'));
                     await this.sendWs(msg);
                     msgCounter++;
@@ -310,14 +310,14 @@ class AlexaWsMqtt extends EventEmitter {
                     msg = this.encodeGWHandshake();
                     //console.log('SEND: ' + msg.toString('ascii'));
                     await this.sendWs(msg);
-                    this._options.logger && this._options.logger('{MQTT}   ║ A-H Initialization Msg 2+3 sent'  ,'INFO');
+                    this._options.logger && this._options.logger('{MQTT}   ║ A-H Initialization Msg 2+3 sent'  ,'DEBUG');
                 }
             }
             if (msgCounter === 1) {
                 if (this.protocolName === 'A:H') {
                     //let msg = new Buffer('MSG 0x00000362 0x0e414e46 f 0x00000001 0xf904b9f5 0x00000109 GWM MSG 0x0000b479 0x0000003b urn:tcomm-endpoint:device:deviceType:0:deviceSerialNumber:0 0x00000041 urn:tcomm-endpoint:service:serviceName:DeeWebsiteMessagingService {"command":"REGISTER_CONNECTION"}FABE');
                     let msg = this.encodeGWRegisterAH();
-                    this._options.logger && this._options.logger('{MQTT}   ║ Initialization Msg 4 (Register Connection) sent'  ,'INFO');
+                    this._options.logger && this._options.logger('{MQTT}   ║ Initialization Msg 4 (Register Connection) sent'  ,'DEBUG');
                     //console.log('SEND: ' + msg.toString('ascii'));
                     await this.sendWs(msg);
                 }
@@ -329,7 +329,7 @@ class AlexaWsMqtt extends EventEmitter {
 
                     //msg = new Buffer('4D53472030783030303030303635203078306534313465343720662030783030303030303031203078626332666262356620307830303030303036322050494E00000000D1098D8CD1098D8C000000070052006500670075006C0061007246414245', 'hex'); // "MSG 0x00000065 0x0e414e47 f 0x00000001 0xbc2fbb5f 0x00000062 PIN" + 30 + "FABE"
                     let msg = this.encodePing();
-                    this._options.logger && this._options.logger('{MQTT}   ║ Send First Ping'  ,'INFO');
+                    this._options.logger && this._options.logger('{MQTT}   ║ Send First Ping MQTT'  ,'INFO');
                     //console.log('SEND: ' + msg.toString('hex'));
                     this.websocket.send(msg);
 
@@ -337,13 +337,13 @@ class AlexaWsMqtt extends EventEmitter {
                         if (!this.websocket) return;
                         //let msg = new Buffer('4D53472030783030303030303635203078306534313465343720662030783030303030303031203078626332666262356620307830303030303036322050494E00000000D1098D8CD1098D8C000000070052006500670075006C0061007246414245', 'hex'); // "MSG 0x00000065 0x0e414e47 f 0x00000001 0xbc2fbb5f 0x00000062 PIN" + 30 + "FABE"
                         let msg = this.encodePing();
-                        this._options.logger && this._options.logger('{MQTT}   ║ Send Ping'  ,'INFO');
+                        this._options.logger && this._options.logger('{MQTT}   ║ Send Ping'  ,'DEBUG');
                         //console.log('SEND: ' + msg.toString('hex'));
                         this.websocket.send(msg);
 
                         this.pongTimeout = setTimeout(() => {
                             this.pongTimeout = null;
-                            this._options.logger && this._options.logger('{MQTT}   ║ No Pong received after 30s'  ,'INFO');
+                            this._options.logger && this._options.logger('{MQTT}   ║ No Pong received after 30s'  ,'DEBUG');
                             this.websocket && this.websocket.close();
                         }, 30000);
                     }, 180000);
@@ -355,12 +355,12 @@ class AlexaWsMqtt extends EventEmitter {
             const incomingMsg = data.toString('ascii');
             //if (incomingMsg.includes('PON') && incomingMsg.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
             if (message.service === 'FABE' && message.content && message.content.messageType === 'PON' && message.content.payloadData && message.content.payloadData.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
-                this._options.logger && this._options.logger('{MQTT}   ║ Received Pong'  ,'DEBUG');
+                this._options.logger && this._options.logger('{MQTT}   ║ Received Pong'  ,'INFO');
                 if (initTimeout) {
                     clearTimeout(initTimeout);
                     initTimeout = null;
-                    this._options.logger && this._options.logger('{MQTT}   ║ Initialization completed','INFO');
-                    this._options.logger && this._options.logger('{MQTT}   ╠═══════════════════════════════════════════════════════════════════════════════','INFO');
+                    this._options.logger && this._options.logger('{MQTT}   ║ Initialization MQTT completed','INFO');
+                    this._options.logger && this._options.logger('{MQTT}   ╚═══════════════════════════════════════════════════════════════════════════════','INFO');
                     this.emit('connect');
                 }
                 if (this.pongTimeout) {
