@@ -179,7 +179,7 @@ class AlexaRemote extends EventEmitter {
         getCookie((err) => {
             if (typeof callback === 'function') callback = callback.bind(this);
             if (err) {
-                this._options.logger && this._options.logger('Alexa-Remote: Error from retrieving cookies');
+                this._options.logger && this._options.logger('{Remote} ╠═══════> Error from retrieving cookies','DEBUG');
                 return callback && callback(err);
             }
             if (!this.csrf) return callback && callback(new Error('no csrf found'));
@@ -191,8 +191,8 @@ class AlexaRemote extends EventEmitter {
 				this._options.logger && this._options.logger('{Remote} ╠═══> Authentication checked: ' + authenticated,'DEBUG');
 
                  if ((!authenticated && !this._options.cookieJustCreated) || !this.macDms) {
-                    this._options.logger && !this.macDms && this._options.logger('Alexa-Remote: JWT missing, forcing a refresh ...');
-                    this._options.logger && this._options.logger('Alexa-Remote: Cookie was set, but authentication invalid');
+                    this._options.logger && !this.macDms && this._options.logger('{Remote} ╠═══════> JWT missing, forcing a refresh ...','DEBUG');
+                    this._options.logger && this._options.logger('{Remote} ╠═══════> Cookie was set, but authentication invalid','DEBUG');
                     delete this._options.cookie;
                     delete this._options.csrf;
                     delete this._options.localCookie;
@@ -404,7 +404,7 @@ class AlexaRemote extends EventEmitter {
         //this.alexaWsMqtt = new AlexaWsMqtt(this._options, this.cookie); 07/11/2021
 		this.alexaWsMqtt = new AlexaWsMqtt(this._options, this.cookie, this.macDms);
         if (!this.alexaWsMqtt) return;
-        this._options.logger && this._options.logger('Alexa-Remote: Initialize WS-MQTT Push Connection');
+        this._options.logger && this._options.logger('{Remote} ╠═══════> Initialize WS-MQTT Push Connection','DEBUG');
         this.activityUpdateQueue = [];
         this.activityUpdateNotFoundCounter = 0;
         this.activityUpdateTimeout = null;
@@ -731,7 +731,7 @@ class AlexaRemote extends EventEmitter {
                     const found = res.findIndex(activity => activity.data.recordKey.endsWith('#' + entry.key.entryId) && activity.data.customerId === entry.key.registeredUserId);
 
                     if (found === -1) {
-                        this._options.logger && this._options.logger('Alexa-Remote: Activity for id ' + entry.key.entryId + ' not found');
+                        this._options.logger && this._options.logger('{Remote} ╠═══════> Activity for id ' + entry.key.entryId + ' not found','DEBUG');
                     }
                     else {
                         lastFoundQueueIndex = queueIndex;
@@ -743,10 +743,10 @@ class AlexaRemote extends EventEmitter {
                 });
 
                 if (lastFoundQueueIndex === -1) {
-                    this._options.logger && this._options.logger('Alexa-Remote: No activities from stored ' + this.activityUpdateQueue.length + ' entries found in queue (' + this.activityUpdateNotFoundCounter + ')');
+                    this._options.logger && this._options.logger('{Remote} ╠═══════> No activities from stored ' + this.activityUpdateQueue.length + ' entries found in queue (' + this.activityUpdateNotFoundCounter + ')');
                     this.activityUpdateNotFoundCounter++;
                     if (this.activityUpdateNotFoundCounter > 5) {
-                        this._options.logger && this._options.logger('Alexa-Remote: Reset expected activities');
+                        this._options.logger && this._options.logger('{Remote} ╠═══════> Reset expected activities','DEBUG');
                         this.activityUpdateQueue = [];
                         this.activityUpdateNotFoundCounter = 0;
                     }
@@ -810,15 +810,15 @@ class AlexaRemote extends EventEmitter {
                 return this.httpsGetCall(path, callback, flags);
             }
             else if (err && authenticated === null) {
-                this._options.logger && this._options.logger('Alexa-Remote: Authentication check returned error: ' + err + '. Still try request');
+                this._options.logger && this._options.logger('{Remote} ╠═══════> Authentication check returned error: ' + err + '. Still try request','DEBUG');
                 return this.httpsGetCall(path, callback, flags);
             }
-            this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error, try re-init');
+            this._options.logger && this._options.logger('{Remote} ╠═══════> Authentication check Error, try re-init');
             delete this._options.csrf;
             delete this._options.cookie;
             this.init(this._options, function(err) {
                 if (err) {
-                    this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error and renew unsuccessful. STOP');
+                    this._options.logger && this._options.logger('{Remote} ╠═══════> Authentication check Error and renew unsuccessful. STOP','DEBUG');
                     return callback && callback(new Error('Cookie invalid, Renew unsuccessful'));
                 }
                 return this.httpsGet(path, callback, flags);
@@ -989,7 +989,7 @@ this._options.logger && this._options.logger(obj.headers);
                         //this._options.logger && this._options.logger('*********************DEBUG****************************','ERROR');
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
                         //this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote ║ Response: No/Invalid JSON','ERROR');
-                        this._options.logger && this._options.logger("Alexa-Remote ║ "+body, 'ERROR');
+                        this._options.logger && this._options.logger("{Remote} ║ "+body, 'ERROR');
                         //this._options.logger && this._options.logger('**DEBUG**DEBUG* Message Exception :'+e.message);
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
@@ -1007,7 +1007,7 @@ this._options.logger && this._options.logger(obj.headers);
                     }
 					
 					if (JSON.stringify(ret)=='{"error":null}')
-						this._options.logger && this._options.logger('{Remote} ║ Response(2): OK');
+						this._options.logger && this._options.logger('{Remote} ║ Response(2): OK','INFO');
 						else
 						this._options.logger && this._options.logger('{Remote} ║ Response(1): ' + JSON.stringify(ret),'DEBUG');
                     return callback && callback (null, ret);
@@ -1056,7 +1056,7 @@ this._options.logger && this._options.logger(obj.headers);
             }
 
                 this._options.logger && this._options.logger('{Remote} ║ Réponse: ' + JSON.stringify(ret),'DEBUG');
-               // this._options.logger && this._options.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','DEBUG');
+                this._options.logger && this._options.logger('{Remote} ╠════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','DEBUG');
 
             callback(null, ret);
             callback = null;
@@ -1527,7 +1527,7 @@ return this.parseValue4Notification(notification, value);    }
                 notification.status = value ? 'ON' : 'OFF';
                 break;
 			            
-			// Bizarre oublé, ajouté 14/09/2019
+			// Bizarre oublié, ajouté 14/09/2019
 			case 'date':
                 if (notification.type !== 'Timer') {
                     notification.alarmTime = value.getTime();
