@@ -211,9 +211,68 @@ CommandAlexa.Speak = function(req,res){
 	}
 
 	let Commands = [];
-	var test = ('volume' in req.query === true) && (req.query.volume != "");
-	if (test) 											Commands.push({command: 'volume', value: req.query.volume});
-														Commands.push({command: SpeakouAnnouncement, value: req.query.text});
+	var test = ('volume' in req.query === true) && (req.query.volume != ""); 
+  	
+	if (test) 									Commands.push({command: 'volume', value: req.query.volume});
+  
+    var TXTchaine = req.query.text; 
+  	var TABdecoupeMot;
+  	var TABdecoupe;
+    var NBmots;
+  	const LimiteAlexa = 250;
+  	var Phrase2 = '';
+  	var Phrase = '';
+  
+if (TXTchaine.length <= LimiteAlexa)	{				
+    Commands.push({command: SpeakouAnnouncement, value: req.query.text});
+}
+else {	
+		TABdecoupe = req.query.text.split(/[;,.—]+/); // on met chaque phrase separer d'une ponctuation dans des elements d'un tableau  
+		for(var i = 0; i < TABdecoupe.length ; i++) {  //on parcourt chaque morceau
+  			if (TABdecoupe[i].length > LimiteAlexa) {  //si l'element est trop grand au decoupe au niveau des mots
+              	Phrase2 ='';
+				TABdecoupeMot = TABdecoupe[i].split(" "); // on met chaque mot du moceau un tableau
+				NBmots = TABdecoupeMot.length; //on determine le nombre de mots dans la phrase
+              	for(var xx = 0; xx < NBmots; xx ++){         //autant de boucle que de mot par morceau  
+                  				if ( (Phrase.length + TABdecoupeMot[xx].length) < LimiteAlexa ){
+                              Phrase = Phrase + " " + TABdecoupeMot[xx];	//on construit le premier morceau mot par mot
+                              }else{
+                              	if (Phrase != '') Commands.push({command: SpeakouAnnouncement, value: Phrase});
+                                Phrase = TABdecoupeMot[xx];
+                              }
+                 }
+              	if ((Phrase != '') && (i == TABdecoupe.length -1 )) Commands.push({command: SpeakouAnnouncement, value: Phrase});
+                
+            }else{  //si c'est pas trop grand alors on regarde le morceau
+              	if ( Phrase != '' && ((Phrase.length + TABdecoupe[i].length )  < LimiteAlexa) ){   //traiement s'il reste un mocreau decoupé mot a mot
+                  Phrase2 = Phrase + "," + TABdecoupe[i] ;   
+                }
+              	if ( (Phrase2.length + TABdecoupe[i].length) < LimiteAlexa ){  //si le precedent morceau + le nouveau ca ne depaase pas la limite
+                	if (i < TABdecoupe.length /*-1*/ ){
+                      
+                      if ((i < TABdecoupe.length -1) && (TABdecoupe[i+1].length < LimiteAlexa)){
+                      	Phrase2 = Phrase2 + TABdecoupe[i] + ",";	//on construit les bloc separé par des virgules
+                      }else{ 
+                      	Phrase2 = Phrase2 + TABdecoupe[i] + ".";
+                      if ((Phrase2 != '') && (i < TABdecoupe.length -1 )) Commands.push({command: SpeakouAnnouncement, value: Phrase2});
+                    }
+                    }else{ 
+                      	Phrase2 = Phrase2 + TABdecoupe[i]; //on construit les bloc separé par des point
+                      if ((Phrase2 != '') && (i == TABdecoupe.length -1 )) Commands.push({command: SpeakouAnnouncement, value: Phrase2});
+                    }
+                }else{   //sinon si c'est trop grand je prononce la phrase d'avant et je garde le morceau actuel pour le prochain passage
+                      if ((Phrase2 != '') && (Phrase == '') && ( i < TABdecoupe.length )) Commands.push({command: SpeakouAnnouncement, value: Phrase2}); //ne plus toucher - 
+                      
+                      if (Phrase == '') {
+                        Phrase2 = TABdecoupe[i] + ",";
+                      }
+                }
+            }
+         if ((Phrase2 != '')  && (i == (TABdecoupe.length - 1 ) )) Commands.push({command: SpeakouAnnouncement, value: Phrase2});//dernier morceau
+        }
+  		 
+  		
+} 
 	if (('lastvolume' in req.query === true) && test) 	Commands.push({command: 'volume', value: req.query.lastvolume});
 	
 	boucleSurSerials_sendMultiSequenceCommand(req, Commands);
@@ -2789,7 +2848,7 @@ function startServer(force=false) {
 					if (server) {
 						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
 						config.logger('{API}    ║   Le lien vers le serveur Amazon est bien lancé sur le port ' + server.address().port ,'INFO');
-						config.logger('{API}    ╚════════════════════════════════════════════════════════════════════════════════════════','INFO');
+						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
 					} else {
 						server = app.listen(config.listeningPort, () => {
 							config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');

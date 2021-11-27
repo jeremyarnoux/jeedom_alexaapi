@@ -1227,13 +1227,13 @@ public static function templateWidget(){
             self::updateCmd($F, 'playlisthtml', 'info', 'string', false, null, true, true, null, null, null, null, null, null, 79, $widgetPlaylist);
             self::updateCmd($F, 'turnOn', 'action', 'other', false, 'turnOn', true, true, "fas fa-circle", null, null, 'SmarthomeCommand?command=turnOn', null, null, 79, $cas8);
             self::updateCmd($F, 'turnOff', 'action', 'other', false, 'turnOff', true, true, "far fa-circle", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
-
             self::updateCmd($F, 'command', 'action', 'message', false, 'Command', false, true, "fas fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);
             self::updateCmd($F, 'textCommand', 'action', 'message', false, 'Parler à Alexa', true, false, null, null, 'alexaapi::message', 'textCommand?text=#message#', null, null, 39, $cas1bis);
             self::updateCmd($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, false, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#', null, null, 40, $cas1bis);
             self::updateCmd($F, 'speaklegacy', 'action', 'message', false, 'Faire parler Alexa (legacy)', false, false, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#&legacy=1', null, null, 43, $cas1bis);
             self::updateCmd($F, 'announcement', 'action', 'message', false, 'Lancer une annonce', true, true, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#&jingle=1', null, null, 44, $cas1bis);
             self::updateCmd($F, 'speakssml', 'action', 'message', false, 'Faire parler Alexa en SSML', false, true, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#&ssml=1', null, null, 42, $cas1bis);
+            self::updateCmd($F, 'announcementgroup', 'action', 'message', false, 'Lancer une annonce générale', true, true, null, null, 'alexaapi::message', 'announcementgroup?text=#message#', null, null, 44, $cas9);
             self::updateCmd($F, 'mediaLength', 'info', 'string', false, null, false, false, null, null, null, null, null, null, 79, $cas1);
             self::updateCmd($F, 'mediaProgress', 'info', 'string', false, null, false, false, null, null, null, null, null, null, 79, $cas1);
             self::updateCmd($F, 'state', 'info', 'string', false, null, true, false, null, null, 'alexaapi::state', null, null, null, 79, $cas1);
@@ -1252,6 +1252,7 @@ public static function templateWidget(){
             self::updateCmd($F, 'reminder', 'action', 'message', false, 'Envoyer un rappel', true, false, null, null, 'alexaapi::message', 'reminder?text=#message#&when=#when#&recurring=#recurring#', null, null, 79, $cas3);
 
             self::updateCmd($F, 'onLine', 'info', 'binary', false, "En ligne", false, true, null, null, null, null, null, null, 99, true); //ajouté aout 2020
+            //self::updateCmd($F, 'speaking', 'info', 'binary', false, "Speaking", false, true, null, null, null, null, null, null, 99, $cas1bis); //ajouté sept 21
 
 
             $volinfo = $this->getCmd(null, 'volumeinfo');
@@ -1477,11 +1478,12 @@ class alexaapiCmd extends cmd
 
     public function execute($_options = null)
     {
+
         if ($this->getLogicalId() == 'refresh') {
             $this->getEqLogic()->refresh();
             return;
         }
-		
+
 		// Protection du sommeil
 		if (config::byKey('dodo', 'alexaapi', 0) != "0") {
 			$debut=config::byKey('dododebut', 'alexaapi', 22);	
@@ -1611,6 +1613,13 @@ class alexaapiCmd extends cmd
             $command = $this->getConfiguration('request');
             $arguments = "";
         }
+		// On va tranformer les commandes qui ne passent plus suite aux modifs d'Amazon en commande "Parler à Alexa"
+       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>command>>>>>>>>>>>>>>>>>>>>>>>'.$command);		
+       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>json_encode_options>>>>>>>>>>>>>>>>>>>>>>'.json_encode($_options));		
+       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>json_encodejson_encode_options>>>>>>>>>>>>>>>>>>>>>>'.json_encode(json_encode($_options)));		
+       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>_options[select]>>>>>>>>>>>>>>>>>>>>>>'.$_options['select']);		
+       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>_options[message]>>>>>>>>>>>>>>>>>>>>>>'.$_options['message']);		
+		
         switch ($command) {
             case 'volume':
                 $request = $this->build_ControledeSliderSelectMessage($_options, '50');
@@ -1620,12 +1629,13 @@ class alexaapiCmd extends cmd
                 $request = $this->build_ControledeSliderSelectMessage($_options, "");
                 break;
             case 'playmusictrack':
-                $request = $this->build_ControledeSliderSelectMessage($_options, "53bfa26d-f24c-4b13-97a8-8c3debdf06f0");
+                $request = $this->build_ControledeSliderSelectMessage($_options, "Imagine");
                 break;
             case 'speak':
             case 'textCommand':
             case 'announcement':
             case 'push':
+            case 'announcementgroup':
             case 'multiplenext':
                 $request = $this->build_ControledeSliderSelectMessage($_options);
                 break;
@@ -1635,7 +1645,7 @@ class alexaapiCmd extends cmd
                 $request = $this->build_ControleWhenTextRecurring($now, "Ceci est un essai", $_options);
                 break;
             case 'radio':
-                $request = $this->build_ControledeSliderSelectMessage($_options, 's2960');
+                $request = $this->build_ControledeSliderSelectMessage($_options, 'France Info');
                 break;
             case 'SmarthomeCommand':
             case 'DisplayPower':
@@ -1672,6 +1682,28 @@ class alexaapiCmd extends cmd
         $request = scenarioExpression::setTags($request);
         if (trim($request) == '') throw new Exception(__('Commande inconnue ou requête vide : ', __FILE__) . print_r($this, true));
         $device = str_replace("_player", "", $this->getEqLogic()->getConfiguration('serial'));
+		
+		if ((strlen($device)>20) && (strpos($request, "textCommand?") !== false)) // On va chercher un device car le serial des groupes ne fonctionne pas.
+		{
+		$groupName=str_replace(" ", "+", $this->getEqLogic()->getName());
+			// C'est un groupe dans une commande textCommand
+		//log::add('alexaapi', 'debug', 'C est un groupe device=' . $device);
+		//$request=$request."+sur+le+groupe+".$groupName;
+		//log::add('alexaapi', 'debug', 'name=' . $deviceName);
+					
+		$device=config::byKey('defaultDevice','alexaapi','',true);
+		
+			if ($device==""){
+					log::add('alexaapi', 'warning', ' ╔═══════════════════════════════[Souci de configuration]══════════════════════════════════════════════════════════════');
+					log::add('alexaapi', 'warning', " ║ La commande n'a pas fonctionné puisqu'aucun appareil n'est défini par défaut dans la configuration");
+					log::add('alexaapi', 'warning', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+			}		
+		}
+		
+		
+		
+		
+		
 		if ($request =="allDeviceVolumes") return 'http://' . config::byKey('internalAddr') . ':3456/' . $request; // cas particulier pour cette commande
 			else return 'http://' . config::byKey('internalAddr') . ':3456/' . $request . '&device=' . $device;
     }
@@ -1684,6 +1716,14 @@ class alexaapiCmd extends cmd
             $lastvolume = $cmd->execCmd();
 
         $request = $this->getConfiguration('request');
+		
+		
+		if ($request=="announcementgroup?text=#message#") 
+			{
+			$request="textCommand?text=annonce+#message#";
+			if (isset($_options['message'])) $_options['message'] = str_replace(" ", "+", $_options['message']);
+			}
+		
         //log::add('alexaapi_node', 'info', '---->Request2:'.$request);
         //log::add('alexaapi_node', 'debug', '---->getName:'.$this->getEqLogic()->getCmd(null, 'volumeinfo')->execCmd());
         if ((isset($_options['slider'])) && ($_options['slider'] == "")) $_options['slider'] = $default;

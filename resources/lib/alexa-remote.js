@@ -55,7 +55,6 @@ class AlexaRemote extends EventEmitter {
     }
 
     setCookie(_cookie) {
-		
         if (!_cookie) return;
         if (typeof _cookie === 'string') {
             this.cookie = _cookie;
@@ -83,14 +82,17 @@ class AlexaRemote extends EventEmitter {
         }
         this._options.csrf = this.csrf;
         this._options.cookie = this.cookie;
-        this.emit('cookie', this.cookie, this.csrf); // ajout 26/12/2020
-    }
+        //this.emit('cookie', this.cookie, this.csrf); // ajout 26/12/2020
+        this.macDms = this._options.macDms = this._options.macDms || (this.cookieData && this.cookieData.macDms);
+        this.emit('cookie', this.cookie, this.csrf, this.macDms);
+		}
 
     init(cookie, callback) {
         if (typeof cookie === 'object') {
             this._options = cookie;
             if (!this._options.userAgent) {
-                let platform = os.platform();
+                //let platform = os.platform();
+                const platform = os.platform();
                 if (platform === 'win32') {
                     this._options.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0';
                 }
@@ -116,7 +118,7 @@ class AlexaRemote extends EventEmitter {
             delete this._options.refreshCookieInterval;
         }
         if (this._options.cookieRefreshInterval !== 0) {
-            this._options.cookieRefreshInterval = this._options.cookieRefreshInterval || 4 * 24 * 60 * 60 * 1000; // Auto Refresh after 4 days
+            this._options.cookieRefreshInterval = this._options.cookieRefreshInterval || 7*24*60*60*1000; // Auto Refresh after 7 days
         }
 
         const self = this;
@@ -143,11 +145,10 @@ class AlexaRemote extends EventEmitter {
 					
                 self._options.logger && self._options.logger('{Remote} ║ ╠═════> Dernier cookie généré le '+datesigalou,'DEBUG');
                     const tokensValidSince = Date.now() - self._options.formerRegistrationData.tokenDate;
-                    //if (tokensValidSince < 5 * 24 * 60 * 60  * 1000) {
-                    if (tokensValidSince < 24 * 60 * 60  * 1000) { // Pour revenir à ce que fait Appollon77
-               //     if (tokensValidSince < 1 *60 * 1000 ) { // Pour revenir à ce que fait Appollon77
-					self._options.logger && self._options.logger('{Remote} ║ ╠═════> donc encore valable, on ne le regénère pas','DEBUG');
-                    self._options.logger && self._options.logger('{Remote} ║ ╚═════> '+JSON.stringify(self._options.formerRegistrationData),'DEBUG');
+                    //if (tokensValidSince < 5 * 24 * 60 * 60  * 1000) { modif 07/11/2021
+					if (tokensValidSince < 24 * 60 * 60 * 1000 && self._options.macDms) {
+                    //if (tokensValidSince <  1000) { // pour tests sigalou
+					self._options.logger && self._options.logger('{Remote} ║ ╚═════> donc encore valable, on ne le regénère pas','DEBUG');
                     //if (tokensValidSince < 24 * 60 * 60 * 1000) {
 						//self._options.logger && self._options.logger('{Remote} ╠══***********************═════> return tokensValidSince='+tokensValidSince,'DEBUG');
                         return callback(null);
@@ -179,7 +180,7 @@ class AlexaRemote extends EventEmitter {
         getCookie((err) => {
             if (typeof callback === 'function') callback = callback.bind(this);
             if (err) {
-                this._options.logger && this._options.logger('Alexa-Remote: Error from retrieving cookies');
+                this._options.logger && this._options.logger('{Remote} ╠═══════> Error from retrieving cookies','DEBUG');
                 return callback && callback(err);
             }
             if (!this.csrf) return callback && callback(new Error('no csrf found'));
@@ -190,11 +191,13 @@ class AlexaRemote extends EventEmitter {
                 //this._options.logger && this._options.logger('Alexa-Remote: Authentication checked: ' + authenticated);
 				this._options.logger && this._options.logger('{Remote} ╠═══> Authentication checked: ' + authenticated,'DEBUG');
 
-                if (! authenticated && !this._options.cookieJustCreated) {
-                    this._options.logger && this._options.logger('Alexa-Remote: Cookie was set, but authentication invalid');
+                 if ((!authenticated && !this._options.cookieJustCreated) || !this.macDms) {
+                    this._options.logger && !this.macDms && this._options.logger('{Remote} ╠═══════> JWT missing, forcing a refresh ...','DEBUG');
+                    this._options.logger && this._options.logger('{Remote} ╠═══════> Cookie was set, but authentication invalid','DEBUG');
                     delete this._options.cookie;
                     delete this._options.csrf;
                     delete this._options.localCookie;
+					delete this._options.macDms;
                     return this.init(this._options, callback);
                 }
                 this.lastAuthCheck = new Date().getTime();
@@ -218,8 +221,9 @@ class AlexaRemote extends EventEmitter {
                 });
             });
         });
-
     }
+	
+	
     prepare(callback) {
         this.getAccount((err, result) => {
             if (!err && result && Array.isArray(result)) {
@@ -245,14 +249,16 @@ class AlexaRemote extends EventEmitter {
         this.getNotifications((err, res) => {
             if (err || !res || !res.notifications || !Array.isArray(res.notifications)) return callback && callback();
 
-            for (var serialNumber in this.serialNumbers) {
+            //for (var serialNumber in this.serialNumbers) {
+               for (const serialNumber in this.serialNumbers) {
                 if (this.serialNumbers.hasOwnProperty(serialNumber)) {
                     this.serialNumbers[serialNumber].notifications = [];
                 }
             }
 
             res.notifications.forEach((noti) => {
-                let device = this.find(noti.deviceSerialNumber);
+                //let device = this.find(noti.deviceSerialNumber);
+              const device = this.find(noti.deviceSerialNumber);
                 if (!device) {
                     //TODO: new stuff
                     return;
@@ -273,7 +279,8 @@ class AlexaRemote extends EventEmitter {
             if (err || !wakeWords || !Array.isArray(wakeWords.wakeWords)) return callback && callback();
 
             wakeWords.wakeWords.forEach((o) => {
-                let device = this.find(o.deviceSerialNumber);
+                //let device = this.find(o.deviceSerialNumber);
+              const device = this.find(o.deviceSerialNumber);
                 if (!device) {
                     //TODO: new stuff
                     return;
@@ -306,7 +313,8 @@ class AlexaRemote extends EventEmitter {
           this.names = {};
           this.friendlyNames = {};
 
-          let customerIds = {};
+          //let customerIds = {};
+          const customerIds = {};
           result.devices.forEach((device) =>
           {
             // Add devices to mapping array
@@ -398,9 +406,10 @@ class AlexaRemote extends EventEmitter {
             this.alexaWsMqtt.disconnect();
             this.alexaWsMqtt = null;
         }
-        this.alexaWsMqtt = new AlexaWsMqtt(this._options, this.cookie);
+        //this.alexaWsMqtt = new AlexaWsMqtt(this._options, this.cookie); 07/11/2021
+		this.alexaWsMqtt = new AlexaWsMqtt(this._options, this.cookie, this.macDms);
         if (!this.alexaWsMqtt) return;
-
+        this._options.logger && this._options.logger('{Remote} ╠═══════> Initialize WS-MQTT Push Connection','DEBUG');
         this.activityUpdateQueue = [];
         this.activityUpdateNotFoundCounter = 0;
         this.activityUpdateTimeout = null;
@@ -727,7 +736,7 @@ class AlexaRemote extends EventEmitter {
                     const found = res.findIndex(activity => activity.data.recordKey.endsWith('#' + entry.key.entryId) && activity.data.customerId === entry.key.registeredUserId);
 
                     if (found === -1) {
-                        this._options.logger && this._options.logger('Alexa-Remote: Activity for id ' + entry.key.entryId + ' not found');
+                        this._options.logger && this._options.logger('{Remote} ╠═══════> Activity for id ' + entry.key.entryId + ' not found','DEBUG');
                     }
                     else {
                         lastFoundQueueIndex = queueIndex;
@@ -739,10 +748,10 @@ class AlexaRemote extends EventEmitter {
                 });
 
                 if (lastFoundQueueIndex === -1) {
-                    this._options.logger && this._options.logger('Alexa-Remote: No activities from stored ' + this.activityUpdateQueue.length + ' entries found in queue (' + this.activityUpdateNotFoundCounter + ')');
+                    this._options.logger && this._options.logger('{Remote} ╠═══════> No activities from stored ' + this.activityUpdateQueue.length + ' entries found in queue (' + this.activityUpdateNotFoundCounter + ')');
                     this.activityUpdateNotFoundCounter++;
-                    if (this.activityUpdateNotFoundCounter > 2) {
-                        this._options.logger && this._options.logger('Alexa-Remote: Reset expected activities');
+                    if (this.activityUpdateNotFoundCounter > 5) {
+                        this._options.logger && this._options.logger('{Remote} ╠═══════> Reset expected activities','DEBUG');
                         this.activityUpdateQueue = [];
                         this.activityUpdateNotFoundCounter = 0;
                     }
@@ -758,7 +767,7 @@ class AlexaRemote extends EventEmitter {
                 this.activityUpdateTimeout = setTimeout(() => {
                     this.activityUpdateTimeout = null;
                     this.getPushedActivities();
-                }, 200);
+                }, 300);
 
             }
 
@@ -806,16 +815,16 @@ class AlexaRemote extends EventEmitter {
                 return this.httpsGetCall(path, callback, flags);
             }
             else if (err && authenticated === null) {
-                this._options.logger && this._options.logger('Alexa-Remote: Authentication check returned error: ' + err + '. Still try request');
+                this._options.logger && this._options.logger('{Remote} ╠═══════> Authentication check returned error: ' + err + '. Still try request','DEBUG');
                 return this.httpsGetCall(path, callback, flags);
             }
-            this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error, try re-init');
+            this._options.logger && this._options.logger('{Remote} ╠═══════> Authentication check Error, try re-init');
             delete this._options.csrf;
             delete this._options.cookie;
             this.init(this._options, function(err) {
                 if (err) {
-                    this._options.logger && this._options.logger('Alexa-Remote: Authentication check Error and renew unsuccessfull. STOP');
-                    return callback && callback(new Error('Cookie invalid, Renew unsuccessfull'));
+                    this._options.logger && this._options.logger('{Remote} ╠═══════> Authentication check Error and renew unsuccessful. STOP','DEBUG');
+                    return callback && callback(new Error('Cookie invalid, Renew unsuccessful'));
                 }
                 return this.httpsGet(path, callback, flags);
             });
@@ -857,7 +866,8 @@ flags=	flagsQuery;
 
 //this._options.logger && this._options.logger("FLAGS:"+JSON.stringify(flags)); 
 		
-        let options = {
+        //let options = {
+        const options = {
             host: host,
             path: '',
             method: 'GET',
@@ -879,7 +889,8 @@ flags=	flagsQuery;
         path = path.replace(/[\n ]/g, '');
         if (!path.startsWith('/')) {
             path = path.replace(/^https:\/\//, '');
-            let ar = path.match(/^([^\/]+)([\/]*.*$)/);
+            //let ar = path.match(/^([^\/]+)([\/]*.*$)/);
+            const ar = path.match(/^([^\/]+)([\/]*.*$)/);
             options.host = ar[1];
             path = ar[2];
         } else {
@@ -904,10 +915,10 @@ if (methodQuery!= null) options.method=methodQuery;
         delete logOptions.headers.csrf;
         delete logOptions.headers['User-Agent'];
         delete logOptions.headers['Content-Type'];
-        delete logOptions.headers['Accept'];
+        delete logOptions.headers.Accept;
         delete logOptions.headers.Referer;
         delete logOptions.headers.Origin;
-	
+	    //delete logOptions.headers['x-amzn-alexa-app'];
 /*const obj = JSON.parse(JSON.stringify(options));
 
 
@@ -985,7 +996,7 @@ this._options.logger && this._options.logger(obj.headers);
                         //this._options.logger && this._options.logger('*********************DEBUG****************************','ERROR');
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
                         //this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote ║ Response: No/Invalid JSON','ERROR');
-                        this._options.logger && this._options.logger("Alexa-Remote ║ "+body, 'ERROR');
+                        this._options.logger && this._options.logger("{Remote} ║ "+body, 'ERROR');
                         //this._options.logger && this._options.logger('**DEBUG**DEBUG* Message Exception :'+e.message);
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
@@ -1003,7 +1014,7 @@ this._options.logger && this._options.logger(obj.headers);
                     }
 					
 					if (JSON.stringify(ret)=='{"error":null}')
-						this._options.logger && this._options.logger('{Remote} ║ Response(2): OK');
+						this._options.logger && this._options.logger('{Remote} ║ Response(2): OK','INFO');
 						else
 						this._options.logger && this._options.logger('{Remote} ║ Response(1): ' + JSON.stringify(ret),'DEBUG');
                     return callback && callback (null, ret);
@@ -1052,7 +1063,7 @@ this._options.logger && this._options.logger(obj.headers);
             }
 
                 this._options.logger && this._options.logger('{Remote} ║ Réponse: ' + JSON.stringify(ret),'DEBUG');
-               // this._options.logger && this._options.logger('{Remote} ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','DEBUG');
+                this._options.logger && this._options.logger('{Remote} ╠════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','DEBUG');
 
             callback(null, ret);
             callback = null;
@@ -1069,6 +1080,7 @@ this._options.logger && this._options.logger(obj.headers);
                 'Referer': `https://alexa.${this._options.amazonPage}/spa/index.html`,
                 'Accept': 'application/json',  //ajout 04/06/21
                 'Origin': `https://alexa.${this._options.amazonPage}`,
+                //'x-amzn-alexa-app': 'eyJ2ZXJzaW9uIjoiMS4wIiwiYXBwSWQiOiJhbXpuMS5hcHBsaWNhdGlvbi40NTc4NmVlMDliMDI0YTA4YTY5OGQzMGIwYWQzMTAzNyJ9', //07/11/2021 resupprimé 
                 //'Content-Type': 'application/json',
                 //'Connection': 'keep-alive',
                 'csrf' : this.csrf,
@@ -1103,7 +1115,8 @@ this._options.logger && this._options.logger(obj.headers);
         delete logOptions.headers['Accept-Encoding'];
         delete logOptions.headers['User-Agent'];
         delete logOptions.headers['Content-Type'];
-        delete logOptions.headers['Accept'];
+        //delete logOptions.headers['Accept']; 07/11/2021
+        delete logOptions.headers.Accept;
         delete logOptions.headers.Referer;
         delete logOptions.headers.Origin;
         this._options.logger && this._options.logger('{Remote} ║ Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT' || options.method === 'DELETE') ? ' and data=' + flags.data : ''),'DEBUG');
@@ -1215,15 +1228,17 @@ this._options.logger && this._options.logger(obj.headers);
     }
 
     getMedia(serialOrName, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        //let dev = this.find(serialOrName);
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         this.httpsGet (`/api/media/state?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
     }
 
     getPlayerInfo(serialOrName, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        //let dev = this.find(serialOrName);
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         this.httpsGet (`/api/np/player?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&screenWidth=1392&_=%t`, callback);
     }
@@ -1246,6 +1261,7 @@ this._options.logger && this._options.logger(obj.headers);
 	 * @param {String} [options.endTime] filter items regarding end time
 	 * @param {String} [options.completed] filter items regarding completion
 	 * @param {String} [options.listIds] list IDs
+	 * @param {function} callback
 	 *
 	 */
     getListItems(listId, options, callback) {
@@ -1258,7 +1274,8 @@ this._options.logger && this._options.logger(obj.headers);
 		
 		// get params by options
 		let params = '';
-		for (let option in options) {
+		//for (let option in options) {
+		for (const option in options) {
 			params += '&' + option + '=' + options[option];	
 		}
 		
@@ -1274,7 +1291,8 @@ this._options.logger && this._options.logger(obj.headers);
         }
 		
 		// request options
-        let request = {
+        //let request = {
+		const request = {
 			'method': 'POST',
 			'data': JSON.stringify({
 				'listId': listId,
@@ -1292,7 +1310,8 @@ this._options.logger && this._options.logger(obj.headers);
 		
 		// providing a version is mandatory
 		if (typeof options !== 'object' || !options.version || !options.value) {
-			let errors = [];
+			//let errors = [];
+			const errors = [];
 			
 			if (!options.version && callback) {
 				errors.push('Providing the current version via options is mandatory!');
@@ -1307,7 +1326,8 @@ this._options.logger && this._options.logger(obj.headers);
 		}
 		
 		// request options
-        let request = {
+        //let request = {
+		const request = {
 			'method': 'PUT',
 			'data': JSON.stringify({
 				'listId': listId,
@@ -1324,14 +1344,16 @@ this._options.logger && this._options.logger(obj.headers);
 	deleteListItem(listId, listItem, callback) {
 		
 		// data
-		let data = JSON.stringify({
+		//let data = JSON.stringify({
+		const data = JSON.stringify({
 			'listId': listId,
 			'id': listItem,
 			'value': '' // must be provided, but value doesn't matter
 		});
 		
 		// request options
-        let request = {
+        //let request = {
+		const request = {
 			'method': 'DELETE',
 			'data': data,
 			'headers': {
@@ -1521,7 +1543,7 @@ return this.parseValue4Notification(notification, value);    }
                 notification.status = value ? 'ON' : 'OFF';
                 break;
 			            
-			// Bizarre oublé, ajouté 14/09/2019
+			// Bizarre oublié, ajouté 14/09/2019
 			case 'date':
                 if (notification.type !== 'Timer') {
                     notification.alarmTime = value.getTime();
@@ -1537,11 +1559,13 @@ return this.parseValue4Notification(notification, value);    }
 				
 				
 				
-            case 'string':
-                let ar = value.split(':');
+            case 'string':{
+                //let ar = value.split(':');
+				const ar = value.split(':');
                 if (notification.type !== 'Timer') {
-                    let date = new Date(notification.alarmTime);
-                    date.setHours(parseInt(ar[0], 10), ar.length>1 ? parseInt(ar[1], 10) : 0, ar.length > 2 ? parseInt(ar[2], 10) : 0);
+                    //let date = new Date(notification.alarmTime);
+					const date = new Date(notification.alarmTime);
+                    date.setHours(parseInt(ar[0], 10), ar.length > 1 ? parseInt(ar[1], 10) : 0, ar.length > 2 ? parseInt(ar[2], 10) : 0);
                     notification.alarmTime = date.getTime();
                     notification.originalTime = `${_00(date.getHours())}:${_00(date.getMinutes())}:${_00(date.getSeconds())}.000`;
                 }
@@ -1556,6 +1580,7 @@ return this.parseValue4Notification(notification, value);    }
                 }*/
                 break;
         }
+		}
 
         const originalDateTime = notification.originalDate + ' ' + notification.originalTime;
         const bits = originalDateTime.split(/\D/);
@@ -1571,7 +1596,8 @@ return this.parseValue4Notification(notification, value);    }
 
 
     createNotification(notification, callback) {
-        let flags = {
+        //let flags = {
+		const flags = {
             data: JSON.stringify(notification),
             method: 'PUT'
         };
@@ -1598,7 +1624,8 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     deleteNotification(notification, callback) {
-        let flags = {
+        //let flags = {
+		const flags = {
             data: JSON.stringify (notification),
             method: 'DELETE'
         };
@@ -1619,8 +1646,9 @@ return this.parseValue4Notification(notification, value);    }
 
     // alarm volume
     getDeviceNotificationState(serialOrName, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        //let dev = this.find(serialOrName);
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         this.httpsGet (`/api/device-notification-state/${dev.deviceType}/${dev.softwareVersion}/${dev.serialNumber}&_=%t`, callback);
     }
@@ -1648,8 +1676,9 @@ return this.parseValue4Notification(notification, value);    }
             callback = contentType;
             contentType = 'station';
         }
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        //let dev = this.find(serialOrName);
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         this.httpsGet (`/api/tunein/queue-and-play
            ?deviceSerialNumber=${dev.serialNumber}
@@ -1684,8 +1713,10 @@ return this.parseValue4Notification(notification, value);    }
                 if (result.activities) {
 					if (typeof result.activities == "undefined") return;
                     for (let r = 0; r < result.activities.length; r++) {
-                        let res = result.activities[r];
-                        let o = {
+                        //let res = result.activities[r];
+                        //let o = {
+						const res = result.activities[r];
+                        const o = {
                             data: res
                         };
                         try {
@@ -1716,7 +1747,8 @@ return this.parseValue4Notification(notification, value);    }
                             if (!this.serialNumbers[o.deviceSerialNumber]) continue;
                             o.name = this.serialNumbers[o.deviceSerialNumber].accountName;
                             const dev = this.find(o.deviceSerialNumber);
-                            let wakeWord = (dev && dev.wakeWord) ? dev.wakeWord : null;
+                            //let wakeWord = (dev && dev.wakeWord) ? dev.wakeWord : null;
+							const wakeWord = (dev && dev.wakeWord) ? dev.wakeWord : null;
                             if (wakeWord && o.description.summary.startsWith(wakeWord)) {
                                 o.description.summary = o.description.summary.substr(wakeWord.length).trim();
                             }
@@ -1752,11 +1784,14 @@ return this.parseValue4Notification(notification, value);    }
             (err, result) => {
                 if (err || !result) return callback/*.length >= 2*/ && callback(err, result);
 
-                let ret = [];
+                //let ret = [];
+				const ret = [];
                 if (result.customerHistoryRecords) {
                     for (let r = 0; r < result.customerHistoryRecords.length; r++) {
-                        let res = result.customerHistoryRecords[r];
-                        let o = {
+                        //let res = result.customerHistoryRecords[r];
+                        //let o = {
+						const res = result.customerHistoryRecords[r];
+                        const o = {
                             data: res
                         };
                         const convParts = {};
@@ -1779,7 +1814,8 @@ return this.parseValue4Notification(notification, value);    }
                         if (!this.serialNumbers[o.deviceSerialNumber]) continue;
                         o.name = this.serialNumbers[o.deviceSerialNumber].accountName;
                         const dev = this.find(o.deviceSerialNumber);
-                        let wakeWord = (dev && dev.wakeWord) ? dev.wakeWord : null;
+                        //let wakeWord = (dev && dev.wakeWord) ? dev.wakeWord : null;
+						const wakeWord = (dev && dev.wakeWord) ? dev.wakeWord : null;
 
                         o.description = {'summary': ''};
                         if (convParts.CUSTOMER_TRANSCRIPT) {
@@ -1825,8 +1861,13 @@ return this.parseValue4Notification(notification, value);    }
     }
 
 
-    getAccount(callback) {
-        this.httpsGet (`https://alexa-comms-mobile-service.${this._options.amazonPage}/accounts`, callback);
+    //getAccount(callback) { 07/11/2021
+     getAccount(includeActors, callback) {
+        if (typeof includeActors === 'function') {
+            callback = includeActors;
+            includeActors = false;
+        }
+        this.httpsGet (`https://alexa-comms-mobile-service.${this._options.amazonPage}/accounts${includeActors ? '?includeActors=true' : ''}`, callback);       this.httpsGet (`https://alexa-comms-mobile-service.${this._options.amazonPage}/accounts`, callback);
     }
 
     getContacts(options, callback) {
@@ -1882,10 +1923,12 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     connectBluetooth(serialOrName, btAddress, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        //let dev = this.find(serialOrName);
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
-        let flags = {
+        //let flags = {
+		const flags = {
             data: JSON.stringify({ bluetoothDeviceAddress: btAddress}),
             method: 'POST'
         };
@@ -1893,10 +1936,12 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     disconnectBluetooth(serialOrName, btAddress, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        //let dev = this.find(serialOrName);
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
-        let flags = {
+        //let flags = {
+		const flags = {
             //data: JSON.stringify({ bluetoothDeviceAddress: btAddress}),
             method: 'POST'
         };
@@ -1904,10 +1949,12 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     setDoNotDisturb(serialOrName, enabled, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        //let dev = this.find(serialOrName);
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
-        let flags = {
+        //let flags = {
+		const flags = {
             data: JSON.stringify({
                 deviceSerialNumber: dev.serialNumber,
                 deviceType: dev.deviceType,
@@ -1918,7 +1965,8 @@ return this.parseValue4Notification(notification, value);    }
         this.httpsGet (`/api/dnd/status`, callback, flags);
     }
 
-    find(serialOrName, callback) {
+    //find(serialOrName, callback) { 07/11/2021
+    find(serialOrName) {
         if (typeof serialOrName === 'object') return serialOrName;
         if (!serialOrName) return null;
         let dev = this.serialNumbers[serialOrName];
@@ -1930,10 +1978,12 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     setAlarmVolume(serialOrName, volume, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        //let dev = this.find(serialOrName);
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
-        let flags = {
+        //let flags = {
+		const flags = {
             data: JSON.stringify ({
                 deviceSerialNumber: dev.serialNumber,
                 deviceType: dev.deviceType,
@@ -1949,8 +1999,9 @@ return this.parseValue4Notification(notification, value);    }
         return this.sendMessage(serialOrName, command, value, callback);
     }
     sendMessage(serialOrName, command, value, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        //let dev = this.find(serialOrName);
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         const commandObj = { contentFocusClientId: null };
         switch (command) {
@@ -1990,17 +2041,32 @@ return this.parseValue4Notification(notification, value);    }
         );
     }
 
-    createSequenceNode(command, value, serialOrName, callback) {
+    createSequenceNode(command, value, serialOrName, overrideCustomerId, callback) {
+		if (typeof overrideCustomerId === 'function') {
+            callback = overrideCustomerId;
+            overrideCustomerId = null;
+        }
         if (typeof serialOrName === 'function') {
             callback = serialOrName;
             serialOrName = undefined;
         }
         let deviceSerialNumber = 'ALEXA_CURRENT_DSN';
         let deviceType= 'ALEXA_CURRENT_DEVICE_TYPE';
+		let deviceOwnerCustomerId = 'ALEXA_CUSTOMER_ID';//07112021
         if (serialOrName && !Array.isArray(serialOrName)) {
             const currDevice = this.find(serialOrName);
-            deviceSerialNumber = currDevice.serialNumber;
-            deviceType = currDevice.deviceType;
+        //    deviceSerialNumber = currDevice.serialNumber;07112021
+        //    deviceType = currDevice.deviceType;
+			
+			 if (currDevice) {//07112021
+                deviceSerialNumber = currDevice.serialNumber;
+                deviceType = currDevice.deviceType;
+                deviceOwnerCustomerId = currDevice.deviceOwnerCustomerId;
+            }
+			
+        }
+		if (overrideCustomerId) {
+            deviceOwnerCustomerId = overrideCustomerId;
         }
         const seqNode = {
             '@type': 'com.amazon.alexa.behaviors.model.OpaquePayloadOperationNode',
@@ -2008,7 +2074,7 @@ return this.parseValue4Notification(notification, value);    }
                 'deviceType': deviceType,
                 'deviceSerialNumber': deviceSerialNumber,
                 'locale': 'ALEXA_CURRENT_LOCALE',
-                'customerId':'ALEXA_CUSTOMER_ID'
+                'customerId': deviceOwnerCustomerId
             }
         };
         switch (command) {
@@ -2053,12 +2119,16 @@ return this.parseValue4Notification(notification, value);    }
                 seqNode.skillId = 'amzn1.ask.1p.tellalexa';
                 seqNode.operationPayload.text = value.toString();
                 break;
-            case 'curatedtts':
-                let supportedValues = ["goodbye", "confirmations", "goodmorning", "compliments", "birthday", "goodnight", "iamhome"];
-                if(!supportedValues.includes(value)) { return null }
+            case 'curatedtts': {
+                //let supportedValues = ["goodbye", "confirmations", "goodmorning", "compliments", "birthday", "goodnight", "iamhome"];
+				const supportedValues = ["goodbye", "confirmations", "goodmorning", "compliments", "birthday", "goodnight", "iamhome"];
+                if(!supportedValues.includes(value)) { 
+				  return null;
+				}
                 seqNode.type = 'Alexa.CannedTts.Speak';
                 seqNode.operationPayload.cannedTtsStringId = `alexa.cannedtts.speak.curatedtts-category-${value}/alexa.cannedtts.speak.curatedtts-random`;
                 break;
+			}
             case 'volume':
                 seqNode.type = 'Alexa.DeviceControls.Volume';
                 value = ~~value;
@@ -2071,8 +2141,8 @@ return this.parseValue4Notification(notification, value);    }
                 seqNode.type = 'Alexa.DeviceControls.Stop';
                 seqNode.operationPayload.devices = [
                     {
-                        "deviceSerialNumber": deviceSerialNumber,
-                        "deviceType": deviceType
+                        'deviceSerialNumber': deviceSerialNumber,
+                        'deviceType': deviceType
                     }
                 ];
                 seqNode.operationPayload.isAssociatedDevice = false;
@@ -2122,11 +2192,30 @@ return this.parseValue4Notification(notification, value);    }
                 }
                 seqNode.operationPayload.textToSpeak = value;
                 break;
+			case 'skill':
+                seqNode.type = 'Alexa.Operation.SkillConnections.Launch';
+                if (typeof value !== 'string') value = String(value);
+                if (value.length === 0) {
+                    return callback && callback(new Error('Can not launch empty skill', null));
+                }
+                seqNode.skillId = value;
+                seqNode.operationPayload.targetDevice = {
+                    deviceType: seqNode.operationPayload.deviceType,
+                    deviceSerialNumber: seqNode.operationPayload.deviceSerialNumber
+                };
+                seqNode.operationPayload.connectionRequest = {
+                    uri: `connection://AMAZON.Launch/${value}`,
+                    input: {}
+                };
+                seqNode.name = null;
+                delete seqNode.operationPayload.deviceType;
+                delete seqNode.operationPayload.deviceSerialNumber;
+                break;
             case 'notification':
                 seqNode.type = 'Alexa.Notifications.SendMobilePush';
                 if (typeof value !== 'string') value = String(value);
                 if (value.length === 0) {
-                    return callback && callback(new Error('Can not notify empty string', null));
+                    return callback && callback(new Error('Can not notify empty string'), null);
                 }
                 seqNode.operationPayload.notificationMessage = value;
                 seqNode.operationPayload.alexaUrl = '#v2/behaviors';
@@ -2156,23 +2245,23 @@ return this.parseValue4Notification(notification, value);    }
                 seqNode.operationPayload.expireAfter = 'PT5S';
                 seqNode.operationPayload.content = [
                     {
-                        "locale": "fr-FR",
-                        "display": {
-                            "title": "ioBroker",
-                            "body": value.replace(/<[^>]+>/g, '')
+                        'locale': 'fr-FR',
+                        'display': {
+                            'title': 'ioBroker',
+                            'body': value.replace(/<[^>]+>/g, '')
                         },
-                        "speak": {
-                            "type": (command === 'ssml') ? 'ssml' : 'text',
-                            "value": value
+                        'speak': {
+                            'type': (command === 'ssml') ? 'ssml' : 'text',
+                            'value': value
                         }
                     }
                 ];
                 seqNode.operationPayload.target = {
-                    "customerId": "ALEXA_CUSTOMER_ID",
-                    "devices": [
+                    'customerId': deviceOwnerCustomerId,
+                    'devices': [
                         {
-                            "deviceSerialNumber": deviceSerialNumber,
-                            "deviceTypeId": deviceType
+                            'deviceSerialNumber': deviceSerialNumber,
+                            'deviceTypeId': deviceType
                         }
                     ]
                 };
@@ -2182,8 +2271,8 @@ return this.parseValue4Notification(notification, value);    }
                         const currDevice = this.find(deviceId);
                         if (!currDevice) return;
                         seqNode.operationPayload.target.devices.push({
-                            "deviceSerialNumber": currDevice.serialNumber,
-                            "deviceTypeId": currDevice.deviceType
+                            'deviceSerialNumber': currDevice.serialNumber,
+                            'deviceTypeId': currDevice.deviceType
                         });
                     });
                 }
@@ -2198,16 +2287,20 @@ return this.parseValue4Notification(notification, value);    }
         return seqNode;
     }
 
-    sendMultiSequenceCommand(serialOrName, commands, sequenceType, callback) {
+    sendMultiSequenceCommand(serialOrName, commands, sequenceType, overrideCustomerId, callback) {
+		if (typeof overrideCustomerId === 'function') {
+            callback = overrideCustomerId;
+            overrideCustomerId = null;
+        }
         if (typeof sequenceType === 'function') {
             callback = sequenceType;
             sequenceType = null;
         }
         if (!sequenceType) sequenceType = 'SerialNode'; // or ParallelNode
 
-        let nodes = [];
-        for (let command of commands) {
-            const commandNode = this.createSequenceNode(command.command, command.value, command.device ? command.device : serialOrName, callback);
+        const nodes = [];
+        for (const command of commands) {
+            const commandNode = this.createSequenceNode(command.command, command.value, command.device ? command.device : serialOrName, overrideCustomerId, callback);
             if (commandNode) nodes.push(commandNode);
         }
 
@@ -2225,9 +2318,14 @@ return this.parseValue4Notification(notification, value);    }
         this.sendSequenceCommand(serialOrName, sequenceObj, callback);
     }
 
-    sendSequenceCommand(serialOrName, command, value, callback) {
-        let dev = this.find(Array.isArray(serialOrName) ? serialOrName[0] : serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+    sendSequenceCommand(serialOrName, command, value, overrideCustomerId, callback) {
+         if (typeof overrideCustomerId === 'function') {
+            callback = overrideCustomerId;
+            overrideCustomerId = null;
+        }
+
+        const dev = this.find(Array.isArray(serialOrName) ? serialOrName[0] : serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         if (typeof value === 'function') {
             callback = value;
@@ -2241,7 +2339,7 @@ return this.parseValue4Notification(notification, value);    }
         else {
             seqCommandObj = {
                 '@type': 'com.amazon.alexa.behaviors.model.Sequence',
-                'startNode': this.createSequenceNode(command, value)
+                'startNode': this.createSequenceNode(command, value, dev, overrideCustomerId)
             };
         }
 
@@ -2291,10 +2389,13 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     playMusicProvider(serialOrName, providerId, searchPhrase, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
-        if (searchPhrase === '') return callback && callback(new Error ('Searchphrase empty', null));
-
+        const dev = this.find(serialOrName);
+     //   if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
+      //  if (searchPhrase === '') return callback && callback(new Error ('Searchphrase empty', null));
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
+        if (searchPhrase === '') return callback && callback(new Error('Searchphrase empty'), null);
+		
+		
         const operationPayload = {
             'deviceType': dev.deviceType,
             'deviceSerialNumber': dev.serialNumber,
@@ -2348,7 +2449,7 @@ return this.parseValue4Notification(notification, value);    }
         // 	"status": 1
         // }]
 
-        let message = [{
+        const message = [{
             conversationId: 'amzn1.comms.messaging.id.conversationV2~' + uuidv1(),
             clientMessageId: uuidv1(),
             messageId: 0.001,
@@ -2371,7 +2472,7 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     deleteConversation(conversationId, callback) {
-        let flags = {
+        const flags = {
             method: 'DELETE'
         };
         this.httpsGet (`https://alexa-comms-mobile-service.${this._options.amazonPage}/users/${this.commsId}/conversations/${conversationId}`, callback, flags);
@@ -2441,10 +2542,10 @@ return this.parseValue4Notification(notification, value);    }
 
 
     renameDevice(serialOrName, newName, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
-        let o = {
+        const o = {
             accountName: newName,
             serialNumber: dev.serialNumber,
             deviceAccountId: dev.deviceAccountId,
@@ -2461,7 +2562,7 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     deleteSmarthomeDevice(smarthomeDevice, callback) {
-        let flags = {
+        const flags = {
             method: 'DELETE'
             //data: JSON.stringify (o),
         };
@@ -2469,7 +2570,7 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     deleteSmarthomeGroup(smarthomeGroup, callback) {
-        let flags = {
+        const flags = {
             method: 'DELETE'
             //data: JSON.stringify (o),
         };
@@ -2477,7 +2578,7 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     deleteAllSmarthomeDevices(callback) {
-        let flags = {
+        const flags = {
             method: 'DELETE'
             //data: JSON.stringify (o),
         };
@@ -2485,7 +2586,7 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     discoverSmarthomeDevice(callback) {
-        let flags = {
+        const flags = {
             method: 'POST'
             //data: JSON.stringify (o),
         };
@@ -2501,9 +2602,9 @@ return this.parseValue4Notification(notification, value);    }
         }
 				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices-1xxxxxxxxxxxxxxx ','DEBUG');
 
-        let reqArr = [];
+        const reqArr = [];
         if (!Array.isArray(applicanceIds)) applicanceIds = [applicanceIds];
-        for (let id of applicanceIds) {
+        for (const id of applicanceIds) {
             reqArr.push({
                 'entityId': id,
                 'entityType': entityType
@@ -2511,7 +2612,7 @@ return this.parseValue4Notification(notification, value);    }
         }
 				//this._options.logger && this._options.logger('{Remote} ║ xxxxxxxxxxxxxquerySmarthomeDevices-2xxxxxxxxxxxxxxx ','DEBUG');
 
-        let flags = {
+        const flags = {
             method: 'POST',
             data: JSON.stringify ({
                 'stateRequests': reqArr
@@ -2552,9 +2653,9 @@ return this.parseValue4Notification(notification, value);    }
             entityType = 'APPLIANCE'; // other value 'GROUP'
         }
 
-        let reqArr = [];
+        const reqArr = [];
         if (!Array.isArray(entityIds)) entityIds = [entityIds];
-        for (let id of entityIds) {
+        for (const id of entityIds) {
             reqArr.push({
                 'entityId': id,
                 'entityType': entityType,
@@ -2562,7 +2663,7 @@ return this.parseValue4Notification(notification, value);    }
             });
         }
 
-        let flags = {
+        const flags = {
             method: 'PUT',
             data: JSON.stringify ({
                 'controlRequests': reqArr
@@ -2598,10 +2699,10 @@ return this.parseValue4Notification(notification, value);    }
 
 
     unpaireBluetooth(serialOrName, btAddress, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
-        let flags = {
+        const flags = {
             method: 'POST',
             data: JSON.stringify ({
                 bluetoothDeviceAddress: btAddress,
@@ -2612,10 +2713,10 @@ return this.parseValue4Notification(notification, value);    }
     }
 
     deleteDevice(serialOrName, callback) {
-        let dev = this.find(serialOrName, callback);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        const dev = this.find(serialOrName, callback);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
-        let flags = {
+        const flags = {
             method: 'DELETE',
             data: JSON.stringify ({
                 deviceType: dev.deviceType
@@ -2627,8 +2728,8 @@ return this.parseValue4Notification(notification, value);    }
 	// Ajouté par Sigalou
 	
     getNotificationSounds(serialOrName, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
         this.httpsGet (`/api/notification/sounds?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&softwareVersion=${dev.softwareVersion}&screenWidth=1392&_=%t`, callback);
     }
@@ -2677,18 +2778,19 @@ return this.parseValue4Notification(notification, value);    }
 	
 	// Liste les Playlists
     Playlists(serialOrName, callback) {
-		let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 		this.httpsGet (`/api/cloudplayer/playlists?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&mediaOwnerCustomerId=${dev.deviceOwnerCustomerId}&_=%t`, callback);
    }
    
    // Lit une playlist
    //http://192.168.0.21:3456/playlist?playlist=a8feaaf9-40a4-4e33-bd4d-b6dd71af85fd&device=G0911W079304113M
     playList(serialOrName, _playlistId, callback) {
-		let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 		
-        let flags = {
+		//JSON='{"contentToken":"music:'$(echo '["music/tuneIn/stationId","'${STATIONID}'"]|{"previousPageId":"TuneIn_SEARCH"}'| base64 -w 0| base64 -w 0 )'"}'
+        const flags = {
             data: JSON.stringify({
                 playlistId: _playlistId,
                 playQueuePrime: true
@@ -2697,15 +2799,19 @@ return this.parseValue4Notification(notification, value);    }
         };	
 		
 		this.httpsGet (`/api/cloudplayer/queue-and-play?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&mediaOwnerCustomerId=${dev.deviceOwnerCustomerId}&shuffle=false&_=%t`, callback, flags);
+//		this.httpsGet (`/api/entertainment/v1/player/queue?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&_=%t`, callback, flags);
+		
+//		 "https://${ALEXA}/api/tunein/queue-and-play?deviceSerialNumber=${DEVICESERIALNUMBER}&deviceType=${DEVICETYPE}&guideId=${STATIONID}&contentType=station&callSign=&mediaOwnerCustomerId=${MEDIAOWNERCUSTOMERID}"
+//		 "https://${ALEXA}/api/entertainment/v1/player/queue?deviceSerialNumber=${DEVICESERIALNUMBER}&deviceType=${DEVICETYPE}"
    }
    
    // Lit une MusicTrack
    //http://192.168.0.21:3456/playmusictrack?trackId=53bfa26d-f24c-4b13-97a8-8c3debdf06f0&device=G0911W079304113M
     playMusicTrack(serialOrName, _trackId, callback) {
-		let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 		
-        let flags = {
+        const flags = {
             data: JSON.stringify({
                 trackId: _trackId,
                 playQueuePrime: true
@@ -2752,10 +2858,10 @@ return this.parseValue4Notification(notification, value);    }
 	}	
 	
     setList(serialOrName, listType, value, callback) {
-        let dev = this.find(serialOrName);
-        if (!dev) return callback && callback(new Error ('Unknown Device or Serial number', null));
+        const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
 
-        let o = {
+        const o = {
             type: listType,
             text: value,
             createdDate: new Date().getTime(),

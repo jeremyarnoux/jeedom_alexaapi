@@ -22,13 +22,13 @@
   "dependencies": {
     "cookie": "^0.4.1",
     "express": "^4.17.1",
-    "alexa-cookie2": "^3.4.3",
+    "alexa-cookie2": "^4.0.1",
     "extend": "^3.0.2",
-    "http-proxy-middleware": "^2.0.0",
+    "http-proxy-middleware": "^2.0.1",
     "http-proxy-response-rewrite": "0.0.1",
     "https": "^1.0.0",
     "querystring": "^0.2.1",
     "request": "^2.88.2",
-    "iobroker.alexa2": "^3.9.0"
+    "iobroker.alexa2": "^3.12.0"
   }
 }
