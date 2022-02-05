@@ -661,6 +661,16 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 					'command': req.query.action,
 					'rangeValue': req.query.rangeValue
 				});
+		
+      	} else if (parameters.action == "lockAction") {
+
+        	parameters={'action': parameters.action,'targetLockState.lockState': req.query.lockState};
+		
+		toReturn.push({
+					'device': req.query.device,
+					'command': parameters.action,
+					'lockState': req.query.lockState
+				});
 
 	}	
 							
