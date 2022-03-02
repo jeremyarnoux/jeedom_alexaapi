@@ -393,19 +393,18 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour = 'per
             //log::add('alexaapi_widget', 'debug', '*********************************1metAJourPlaylist par '.$_quiMetaJour.'********************');
             $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/playerinfo?device=" . $serialdevice);
             $result = json_decode($json, true);
-            if (isset($result['playerInfo'])) {
-                $imageURLenCoursdeLecture = $result['playerInfo']['miniArt']['url']; //Modif 09/12/2019 proposée par Aidom, annulée 10/12/2019
-                $artist_enCoursdeLecture = $result['playerInfo']['infoText']['subText1'];
-                $title_enCoursdeLecture = $result['playerInfo']['infoText']['title'];
-                $album_enCoursdeLecture = $result['playerInfo']['infoText']['subText2'];
-                $etatPlayer = $result['playerInfo']['state'];
-            } else {
                 $imageURLenCoursdeLecture = "";
                 $artist_enCoursdeLecture = "";
                 $title_enCoursdeLecture = "";
                 $album_enCoursdeLecture = "";
                 $etatPlayer = "";
-            }
+            if (isset($result['playerInfo'])) {
+                if (isset($result['playerInfo']['miniArt']['url'])) $imageURLenCoursdeLecture = $result['playerInfo']['miniArt']['url']; //Modif 09/12/2019 proposée par Aidom, annulée 10/12/2019
+                if (isset($result['playerInfo']['infoText']['subText1'])) $artist_enCoursdeLecture = $result['playerInfo']['infoText']['subText1'];
+                if (isset($result['playerInfo']['infoText']['title'])) $title_enCoursdeLecture = $result['playerInfo']['infoText']['title'];
+                if (isset($result['playerInfo']['infoText']['subText2'])) $album_enCoursdeLecture = $result['playerInfo']['infoText']['subText2'];
+                if (isset($result['playerInfo']['state'])) $etatPlayer = $result['playerInfo']['state'];
+            } 
 
             //log::add('alexaapi_widget', 'debug', '-----------------subText1:'.$result['playerInfo']['infoText']['subText1']);
             //log::add('alexaapi_widget', 'debug', '-----------------subText2:'.$result['playerInfo']['infoText']['subText2']);
