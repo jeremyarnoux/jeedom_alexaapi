@@ -98,6 +98,9 @@ $json = json_decode($json, true);
 
             $heures = date("d-m-Y H:i:s", intval($item['creationTimestamp'] / 1000));
 
+            if(array_key_exists("activityStatus", $item)){$activityStatus = $item['activityStatus'];}
+            else {$activityStatus = "";}
+
             echo '<tr><td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $heures . '</span></td>';
             if ($ledevice != "")
                 echo '<td>' . $compteur . '<span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $ledevice . '</span></td>';
@@ -108,7 +111,7 @@ $json = json_decode($json, true);
             echo '<td><span style="font-size : 1em; cursor : default;">' . str_replace("jacques dit", "(via Jeedom)", $item['summary']) . '</span></td>';
 
 
-            echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $item['activityStatus'] . '</span></td>';
+            echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $activityStatus . '</span></td>';
 
 
             echo '</tr>';
