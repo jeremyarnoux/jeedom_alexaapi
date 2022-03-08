@@ -41,24 +41,8 @@ log::add('alexaapi', 'debug', '=================================================
 $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/routines");
 //echo $json;
 $json = json_decode($json, true);
-
-function sortBy($field, &$array, $direction = 'asc')
-{
-    usort($array, create_function('$a, $b', '
-        $a = $a["' . $field . '"];
-        $b = $b["' . $field . '"];
-
-        if ($a == $b) return 0;
-
-        $direction = strtolower(trim($direction));
-
-        return ($a ' . ($direction == 'desc' ? '>' : '<') . ' $b) ? -1 : 1;
-    '));
-
-    return true;
-}
-
-sortBy('utterance', $json, 'asc');
+$Temp = array_column($json, 'utterance');
+array_multisort($Temp, SORT_ASC, $json);
 ?>
 
     <table class="table table-condensed tablesorter" id="table_healthNetwork">
