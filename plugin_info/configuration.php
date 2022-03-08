@@ -30,6 +30,7 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 $plugin = plugin::byId('alexaapi');
 $deamon_info = $plugin->deamon_info();
 
+if (isset($_eqlogic_id) === false) {$_eqlogic_id = null;}
 $eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
 
 
