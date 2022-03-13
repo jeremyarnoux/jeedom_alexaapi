@@ -704,6 +704,7 @@ public static function templateWidget(){
                         $device = alexasmarthome::createNewDevice($item['displayName'], $item['id']);
                         $numNewDevices++;
                     }
+					event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Détection équipement smartHome [' . $device->getName() . ']', __FILE__),));
                     log::add('alexaapi_scan', 'debug', '[Plugin AlexasmartHome  ] ->> détection de [' . $item['id'] . "]" . $device->getName());
                     // Update device configuration
                     $device->setConfiguration('device', $item['displayName']);
@@ -746,7 +747,14 @@ public static function templateWidget(){
         config::save("numDevices", $numDevices, "alexaapi");
         log::add('alexaapi_scan', 'debug', $numAudioPlayer . ' Players / ' . $numFireTV . ' Fire TV / ' . $numsmartHome . ' smartHome/ ' . $numDevices . ' numDevices  -> enregistré dans Config');
 
-        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
+       // event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
+
+		event::add('jeedom::alert', array(
+												'level' => 'success',
+												'page' => 'alexaapi',
+												'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__),
+												'ttl' => 10000
+											));
     }
 
     public static function ajouteAmazonSmartHome($item)
@@ -872,6 +880,15 @@ public static function templateWidget(){
                                         if (!($Onatrouvelelien)) {
                                                 log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.json_encode($value7['friendlyName']).']═══════════════════════════════════════════════════════════════════════════');
                                                 log::add('alexasmarthome_scan', 'info', ' ║ Equipement ajouté.');
+												//event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Mise à jour de : ' . json_encode($value7['friendlyName']) . '"', __FILE__),));
+												
+												event::add('jeedom::alert', array(
+																						'level' => 'success',
+																						'page' => 'alexaapi',
+																						'message' => __('Mise à jour de [' . json_encode($value7['friendlyName']) . ']', __FILE__),
+																						'ttl' => 1000
+																					));
+												
 												//Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome)
                                                 log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
                                                 log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
@@ -906,7 +923,7 @@ public static function templateWidget(){
     private static function createNewDevice($deviceName, $deviceSerial)
     {
         $defaultRoom = intval(config::byKey('defaultParentObject', "alexaapi", '', true));
-        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Ajout de "' . $deviceName . '"', __FILE__),));
+        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Ajout de [' . $deviceName . ']', __FILE__),));
         $newDevice = new alexaapi();
         $newDevice->setName($deviceName);
         $newDevice->setLogicalId($deviceSerial);
@@ -1290,7 +1307,7 @@ public static function templateWidget(){
             log::add('alexaapi', 'warning', 'Pas de capacité détectée sur ' . $this->getName() . ' , assurez-vous que le démon est OK');
         }
 
-        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Mise à jour de "' . $this->getName() . '"', __FILE__),));
+        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Mise à jour de [' . $this->getName() . ']', __FILE__),));
         $this->refresh();
 
         if ($widgetPlayer) {
