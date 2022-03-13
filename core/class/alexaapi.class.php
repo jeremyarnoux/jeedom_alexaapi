@@ -122,24 +122,10 @@ class alexaapi extends eqLogic
                 "actif" => false
             );
         }
-		//log::add('alexaapi', 'debug', 'Test1  : listePluginsAlexaArray_controle' . $pluginId.":".plugin::byId($pluginId)->isActive());
-		//log::add('alexaapi', 'debug', 'Test2  : listePluginsAlexaArray_controle' . $pluginId.":".plugin::byId($pluginId)->getName());
-        //	array_push($liste, $valeurs);
+
         return $valeurs;
     }
 
-    /*
-public static function templateWidget(){
-        $return = array('info' => array('string' => array()));
-        $return['info']['string']['state'] = array(
-            'template' => 'tmplmultistate','test' => array(
-                array('operation' => '#value# == 2','state' => '<i class="icon maison-vacuum6"></i>'),
-                array('operation' => '#value# == 3','state' => '<i class="fas fa-pause"></i>'),
-                array('operation' => '#value# > 3 || #value# < 2','state' => '<i class="fas fa-home"></i>')
-            )
-        );
-        return $return;
-    }*/
     public static function templateWidget()
     {
         $return = array('info' => array('string' => array(), 'numeric' => array()));
@@ -430,24 +416,12 @@ public static function templateWidget(){
 	
     public static function supprimeTouslesDevicesSmartHome()
     {
-//$test = plugin::byId('alexasmarthome');
-        
-		//$eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexasmarthome', true);
-		
-	//	foreach (self::listePluginsAlexa(false, true) as $pluginAlexaUnparUn) {
             foreach (eqLogic::byType('alexasmarthome', false) as $eqLogic) {
 					//log::add('alexasmarthome_scan', 'debug', 'TEST---------->>>>> ' . $eqLogic->getName());
                 $eqLogic->remove();
             }
         }
-      /*  event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Suppression en cours ...', __FILE__)));
-        foreach (self::listePluginsAlexa(true, true) as $pluginAlexaUnparUn) {
-            foreach (eqLogic::byType(plugin::byId($pluginAlexaUnparUn)->getId()) as $eqLogic) {
-                $eqLogic->remove();
-            }
-        }*/
-        //self::scanAmazonAlexa();
- //   }
+
 	
     public static function cron($_eqlogic_id = null)
     {
@@ -882,10 +856,15 @@ public static function templateWidget(){
                                                 log::add('alexasmarthome_scan', 'info', ' ║ Equipement ajouté.');
 												//event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Mise à jour de : ' . json_encode($value7['friendlyName']) . '"', __FILE__),));
 												
+												$chaineName=json_encode($value7['friendlyName']);
+												$chaineName=preg_replace('/u([\da-fA-F]{4})/', '&#x\1;', $chaineName);
+												$chaineName= str_replace("*", "", $chaineName);
+												$chaineName= str_replace('"', '', $chaineName);
+												$chaineName= str_replace("\\", "", $chaineName);
 												event::add('jeedom::alert', array(
 																						'level' => 'success',
 																						'page' => 'alexaapi',
-																						'message' => __('Mise à jour de [' . json_encode($value7['friendlyName']) . ']', __FILE__),
+																						'message' => __('Mise à jour de [' . $chaineName, __FILE__),
 																						'ttl' => 1000
 																					));
 												
@@ -923,7 +902,7 @@ public static function templateWidget(){
     private static function createNewDevice($deviceName, $deviceSerial)
     {
         $defaultRoom = intval(config::byKey('defaultParentObject', "alexaapi", '', true));
-        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Ajout de [' . $deviceName . ']', __FILE__),));
+        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Ajout Equipement Amazon [' . $deviceName . ']', __FILE__),));
         $newDevice = new alexaapi();
         $newDevice->setName($deviceName);
         $newDevice->setLogicalId($deviceSerial);
@@ -969,17 +948,6 @@ public static function templateWidget(){
     	'));
         return true;
     }
-
-    /*
-    public function sortBy($field, &$array) {
-        usort($array, create_function('$a, $b', '
-        $a = $a["' . $field . '"];
-        $b = $b["' . $field . '"];
-        if ($a == $b) return 0;
-        return ($a < $b) ? -1 : 1;
-        '));
-        return true;
-    }*/
 
     public function refresh()
     { //$_routines c'est pour éviter de charger les routines lors du scan
@@ -1274,10 +1242,13 @@ public static function templateWidget(){
 
             $volinfo = $this->getCmd(null, 'volumeinfo');
             $vol = $this->getCmd(null, 'volume');
+			// ici c'est uniquement les devices Amazon les playlist et les players sont dans AmazonMusic
             if ((is_object($volinfo)) && (is_object($vol))) {
-                $vol->setValue($volinfo->getId()); // Lien entre volume et volumeinfo
-                $vol->save();
-            }
+               $vol->setValue($volinfo->getId()); // Lien entre volume et volumeinfo
+               $vol->save();
+            } 
+						
+			
             // Pour la commande Refresh, on garde l'ancienne méthode
             if (($this->hasCapaorFamilyorType("REMINDERS")) && !($this->getConfiguration('devicetype') == "Smarthome")) {
                 //Commande Refresh

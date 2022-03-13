@@ -118,13 +118,14 @@ class AlexaRemote extends EventEmitter {
             delete this._options.refreshCookieInterval;
         }
         if (this._options.cookieRefreshInterval !== 0) {
-            this._options.cookieRefreshInterval = this._options.cookieRefreshInterval || 7*24*60*60*1000; // Auto Refresh after 7 days
+        //    this._options.cookieRefreshInterval = this._options.cookieRefreshInterval || 7*24*60*60*1000; // Auto Refresh after 7 days
+            this._options.cookieRefreshInterval = this._options.cookieRefreshInterval || 4*24*60*60*1000; // Auto Refresh after 4 days modif 13/03/2022
         }
 
         const self = this;
         function getCookie(callback) {
             if (!self.cookie) {
-				self._options.logger && self._options.logger('{Remote} ║ No cookie given, generate one !!!!!!!!!! ','DEBUG');
+				self._options.logger && self._options.logger('{Remote} ║ Pas de cookie présent, Il faut le générer.','DEBUG');
                 //self._options.logger && self._options.logger('{Remote} ║ No cookie given, generate one');
                 self._options.cookieJustCreated = true;
                 self.generateCookie(self._options.email, self._options.password, function(err, res) {
@@ -164,9 +165,9 @@ class AlexaRemote extends EventEmitter {
                             self.cookie = null;
                             return getCookie(callback); // error on refresh
                         }
-                //self._options.logger && self._options.logger('{Remote} ╠══***********************═════> avant','DEBUG');
+                self._options.logger && self._options.logger('{Remote} ╠══***********************═════> avant','DEBUG');
 						self.setCookie(res); // update
-                //self._options.logger && self._options.logger('{Remote} ╠══***********************═════> après','DEBUG');
+                self._options.logger && self._options.logger('{Remote} ╠══***********************═════> après','DEBUG');
                         return callback(null);
                     });
                 }
@@ -785,11 +786,13 @@ class AlexaRemote extends EventEmitter {
     }
 
     generateCookie(email, password, callback) {
+		this._options.logger && this._options.logger('{Remote} ╠═══════> generateCookie()','DEBUG');
         if (!this.alexaCookie) this.alexaCookie = require('./alexa-cookie.js');
         this.alexaCookie.generateAlexaCookie(email, password, this._options, callback);
     }
 
     refreshCookie(callback) {
+		this._options.logger && this._options.logger('{Remote} ╠═══════> refreshCookie()','DEBUG');
         if (!this.alexaCookie) this.alexaCookie = require('./alexa-cookie.js');
         this.alexaCookie.refreshAlexaCookie(this._options, callback);
     }

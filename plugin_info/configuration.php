@@ -423,7 +423,7 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
         $('#md_modal').dialog('close');
 
         bootbox.confirm({
-            message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API (et des autres plugin Alexa-xx) ? Il faudra refaire les scénarios.",
+            message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API (Cela supprime les players et les playlists mais pas les smartHome du plugin Alexa-smartHome) ? Il faudra refaire les scénarios.",
             buttons: {
                 confirm: {
                     label: 'Oui',
