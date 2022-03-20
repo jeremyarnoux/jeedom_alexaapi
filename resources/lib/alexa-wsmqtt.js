@@ -243,7 +243,7 @@ class AlexaWsMqtt extends EventEmitter {
                 this.websocket.close();
                 return;
             }
-            this._options.logger && this._options.logger('{MQTT}   ║ Open: ' + url  ,'DEBUG');
+            //this._options.logger && this._options.logger('{MQTT}   ║ Open: ' + url  ,'DEBUG');
             this.connectionActive = false;
 
             if (!this.macDms) {
@@ -272,9 +272,9 @@ class AlexaWsMqtt extends EventEmitter {
             if (!this.websocket || this.websocket.readyState !== 1 /* OPEN */) {
                 return;
             }
-            this._options.logger && this._options.logger('{MQTT}   ║ Incoming RAW message: ' + data.toString('hex')  ,'DEBUG');
+            //this._options.logger && this._options.logger('{MQTT}   ║ Incoming RAW message: ' + data.toString('hex')  ,'DEBUG');
             let message = this.parseIncomingMessage(data);
-            this._options.logger && this._options.logger('{MQTT}   ║ Incoming message: ' + JSON.stringify(message)  ,'DEBUG');
+            //this._options.logger && this._options.logger('{MQTT}   ║ Incoming message: ' + JSON.stringify(message)  ,'DEBUG');
 
             if (msgCounter === 0) { // initialization
                 if (message.content.protocolName) {
@@ -287,16 +287,16 @@ class AlexaWsMqtt extends EventEmitter {
                     this._options.logger && this._options.logger('{MQTT}   ║ Unexpected Response: ' + JSON.stringify(message)  ,'DEBUG');
                     this.protocolName = this.macDms ? 'A:F' : 'A:H';
                 }
-                this._options.logger && this._options.logger('{MQTT}   ║ Detected protocol ' + this.protocolName  ,'DEBUG');
+                //this._options.logger && this._options.logger('{MQTT}   ║ Detected protocol ' + this.protocolName  ,'DEBUG');
 
                 let msg;
                 if (this.protocolName === 'A:F') { // A:F
                     msg = Buffer.from('0xfe88bc52 0x0000009c {"protocolName":"A:F","parameters":{"AlphaProtocolHandler.receiveWindowSize":"16","AlphaProtocolHandler.maxFragmentSize":"16000"}}TUNE');
                     await this.sendWs(msg);
-                   this._options.logger && this._options.logger('{MQTT}   ║ A:F Initialization Msg 2 sent: ' + msg.toString('hex')  ,'DEBUG');
+                   //this._options.logger && this._options.logger('{MQTT}   ║ A:F Initialization Msg 2 sent: ' + msg.toString('hex')  ,'DEBUG');
                     await this.wait(50);
                     msg = this.encodeGWRegisterAF();
-                   this._options.logger && this._options.logger('{MQTT}   ║ A:F Initialization Msg 3 (Register Connection) sent: ' + msg.toString('hex')  ,'DEBUG');
+                   //this._options.logger && this._options.logger('{MQTT}   ║ A:F Initialization Msg 3 (Register Connection) sent: ' + msg.toString('hex')  ,'DEBUG');
                     //console.log('SEND: ' + msg.toString('ascii'));
                     await this.sendWs(msg);
                     msgCounter++;
@@ -329,7 +329,7 @@ class AlexaWsMqtt extends EventEmitter {
 
                     //msg = new Buffer('4D53472030783030303030303635203078306534313465343720662030783030303030303031203078626332666262356620307830303030303036322050494E00000000D1098D8CD1098D8C000000070052006500670075006C0061007246414245', 'hex'); // "MSG 0x00000065 0x0e414e47 f 0x00000001 0xbc2fbb5f 0x00000062 PIN" + 30 + "FABE"
                     let msg = this.encodePing();
-                    this._options.logger && this._options.logger('{MQTT}   ║ Send First Ping MQTT'  ,'INFO');
+                    this._options.logger && this._options.logger('{MQTT}   ║ Ping MQTT ►►► sur '+ url  ,'INFO');
                     //console.log('SEND: ' + msg.toString('hex'));
                     this.websocket.send(msg);
 
@@ -355,11 +355,11 @@ class AlexaWsMqtt extends EventEmitter {
             const incomingMsg = data.toString('ascii');
             //if (incomingMsg.includes('PON') && incomingMsg.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
             if (message.service === 'FABE' && message.content && message.content.messageType === 'PON' && message.content.payloadData && message.content.payloadData.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
-                this._options.logger && this._options.logger('{MQTT}   ║ Received Pong'  ,'INFO');
+                this._options.logger && this._options.logger('{MQTT}   ║ ◄◄◄  MQTT Pong'  ,'INFO');
                 if (initTimeout) {
                     clearTimeout(initTimeout);
                     initTimeout = null;
-                    this._options.logger && this._options.logger('{MQTT}   ║ Initialization MQTT completed','INFO');
+                    this._options.logger && this._options.logger('{MQTT}   ║ Initialisation MQTT OK','INFO');
                     this._options.logger && this._options.logger('{MQTT}   ╚═══════════════════════════════════════════════════════════════════════════════','INFO');
                     this.emit('connect');
                 }

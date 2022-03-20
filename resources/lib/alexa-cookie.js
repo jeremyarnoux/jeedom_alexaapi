@@ -54,7 +54,7 @@ function AlexaCookie() {
                 if (cookies[cookie[1]] && cookies[cookie[1]] !== cookie[2]) {
                     _options.logger('{Cookie} ║ │ Update Cookie ' + cookie[1] + ' = ' + cookie[2],'DEBUG');
                 } else if (!cookies[cookie[1]]) {
-                    _options.logger('{Cookie} ║ │ Add Cookie ' + cookie[1] + ' = ' + cookie[2],'DEBUG');
+                    //_options.logger('{Cookie} ║ │ Add Cookie ' + cookie[1] + ' = ' + cookie[2],'DEBUG');
                 }
                 cookies[cookie[1]] = cookie[2];
             }
@@ -69,7 +69,7 @@ function AlexaCookie() {
     };
 
     const request = (options, info, callback) => {
-        _options.logger('{Cookie} ║ │ Sending Request with ' + JSON.stringify(options),'DEBUG');
+        //_options.logger('{Cookie} ║ │ Sending Request with ' + JSON.stringify(options),'DEBUG');
         if (typeof info === 'function') {
             callback = info;
             info = {
@@ -91,7 +91,7 @@ function AlexaCookie() {
             info.requests.push({options: options, response: res});
 
             if (options.followRedirects !== false && res.statusCode >= 300 && res.statusCode < 400) {
-                _options.logger('{Cookie} ║ │ Response (' + res.statusCode + ')' + (res.headers.location ? ' - Redirect to ' + res.headers.location : ''),'DEBUG');
+                //_options.logger('{Cookie} ║ │ Response (' + res.statusCode + ')' + (res.headers.location ? ' - Redirect to ' + res.headers.location : ''),'DEBUG');
                 //options.url = res.headers.location;
                 let u = url.parse(res.headers.location);
                 if (u.host) options.host = u.host;
@@ -103,7 +103,7 @@ function AlexaCookie() {
                 res.socket && res.socket.end();
                 return request(options, info, callback);
             } else {
-                _options.logger('{Cookie} ║ │ Response (' + res.statusCode + ')','DEBUG');
+                //_options.logger('{Cookie} ║ │ Response (' + res.statusCode + ')','DEBUG');
                 res.on('data', (chunk) => {
                     body += chunk;
                 });
@@ -148,12 +148,12 @@ function AlexaCookie() {
         if (_options.formerRegistrationData && _options.formerRegistrationData.amazonPage) _options.amazonPage = _options.formerRegistrationData.amazonPage;
 
 		_options.logger('{Cookie} ║ ┌────────────────────────────────────────────────────────────────────────────────────────────────────','INFO');
-		_options.logger('{Cookie} ║ │        Récupération du Cookie Amazon   ' ,'INFO');
+		_options.logger('{Cookie} ║ │        Récupération d\'un nouveau Cookie Amazon   ' ,'INFO');
  		_options.logger('{Cookie} ║ ├────────────────────────────────────────────────────────────────────────────────────────────────────','INFO');
-       _options.logger('{Cookie} ║ │ Use as Login-Amazon-URL: ' + _options.amazonPage,'DEBUG');
+      // _options.logger('{Cookie} ║ │ Use as Login-Amazon-URL: ' + _options.amazonPage,'DEBUG');
 
         _options.baseAmazonPage = _options.baseAmazonPage || 'amazon.com';
-        _options.logger('{Cookie} ║ │ Use as Base-Amazon-URL: ' + _options.baseAmazonPage,'DEBUG');
+     //   _options.logger('{Cookie} ║ │ Use as Base-Amazon-URL: ' + _options.baseAmazonPage,'DEBUG');
 
         if (!_options.baseAmazonPageHandle) {
             const amazonDomain = _options.baseAmazonPage.substr(_options.baseAmazonPage.lastIndexOf('.') + 1);
@@ -180,10 +180,10 @@ function AlexaCookie() {
                 _options.userAgent = defaultUserAgentLinux;
             }
         }
-        _options.logger('{Cookie} ║ │ Use as User-Agent: ' + _options.userAgent,'DEBUG');
+     //   _options.logger('{Cookie} ║ │ Use as User-Agent: ' + _options.userAgent,'DEBUG');
 
         _options.acceptLanguage = _options.acceptLanguage || defaultAcceptLanguage;
-        _options.logger('{Cookie} ║ │ Use as Accept-Language: ' + _options.acceptLanguage,'DEBUG');
+    //    _options.logger('{Cookie} ║ │ Use as Accept-Language: ' + _options.acceptLanguage,'DEBUG');
 
         if (_options.setupProxy && !_options.proxyOwnIp) {
             _options.logger('{Cookie} ║ │ Own-IP Setting missing for Proxy. Disabling!','DEBUG');
@@ -196,7 +196,7 @@ function AlexaCookie() {
             _options.logger('{Cookie} ║ │ Proxy-Mode enabled if needed: ' + _options.proxyOwnIp + ':' + _options.proxyPort + ' to listen on ' + _options.proxyListenBind,'DEBUG');
         } else {
             _options.setupProxy = false;
-            _options.logger('{Cookie} ║ │ Proxy mode disabled','DEBUG');
+           // _options.logger('{Cookie} ║ │ Proxy mode disabled','DEBUG');
         }
         _options.proxyLogLevel = _options.proxyLogLevel || 'warn';
         _options.amazonPageProxyLanguage = _options.amazonPageProxyLanguage || 'fr_FR';
@@ -235,7 +235,7 @@ function AlexaCookie() {
                 }
             };
 
-            _options.logger('{Cookie} ║ │ Step 4: get CSRF via ' + path,'DEBUG');
+           // _options.logger('{Cookie} ║ │ Step 4: get CSRF via ' + path,'DEBUG');
             request(options, (error, response) => {
                 cookie = addCookies(cookie, response ? response.headers : null);
                 let ar = /csrf=([^;]+)/.exec(cookie);
@@ -417,7 +417,7 @@ function AlexaCookie() {
 
 
     const handleTokenRegistration = (_options, loginData, callback) => {
-        _options.logger('{Cookie} ║ │ Handle token registration Start: ' + JSON.stringify(loginData),'DEBUG');
+        //_options.logger('{Cookie} ║ │ Handle token registration Start: ' + JSON.stringify(loginData),'DEBUG');
 
         let deviceSerial;
         if (!_options.formerRegistrationData || !_options.formerRegistrationData.deviceSerial) {
@@ -427,7 +427,7 @@ function AlexaCookie() {
             }
             deviceSerial = deviceSerialBuffer.toString('hex');
         } else {
-            _options.logger('{Proxy}  ║ │ reuse deviceSerial from former data','DEBUG');
+            //_options.logger('{Proxy}  ║ │ reuse deviceSerial from former data','DEBUG');
             deviceSerial = _options.formerRegistrationData.deviceSerial;
         }
         loginData.deviceSerial = deviceSerial;
@@ -500,8 +500,8 @@ function AlexaCookie() {
             },
             body: JSON.stringify(registerData)
         };
-        _options.logger('{Cookie} ║ │ Register App','DEBUG');
-        _options.logger('{Cookie} ║ │ '+JSON.stringify(options),'DEBUG');
+        //_options.logger('{Cookie} ║ │ Register App','DEBUG');
+        //_options.logger('{Cookie} ║ │ '+JSON.stringify(options),'DEBUG');
         request(options, (error, response, body) => {
             if (error) {
                 callback && callback(error, null);
@@ -514,7 +514,7 @@ function AlexaCookie() {
                 callback && callback(err, null);
                 return;
             }
-            _options.logger('{Cookie} ║ │ Register App Response: ' + JSON.stringify(body),'DEBUG');
+            //_options.logger('{Cookie} ║ │ Register App Response: ' + JSON.stringify(body),'DEBUG');
 
             if (!body.response || !body.response.success || !body.response.success.tokens || !body.response.success.tokens.bearer) {
                 callback && callback(new Error('No tokens in Register response'), null);
@@ -543,8 +543,8 @@ function AlexaCookie() {
                     'Cookie': Cookie
                 }
             };
-            _options.logger('{Cookie} ║ │ Get User data','DEBUG');
-            _options.logger('{Cookie} ║ │ '+JSON.stringify(options),'DEBUG');
+            //_options.logger('{Cookie} ║ │ Get User data','DEBUG');
+            //_options.logger('{Cookie} ║ │ '+JSON.stringify(options),'DEBUG');
             request(options, (error, response, body) => {
                 if (!error) {
                     try {
@@ -554,7 +554,7 @@ function AlexaCookie() {
                         callback && callback(err, null);
                         return;
                     }
-                    _options.logger('{Cookie} ║ │ Get User data Response: ' + JSON.stringify(body),'DEBUG');
+                    //_options.logger('{Cookie} ║ │ Get User data Response: ' + JSON.stringify(body),'DEBUG');
 
                     Cookie = addCookies(Cookie, response.headers);
 
@@ -589,6 +589,7 @@ function AlexaCookie() {
                         loginData.csrf = resData.csrf;
                         delete loginData.accessToken;
                         _options.logger('{Cookie} ║ │ Final Registration Result: ' + JSON.stringify(loginData),'DEBUG');
+						_options.logger('{Cookie} ║ │ OK Opération réussie OK','INFO');
 						_options.logger('{Cookie} ║ └────────────────────────────────────────────────────────────────────────────────────────────────────','INFO');
 
                         callback && callback(null, loginData);
@@ -633,8 +634,8 @@ function AlexaCookie() {
                 encodeURIComponent: encodeURIComponent
             })
         };
-        _options.logger('{Cookie} ║ │ Exchange tokens for ' + amazonPage,'DEBUG');
-        _options.logger('{Cookie} ║ │ '+JSON.stringify(options),'DEBUG');
+        //_options.logger('{Cookie} ║ │ Exchange tokens for ' + amazonPage,'DEBUG');
+        //_options.logger('{Cookie} ║ │ '+JSON.stringify(options),'DEBUG');
 
         request(options, (error, response, body) => {
             if (error) {
@@ -648,7 +649,7 @@ function AlexaCookie() {
                 callback && callback(err, null);
                 return;
             }
-            _options.logger('{Cookie} ║ │ Exchange Token Response: ' + JSON.stringify(body),'DEBUG');
+            //_options.logger('{Cookie} ║ │ Exchange Token Response: ' + JSON.stringify(body),'DEBUG');
 
             if (!body.response || !body.response.tokens || !body.response.tokens.cookies) {
                 callback && callback(new Error('No cookies in Exchange response'), null);
@@ -662,11 +663,11 @@ function AlexaCookie() {
             Cookie = addCookies(Cookie, response.headers);
             const cookies = cookieTools.parse(Cookie);
             body.response.tokens.cookies['.' + amazonPage].forEach((cookie) => {
-                if (cookies[cookie.Name] && cookies[cookie.Name] !== cookie.Value) {
+                /*if (cookies[cookie.Name] && cookies[cookie.Name] !== cookie.Value) { // Non indispensable debug uniquement
                     _options.logger('{Cookie} ║ │ Update Cookie ' + cookie.Name + ' = ' + cookie.Value,'DEBUG');
                 } else if (!cookies[cookie.Name]) {
                     _options.logger('{Cookie} ║ │ Add Cookie ' + cookie.Name + ' = ' + cookie.Value,'DEBUG');
-                }
+                }*/
                 cookies[cookie.Name] = cookie.Value;
 
             });
@@ -730,8 +731,8 @@ function AlexaCookie() {
             body: querystring.stringify(refreshData)
         };
         Cookie = _options.formerRegistrationData.loginCookie;
-        _options.logger('{Cookie} ║ │ Refresh Token','DEBUG');
-        _options.logger('{Cookie} ║ │ '+JSON.stringify(options),'DEBUG');
+       // _options.logger('{Cookie} ║ │ Refresh Token','DEBUG');
+       // _options.logger('{Cookie} ║ │ '+JSON.stringify(options),'DEBUG');
         request(options, (error, response, body) => {
             if (error) {
                 callback && callback(error, null);
@@ -744,7 +745,7 @@ function AlexaCookie() {
                 callback && callback(err, null);
                 return;
             }
-            _options.logger('{Cookie} ║ │ Refresh Token Response: ' + JSON.stringify(body),'DEBUG');
+            //_options.logger('{Cookie} ║ │ Refresh Token Response: ' + JSON.stringify(body),'DEBUG');
 
             _options.formerRegistrationData.loginCookie = addCookies(_options.formerRegistrationData.loginCookie, response.headers);
 

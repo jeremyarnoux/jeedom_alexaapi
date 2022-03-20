@@ -465,16 +465,25 @@ class alexaapi extends eqLogic
             //self::checkAuth(); 20/09/2020 on désactive ce test pour voir s'il est utile ou pas
         }
 
+		//Version Précédente (option dans config)
 		//Relance non obligatoire depuis la stabilité du cookie. Déconseillé, ajout de la condition "réservé aux utilisateurs expérimentés" Modif Sigalou 21/03/2021
+		/*
         if (config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0") {
-			//$autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '33 3 * * *'));/* boucle qui relance la connexion au serveur*/
-			$autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '51 20 31 01 0 2021'));/* Par défaut désactivé également Modif Sigalou 21/03/2021*/
+			//$autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '33 3 * * *'));
+			$autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '51 20 31 01 0 2021'));
 			$cc = new Cron\CronExpression($autorefreshRR, new Cron\FieldFactory);
 			if ($cc->isDue() && $deamon_info['state'] == 'ok') {
 				self::restartServeurPHP();
 			}
-		}
-
+		}*/
+		//Nouvelle Version RELANCE TOUS LES 7 JOURS POUR VERIFIER LE REFRESH COOKIE
+			//$autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '33 3 * * *'));/* boucle qui relance la connexion au serveur*/
+			$cc = new Cron\CronExpression('30 15 * * */7', new Cron\FieldFactory); 
+			if ($cc->isDue() && $deamon_info['state'] == 'ok') {
+				self::restartServeurPHP();
+			}
+		
+		
         $r = new Cron\CronExpression('*/16 * * * *', new Cron\FieldFactory); // boucle refresh
         //		$r = new Cron\CronExpression('* * * * *', new Cron\FieldFactory);// boucle refresh
         if ($r->isDue() && $deamon_info['state'] == 'ok') {

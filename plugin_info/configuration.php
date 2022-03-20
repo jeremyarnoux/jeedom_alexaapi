@@ -136,30 +136,7 @@ $versionJeedom = $return['configuration']['version'];
     </fieldset>
 </form>
 
-<?php if (config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0") :?>
-				<form class="form-horizontal">
-					<fieldset>
-						<legend><i class="fas fa-server"></i> {{Option Lien serveur}}</legend>
-
-						<div class="form-group">
-							<label class="col-sm-4 control-label">{{Relance de l'identification au serveur}}</label>
-							<div class="col-lg-2">
-								<div class="input-group">
-									<input type="text" class="configKey form-control" data-l1key="autorefresh"
-										   placeholder="33 3 * * *"/>
-									<span class="input-group-btn">
-										<a class="btn btn-success btn-sm " id="bt_cronGenerator"><i class="fas fa-question-circle"></i></a>
-									</span>
-								</div>
-							</div>
-						</div>
-						</div>
-					</fieldset>
-				</form>
-				<?php
-    endif; 
-
-
+<?php 
 			
 $foundSelect = false;
 if (config::byKey("listRoutines", "alexaapi", "") != '') {

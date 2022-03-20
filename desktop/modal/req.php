@@ -69,7 +69,7 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
                 <option value="wakeWords" <?php if ($_GET['json'] == "wakeWords") echo "selected" ?>>WakeWords</option>
                 <option value="devicesFull" <?php if ($_GET['json'] == "devicesFull") echo "selected" ?>>Devices
                 </option>
-                <option value="historyFull" <?php if ($_GET['json'] == "historyFull") echo "selected" ?>>History
+				<option value="historyFull" <?php if ($_GET['json'] == "historyFull") echo "selected" ?>>History
                 </option>
                 <option value="remindersFull" <?php if ($_GET['json'] == "remindersFull") echo "selected" ?>>Reminders
                 </option>
