@@ -68,7 +68,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
                     _options.formerRegistrationData.frc = _options.formerRegistrationData.frc || formerDataStore.frc;
                     _options.formerRegistrationData['map-md'] = _options.formerRegistrationData['map-md'] || formerDataStore['map-md'];
                     _options.formerRegistrationData.deviceId = _options.formerRegistrationData.deviceId || formerDataStore.deviceId;
-                    _options.logger && _options.logger('{Proxy}  ║ │ loaded temp data store ass fallback former data');
+                    //_options.logger && _options.logger('{Proxy}  ║ │ loaded temp data store ass fallback former data');
                     formerDataStoreValid = true;
                 }
             }
@@ -86,7 +86,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         initialCookies.frc = frcBuffer.toString('base64');
     }
     else {
-        _options.logger && _options.logger('{Proxy}  ║ │ reuse frc from former data');
+        //_options.logger && _options.logger('{Proxy}  ║ │ reuse frc from former data');
         initialCookies.frc = _options.formerRegistrationData.frc;
     }
 
@@ -94,7 +94,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         initialCookies['map-md'] = Buffer.from('{"device_user_dictionary":[],"device_registration_data":{"software_version":"1"},"app_identifier":{"app_version":"2.2.223830","bundle_id":"com.amazon.echo"}}').toString('base64');
     }
     else {
-        _options.logger && _options.logger('{Proxy}  ║ │ reuse map-md from former data');
+        //_options.logger && _options.logger('{Proxy}  ║ │ reuse map-md from former data');
         initialCookies['map-md'] = _options.formerRegistrationData['map-md'];
     }
 
@@ -106,7 +106,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         deviceId += '23413249564c5635564d32573831';
     }
     else {
-        _options.logger && _options.logger('{Proxy}  ║ │ reuse deviceId from former data');
+        //_options.logger && _options.logger('{Proxy}  ║ │ reuse deviceId from former data');
         deviceId = _options.formerRegistrationData.deviceId;
     }
 
@@ -228,11 +228,11 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         if (url.endsWith('.ico') || url.endsWith('.js') || url.endsWith('.ttf') || url.endsWith('.svg') || url.endsWith('.png') || url.endsWith('.appcache')) return;
         //if (url.startsWith('/ap/uedata')) return;
 
-        _options.logger && _options.logger('{Proxy}  ║ │ Proxy-Request: ' + req.method + ' ' + url);
+        //_options.logger && _options.logger('{Proxy}  ║ │ Proxy-Request: ' + req.method + ' ' + url);
         //_options.logger && _options.logger('{Proxy}  ║ │ Proxy-Request-Data: ' + customStringify(proxyReq, null, 2));
 
         if (typeof proxyReq.getHeader === 'function') {
-            _options.logger && _options.logger('{Proxy}  ║ │ Headers: ' + JSON.stringify(proxyReq.getHeaders()));
+            //_options.logger && _options.logger('{Proxy}  ║ │ Headers: ' + JSON.stringify(proxyReq.getHeaders()));
             let reqCookie = proxyReq.getHeader('cookie');
             if (reqCookie === undefined) {
                 reqCookie = "";
@@ -252,7 +252,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             } else {
                 proxyCookies += '; ' + reqCookie;
             }
-            _options.logger && _options.logger('{Proxy}  ║ │ Headers: ' + JSON.stringify(proxyReq.getHeaders()));
+            //_options.logger && _options.logger('{Proxy}  ║ │ Headers: ' + JSON.stringify(proxyReq.getHeaders()));
         }
 
         let modified = false;
@@ -260,12 +260,12 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             if (typeof proxyReq.getHeader === 'function' && proxyReq.getHeader('referer')) {
                 let fixedReferer = replaceHostsBack(proxyReq.getHeader('referer'));
                 proxyReq.setHeader('referer', fixedReferer);
-                _options.logger && _options.logger('{Proxy}  ║ │ Modify headers: Changed Referer: ' + fixedReferer);
+                //_options.logger && _options.logger('{Proxy}  ║ │ Modify headers: Changed Referer: ' + fixedReferer);
                 modified = true;
             }
             if (typeof proxyReq.getHeader === 'function' && proxyReq.getHeader('origin') !== 'https://' + proxyReq.getHeader('host')) {
                 proxyReq.setHeader('origin', `https://www.${_options.baseAmazonPage}`);
-                _options.logger && _options.logger('{Proxy}  ║ │ Modify headers: Delete Origin');
+                //_options.logger && _options.logger('{Proxy}  ║ │ Modify headers: Delete Origin');
                 modified = true;
             }
 
@@ -274,7 +274,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
                 postBody += chunk.toString(); // convert Buffer to string
             });
         }
-        _options.proxyLogLevel === 'debug' && _options.logger && _options.logger('{Proxy}  ║ │ Proxy-Request: (modified:' + modified + ')' + customStringify(proxyReq, null, 2));
+        //_options.proxyLogLevel === 'debug' && _options.logger && _options.logger('{Proxy}  ║ │ Proxy-Request: (modified:' + modified + ')' + customStringify(proxyReq, null, 2));
     }
 
     function onProxyRes(proxyRes, req, res) {
@@ -284,9 +284,9 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
         //_options.logger && _options.logger('Proxy-Response: ' + customStringify(proxyRes, null, 2));
         let reqestHost = null;
         if (proxyRes.socket && proxyRes.socket._host) reqestHost = proxyRes.socket._host;
-        _options.logger && _options.logger('{Proxy}  ║ │ Proxy Response from Host: ' + reqestHost);
-        _options.proxyLogLevel === 'debug' && _options.logger && _options.logger('{Proxy}  ║ │ Proxy-Response Headers: ' + customStringify(proxyRes.headers, null, 2));
-        _options.proxyLogLevel === 'debug' && _options.logger && _options.logger('{Proxy}  ║ │ Proxy-Response Outgoing: ' + customStringify(proxyRes.socket.parser.outgoing, null, 2));
+        //_options.logger && _options.logger('{Proxy}  ║ │ Proxy Response from Host: ' + reqestHost);
+        //_options.proxyLogLevel === 'debug' && _options.logger && _options.logger('{Proxy}  ║ │ Proxy-Response Headers: ' + customStringify(proxyRes.headers, null, 2));
+        //_options.proxyLogLevel === 'debug' && _options.logger && _options.logger('{Proxy}  ║ │ Proxy-Response Outgoing: ' + customStringify(proxyRes.socket.parser.outgoing, null, 2));
         //_options.logger && _options.logger('Proxy-Response RES!!: ' + customStringify(res, null, 2));
 
         if (proxyRes && proxyRes.headers && proxyRes.headers['set-cookie']) {
@@ -303,7 +303,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             (proxyRes.socket && proxyRes.socket.parser.outgoing && proxyRes.socket.parser.outgoing.getHeader('location') && proxyRes.socket.parser.outgoing.getHeader('location').includes('/ap/maplanding?')) ||
             (proxyRes.headers.location && (proxyRes.headers.location.includes('/ap/maplanding?') || proxyRes.headers.location.includes('/spa/index.html')))
         ) {
-            _options.logger && _options.logger('{Proxy}  ║ │ Proxy detected SUCCESS!!');
+            //_options.logger && _options.logger('{Proxy}  ║ │ Proxy detected SUCCESS!!');
 
             const paramStart = proxyRes.headers.location.indexOf('?');
             const queryParams = querystring.parse(proxyRes.headers.location.substr(paramStart + 1));
@@ -312,8 +312,8 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             proxyRes.headers.location = `http://${_options.proxyOwnIp}:${_options.proxyPort}/cookie-success`;
             delete proxyRes.headers.referer;
 
-            _options.logger && _options.logger('{Proxy}  ║ │ Proxy catched cookie: ' + proxyCookies);
-            _options.logger && _options.logger('{Proxy}  ║ │ Proxy catched parameters: ' + JSON.stringify(queryParams));
+           // _options.logger && _options.logger('{Proxy}  ║ │ Proxy catched cookie: ' + proxyCookies);
+           // _options.logger && _options.logger('{Proxy}  ║ │ Proxy catched parameters: ' + JSON.stringify(queryParams));
 
             callbackCookie && callbackCookie(null, {
                 "loginCookie": proxyCookies,
@@ -340,12 +340,12 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             if (body) {
                 const bodyOrig = body;
                 body = replaceHosts(body);
-                if (body !== bodyOrig) {
+                /*if (body !== bodyOrig) {
                     _options.logger && _options.logger('{Proxy}  ║ │ MODIFIED Response Body to rewrite URLs');
                     _options.logger && _options.logger('');
                     _options.logger && _options.logger('');
                     _options.logger && _options.logger('');
-                }
+                }*/
             }
             return body;
         });

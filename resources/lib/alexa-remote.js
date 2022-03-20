@@ -126,7 +126,7 @@ class AlexaRemote extends EventEmitter {
         const self = this;
         function getCookie(callback) {
             if (!self.cookie) {
-				self._options.logger && self._options.logger('{Remote} ║ Pas de cookie présent, Il faut le générer.','DEBUG');
+				//self._options.logger && self._options.logger('{Remote} ║ Pas de cookie présent, Il faut le générer.','DEBUG');
                 //self._options.logger && self._options.logger('{Remote} ║ No cookie given, generate one');
                 self._options.cookieJustCreated = true;
                 self.generateCookie(self._options.email, self._options.password, function(err, res) {
@@ -182,7 +182,7 @@ class AlexaRemote extends EventEmitter {
         getCookie((err) => {
             if (typeof callback === 'function') callback = callback.bind(this);
             if (err) {
-                this._options.logger && this._options.logger('{Remote} ╠═══════> Error from retrieving cookies','DEBUG');
+                //this._options.logger && this._options.logger('{Remote} ╠═══════> Error from retrieving cookies','DEBUG');
                 return callback && callback(err);
             }
             if (!this.csrf) return callback && callback(new Error('no csrf found'));
@@ -788,7 +788,7 @@ class AlexaRemote extends EventEmitter {
     }
 
     generateCookie(email, password, callback) {
-		this._options.logger && this._options.logger('{Remote} ╠═══════> generateCookie()','DEBUG');
+		//this._options.logger && this._options.logger('{Remote} ╠═══════> generateCookie()','DEBUG');
         if (!this.alexaCookie) this.alexaCookie = require('./alexa-cookie.js');
         this.alexaCookie.generateAlexaCookie(email, password, this._options, callback);
     }
