@@ -415,7 +415,7 @@ function addCmdToTable(_cmd) {
 
     $('#table_cmd tbody').append(tr);
     var tr = $('#table_cmd tbody tr:last');
-    jeedom.eqLogic.builSelectCmd({
+    jeedom.eqLogic.buildSelectCmd({
       id: $(".li_eqLogic.active").attr('data-eqLogic_id'),
       filter: {
         type: 'i'
