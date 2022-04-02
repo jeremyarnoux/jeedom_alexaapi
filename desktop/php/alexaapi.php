@@ -67,7 +67,7 @@ foreach ($eqLogics as $eqLogic) {
         <div class="eqLogicThumbnailContainer">
             <!-- Bouton de scan des objets -->
             <div class="cursor logoPrimary" id="bt_scan">
-                <span style="font-size: 3em;color: #00caff;"><i class="fas fa-bullseye"></i></span>
+                <i class="fas fa-bullseye" style="font-size: 3em;color: #00caff;"></i>
                 <br />
                 <span style="color: #00caff;">{{Scan}}</span>
             </div>
