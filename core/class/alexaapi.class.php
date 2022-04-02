@@ -3,8 +3,8 @@ require_once dirname(__FILE__) . '/../../../../core/php/core.inc.php';
 
 class alexaapi extends eqLogic
 {
-	/*     * *************************Attributs pour autoriser les onglets Affichage et Disposition****************************** */
-	public static $_widgetPossibility = array('custom' => true, 'custom::layout' => true);
+    /*     * *************************Attributs pour autoriser les onglets Affichage et Disposition****************************** */
+    public static $_widgetPossibility = array('custom' => true, 'custom::layout' => true);
 
     // A supprimer dans quelques temps, tous les listePluginsAlexa sont remplacés par listePluginsAlexaArray
     public static function listePluginsAlexa($withAPI = false, $withSmartHome = false)
@@ -39,12 +39,12 @@ class alexaapi extends eqLogic
     public static function listePluginsAlexaArray($withAPI = false, $withSmartHome = false, $all = false, $withFireTV = false)
     {
         //log::add('alexaapi', 'debug', 'Test  : listePluginsAlexaArray');
-		$liste = array();
+        $liste = array();
         if ($withAPI) array_push($liste, array("pluginId" => "alexaapi", "nom" => "Alexa-API", "actif" => true));
         if ($withSmartHome) {
             try {
                 $test = plugin::byId('alexasmarthome');
-				$eqLogics = eqLogic::byType($test->getId());
+                $eqLogics = eqLogic::byType($test->getId());
                 //array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914', config::byKey('numsmartHome', 'alexaapi')));
                 array_push($liste, self::listePluginsAlexaArray_controle('alexasmarthome', 'smartHome', '3914', count($eqLogics)));
             } catch (Exception $e) {
@@ -56,7 +56,7 @@ class alexaapi extends eqLogic
         if ($withFireTV) {
             try {
                 $test = plugin::byId('alexafiretv');
-				$eqLogics = eqLogic::byType($test->getId());
+                $eqLogics = eqLogic::byType($test->getId());
                 //array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064', config::byKey('numFireTV', 'alexaapi')));
                 array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064', count($eqLogics)));
             } catch (Exception $e) {
@@ -64,12 +64,12 @@ class alexaapi extends eqLogic
                     array_push($liste, self::listePluginsAlexaArray_controle('alexafiretv', 'FireTV', '4064'));
                 }
             }
-        }        
-			try {
-			$test = plugin::byId('alexaamazonmusic');
-			$eqLogics = eqLogic::byType($test->getId());
+        }
+        try {
+            $test = plugin::byId('alexaamazonmusic');
+            $eqLogics = eqLogic::byType($test->getId());
             //array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910', config::byKey('numAudioPlayer', 'alexaapi')));
-            array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910', intval(count($eqLogics)/2)));
+            array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910', intval(count($eqLogics) / 2)));
         } catch (Exception $e) {
             if ($all) {
                 array_push($liste, self::listePluginsAlexaArray_controle('alexaamazonmusic', 'Amazon Music', '3910'));
@@ -77,9 +77,9 @@ class alexaapi extends eqLogic
         }
         try {
             $test = plugin::byId('alexadeezer');
-			$eqLogics = eqLogic::byType($test->getId());
+            $eqLogics = eqLogic::byType($test->getId());
             //array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911', config::byKey('numAudioPlayer', 'alexaapi')));
-            array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911', intval(count($eqLogics)/2)));
+            array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911', intval(count($eqLogics) / 2)));
         } catch (Exception $e) {
             if ($all) {
                 array_push($liste, self::listePluginsAlexaArray_controle('alexadeezer', 'Deezer', '3911'));
@@ -87,9 +87,9 @@ class alexaapi extends eqLogic
         }
         try {
             $test = plugin::byId('alexaspotify');
-			$eqLogics = eqLogic::byType($test->getId());
+            $eqLogics = eqLogic::byType($test->getId());
             //array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913', config::byKey('numAudioPlayer', 'alexaapi')));
-            array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913', intval(count($eqLogics)/2)));
+            array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913', intval(count($eqLogics) / 2)));
         } catch (Exception $e) {
             if ($all) {
                 array_push($liste, self::listePluginsAlexaArray_controle('alexaspotify', 'Spotify', '3913'));
@@ -101,7 +101,7 @@ class alexaapi extends eqLogic
     public static function listePluginsAlexaArray_controle($pluginId = "", $plugin = "inconnu", $idMarket = "3910", $nb = "0")
     {
         $valeurs = array();
-		        //log::add('alexaapi', 'debug', 'Test  : listePluginsAlexaArray_controle' . $pluginId.$idMarket);
+        //log::add('alexaapi', 'debug', 'Test  : listePluginsAlexaArray_controle' . $pluginId.$idMarket);
 
         try {
             $valeurs = array(
@@ -137,8 +137,8 @@ class alexaapi extends eqLogic
         $return['info']['binary']['isMutedinfo'] = array(
             'template' => 'isMutedinfo',
             'replace' => array("#_icon_on_#" => "<i class='icon jeedomapp-audiomute icon_orange'></i>", "#_icon_off_#" => "<i class=''></i>", "#hide_name#" => "hidden", "#message_disable#" => "1")
-        );      
-		$return['action']['other']['shuffle'] = array(
+        );
+        $return['action']['other']['shuffle'] = array(
             'template' => 'tmplicon',
             'replace' => array("#_icon_off_#" => "<i class='fas fa-random fa-ld' style='opacity:0.3'></i>", "#_icon_on_#" => "<i class='fas fa-random fa-ld'></i>", "#hide_name#" => "hidden", "#message_disable#" => "1")
         );
@@ -168,8 +168,9 @@ class alexaapi extends eqLogic
             'test' => array(
                 array(
                     'operation' => "#value# == 'PLAYING'", 'state_light' => "<img src='plugins/alexaapi/core/img/playing.png'  title ='" . __('Playing', __FILE__) . "'>",
-                    'state_dark' => "<img src='plugins/alexaapi/core/img/playing.png' title ='" . __('En charge', __FILE__) . "'>"),
-					
+                    'state_dark' => "<img src='plugins/alexaapi/core/img/playing.png' title ='" . __('En charge', __FILE__) . "'>"
+                ),
+
                 array('operation' => "#value# != 'PLAYING'", 'state_light' => "<img src='plugins/alexaapi/core/img/paused.png' title ='" . __('En Pause', __FILE__) . "'>")
             )
         );
@@ -413,16 +414,16 @@ class alexaapi extends eqLogic
         }
         self::scanAmazonAlexa();
     }
-	
+
     public static function supprimeTouslesDevicesSmartHome()
     {
-            foreach (eqLogic::byType('alexasmarthome', false) as $eqLogic) {
-					//log::add('alexasmarthome_scan', 'debug', 'TEST---------->>>>> ' . $eqLogic->getName());
-                $eqLogic->remove();
-            }
+        foreach (eqLogic::byType('alexasmarthome', false) as $eqLogic) {
+            //log::add('alexasmarthome_scan', 'debug', 'TEST---------->>>>> ' . $eqLogic->getName());
+            $eqLogic->remove();
         }
+    }
 
-	
+
     public static function cron($_eqlogic_id = null)
     {
         // Toutes les minutes, on cherche les players en lecture et on les actualise
@@ -465,9 +466,9 @@ class alexaapi extends eqLogic
             //self::checkAuth(); 20/09/2020 on désactive ce test pour voir s'il est utile ou pas
         }
 
-		//Version Précédente (option dans config)
-		//Relance non obligatoire depuis la stabilité du cookie. Déconseillé, ajout de la condition "réservé aux utilisateurs expérimentés" Modif Sigalou 21/03/2021
-		/*
+        //Version Précédente (option dans config)
+        //Relance non obligatoire depuis la stabilité du cookie. Déconseillé, ajout de la condition "réservé aux utilisateurs expérimentés" Modif Sigalou 21/03/2021
+        /*
         if (config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0") {
 			//$autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '33 3 * * *'));
 			$autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '51 20 31 01 0 2021'));
@@ -476,20 +477,20 @@ class alexaapi extends eqLogic
 				self::restartServeurPHP();
 			}
 		}*/
-		//Nouvelle Version RELANCE TOUS LES 7 JOURS POUR VERIFIER LE REFRESH COOKIE
-			//$autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '33 3 * * *'));/* boucle qui relance la connexion au serveur*/
-			$cc = new Cron\CronExpression('30 15 * * */7', new Cron\FieldFactory); 
-			if ($cc->isDue() && $deamon_info['state'] == 'ok') {
-				self::restartServeurPHP();
-			}
-		
-		
+        //Nouvelle Version RELANCE TOUS LES 7 JOURS POUR VERIFIER LE REFRESH COOKIE
+        //$autorefreshRR = checkAndFixCron(config::byKey('autorefresh', 'alexaapi', '33 3 * * *'));/* boucle qui relance la connexion au serveur*/
+        $cc = new Cron\CronExpression('30 15 * * */7', new Cron\FieldFactory);
+        if ($cc->isDue() && $deamon_info['state'] == 'ok') {
+            self::restartServeurPHP();
+        }
+
+
         $r = new Cron\CronExpression('*/16 * * * *', new Cron\FieldFactory); // boucle refresh
         //		$r = new Cron\CronExpression('* * * * *', new Cron\FieldFactory);// boucle refresh
         if ($r->isDue() && $deamon_info['state'] == 'ok') {
             $eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
             config::save("listRoutinesProchain", time() + 960, "alexaapi");
-                //log::add('alexaapi_node', 'debug', 'Prochain CRON calé à : '.time() + 960);
+            //log::add('alexaapi_node', 'debug', 'Prochain CRON calé à : '.time() + 960);
             foreach ($eqLogics as $alexaapi) {
                 //log::add('alexaapi_node', 'debug', 'CRON Refresh: '.$alexaapi->getName());
                 $alexaapi->refresh();
@@ -552,7 +553,7 @@ class alexaapi extends eqLogic
         // --- Mise à jour des Amazon Echo
         event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
         $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
-		//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         $json = json_decode($json, true);
         $numDevices = 0;
         $numNewDevices = 0;
@@ -567,7 +568,7 @@ class alexaapi extends eqLogic
 
             foreach (self::listePluginsAlexa() as $pluginAlexaUnparUn) {
 
-                log::add('alexaapi_scan', 'debug', '*** Détection pour le plugin '.$pluginAlexaUnparUn);
+                log::add('alexaapi_scan', 'debug', '*** Détection pour le plugin ' . $pluginAlexaUnparUn);
 
                 if (in_array("AUDIO_PLAYER", $item['capabilities'])) {
                     $numAudioPlayer++;
@@ -585,7 +586,7 @@ class alexaapi extends eqLogic
                         $device->setConfiguration('devicetype', "PlayList");
                         $device->setConfiguration('family', $item['family']);
                         $device->setConfiguration('members', $item['members']);
-                        $device->setIsVisible(1);
+                        //$device->setIsVisible(1);
                         //$device->setIsEnable(0);
                         $device->setConfiguration('capabilities', $item['capabilities']);
                         try {
@@ -623,51 +624,49 @@ class alexaapi extends eqLogic
             }
 
 
-			// On teste si Alexa-FireTV est installé et actif
-			$alexaFireTVActif=false;
-			$listePluginsAlexaArray=self::listePluginsAlexaArray(false, false, false, true);
-			if (in_array("alexafiretv", array_column($listePluginsAlexaArray, 'pluginId')))
-			{
-				// Ici Alexa-FireTV installé, on va tester si actif.
-				$keyAlexaFireTV=array_search("alexafiretv", array_column($listePluginsAlexaArray, 'pluginId'));
-				$alexaFireTVActif=$listePluginsAlexaArray[$keyAlexaFireTV]['actif']; // 0=inactif 1 =actif
-			}
+            // On teste si Alexa-FireTV est installé et actif
+            $alexaFireTVActif = false;
+            $listePluginsAlexaArray = self::listePluginsAlexaArray(false, false, false, true);
+            if (in_array("alexafiretv", array_column($listePluginsAlexaArray, 'pluginId'))) {
+                // Ici Alexa-FireTV installé, on va tester si actif.
+                $keyAlexaFireTV = array_search("alexafiretv", array_column($listePluginsAlexaArray, 'pluginId'));
+                $alexaFireTVActif = $listePluginsAlexaArray[$keyAlexaFireTV]['actif']; // 0=inactif 1 =actif
+            }
 
-			if (($item['family'] == 'FIRE_TV') && ($alexaFireTVActif))
-			{
-			// On a le plugin Alexa Fire TV présent et activé et la famille est FIRE_TV
-				$device = self::byLogicalId($item['serial'], 'alexafiretv');
-				if (!is_object($device)) {
-					$device = alexafiretv::createNewDevice($item['name'], $item['serial']);
-					$numNewDevices++;
-				}
-				// Update device configuration
-				log::add('alexaapi_scan', 'debug', '*** [Plugin Alexa-Fire TV       ] ->> détection de ' . $device->getName());
-				$numFireTV++;
-			} else {
+            if (($item['family'] == 'FIRE_TV') && ($alexaFireTVActif)) {
+                // On a le plugin Alexa Fire TV présent et activé et la famille est FIRE_TV
+                $device = self::byLogicalId($item['serial'], 'alexafiretv');
+                if (!is_object($device)) {
+                    $device = alexafiretv::createNewDevice($item['name'], $item['serial']);
+                    $numNewDevices++;
+                }
+                // Update device configuration
+                log::add('alexaapi_scan', 'debug', '*** [Plugin Alexa-Fire TV       ] ->> détection de ' . $device->getName());
+                $numFireTV++;
+            } else {
 
-				// Détection des devices d'Alexa-API qui ne sont pas des Fire TV
-				$device = self::byLogicalId($item['serial'], 'alexaapi');
-				if (!is_object($device)) {
-					$device = self::createNewDevice($item['name'], $item['serial']);
-					$numNewDevices++;
-				}
-				// Update device configuration
-				log::add('alexaapi_scan', 'debug', '*** [Plugin Alexa-API       ] ->> détection de ' . $device->getName());
-			}
-				$device->setConfiguration('device', $item['name']);
-				$device->setConfiguration('type', $item['type']);
-				$device->setConfiguration('devicetype', "Echo");
-				$device->setConfiguration('family', $item['family']);
-				$device->setConfiguration('members', $item['members']);
-				$device->setConfiguration('capabilities', $item['capabilities']);
-				try {
-					$device->save();
-				} catch (Exception $e) {
-					$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
-					$device->save();
-				}
-				$device->setStatus('online', (($item['online']) ? true : false)); //SetStatus doit être lancé après Save et Save après inutile
+                // Détection des devices d'Alexa-API qui ne sont pas des Fire TV
+                $device = self::byLogicalId($item['serial'], 'alexaapi');
+                if (!is_object($device)) {
+                    $device = self::createNewDevice($item['name'], $item['serial']);
+                    $numNewDevices++;
+                }
+                // Update device configuration
+                log::add('alexaapi_scan', 'debug', '*** [Plugin Alexa-API       ] ->> détection de ' . $device->getName());
+            }
+            $device->setConfiguration('device', $item['name']);
+            $device->setConfiguration('type', $item['type']);
+            $device->setConfiguration('devicetype', "Echo");
+            $device->setConfiguration('family', $item['family']);
+            $device->setConfiguration('members', $item['members']);
+            $device->setConfiguration('capabilities', $item['capabilities']);
+            try {
+                $device->save();
+            } catch (Exception $e) {
+                $device->setName($device->getName() . ' doublon ' . rand(0, 9999));
+                $device->save();
+            }
+            $device->setStatus('online', (($item['online']) ? true : false)); //SetStatus doit être lancé après Save et Save après inutile
 
             $numDevices++;
         }
@@ -687,7 +686,7 @@ class alexaapi extends eqLogic
                         $device = alexasmarthome::createNewDevice($item['displayName'], $item['id']);
                         $numNewDevices++;
                     }
-					event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Détection équipement smartHome [' . $device->getName() . ']', __FILE__),));
+                    event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Détection équipement smartHome [' . $device->getName() . ']', __FILE__),));
                     log::add('alexaapi_scan', 'debug', '[Plugin AlexasmartHome  ] ->> détection de [' . $item['id'] . "]" . $device->getName());
                     // Update device configuration
                     $device->setConfiguration('device', $item['displayName']);
@@ -730,14 +729,14 @@ class alexaapi extends eqLogic
         config::save("numDevices", $numDevices, "alexaapi");
         log::add('alexaapi_scan', 'debug', $numAudioPlayer . ' Players / ' . $numFireTV . ' Fire TV / ' . $numsmartHome . ' smartHome/ ' . $numDevices . ' numDevices  -> enregistré dans Config');
 
-       // event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
+        // event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__)));
 
-		event::add('jeedom::alert', array(
-												'level' => 'success',
-												'page' => 'alexaapi',
-												'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__),
-												'ttl' => 10000
-											));
+        event::add('jeedom::alert', array(
+            'level' => 'success',
+            'page' => 'alexaapi',
+            'message' => __('Scan terminé. ' . $numDevices . ' équipements mis a jour dont ' . $numNewDevices . " ajouté(s). Appuyez sur F5 si votre écran ne s'est pas actualisé", __FILE__),
+            'ttl' => 10000
+        ));
     }
 
     public static function ajouteAmazonSmartHome($item)
@@ -746,47 +745,45 @@ class alexaapi extends eqLogic
         //log::add('alexasmarthome_scan', 'debug', "************************************Ajout d'un device smartHome non détecté par le scan ***********************************");
         //$json = json_decode($json, true);
         //log::add('alexasmarthome_scan', 'debug', 'json:' . json_encode($item));
-		
-		
-		                    // Retireve the device (if already registered in Jeedom)
-                    $device = alexasmarthome::byLogicalId($item['entityId'], 'alexasmarthome');
 
-                    if (!is_object($device)) {
-                        $device = alexasmarthome::createNewDevice($item['friendlyName'], $item['entityId']);
-                        $numNewDevices++;
-						log::add('alexasmarthome_scan', 'debug', 'Ajout sup de [' . $item['entityId'] . "]" );// ou applianceKey
-                    }
-                    log::add('alexaapi_scan', 'debug', '[Plugin AlexasmartHome  ] ->> détection2 de [' . $item['entityId'] . "]" . $device->getName());// ou applianceKey
 
-                    //$device->setConfiguration('device', $item['displayName']);
-                    //$device->setConfiguration('type', $item['description']); a voir si on utilise ou pas descriotion
-                    $device->setConfiguration('type', $item['deviceType']);
-                    $device->setConfiguration('applianceId', $item['applianceId']);
-                    //$device->setConfiguration('icon', $item['icon']['value']);
-                    $device->setConfiguration('devicetype', "Smarthome");
-                    $device->setConfiguration('typeSmartHome', $item['applianceTypes']['0']); // faudra voir s'il y a plusieurs types
-                    //$device->setConfiguration('members', $item['members']);
-					$capabilitiesjson=$item['capabilities'];
-					$capabilities=[];        
-					        foreach ($capabilitiesjson as $value) {
-								//log::add('alexasmarthome_scan', 'debug', '[interfaceName  ] ->> [' . $value['interfaceName'] . "]");
-								array_push($capabilities, $value['interfaceName']);
-							}
-					//log::add('alexasmarthome_scan', 'debug', '[capabilities  ] ->> [' . json_encode($capabilities) . "]" . $device->getName());// ou applianceKey
-                    $device->setConfiguration('capabilitiesSmartHome', $capabilities);
-					$manufacturerName=$item['manufacturerName'];
-					if ($manufacturerName=="Amazon Inc.") $manufacturerName="Amazon";
-					$device->setConfiguration('manufacturerName', $manufacturerName);
-					$device->setConfiguration('friendlyDescription', $item['friendlyDescription']);
+        // Retireve the device (if already registered in Jeedom)
+        $device = alexasmarthome::byLogicalId($item['entityId'], 'alexasmarthome');
 
-					try {
-						$device->save();
-					} catch (Exception $e) {
-						$device->setName($device->getName() . ' doublon ' . rand(0, 9999));
-						$device->save();
-					}
-			
-					
+        if (!is_object($device)) {
+            $device = alexasmarthome::createNewDevice($item['friendlyName'], $item['entityId']);
+            $numNewDevices++;
+            log::add('alexasmarthome_scan', 'debug', 'Ajout sup de [' . $item['entityId'] . "]"); // ou applianceKey
+        }
+        log::add('alexaapi_scan', 'debug', '[Plugin AlexasmartHome  ] ->> détection2 de [' . $item['entityId'] . "]" . $device->getName()); // ou applianceKey
+
+        //$device->setConfiguration('device', $item['displayName']);
+        //$device->setConfiguration('type', $item['description']); a voir si on utilise ou pas descriotion
+        $device->setConfiguration('type', $item['deviceType']);
+        $device->setConfiguration('applianceId', $item['applianceId']);
+        //$device->setConfiguration('icon', $item['icon']['value']);
+        $device->setConfiguration('devicetype', "Smarthome");
+        $device->setConfiguration('typeSmartHome', $item['applianceTypes']['0']); // faudra voir s'il y a plusieurs types
+        //$device->setConfiguration('members', $item['members']);
+        $capabilitiesjson = $item['capabilities'];
+        $capabilities = [];
+        foreach ($capabilitiesjson as $value) {
+            //log::add('alexasmarthome_scan', 'debug', '[interfaceName  ] ->> [' . $value['interfaceName'] . "]");
+            array_push($capabilities, $value['interfaceName']);
+        }
+        //log::add('alexasmarthome_scan', 'debug', '[capabilities  ] ->> [' . json_encode($capabilities) . "]" . $device->getName());// ou applianceKey
+        $device->setConfiguration('capabilitiesSmartHome', $capabilities);
+        $manufacturerName = $item['manufacturerName'];
+        if ($manufacturerName == "Amazon Inc.") $manufacturerName = "Amazon";
+        $device->setConfiguration('manufacturerName', $manufacturerName);
+        $device->setConfiguration('friendlyDescription', $item['friendlyDescription']);
+
+        try {
+            $device->save();
+        } catch (Exception $e) {
+            $device->setName($device->getName() . ' doublon ' . rand(0, 9999));
+            $device->save();
+        }
     }
 
     public static function scanAmazonSmartHome()
@@ -799,7 +796,7 @@ class alexaapi extends eqLogic
             return;
         }
         $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/smarthomeDevices");
-        log::add('alexasmarthome_scan', 'debug', 'On récupère : '."http://" . config::byKey('internalAddr') . ":3456/smarthomeDevices");
+        log::add('alexasmarthome_scan', 'debug', 'On récupère : ' . "http://" . config::byKey('internalAddr') . ":3456/smarthomeDevices");
         $json = json_decode($json, true);
         log::add('alexasmarthome_scan', 'debug', 'json:' . $json);
         foreach ($json as $key => $value) {
@@ -827,71 +824,71 @@ class alexaapi extends eqLogic
                                         foreach (eqLogic::byType('alexasmarthome', true) as $alexasmarthome) {
                                             if ($alexasmarthome->getLogicalId() == $value7['entityId']) {
                                                 $alexasmarthome->setConfiguration('applianceId', $value7['applianceId']);
-                                                log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.$alexasmarthome->getName().']═══════════════════════════════════════════════════════════════════════════');
-                                                log::add('alexasmarthome_scan', 'info', ' ║ Lien entre Alexa-API ('.$alexasmarthome->getName().') et smarHome ('.json_encode($value7['friendlyName']).') trouvé et mis à jour');
+                                                log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════[' . $alexasmarthome->getName() . ']═══════════════════════════════════════════════════════════════════════════');
+                                                log::add('alexasmarthome_scan', 'info', ' ║ Lien entre Alexa-API (' . $alexasmarthome->getName() . ') et smarHome (' . json_encode($value7['friendlyName']) . ') trouvé et mis à jour');
                                                 log::add('alexasmarthome_scan', 'info', ' ║ Equipement trouvé et mis à jour');
-												//Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome)
-                                                log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
+                                                //Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome)
+                                                log::add('alexasmarthome_scan', 'info', ' ║ ' . json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
                                                 log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
                                                 log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
-												$manufacturerName=$value7['manufacturerName'];
-												if ($manufacturerName=="Amazon Inc.") $manufacturerName="Amazon";
-												if ($manufacturerName=="FREEBOX") $manufacturerName="Freebox";
-												$alexasmarthome->setConfiguration('manufacturerName', $manufacturerName);
-												$alexasmarthome->setConfiguration('friendlyDescription', $value7['friendlyDescription']);
-												// Accessible sur le réseau sera : object►applianceNetworkState►reachability donne la valeur REACHABLE
-												$capabilitiesjson=$value7['capabilities'];
-												$capabilities=[];        
-													foreach ($capabilitiesjson as $value) {
-														//log::add('alexasmarthome_scan', 'debug', '[interfaceName  ] ->> [' . $value['interfaceName'] . "]");
-														array_push($capabilities, $value['interfaceName']);
-													}
-												//log::add('alexasmarthome_scan', 'debug', '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%[capabilities] ->> [' . json_encode($capabilities) . "]" . $alexasmarthome->getName());// ou applianceKey
-												$alexasmarthome->setConfiguration('capabilitiesSmartHome', $capabilities);
-												//$alexasmarthome->setConfiguration('capabilitiesSmartHome', "coucou");
-												//$capabilitiesrecup=$alexasmarthome->getConfiguration('capabilities');
-												//$alexasmarthome->setConfiguration('capabilitiesSmartHome', $capabilitiesrecup);
-												
-												
-												$alexasmarthome->setConfiguration('typeSmartHome', $value7['applianceTypes']['0']); // faudra voir s'il y a plusieurs types
+                                                $manufacturerName = $value7['manufacturerName'];
+                                                if ($manufacturerName == "Amazon Inc.") $manufacturerName = "Amazon";
+                                                if ($manufacturerName == "FREEBOX") $manufacturerName = "Freebox";
+                                                $alexasmarthome->setConfiguration('manufacturerName', $manufacturerName);
+                                                $alexasmarthome->setConfiguration('friendlyDescription', $value7['friendlyDescription']);
+                                                // Accessible sur le réseau sera : object►applianceNetworkState►reachability donne la valeur REACHABLE
+                                                $capabilitiesjson = $value7['capabilities'];
+                                                $capabilities = [];
+                                                foreach ($capabilitiesjson as $value) {
+                                                    //log::add('alexasmarthome_scan', 'debug', '[interfaceName  ] ->> [' . $value['interfaceName'] . "]");
+                                                    array_push($capabilities, $value['interfaceName']);
+                                                }
+                                                //log::add('alexasmarthome_scan', 'debug', '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%[capabilities] ->> [' . json_encode($capabilities) . "]" . $alexasmarthome->getName());// ou applianceKey
+                                                $alexasmarthome->setConfiguration('capabilitiesSmartHome', $capabilities);
+                                                //$alexasmarthome->setConfiguration('capabilitiesSmartHome', "coucou");
+                                                //$capabilitiesrecup=$alexasmarthome->getConfiguration('capabilities');
+                                                //$alexasmarthome->setConfiguration('capabilitiesSmartHome', $capabilitiesrecup);
 
-												
+
+                                                $alexasmarthome->setConfiguration('typeSmartHome', $value7['applianceTypes']['0']); // faudra voir s'il y a plusieurs types
+
+
                                                 $alexasmarthome->save();
                                                 $Onatrouvelelien = true;
                                             }
                                         }
                                         if (!($Onatrouvelelien)) {
-                                                log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.json_encode($value7['friendlyName']).']═══════════════════════════════════════════════════════════════════════════');
-                                                log::add('alexasmarthome_scan', 'info', ' ║ Equipement ajouté.');
-												//event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Mise à jour de : ' . json_encode($value7['friendlyName']) . '"', __FILE__),));
-												
-												$chaineName=json_encode($value7['friendlyName']);
-												$chaineName=preg_replace('/u([\da-fA-F]{4})/', '&#x\1;', $chaineName);
-												$chaineName= str_replace("*", "", $chaineName);
-												$chaineName= str_replace('"', '', $chaineName);
-												$chaineName= str_replace("\\", "", $chaineName);
-												event::add('jeedom::alert', array(
-																						'level' => 'success',
-																						'page' => 'alexaapi',
-																						'message' => __('Mise à jour de [' . $chaineName, __FILE__),
-																						'ttl' => 1000
-																					));
-												
-												//Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome)
-                                                log::add('alexasmarthome_scan', 'info', ' ║ '.json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
-                                                log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
-                                                log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+                                            log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════[' . json_encode($value7['friendlyName']) . ']═══════════════════════════════════════════════════════════════════════════');
+                                            log::add('alexasmarthome_scan', 'info', ' ║ Equipement ajouté.');
+                                            //event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Mise à jour de : ' . json_encode($value7['friendlyName']) . '"', __FILE__),));
+
+                                            $chaineName = json_encode($value7['friendlyName']);
+                                            $chaineName = preg_replace('/u([\da-fA-F]{4})/', '&#x\1;', $chaineName);
+                                            $chaineName = str_replace("*", "", $chaineName);
+                                            $chaineName = str_replace('"', '', $chaineName);
+                                            $chaineName = str_replace("\\", "", $chaineName);
+                                            event::add('jeedom::alert', array(
+                                                'level' => 'success',
+                                                'page' => 'alexaapi',
+                                                'message' => __('Mise à jour de [' . $chaineName, __FILE__),
+                                                'ttl' => 1000
+                                            ));
+
+                                            //Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome)
+                                            log::add('alexasmarthome_scan', 'info', ' ║ ' . json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
+                                            log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
+                                            log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
                                             //log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT AJOUTER UN DEVICE !!!!!!!!!!');
-											self::ajouteAmazonSmartHome($value7);
-										}
-										/*
+                                            self::ajouteAmazonSmartHome($value7);
+                                        }
+                                        /*
 										if (json_encode($value7['applianceId']) != json_encode($value7['mergedApplianceIds']['0'])) {
                                                 log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.json_encode($value7['friendlyName']).']═══════════════════════════════════════════════════════════════════════════');
                                                 log::add('alexasmarthome_scan', 'info', ' ║ ' . json_encode($value7['applianceId']).' <═> '.json_encode($value7['mergedApplianceIds']['0']));
                                                 log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
                                             //log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT AJOUTER UN DEVICE !!!!!!!!!!');
 											self::ajouteAmazonSmartHome($value7['mergedApplianceIds']['0']);
-										}	*/										
+										}	*/
                                     }
                                 }
                             }
@@ -905,7 +902,7 @@ class alexaapi extends eqLogic
                 }
             }
         }
-	alexasmarthome::metAjourFabriquantsDesactives();	
+        alexasmarthome::metAjourFabriquantsDesactives();
     }
 
     private static function createNewDevice($deviceName, $deviceSerial)
@@ -1095,7 +1092,7 @@ class alexaapi extends eqLogic
                     if (!empty($listValue)) $cmd->setConfiguration('listValue', $listValue);
                     $cmd->setConfiguration('RunWhenRefresh', $RunWhenRefresh);
                     $cmd->setDisplay('title_disable', $title_disable);
-					$cmd->setDisplay('showNameOndashboard', !$title_disable);
+                    $cmd->setDisplay('showNameOndashboard', !$title_disable);
 
                     $cmd->setOrder($Order);
                     //cas particulier
@@ -1165,7 +1162,7 @@ class alexaapi extends eqLogic
             self::updateCmd($F, 'allDeviceVolumes', 'action', 'other', false, 'Actualise tous les volumes', false, true, 'fas fa-sync', null, null, 'allDeviceVolumes', null, null, 80, $cas9);
 
 
-			// Pour l'echo avec horloge
+            // Pour l'echo avec horloge
             self::updateCmd($F, 'clockon', 'action', 'other', false, 'Afficher Heure', true, true, 'fas fa-toggle-on', null, null, 'DisplayPower?value=ON', null, null, 80, $cas10);
             self::updateCmd($F, 'clockoff', 'action', 'other', false, 'Eteindre Heure', true, true, 'fas fa-toggle-off', null, null, 'DisplayPower?value=OFF', null, null, 81, $cas10);
 
@@ -1251,13 +1248,13 @@ class alexaapi extends eqLogic
 
             $volinfo = $this->getCmd(null, 'volumeinfo');
             $vol = $this->getCmd(null, 'volume');
-			// ici c'est uniquement les devices Amazon les playlist et les players sont dans AmazonMusic
+            // ici c'est uniquement les devices Amazon les playlist et les players sont dans AmazonMusic
             if ((is_object($volinfo)) && (is_object($vol))) {
-               $vol->setValue($volinfo->getId()); // Lien entre volume et volumeinfo
-               $vol->save();
-            } 
-						
-			
+                $vol->setValue($volinfo->getId()); // Lien entre volume et volumeinfo
+                $vol->save();
+            }
+
+
             // Pour la commande Refresh, on garde l'ancienne méthode
             if (($this->hasCapaorFamilyorType("REMINDERS")) && !($this->getConfiguration('devicetype') == "Smarthome")) {
                 //Commande Refresh
@@ -1344,85 +1341,83 @@ class alexaapi extends eqLogic
     // https://github.com/NextDom/NextDom/wiki/Ajout-d%27un-template-a-votre-plugin
     // https://jeedom.github.io/documentation/dev/fr_FR/widget_plugin
 
-	public function toHtml($_version = 'dashboard') 
+    public function toHtml($_version = 'dashboard')
     {
-		$replace = $this->preToHtml($_version);
-		if (!is_array($replace)) {
-			return $replace;
-		}
-		$_version = jeedom::versionAlias($_version);
+        $replace = $this->preToHtml($_version);
+        if (!is_array($replace)) {
+            return $replace;
+        }
+        $_version = jeedom::versionAlias($_version);
 
         //log::add('alexaapi','debug','************Début génération du Widget de '.$this->getName());
-		switch ($this->getDisplay('layout::' . $_version)) {
-			case 'table':
-			$replace['#eqLogic_class#'] = 'eqLogic_layout_table';
-			$table = self::generateHtmlTable($this->getDisplay('layout::'.$_version.'::table::nbLine', 1), $this->getDisplay('layout::'.$_version.'::table::nbColumn', 1), $this->getDisplay('layout::'.$_version.'::table::parameters'));
-			$br_before = 0;
-			foreach ($this->getCmd(null, null, true) as $cmd) {
-				if (isset($replace['#refresh_id#']) && $cmd->getId() == $replace['#refresh_id#']) {
-					continue;
-				}
-				$tag = '#cmd::' . $this->getDisplay('layout::'.$_version.'::table::cmd::' . $cmd->getId() . '::line', 1) . '::' . $this->getDisplay('layout::'.$_version.'::table::cmd::' . $cmd->getId() . '::column', 1) . '#';
-				if ($br_before == 0 && $cmd->getDisplay('forceReturnLineBefore', 0) == 1) {
-					$table['tag'][$tag] .= '<br/>';
-				}
-				$table['tag'][$tag] .= $cmd->toHtml($_version, '');
-				$br_before = 0;
-				if ($cmd->getDisplay('forceReturnLineAfter', 0) == 1) {
-					$table['tag'][$tag] .= '<br/>';
-					$br_before = 1;
-				}
-			}
-			$replace['#cmd#'] = template_replace($table['tag'], $table['html']);
-			break;
+        switch ($this->getDisplay('layout::' . $_version)) {
+            case 'table':
+                $replace['#eqLogic_class#'] = 'eqLogic_layout_table';
+                $table = self::generateHtmlTable($this->getDisplay('layout::' . $_version . '::table::nbLine', 1), $this->getDisplay('layout::' . $_version . '::table::nbColumn', 1), $this->getDisplay('layout::' . $_version . '::table::parameters'));
+                $br_before = 0;
+                foreach ($this->getCmd(null, null, true) as $cmd) {
+                    if (isset($replace['#refresh_id#']) && $cmd->getId() == $replace['#refresh_id#']) {
+                        continue;
+                    }
+                    $tag = '#cmd::' . $this->getDisplay('layout::' . $_version . '::table::cmd::' . $cmd->getId() . '::line', 1) . '::' . $this->getDisplay('layout::' . $_version . '::table::cmd::' . $cmd->getId() . '::column', 1) . '#';
+                    if ($br_before == 0 && $cmd->getDisplay('forceReturnLineBefore', 0) == 1) {
+                        $table['tag'][$tag] .= '<br/>';
+                    }
+                    $table['tag'][$tag] .= $cmd->toHtml($_version, '');
+                    $br_before = 0;
+                    if ($cmd->getDisplay('forceReturnLineAfter', 0) == 1) {
+                        $table['tag'][$tag] .= '<br/>';
+                        $br_before = 1;
+                    }
+                }
+                $replace['#cmd#'] = template_replace($table['tag'], $table['html']);
+                break;
 
-			default:
-			$replace['#eqLogic_class#'] = 'eqLogic_layout_default';
-			$cmd_html = '';
-			$br_before = 0;
-			$isMutedPresent=false;
-			foreach ($this->getCmd(null, null, true) as $cmd) {
-				//$replace['#mute#'] = "";
-				if ($cmd->getLogicalId() == "isMutedinfo") {	
-				//log::add('alexaapi','debug','**************************************************>>>'.$cmd->toHtml($_version, ''));
-				$replace['#mute#'] = $cmd->toHtml($_version, '');
-				$isMutedPresent=true;
-				continue;	// Pour désactiver l'icone de isMuted 		
-				}
-				
-				if (isset($replace['#refresh_id#']) && $cmd->getId() == $replace['#refresh_id#']) {
-					continue;
-				}
-				if ($_version == 'dashboard' && $br_before == 0 && $cmd->getDisplay('forceReturnLineBefore', 0) == 1) {
-					$cmd_html .= '<br/>';
-				}
-				$cmd_html .= $cmd->toHtml($_version, '');
-				$br_before = 0;
-				if ($_version == 'dashboard' && $cmd->getDisplay('forceReturnLineAfter', 0) == 1) {
-					$cmd_html .= '<br/>';
-					$br_before = 1;
-				}
-				
-//if ($cmd->getLogicalId() == "isMutedinfo") log::add('alexaapi','debug','**************************************************-->'.$cmd->getValue());
+            default:
+                $replace['#eqLogic_class#'] = 'eqLogic_layout_default';
+                $cmd_html = '';
+                $br_before = 0;
+                $isMutedPresent = false;
+                foreach ($this->getCmd(null, null, true) as $cmd) {
+                    //$replace['#mute#'] = "";
+                    if ($cmd->getLogicalId() == "isMutedinfo") {
+                        //log::add('alexaapi','debug','**************************************************>>>'.$cmd->toHtml($_version, ''));
+                        $replace['#mute#'] = $cmd->toHtml($_version, '');
+                        $isMutedPresent = true;
+                        continue;    // Pour désactiver l'icone de isMuted 		
+                    }
 
-//$replace['#mute#'] = "fas fa-volume-mute";
-	//log::add('alexaapi','debug','--Début génération du Widget de *'.$cmd->getLogicalId().'*');
-				
-				
-			}
-			if (!$isMutedPresent) $replace['#mute#'] = "";
-			$replace['#cmd#'] = $cmd_html;
-			break;
-		}
+                    if (isset($replace['#refresh_id#']) && $cmd->getId() == $replace['#refresh_id#']) {
+                        continue;
+                    }
+                    if ($_version == 'dashboard' && $br_before == 0 && $cmd->getDisplay('forceReturnLineBefore', 0) == 1) {
+                        $cmd_html .= '<br/>';
+                    }
+                    $cmd_html .= $cmd->toHtml($_version, '');
+                    $br_before = 0;
+                    if ($_version == 'dashboard' && $cmd->getDisplay('forceReturnLineAfter', 0) == 1) {
+                        $cmd_html .= '<br/>';
+                        $br_before = 1;
+                    }
 
-			//$replace['#mute#'] = "fas fa-volume-mute";
+                    //if ($cmd->getLogicalId() == "isMutedinfo") log::add('alexaapi','debug','**************************************************-->'.$cmd->getValue());
+
+                    //$replace['#mute#'] = "fas fa-volume-mute";
+                    //log::add('alexaapi','debug','--Début génération du Widget de *'.$cmd->getLogicalId().'*');
 
 
-		$html = template_replace($replace, getTemplate('core', $_version, 'eqLogic','alexaapi'));
-		return $html;
-		}
+                }
+                if (!$isMutedPresent) $replace['#mute#'] = "";
+                $replace['#cmd#'] = $cmd_html;
+                break;
+        }
+
+        //$replace['#mute#'] = "fas fa-volume-mute";
 
 
+        $html = template_replace($replace, getTemplate('core', $_version, 'eqLogic', 'alexaapi'));
+        return $html;
+    }
 }
 
 class alexaapiCmd extends cmd
@@ -1481,25 +1476,25 @@ class alexaapiCmd extends cmd
             return;
         }
 
-		// Protection du sommeil
-		if (config::byKey('dodo', 'alexaapi', 0) != "0") {
-			$debut=config::byKey('dododebut', 'alexaapi', 22);	
-			$fin=config::byKey('dodofin', 'alexaapi', 7);		
-			$maintenant=date("H");								
-			if ($fin<$debut) {
-				$fin=$fin+24;
-				if ($maintenant<$fin) $maintenant=$maintenant+24;
-			}
-			if (($maintenant>=$debut) && ($maintenant<$fin)) {
-				log::add('alexaapi', 'info', ' ╔══════════════════════[Opion Protection du sommeil ACTIVEE de '.config::byKey('dododebut', 'alexaapi', 22).'h à '.config::byKey('dodofin', 'alexaapi', 7).'h]═══════════════════════════════════════════════════════════════════════════');
-				log::add('alexaapi', 'info', ' ║ Commande annulée');
-				log::add('alexaapi', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
-				return;
-			}
-		}
+        // Protection du sommeil
+        if (config::byKey('dodo', 'alexaapi', 0) != "0") {
+            $debut = config::byKey('dododebut', 'alexaapi', 22);
+            $fin = config::byKey('dodofin', 'alexaapi', 7);
+            $maintenant = date("H");
+            if ($fin < $debut) {
+                $fin = $fin + 24;
+                if ($maintenant < $fin) $maintenant = $maintenant + 24;
+            }
+            if (($maintenant >= $debut) && ($maintenant < $fin)) {
+                log::add('alexaapi', 'info', ' ╔══════════════════════[Opion Protection du sommeil ACTIVEE de ' . config::byKey('dododebut', 'alexaapi', 22) . 'h à ' . config::byKey('dodofin', 'alexaapi', 7) . 'h]═══════════════════════════════════════════════════════════════════════════');
+                log::add('alexaapi', 'info', ' ║ Commande annulée');
+                log::add('alexaapi', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+                return;
+            }
+        }
 
-		
-		
+
+
 
         $request = $this->buildRequest($_options);
         log::add('alexaapi', 'info', 'Envoi de ' . $request); //Request : http://192.168.0.21:3456/volume?value=50&device=G090LF118173117U
@@ -1540,13 +1535,15 @@ class alexaapiCmd extends cmd
             $value = $resultjson['value'];
         }
 
-		if (isset($resultjson['volumes'])) self::decodeTousLesVolumes($resultjson['volumes']); //Lancé dans le cas de la commande allDeviceVolumes
+        if (isset($resultjson['volumes'])) self::decodeTousLesVolumes($resultjson['volumes']); //Lancé dans le cas de la commande allDeviceVolumes
 
         if (($this->getType() == 'action') && (is_array($this->getConfiguration('infoNameArray')))) {
             foreach ($this->getConfiguration('infoNameArray') as $LogicalIdCmd) {
                 $cmd = $this->getEqLogic()->getCmd(null, $LogicalIdCmd);
                 if (is_object($cmd)) {
-                    if(array_key_exists('0', $resultjson)){$this->getEqLogic()->checkAndUpdateCmd($LogicalIdCmd, $resultjson[0][$LogicalIdCmd]);}
+                    if (array_key_exists('0', $resultjson)) {
+                        $this->getEqLogic()->checkAndUpdateCmd($LogicalIdCmd, $resultjson[0][$LogicalIdCmd]);
+                    }
                     //log::add('alexaapi', 'info', $LogicalIdCmd.' prévu dans infoNameArray de '.$this->getName().' trouvé ! '.$resultjson[0]['whennextmusicalalarminfo'].' OK !');
                 } else {
                     log::add('alexaapi', 'warning', $LogicalIdCmd . ' prévu dans infoNameArray de ' . $this->getName() . ' mais non trouvé ! donc ignoré');
@@ -1562,43 +1559,39 @@ class alexaapiCmd extends cmd
                 log::add('alexaapi', 'warning', $LogicalIdCmd . ' prévu dans infoName de ' . $this->getName() . ' mais non trouvé ! donc ignoré');
             }
         }
- 
- return true;
+
+        return true;
     }
 
     private function decodeTousLesVolumes($_resultjson = array())
-	{
-					
-	//$listePluginsAlexaArray=self::listePluginsAlexaArray(false, false, false, true);
+    {
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		foreach ($_resultjson as $equip) {
-			//log::add('alexaapi', 'info', 'equip:'.json_encode($equip));
-			//log::add('alexaapi', 'info', 'dsn:'.$equip['dsn']);
-			
-						foreach (eqLogic::byType('alexaapi') as $eqLogic) {
-						//log::add('alexaapi', 'info', 'eqlogic::'.$eqLogic->getLogicalId());
-						
-						if ($eqLogic->getLogicalId()==$equip['dsn']) {
-							log::add('alexaapi', 'info', '-----!!!!!!!!! Trouvé :'.$equip['dsn'].' son volume est de '.$equip['speakerVolume']);
-							$eqLogic->checkAndUpdateCmd('volumeinfo', $equip['speakerVolume']);
-						}
-						
-							}
+        //$listePluginsAlexaArray=self::listePluginsAlexaArray(false, false, false, true);
+
+
+
+
+
+
+
+
+
+
+
+        foreach ($_resultjson as $equip) {
+            //log::add('alexaapi', 'info', 'equip:'.json_encode($equip));
+            //log::add('alexaapi', 'info', 'dsn:'.$equip['dsn']);
+
+            foreach (eqLogic::byType('alexaapi') as $eqLogic) {
+                //log::add('alexaapi', 'info', 'eqlogic::'.$eqLogic->getLogicalId());
+
+                if ($eqLogic->getLogicalId() == $equip['dsn']) {
+                    log::add('alexaapi', 'info', '-----!!!!!!!!! Trouvé :' . $equip['dsn'] . ' son volume est de ' . $equip['speakerVolume']);
+                    $eqLogic->checkAndUpdateCmd('volumeinfo', $equip['speakerVolume']);
+                }
             }
-		
-
-		
-	}
+        }
+    }
 
     private function buildRequest($_options = array())
     {
@@ -1610,13 +1603,13 @@ class alexaapiCmd extends cmd
             $command = $this->getConfiguration('request');
             $arguments = "";
         }
-		// On va tranformer les commandes qui ne passent plus suite aux modifs d'Amazon en commande "Parler à Alexa"
-       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>command>>>>>>>>>>>>>>>>>>>>>>>'.$command);		
-       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>json_encode_options>>>>>>>>>>>>>>>>>>>>>>'.json_encode($_options));		
-       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>json_encodejson_encode_options>>>>>>>>>>>>>>>>>>>>>>'.json_encode(json_encode($_options)));		
-       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>_options[select]>>>>>>>>>>>>>>>>>>>>>>'.$_options['select']);		
-       // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>_options[message]>>>>>>>>>>>>>>>>>>>>>>'.$_options['message']);		
-		
+        // On va tranformer les commandes qui ne passent plus suite aux modifs d'Amazon en commande "Parler à Alexa"
+        // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>command>>>>>>>>>>>>>>>>>>>>>>>'.$command);		
+        // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>json_encode_options>>>>>>>>>>>>>>>>>>>>>>'.json_encode($_options));		
+        // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>json_encodejson_encode_options>>>>>>>>>>>>>>>>>>>>>>'.json_encode(json_encode($_options)));		
+        // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>_options[select]>>>>>>>>>>>>>>>>>>>>>>'.$_options['select']);		
+        // log::add('alexaapi', 'debug', '1>>>>>>>>>>>>>>>>_options[message]>>>>>>>>>>>>>>>>>>>>>>'.$_options['message']);		
+
         switch ($command) {
             case 'volume':
                 $request = $this->build_ControledeSliderSelectMessage($_options, '50');
@@ -1679,48 +1672,47 @@ class alexaapiCmd extends cmd
         $request = scenarioExpression::setTags($request);
         if (trim($request) == '') throw new Exception(__('Commande inconnue ou requête vide : ', __FILE__) . print_r($this, true));
         $device = str_replace("_player", "", $this->getEqLogic()->getConfiguration('serial'));
-		
-		if ((strlen($device)>20) && (strpos($request, "textCommand?") !== false)) // On va chercher un device car le serial des groupes ne fonctionne pas.
-		{
-		$groupName=str_replace(" ", "+", $this->getEqLogic()->getName());
-			// C'est un groupe dans une commande textCommand
-		//log::add('alexaapi', 'debug', 'C est un groupe device=' . $device);
-		//$request=$request."+sur+le+groupe+".$groupName;
-		//log::add('alexaapi', 'debug', 'name=' . $deviceName);
-					
-		$device=config::byKey('defaultDevice','alexaapi','',true);
-		
-			if ($device==""){
-					log::add('alexaapi', 'warning', ' ╔═══════════════════════════════[Souci de configuration]══════════════════════════════════════════════════════════════');
-					log::add('alexaapi', 'warning', " ║ La commande n'a pas fonctionné puisqu'aucun appareil n'est défini par défaut dans la configuration");
-					log::add('alexaapi', 'warning', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
-			}		
-		}
-		
-		
-		
-		
-		
-		if ($request =="allDeviceVolumes") return 'http://' . config::byKey('internalAddr') . ':3456/' . $request; // cas particulier pour cette commande
-			else return 'http://' . config::byKey('internalAddr') . ':3456/' . $request . '&device=' . $device;
+
+        if ((strlen($device) > 20) && (strpos($request, "textCommand?") !== false)) // On va chercher un device car le serial des groupes ne fonctionne pas.
+        {
+            $groupName = str_replace(" ", "+", $this->getEqLogic()->getName());
+            // C'est un groupe dans une commande textCommand
+            //log::add('alexaapi', 'debug', 'C est un groupe device=' . $device);
+            //$request=$request."+sur+le+groupe+".$groupName;
+            //log::add('alexaapi', 'debug', 'name=' . $deviceName);
+
+            $device = config::byKey('defaultDevice', 'alexaapi', '', true);
+
+            if ($device == "") {
+                log::add('alexaapi', 'warning', ' ╔═══════════════════════════════[Souci de configuration]══════════════════════════════════════════════════════════════');
+                log::add('alexaapi', 'warning', " ║ La commande n'a pas fonctionné puisqu'aucun appareil n'est défini par défaut dans la configuration");
+                log::add('alexaapi', 'warning', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+            }
+        }
+
+
+
+
+
+        if ($request == "allDeviceVolumes") return 'http://' . config::byKey('internalAddr') . ':3456/' . $request; // cas particulier pour cette commande
+        else return 'http://' . config::byKey('internalAddr') . ':3456/' . $request . '&device=' . $device;
     }
 
 
     private function build_ControledeSliderSelectMessage($_options = array(), $default = "Ceci est un message de test")
     {
-       $cmd = $this->getEqLogic()->getCmd(null, 'volumeinfo');
+        $cmd = $this->getEqLogic()->getCmd(null, 'volumeinfo');
         if (is_object($cmd))
             $lastvolume = $cmd->execCmd();
 
         $request = $this->getConfiguration('request');
-		
-		
-		if ($request=="announcementgroup?text=#message#") 
-			{
-			$request="textCommand?text=annonce+#message#";
-			if (isset($_options['message'])) $_options['message'] = str_replace(" ", "+", $_options['message']);
-			}
-		
+
+
+        if ($request == "announcementgroup?text=#message#") {
+            $request = "textCommand?text=annonce+#message#";
+            if (isset($_options['message'])) $_options['message'] = str_replace(" ", "+", $_options['message']);
+        }
+
         //log::add('alexaapi_node', 'info', '---->Request2:'.$request);
         //log::add('alexaapi_node', 'debug', '---->getName:'.$this->getEqLogic()->getCmd(null, 'volumeinfo')->execCmd());
         if ((isset($_options['slider'])) && ($_options['slider'] == "")) $_options['slider'] = $default;
@@ -1729,11 +1721,11 @@ class alexaapiCmd extends cmd
         if (!(isset($_options['slider']))) $_options['slider'] = "";
         if (!(isset($_options['select']))) $_options['select'] = "";
         if (!(isset($_options['message']))) $_options['message'] = "";
-        if ((!(isset($_options['volume']))) || ($_options['volume']=="#volume#")) $_options['volume'] = ""; //2eme partie du test : Rustine pour supprimer un volume qui serait resté sur #volume# sur un scénario
+        if ((!(isset($_options['volume']))) || ($_options['volume'] == "#volume#")) $_options['volume'] = ""; //2eme partie du test : Rustine pour supprimer un volume qui serait resté sur #volume# sur un scénario
         //log::add('alexaapi_node', 'info', '---->!!!!!!!!!!!!!!!!!!!!!!!:'.$_options['volume']);
-		
+
         if (!(isset($_options['volume']))) $_options['volume'] = "";
-		
+
         //log::add('alexaapi', 'info', 'xxxxxxxxxxxxx---->_options:'.json_encode($_options));
         // Si on est sur une commande qui utilise volume, on va remettre après execution le volume courant
         if (strstr($request, '&volume=')) $request = $request . '&lastvolume=' . $lastvolume;
@@ -1754,12 +1746,12 @@ class alexaapiCmd extends cmd
 
     public static function decodeTexteAleatoire($_text)
     {
-		// Pour le décodage des interjections et de la librairie de sons
-		// https://developer.amazon.com/en-US/docs/alexa/custom-skills/ask-soundlibrary.html
-		// https://developer.amazon.com/en-US/docs/alexa/custom-skills/speechcon-reference-interjections-french.html
-		$_text= preg_replace("~#([^/#\[\]]+/[^/#\[\]]+)#~i",'<audio src="soundbank://soundlibrary/$1" />',$_text);
-		$_text= preg_replace("~#([^/#\[\]]+/[^/#\[\]]+/[^/#\[\]]+)#~i",'<audio src="soundbank://soundlibrary/$1" />',$_text);
-		$return= preg_replace("~#([^/#\[\]]+)#~i",'<say-as interpret-as="interjection">$1</say-as>',$_text);
+        // Pour le décodage des interjections et de la librairie de sons
+        // https://developer.amazon.com/en-US/docs/alexa/custom-skills/ask-soundlibrary.html
+        // https://developer.amazon.com/en-US/docs/alexa/custom-skills/speechcon-reference-interjections-french.html
+        $_text = preg_replace("~#([^/#\[\]]+/[^/#\[\]]+)#~i", '<audio src="soundbank://soundlibrary/$1" />', $_text);
+        $_text = preg_replace("~#([^/#\[\]]+/[^/#\[\]]+/[^/#\[\]]+)#~i", '<audio src="soundbank://soundlibrary/$1" />', $_text);
+        $return = preg_replace("~#([^/#\[\]]+)#~i", '<say-as interpret-as="interjection">$1</say-as>', $_text);
 
 
         if (strpos($_text, '|') !== false && strpos($_text, '[') !== false && strpos($_text, ']') !== false) {
@@ -1853,8 +1845,8 @@ class alexaapiCmd extends cmd
         if ($command == 'alarm')
             $data = getTemplate('core', 'scenario', 'cmd.alarm', 'alexaapi');
         if (!is_null($data)) {
-            if (version_compare(jeedom::version(),'4.2.0','>=')) {
-                if(!is_array($data)) return array('template' => $data, 'isCoreWidget' => false);
+            if (version_compare(jeedom::version(), '4.2.0', '>=')) {
+                if (!is_array($data)) return array('template' => $data, 'isCoreWidget' => false);
             } else return $data;
         }
         return parent::getWidgetTemplateCode($_version, $_clean, $_widgetName);
