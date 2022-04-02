@@ -156,13 +156,13 @@ foreach ($eqLogics as $eqLogic) {
 
                             $alternateImg = $eqLogic->getConfiguration('type');
                             if (file_exists(dirname(__FILE__) . '/../../core/config/devices/' . $alternateImg . '.png'))
-                                echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/' . $alternateImg . '.png" style="min-height:75px !important;" />';
+                                echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/' . $alternateImg . '.png" style=" !important;" />';
                             elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/' . $eqLogic->getConfiguration('family') . '.png'))
-                                echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/' . $eqLogic->getConfiguration('family') . '.png" style="min-height:75px !important;" />';
+                                echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/' . $eqLogic->getConfiguration('family') . '.png" style=" !important;" />';
                             elseif (file_exists(dirname(__FILE__) . '/../../core/config/devices/default.png'))
-                                echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" style="min-height:75px !important;" />';
+                                echo '<img class="lazy" src="plugins/alexaapi/core/config/devices/default.png" style=" !important;" />';
                             else
-                                echo '<img class="lazy" src="' . $plugin->getPathImgIcon() . '" style="min-height:75px !important;" />';
+                                echo '<img class="lazy" src="' . $plugin->getPathImgIcon() . '" style=" !important;" />';
 
                             echo "<br />";
                             echo '<span class="name">' . $eqLogic->getHumanName(true, true) . '</span>';
@@ -207,7 +207,7 @@ foreach ($eqLogics as $eqLogic) {
                             else
                                 echo 'https://www.jeedom.com/market/index.php?v=d&p=market&type=plugin&plugin_id=' . $pluginAlexaUnparUn['idMarket'] . '" target="_blank';
 
-                            echo '"><img src="plugins/alexaapi/plugin_info/' . $pluginAlexaUnparUn['pluginId'] . '_icon.png" width="75" height="75" style="min-height:75px !important;" />
+                            echo '"><img src="plugins/alexaapi/plugin_info/' . $pluginAlexaUnparUn['pluginId'] . '_icon.png" width="75" height="75" style=" !important;" />
 			<br /><span >{{' . $pluginAlexaUnparUn['nom'] . '}}</span></a>
 		</div>';
                         }
