@@ -261,76 +261,65 @@ foreach ($eqLogics as $eqLogic) {
         </div>
         <!-- Container du panneau de contrôle -->
         <div class="col-lg-12 eqLogic" style="display: none;">
-            <!-- Bouton sauvegarder -->
-            <a class="btn btn-success eqLogicAction pull-right" data-action="save"><i class="fas fa-check-circle"></i>
-                {{Sauvegarder}}</a>
-            <!-- Bouton Supprimer -->
-            <a class="btn btn-danger eqLogicAction pull-right" data-action="remove"><i class="fas fa-minus-circle"></i>
-                {{Supprimer}}</a>
-            <!-- Bouton configuration par défaut -->
-            <a id="bt_forcerDefaultCmd" class="btn btn-warning pull-right"><i class="fas fa-search"></i> {{Recharger
-                configuration par défaut}}</a>
-            <!-- Bouton configuration avancée -->
-            <a class="btn btn-default eqLogicAction pull-right" data-action="configure"><i class="fas fa-cogs"></i>
-                {{Configuration avancée}}</a>
-            <!-- Liste des onglets -->
+            <div class="input-group pull-right" style="display:inline-flex">
+                <span class="input-group-btn">
+                    <!-- Les balises <a></a> sont volontairement fermées à la ligne suivante pour éviter les espaces entre les boutons. Ne pas modifier -->
+                    <a class="btn btn-sm btn-default eqLogicAction roundedLeft" data-action="configure"><i class="fas fa-cogs"></i><span class="hidden-xs"> {{Configuration avancée}}</span>
+                    </a><a class="btn btn-warning btn-sm" id="bt_forcerDefaultCmd" title="{{Recharger configuration par défaut}}"><i class="fas fa-search"></i><span class="hidden-xs"> {{Recharger configuration par défaut}}</span>
+                    </a><a class="btn btn-sm btn-success eqLogicAction" data-action="save"><i class="fas fa-check-circle"></i> {{Sauvegarder}}
+                    </a><a class="btn btn-sm btn-danger eqLogicAction roundedRight" data-action="remove"><i class="fas fa-minus-circle"></i> {{Supprimer}}
+                    </a>
+                </span>
+            </div>
+            <!-- Onglets -->
             <ul class="nav nav-tabs" role="tablist">
-                <!-- Bouton de retour -->
-                <li role="presentation"><a class="eqLogicAction cursor" aria-controls="home" role="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
-                <!-- Onglet "Equipement" -->
-                <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i>
-                        {{Equipement}}</a></li>
-                <!-- Onglet "Commandes" -->
+                <li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fas fa-arrow-circle-left"></i></a></li>
+                <li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fas fa-tachometer-alt"></i> {{Equipement}}</a></li>
                 <li role="presentation"><a href="#commandtab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-list-alt"></i> {{Commandes}}</a></li>
             </ul>
             <!-- Container du contenu des onglets -->
-            <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
+            <div class="tab-content">
+                <!-- Onglet de configuration de l'équipement -->
                 <div role="tabpanel" class="tab-pane active" id="eqlogictab">
                     <br />
-                    <div class="row">
-                        <div class="col-sm-7">
-                            <form class="form-horizontal">
-                                <fieldset>
-                                    <div class="form-group">
-                                        <label class="col-sm-4 control-label">{{Nom de l'équipement Jeedom}}</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement}}" />
-                                        </div>
+                    <!-- Partie gauche de l'onglet "Equipements" -->
+                    <!-- Paramètres généraux de l'équipement -->
+                    <form class="form-horizontal">
+                        <fieldset>
+                            <div class="col-lg-6">
+                                <legend><i class="fas fa-wrench"></i> {{Paramètres généraux}}</legend>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">{{Nom de l'équipement Jeedom}}</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement}}" />
                                     </div>
-
-                                    <div class="form-group">
-                                        <label class="col-sm-4 control-label">{{Nom de l'équipement Amazon}}</label>
-                                        <div class="col-sm-8">
-                                            <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="device"> </span>
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">{{Nom de l'équipement Amazon}}</label>
+                                    <div class="col-sm-6">
+                                        <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="device"> </span>
                                     </div>
-                                    <!-- Onglet "Objet Parent" -->
-                                    <div class="form-group">
-                                        <label class="col-sm-4 control-label">{{Objet parent}}</label>
-                                        <div class="col-sm-6">
-                                            <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;" />
-                                            <select class="eqLogicAttr form-control" data-l1key="object_id">
-                                                <option value="">{{Aucun}}</option>
-                                                <?php
-                                                foreach ((jeeObject::buildTree(null, false)) as $object) {
-                                                    echo '<option value="' . $object->getId() . '">' . str_repeat('&nbsp;&nbsp;', $object->getConfiguration('parentNumber')) . $object->getName() . '</option>';
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <!-- Onglet "Device Playlist" -->
-                                    <div class="form-group">
-                                        <label class="col-sm-4 control-label">Option</label>
-                                        <div class="col-sm-8" id="widgetPlayListEnable">
-                                            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="widgetPlayListEnable" />{{Activer
-                                                le widget Playlist}}</label>
-                                        </div>
+                                </div>
+                                <!-- Onglet "Objet Parent" -->
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">{{Objet parent}}</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;" />
+                                        <select id="sel_object" class="eqLogicAttr form-control" data-l1key="object_id">
+                                            <option value="">{{Aucun}}</option>
+                                            <?php
+                                            $options = '';
+                                            foreach ((jeeObject::buildTree(null, false)) as $object) {
+                                                $options .= '<option value="' . $object->getId() . '">' . str_repeat('&nbsp;&nbsp;', $object->getConfiguration('parentNumber')) . $object->getName() . '</option>';
+                                            }
+                                            echo $options;
+                                            ?>
+                                        </select>
                                     </div>
                                     <!-- Catégorie" -->
                                     <div class="form-group">
                                         <label class="col-sm-4 control-label">{{Catégorie}}</label>
-                                        <div class="col-sm-8">
+                                        <div class="col-sm-6">
                                             <?php
                                             foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
                                                 echo '<label class="checkbox-inline">';
@@ -342,17 +331,74 @@ foreach ($eqLogics as $eqLogic) {
                                     </div>
                                     <!-- Onglet "Active Visible" -->
                                     <div class="form-group">
-                                        <label class="col-sm-4 control-label"></label>
-                                        <div class="col-sm-8">
-                                            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked />{{Activer}}</label>
-                                            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked />{{Visible}}</label>
-                                            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="interactionjeedom" />{{Interactions
-                                                Avec Jeedom}}</label>
+                                        <label class="col-sm-4 control-label">{{Options}}</label>
+                                        <div class="col-sm-6">
+                                            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked>{{Activer}}</label>
+                                            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked>{{Visible}}</label>
+                                            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="interactionjeedom" />{{Interactions Avec Jeedom}}</label>
                                         </div>
                                     </div>
-                                </fieldset>
-                            </form>
-                        </div>
+
+                                    <legend><i class="fas fa-cogs"></i> {{Paramètres spécifiques}}</legend>
+
+                                    <!-- Onglet "Device Playlist" -->
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">{Option Playlist}</label>
+                                        <div class="col-sm-6" id="widgetPlayListEnable">
+                                            <label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="widgetPlayListEnable" />{{Activer
+                                                le widget Playlist}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Partie droite de l'onglet "Équipement" -->
+                            <!-- Affiche un champ de commentaire par défaut mais vous pouvez y mettre ce que vous voulez -->
+                            <div class="col-lg-6">
+                                <legend><i class="fas fa-info"></i> {{Informations}}</legend>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">{{ID}}</label>
+                                    <div class="col-sm-8">
+                                        <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="logicalId"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">{{Type}}</label>
+                                    <div class="col-sm-8">
+                                        <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="type"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group" id="family">
+                                    <label class="col-sm-2 control-label">{{Famille}}</label>
+                                    <div class="col-sm-8">
+                                        <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="family"></span>
+                                    </div>
+                                </div>
+                                <label class="col-sm-2 control-label">{{Fonctionnalités}}</label>
+                                <div class="col-sm-8">
+                                    <span style="position:relative;top:+5px;left:+5px;font-size: 10px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="capabilities"></span>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-10">
+                                        <center>
+                                            <img src="core/img/no_image.gif" data-original=".jpg" id="img_device" class="img-responsive" style="max-height : 250px;" onerror="this.src='plugins/alexaapi/core/config/devices/default.png'" />
+                                        </center>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">{{Multiroom}}</label>
+                                    <div class="col-sm-8" id="multiroom-members">
+                                        <!-- Liste des membres du multiroom -->
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </fieldset>
+                    </form>
+
+                    <div class="row">
+
 
                         <!--
             <div class="cursor" id="bt_media" data-l1key="logicalId" style="background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;" >
@@ -374,91 +420,35 @@ foreach ($eqLogics as $eqLogic) {
                         //if ($eqLogic->getConfiguration('devicetype')!="Smarthome")
                         //{
                         ?>
-                        <div class="col-sm-5">
-                            <form class="form-horizontal">
-                                <fieldset>
-                                    <div class="form-group">
-                                        <label class="col-sm-2 control-label">{{ID}}</label>
-                                        <div class="col-sm-8">
-                                            <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="logicalId"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="col-sm-2 control-label">{{Type}}</label>
-                                        <div class="col-sm-8">
-                                            <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="type"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group" id="family">
-                                        <label class="col-sm-2 control-label">{{Famille}}</label>
-                                        <div class="col-sm-8">
-                                            <span style="position:relative;top:+5px;left:+5px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="family"></span>
-                                        </div>
-                                    </div> <!-- Onglet "Image" -->
-                                    <div class="form-group">
-                                        <label class="col-sm-2 control-label">{{Fonctionnalités}}</label>
-                                        <div class="col-sm-8">
-                                            <span style="position:relative;top:+5px;left:+5px;font-size: 10px;" class="eqLogicAttr" data-l1key="configuration" data-l2key="capabilities"></span>
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="col-sm-10">
-                                                <center>
-                                                    <img src="core/img/no_image.gif" data-original=".jpg" id="img_device" class="img-responsive" style="max-height : 250px;" onerror="this.src='plugins/alexaapi/core/config/devices/default.png'" />
-                                                </center>
-                                            </div>
-                                        </div>
 
-
-                                        <div class="form-group">
-                                            <label class="col-sm-2 control-label">{{Multiroom}}</label>
-                                            <div class="col-sm-8" id="multiroom-members">
-                                                <!-- Liste des membres du multiroom -->
-
-                                            </div>
-                                        </div>
-                                </fieldset>
-                            </form>
-                        </div>
 
                     </div>
                 </div>
 
                 <div role="tabpanel" class="tab-pane" id="commandtab">
-
+                    <?php
+                    if (config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0") {
+                    ?>
+                        <a class="pull-right btn btn-success btn-sm cmdAction" id="bt_addespeasyAction"><i class="fa fa-plus-circle"></i> {{Ajouter une commande action}}</a>
+                    <?php
+                    }
+                    ?>
 
                     <table id="table_cmd" class="table table-bordered table-condensed">
                         <thead>
                             <tr>
-                                <th style="width: 40px;">#</th>
-                                <th style="width: 200px;">{{Nom}}</th>
-                                <th style="width: 150px;">{{Type}}</th>
-                                <th style="width: 300px;">{{Commande & Variable}}</th>
-                                <th style="width: 40px;">{{Min}}</th>
-                                <th style="width: 40px;">{{Max}}</th>
-                                <th style="width: 150px;">{{Paramètres}}</th>
-                                <th style="width: 100px;"></th>
+                                <th class="hidden-xs" style="min-width:50px;width:70px;">ID</th>
+                                <th style="min-width:200px;width:350px;">{{Nom}}</th>
+                                <th>{{Type}}</th>
+                                <th style="width: 600px;">{{Commande & Variable}}</th>
+                                <th style="min-width:360px;">{{Options}}</th>
+                                <th style="min-width:80px;width:200px;">{{Actions}}</th>
                             </tr>
                         </thead>
                         <tbody>
 
                         </tbody>
                     </table>
-
-                    <?php
-
-                    if (config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0") {
-                    ?>
-
-                        <form class="form-horizontal">
-                            <fieldset>
-                                <div class="form-actions">
-                                    <a class="btn btn-success btn-sm cmdAction" id="bt_addespeasyAction"><i class="fas fa-plus-circle"></i> {{Ajouter une commande action}}</a>
-                                </div>
-                            </fieldset>
-                        </form>
-                    <?php
-                    }
-                    ?>
                 </div>
 
 
