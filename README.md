@@ -1,1 +1,1 @@
-# jeedom_alexasmarthome
+http://jeedom.sigalou-domotique.fr/alexa-api-changelog
