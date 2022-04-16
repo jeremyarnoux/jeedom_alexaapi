@@ -1,9 +1,16 @@
 #!/bin/bash
 
 TMPFOLDER=/tmp/jeedom/${PLUGIN}
-PROGRESS_FILE=${TMPFOLDER}/dependance
+if [ -z $PROGRESS_FILENAME ]; then
+    PROGRESS_FILENAME=dependance
+fi
+PROGRESS_FILE=${TMPFOLDER}/${PROGRESS_FILENAME}
 HR=$(printf '=%.0s' {1..70})
 TAB="echo -n "________""
+
+if [ -z $LANG_DEP ]; then
+    LANG_DEP=fr
+fi
 
 echo_success() {
 	echo -en "[  OK  ]\r"
@@ -11,7 +18,11 @@ echo_success() {
 }
 
 echo_failure() {
-	echo -en "[ERREUR]\r"
+	if [ "$LANG_DEP" = "fr" ];then
+		echo -en "[ERREUR]\r"
+	else
+		echo -en "[ERROR]\r"
+	fi
 	return 1
 }
 
@@ -44,7 +55,11 @@ info() {
 
 pre() {
 	echo "$HR"
-	echo "== $(date +'%d/%m/%Y %H:%M:%S') == Installation des dépendances de $PLUGIN"
+	if [ "$LANG_DEP" = "fr" ];then
+		echo "== $(date +'%d/%m/%Y %H:%M:%S') == Installation des dépendances de $PLUGIN"
+	else
+		echo "== $(date +'%d/%m/%Y %H:%M:%S') == Dependencies installation for $PLUGIN"
+	fi
 	echo "$HR"
 	echo
 	touch $TMPFOLDER/errorLog.$$
@@ -82,11 +97,19 @@ try() {
 		echo 1 > $TMPFOLDER/hasError.$$
 
 		local LINE=${BASH_LINENO[0]}
-		echo -e "== Erreur à l'étape : $STEP_NAME" >> $TMPFOLDER/errorLog.$$
-		echo -e "== Ligne $LINE" >> $TMPFOLDER/errorLog.$$
-		echo -e "== La commande \`$*' pose problème" >> $TMPFOLDER/errorLog.$$
-		echo -e "== Le code de retour est $EXIT_CODE" >> $TMPFOLDER/errorLog.$$
-		echo -e "== Le message d'erreur :" >> $TMPFOLDER/errorLog.$$
+		if [ "$LANG_DEP" = "fr" ];then
+			echo -e "== Erreur à l'étape : $STEP_NAME" >> $TMPFOLDER/errorLog.$$
+			echo -e "== Ligne $LINE" >> $TMPFOLDER/errorLog.$$
+			echo -e "== La commande \`$*' pose problème" >> $TMPFOLDER/errorLog.$$
+			echo -e "== Le code de retour est $EXIT_CODE" >> $TMPFOLDER/errorLog.$$
+			echo -e "== Le message d'erreur :" >> $TMPFOLDER/errorLog.$$
+		else
+			echo -e "== Error in step : $STEP_NAME" >> $TMPFOLDER/errorLog.$$
+			echo -e "== Line $LINE" >> $TMPFOLDER/errorLog.$$
+			echo -e "== Command \`$*' have an issue" >> $TMPFOLDER/errorLog.$$
+			echo -e "== Return code is $EXIT_CODE" >> $TMPFOLDER/errorLog.$$
+			echo -e "== Error message :" >> $TMPFOLDER/errorLog.$$
+		fi
 		echo -e "$cmdout\n" >> $TMPFOLDER/errorLog.$$
 		echo -e "$HR" >> $TMPFOLDER/errorLog.$$
 	fi
@@ -124,56 +147,102 @@ post() {
 		next
 	fi
 	echo 100 > ${PROGRESS_FILE}
-	echo "[100% ] : Terminé !"
+	if [ "$LANG_DEP" = "fr" ];then
+		echo "[100% ] : Terminé !"
+	else
+		echo "[100% ] : Finished !"
+	fi
 	[[ -f $TMPFOLDER/hasError.$$ ]] && { hasError=$(< $TMPFOLDER/hasError.$$); rm -f $TMPFOLDER/hasError.$$; }
 	echo
 	if [[ $hasError -eq 1 ]]; then
 		echo "$HR"
-		echo "== KO == Erreur d'Installation"
+		if [ "$LANG_DEP" = "fr" ];then
+			echo "== KO == Erreur d'Installation"
+		else
+			echo "== KO == Installation Error"
+		fi
 		echo "$HR"
 		[[ -f $TMPFOLDER/errorLog.$$ ]] && {
 			HAS_FIX=0
-			echo "== ANALYSE DES ERREURS..."
+			if [ "$LANG_DEP" = "fr" ];then
+				echo "== ANALYSE DES ERREURS..."
+			else
+				echo "== ANALYSING ERRORS..."
+			fi
 			#try to fix if possible
 			grep "apt --fix-broken install" $TMPFOLDER/errorLog.$$ &>/dev/null
 			FOUND_FIX_BROKEN=$?
 			if [[ $FOUND_FIX_BROKEN -eq 0 ]]; then
-				echo "== TROUVÉ 'sudo apt --fix-broken install' dans l'erreur, je lance la commande, attendez 45sec et relancez les dépendances pour réessayer"
+				if [ "$LANG_DEP" = "fr" ];then
+					echo "== TROUVÉ 'sudo apt --fix-broken install' dans l'erreur, je lance une commande pour corriger, attendez 45sec et relancez les dépendances pour réessayer"
+				else
+					echo "== FOUND 'sudo apt --fix-broken install' in error, launching countermeasures, wait 45sec and relaunch dependencies to retry"
+				fi
 				yes | sudo apt --fix-broken install
 				HAS_FIX=1
 			fi
 			grep "sudo dpkg --configure -a" $TMPFOLDER/errorLog.$$ &>/dev/null
 			FOUND_DPKG_CONFIGURE_A=$?
 			if [[ $FOUND_DPKG_CONFIGURE_A -eq 0 ]]; then
-				echo "== TROUVÉ 'dpkg --configure -a' dans l'erreur, je lance la commande, attendez 45sec et relancez les dépendances pour réessayer"
+				if [ "$LANG_DEP" = "fr" ];then
+					echo "== TROUVÉ 'dpkg --configure -a' dans l'erreur, je lance une commande pour corriger, attendez 45sec et relancez les dépendances pour réessayer"
+				else
+					echo "== FOUND 'dpkg --configure -a' in error, launching countermeasures, wait 45sec and relaunch dependencies to retry"
+				fi
 				sudo dpkg --configure -a --force-confdef
 				HAS_FIX=1
 			fi
 			grep "EINTEGRITY" $TMPFOLDER/errorLog.$$ &>/dev/null
 			FOUND_EINTEGRITY=$?
 			if [[ $FOUND_EINTEGRITY -eq 0 ]]; then
-				echo "== TROUVÉ 'EINTEGRITY' dans l'erreur, je lance une commande pour corriger, attendez 45sec et relancez les dépendances pour réessayer"
+				if [ "$LANG_DEP" = "fr" ];then
+					echo "== TROUVÉ 'EINTEGRITY' dans l'erreur, je lance une commande pour corriger, attendez 45sec et relancez les dépendances pour réessayer"
+				else
+					echo "== FOUND 'EINTEGRITY' in error, launching countermeasures, wait 45sec and relaunch dependencies to retry"
+				fi
 				sudo npm cache clean --force
 				HAS_FIX=1
 			fi
 			grep "npm ERR! fatal: could not create leading directories of '/root/.npm/_cacache/tmp/" $TMPFOLDER/errorLog.$$ &>/dev/null
 			FOUND_E128=$?
 			if [[ $FOUND_E128 -eq 0 ]]; then
-				echo "== TROUVÉ 'code 128' dans l'erreur, je lance une commande pour corriger, attendez 45sec et relancez les dépendances pour réessayer"
+				if [ "$LANG_DEP" = "fr" ];then
+					echo "== TROUVÉ 'code 128' dans l'erreur, je lance une commande pour corriger, attendez 45sec et relancez les dépendances pour réessayer"
+				else
+					echo "== FOUND 'code 128' in error, launching countermeasures, wait 45sec and relaunch dependencies to retry"
+				fi
 				sudo chown -R root:root /root/.npm
 				HAS_FIX=1
 			fi
-			
+			grep "changed its 'Suite' value from" $TMPFOLDER/errorLog.$$ &>/dev/null
+			FOUND_SUITECHANGED=$?
+			if [[ $FOUND_SUITECHANGED -eq 0 ]]; then
+				if [ "$LANG_DEP" = "fr" ];then
+					echo "== TROUVÉ -changed its 'Suite' value from- dans l'erreur, je lance une commande pour corriger, attendez 45sec et relancez les dépendances pour réessayer"
+				else
+					echo "== FOUND -changed its 'Suite' value from- in error, launching countermeasures, wait 45sec and relaunch dependencies to retry"
+				fi
+				sudo apt-get --allow-releaseinfo-change update
+				HAS_FIX=1
+			fi
 			if [[ $HAS_FIX -eq 0 ]]; then
 				#show the error
-				echo "== AUCUNE ERREUR CONNUE DÉTECTÉE"
+				if [ "$LANG_DEP" = "fr" ];then
+					echo "== AUCUNE ERREUR CONNUE DÉTECTÉE"
+				else
+					echo "== NO KNOWN ERROR DETECTED"
+				fi
 				cat $TMPFOLDER/errorLog.$$;
 			fi
 			rm -f $TMPFOLDER/errorLog.$$; 
 		}
 	else
 		echo "$HR"
-		echo "== OK == Installation Réussie"
+		if [ "$LANG_DEP" = "fr" ];then
+			echo "== OK == Installation Réussie"
+		else
+			echo "== OK == Installation Successful"
+		fi
 		echo "$HR"
 	fi
 	rm -f ${PROGRESS_FILE}

@@ -88,7 +88,8 @@ class AlexaRemote extends EventEmitter {
 		}
 
     init(cookie, callback) {
-        if (typeof cookie === 'object') {
+
+       if (typeof cookie === 'object') {
             this._options = cookie;
             if (!this._options.userAgent) {
                 //let platform = os.platform();
@@ -109,22 +110,23 @@ class AlexaRemote extends EventEmitter {
             cookie = this._options.cookie;
         }
 		//this._options.logger && this._options.logger('{Remote} ║ Use as User-Agent: ' + this._options.userAgent,'DEBUG');
-		this._options.logger && this._options.logger('{Remote} ║ Use as Login-Amazon-URL: ' + this._options.amazonPage,'DEBUG');
+		//this._options.logger && this._options.logger('{Remote} ║ Use as Login-Amazon-URL: ' + this._options.amazonPage,'DEBUG');
         if (this._options.alexaServiceHost) this.baseUrl = this._options.alexaServiceHost;
-		this._options.logger && this._options.logger('{Remote} ║ Use as Base-URL: ' + this.baseUrl,'DEBUG');
+		//this._options.logger && this._options.logger('{Remote} ║ Use as Base-URL: ' + this.baseUrl,'DEBUG');
         this._options.alexaServiceHost = this.baseUrl;
         if (this._options.refreshCookieInterval !== undefined && this._options.cookieRefreshInterval === undefined) {
             this._options.cookieRefreshInterval = this._options.refreshCookieInterval;
             delete this._options.refreshCookieInterval;
         }
         if (this._options.cookieRefreshInterval !== 0) {
-            this._options.cookieRefreshInterval = this._options.cookieRefreshInterval || 7*24*60*60*1000; // Auto Refresh after 7 days
+        //    this._options.cookieRefreshInterval = this._options.cookieRefreshInterval || 7*24*60*60*1000; // Auto Refresh after 7 days
+            this._options.cookieRefreshInterval = this._options.cookieRefreshInterval || 4*24*60*60*1000; // Auto Refresh after 4 days modif 13/03/2022
         }
 
         const self = this;
         function getCookie(callback) {
             if (!self.cookie) {
-				self._options.logger && self._options.logger('{Remote} ║ No cookie given, generate one !!!!!!!!!! ','DEBUG');
+				//self._options.logger && self._options.logger('{Remote} ║ Pas de cookie présent, Il faut le générer.','DEBUG');
                 //self._options.logger && self._options.logger('{Remote} ║ No cookie given, generate one');
                 self._options.cookieJustCreated = true;
                 self.generateCookie(self._options.email, self._options.password, function(err, res) {
@@ -137,7 +139,7 @@ class AlexaRemote extends EventEmitter {
                 });
             }
             else {
-                self._options.logger && self._options.logger('{Remote} ╠═╦═> Cookie OK','DEBUG');
+                self._options.logger && self._options.logger('{Remote} ╠═╦═> Cookie présent OK','DEBUG');
                 if (self._options.formerRegistrationData) {
 					
 				const dateObject = new Date(self._options.formerRegistrationData.tokenDate);
@@ -146,8 +148,8 @@ class AlexaRemote extends EventEmitter {
                 self._options.logger && self._options.logger('{Remote} ║ ╠═════> Dernier cookie généré le '+datesigalou,'DEBUG');
                     const tokensValidSince = Date.now() - self._options.formerRegistrationData.tokenDate;
                     //if (tokensValidSince < 5 * 24 * 60 * 60  * 1000) { modif 07/11/2021
-					if (tokensValidSince < 24 * 60 * 60 * 1000 && self._options.macDms) {
-                    //if (tokensValidSince <  1000) { // pour tests sigalou
+					if (tokensValidSince < 19 * 60 * 60 * 1000 && self._options.macDms) {
+                    //if (tokensValidSince <  10000) { // pour tests sigalou
 					self._options.logger && self._options.logger('{Remote} ║ ╚═════> donc encore valable, on ne le regénère pas','DEBUG');
                     //if (tokensValidSince < 24 * 60 * 60 * 1000) {
 						//self._options.logger && self._options.logger('{Remote} ╠══***********************═════> return tokensValidSince='+tokensValidSince,'DEBUG');
@@ -180,7 +182,7 @@ class AlexaRemote extends EventEmitter {
         getCookie((err) => {
             if (typeof callback === 'function') callback = callback.bind(this);
             if (err) {
-                this._options.logger && this._options.logger('{Remote} ╠═══════> Error from retrieving cookies','DEBUG');
+                //this._options.logger && this._options.logger('{Remote} ╠═══════> Error from retrieving cookies','DEBUG');
                 return callback && callback(err);
             }
             if (!this.csrf) return callback && callback(new Error('no csrf found'));
@@ -189,7 +191,7 @@ class AlexaRemote extends EventEmitter {
                     return callback && callback(new Error('Error while checking Authentication: ' + err));
                 }
                 //this._options.logger && this._options.logger('Alexa-Remote: Authentication checked: ' + authenticated);
-				this._options.logger && this._options.logger('{Remote} ╠═══> Authentication checked: ' + authenticated,'DEBUG');
+				//this._options.logger && this._options.logger('{Remote} ╠═══> Authentication checked: ' + authenticated,'DEBUG');
 
                  if ((!authenticated && !this._options.cookieJustCreated) || !this.macDms) {
                     this._options.logger && !this.macDms && this._options.logger('{Remote} ╠═══════> JWT missing, forcing a refresh ...','DEBUG');
@@ -213,6 +215,7 @@ class AlexaRemote extends EventEmitter {
                         this.init(this._options, callback);
                     }, this._options.cookieRefreshInterval);
                 }
+                
                 this.prepare(() => {
                     if (this._options.useWsMqtt) {
                         this.initWsMqttConnection();
@@ -222,12 +225,11 @@ class AlexaRemote extends EventEmitter {
             });
         });
     }
-	
-	
+
     prepare(callback) {
         this.getAccount((err, result) => {
             if (!err && result && Array.isArray(result)) {
-                result.forEach ((account) => {
+               result.forEach ((account) => {
                     if (!this.commsId) this.commsId = account.commsId;
                     //if (!this.directedId) this.directedId = account.directedId;
                 });
@@ -401,11 +403,12 @@ class AlexaRemote extends EventEmitter {
     }
 
     initWsMqttConnection() {
-        if (this.alexaWsMqtt) {
-            this.alexaWsMqtt.removeAllListeners();
-            this.alexaWsMqtt.disconnect();
-            this.alexaWsMqtt = null;
-        }
+//		if (!this._options.useWsMqtt) return;
+		if (this.alexaWsMqtt) {
+			this.alexaWsMqtt.removeAllListeners();
+			this.alexaWsMqtt.disconnect();
+			this.alexaWsMqtt = null;
+		}
         //this.alexaWsMqtt = new AlexaWsMqtt(this._options, this.cookie); 07/11/2021
 		this.alexaWsMqtt = new AlexaWsMqtt(this._options, this.cookie, this.macDms);
         if (!this.alexaWsMqtt) return;
@@ -785,13 +788,16 @@ class AlexaRemote extends EventEmitter {
     }
 
     generateCookie(email, password, callback) {
+		//this._options.logger && this._options.logger('{Remote} ╠═══════> generateCookie()','DEBUG');
         if (!this.alexaCookie) this.alexaCookie = require('./alexa-cookie.js');
         this.alexaCookie.generateAlexaCookie(email, password, this._options, callback);
     }
 
     refreshCookie(callback) {
         if (!this.alexaCookie) this.alexaCookie = require('./alexa-cookie.js');
+		//this._options.logger && this._options.logger('{Remote} ╠═══════> refreshCookie() avant','DEBUG');
         this.alexaCookie.refreshAlexaCookie(this._options, callback);
+		//this._options.logger && this._options.logger('{Remote} ╠═══════> refreshCookie() après','DEBUG');
     }
 
     httpsGet(noCheck, path, callback, flags = {}) {
@@ -1062,7 +1068,7 @@ this._options.logger && this._options.logger(obj.headers);
                 return;
             }
 
-                this._options.logger && this._options.logger('{Remote} ║ Réponse: ' + JSON.stringify(ret),'DEBUG');
+                this._options.logger && this._options.logger('{Remote} ║ ◄◄◄ Réception : ' + JSON.stringify(ret),'DEBUG');
                 this._options.logger && this._options.logger('{Remote} ╠════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════','DEBUG');
 
             callback(null, ret);
@@ -1119,7 +1125,7 @@ this._options.logger && this._options.logger(obj.headers);
         delete logOptions.headers.Accept;
         delete logOptions.headers.Referer;
         delete logOptions.headers.Origin;
-        this._options.logger && this._options.logger('{Remote} ║ Sending Request with ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT' || options.method === 'DELETE') ? ' and data=' + flags.data : ''),'DEBUG');
+        this._options.logger && this._options.logger('{Remote} ║     Envoi ►►► : ' + JSON.stringify(logOptions) + ((options.method === 'POST' || options.method === 'PUT' || options.method === 'DELETE') ? ' and data=' + flags.data : ''),'DEBUG');
 
         let req;
         let responseReceived = false;
@@ -1867,8 +1873,10 @@ return this.parseValue4Notification(notification, value);    }
             callback = includeActors;
             includeActors = false;
         }
-        this.httpsGet (`https://alexa-comms-mobile-service.${this._options.amazonPage}/accounts${includeActors ? '?includeActors=true' : ''}`, callback);       this.httpsGet (`https://alexa-comms-mobile-service.${this._options.amazonPage}/accounts`, callback);
+        this.httpsGet (`https://alexa-comms-mobile-service.${this._options.amazonPage}/accounts${includeActors ? '?includeActors=true' : ''}`, callback);       
+		//this.httpsGet (`https://alexa-comms-mobile-service.${this._options.amazonPage}/accounts`, callback);
     }
+
 
     getContacts(options, callback) {
         if (typeof options === 'function') {

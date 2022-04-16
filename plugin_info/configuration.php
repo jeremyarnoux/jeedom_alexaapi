@@ -30,6 +30,7 @@ include_file('desktop', 'alexaapi', 'js', 'alexaapi');
 $plugin = plugin::byId('alexaapi');
 $deamon_info = $plugin->deamon_info();
 
+if (isset($_eqlogic_id) === false) {$_eqlogic_id = null;}
 $eqLogics = ($_eqlogic_id !== null) ? array(eqLogic::byId($_eqlogic_id)) : eqLogic::byType('alexaapi', true);
 
 
@@ -135,30 +136,7 @@ $versionJeedom = $return['configuration']['version'];
     </fieldset>
 </form>
 
-<?php if (config::byKey('utilisateurExperimente', 'alexaapi', 0) != "0") :?>
-				<form class="form-horizontal">
-					<fieldset>
-						<legend><i class="fas fa-server"></i> {{Option Lien serveur}}</legend>
-
-						<div class="form-group">
-							<label class="col-sm-4 control-label">{{Relance de l'identification au serveur}}</label>
-							<div class="col-lg-2">
-								<div class="input-group">
-									<input type="text" class="configKey form-control" data-l1key="autorefresh"
-										   placeholder="33 3 * * *"/>
-									<span class="input-group-btn">
-										<a class="btn btn-success btn-sm " id="bt_cronGenerator"><i class="fas fa-question-circle"></i></a>
-									</span>
-								</div>
-							</div>
-						</div>
-						</div>
-					</fieldset>
-				</form>
-				<?php
-    endif; 
-
-
+<?php 
 			
 $foundSelect = false;
 if (config::byKey("listRoutines", "alexaapi", "") != '') {
@@ -422,7 +400,7 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
         $('#md_modal').dialog('close');
 
         bootbox.confirm({
-            message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API (et des autres plugin Alexa-xx) ? Il faudra refaire les scénarios.",
+            message: "Etes-vous sûr de vouloir supprimer tous les équipements du plugin Alexa-API (Cela supprime les players et les playlists mais pas les smartHome du plugin Alexa-smartHome) ? Il faudra refaire les scénarios.",
             buttons: {
                 confirm: {
                     label: 'Oui',

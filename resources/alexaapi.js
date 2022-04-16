@@ -661,6 +661,16 @@ CommandAlexa.SmarthomeCommand = function(req,res){
 					'command': req.query.action,
 					'rangeValue': req.query.rangeValue
 				});
+		
+      	} else if (parameters.action == "lockAction") {
+
+        	parameters={'action': parameters.action,'targetLockState.lockState': req.query.lockState};
+		
+		toReturn.push({
+					'device': req.query.device,
+					'command': parameters.action,
+					'lockState': req.query.lockState
+				});
 
 	}	
 							
@@ -2785,8 +2795,8 @@ fs.readFile(config.cookieLocation, 'utf8', (err, data) => {
 
 });
 
-function startServer(force=false) {
-
+function startServer(force=false) { //force=true pour la relance avec nouveau cookie
+	
 	if (force||(Date.now()-dernierStartServeur)>20000)
 	{
 		dernierStartServeur=Date.now();
@@ -2818,16 +2828,17 @@ function startServer(force=false) {
 					process.exit(-1);
 				}
 
-				if (alexa.cookieData) {
+				if (!force && alexa.cookieData) {
 					if (alexa.cookieaSauvegarder) {
 						fs.writeFile(config.cookieLocation, JSON.stringify(alexa.cookieData), 'utf8', (err) => {
 							if (err) {
 								config.logger('{API}:    Error while saving the cookie to: ' + config.cookieLocation);
 								config.logger('{API}:    ' + err);
 							}
-							config.logger('{API}    ╠═══> New cookie saved to:' + config.cookieLocation,'DEBUG');
+							config.logger('{API}    ╠═══> Le nouveau cookie est bien récupéré et sauvegardé dans ' + config.cookieLocation,'DEBUG');
 							config.logger("{API}    ╠═══> On doit relancer l'initialisation avec le nouveau Cookie",'DEBUG');
 							startServer(true);
+							
 						});
 						
 						//-------------------------------------------------------------------------------------------------
@@ -2851,20 +2862,20 @@ function startServer(force=false) {
 						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
 					} else {
 						server = app.listen(config.listeningPort, () => {
-							config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-							config.logger('{API}    ║   Activation du port ' + server.address().port ,'INFO');
-							config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+							//config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
+							config.logger('{API}    ╠═══> Ouverture du port ' + server.address().port ,'INFO');
+							//config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
 								//server.close(() => {
 								//server = app.listen(config.listeningPort);
 								//});
 
 						});
 					}
-				} else {
+				} /*else {
 						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-						config.logger('{API}    ║   Ne devrait jamais arriver !! On a pas de cookieData' ,'INFO');
+						config.logger('{API}    ║   Ne devrait jamais arriver !! On a pas de cookieData' ,'INFO'); AJOUT DE force donc désactivé
 						config.logger('{API}    ╠════════════════════════════════════════════════════════════════════════════════════════','INFO');
-				}
+				}*/
 					
 					
 				
