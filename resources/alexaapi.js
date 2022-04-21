@@ -1506,7 +1506,7 @@ CommandAlexa.media = function(req, res) {
 	Appel_getMedia(req.query.device, function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
 		if(typeof JSON.stringify(retourAmazon, null, 2) == "undefined") {
-			config.logger('{API}    ╠═══> Réponse est undefined - A voir pourquoi ?!', 'DEBUG');
+			config.logger('{API}    ╠═══> Réponse est undefined - Elle est donc ignorée', 'DEBUG');
 			return res.sendStatus(500);
 			}		
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
@@ -1526,7 +1526,7 @@ config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+'
 	Appel_getPlayerInfo(req.query.device, function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
 		if(typeof JSON.stringify(retourAmazon, null, 2) == "undefined") {
-			config.logger('{API}    ╠═══> Réponse est undefined - A voir pourquoi ?!', 'DEBUG');
+			config.logger('{API}    ╠═══> Réponse est undefined - Elle est donc ignorée', 'DEBUG');
 			return res.sendStatus(500);
 			}		
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
@@ -1542,6 +1542,10 @@ CommandAlexa.Bluetooth = function(req, res) {
 
 	Appel_getBluetooth(false, function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		if(typeof JSON.stringify(retourAmazon, null, 2) == "undefined") {
+			config.logger('{API}    ╠═══> Réponse est undefined - Elle est donc ignorée', 'DEBUG');
+			return res.sendStatus(500);
+			}		
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500);});
 		res.status(200).json(retourAmazon);
@@ -1558,6 +1562,10 @@ CommandAlexa.notificationSounds = function(req, res) {
 
 	Appel_getNotificationSounds(req.query.device, function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		if(typeof JSON.stringify(retourAmazon, null, 2) == "undefined") {
+			config.logger('{API}    ╠═══> Réponse est undefined - Elle est donc ignorée', 'DEBUG');
+			return res.sendStatus(500);
+			}		
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500);});
 		res.status(200).json(retourAmazon);
@@ -1574,6 +1582,10 @@ CommandAlexa.Playlists = function(req, res) {
 	Appel_Playlists(req.query.device, function(retourAmazon) {
 		//config.logger('{API}: retour: ' + commandeEnvoyee);
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		if(typeof JSON.stringify(retourAmazon, null, 2) == "undefined") {
+			config.logger('{API}    ╠═══> Réponse est undefined - Elle est donc ignorée', 'DEBUG');
+			return res.sendStatus(500);
+			}		
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500);});
 		res.status(200).json(retourAmazon);
@@ -1590,6 +1602,10 @@ CommandAlexa.activities = function(req, res) {
 
 	Appel_getActivities(req.query.device, function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		if(typeof JSON.stringify(retourAmazon, null, 2) == "undefined") {
+			config.logger('{API}    ╠═══> Réponse est undefined - Elle est donc ignorée', 'DEBUG');
+			return res.sendStatus(500);
+			}		
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500);});
 		res.status(200).json(retourAmazon);
@@ -1607,6 +1623,10 @@ CommandAlexa.deviceNotificationState = function(req, res) {
 
 	Appel_getDeviceNotificationState(req.query.device, function(retourAmazon) {
 		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
+		if(typeof JSON.stringify(retourAmazon, null, 2) == "undefined") {
+			config.logger('{API}    ╠═══> Réponse est undefined - Elle est donc ignorée', 'DEBUG');
+			return res.sendStatus(500);
+			}		
 		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
 			{if (err) return res.sendStatus(500);});
 		res.status(200).json(retourAmazon);
