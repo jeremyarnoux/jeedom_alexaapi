@@ -313,7 +313,7 @@ function addCmdToTable(_cmd) {
   	tr += '</select>'
   	tr += '</td>'
   	tr += '<td>'
-    tr += '<span class="type disabled" type="' + init(_cmd.type) + '" disabled = "false">' + jeedom.cmd.availableType() + '</span>'
+    tr += '<span class="type" type="' + init(_cmd.type) + '" disabled = "false">' + jeedom.cmd.availableType() + '</span>'
     tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>'
     
     if (init(_cmd.type) == 'action' && init(_cmd.logicalId) != 'refresh') {
