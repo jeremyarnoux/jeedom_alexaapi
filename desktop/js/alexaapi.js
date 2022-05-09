@@ -324,16 +324,18 @@ function addCmdToTable(_cmd) {
         tr += '<td>'
     }
       tr += '</td>'
-    if ((init(_cmd.logicalId) == "") || (init(_cmd.logicalId) == "volume")) {
+  /*  
+  Supprimé le 09/05/2022 doubloni d'unité et max ?? pouruqoi ce test ???????
+  if ((init(_cmd.logicalId) == "") || (init(_cmd.logicalId) == "volume")) {
         tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite"  style="width : 100px;" placeholder="{{Unité}}" title="{{Unité}}" >';
-        tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}"  title="{{Min}} style="margin-top : 3px;"> ';
+        tr += '55<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}"  title="{{Min}} style="margin-top : 3px;"> ';
         tr += '</td>';
         tr += '<td>';
-        tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">';
-    } else {
+        tr += '1<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">';
+    } else {*/
         tr += '</td>';
         tr += '<td>';
-    }
+   //}
 
 	tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="isVisible" checked/>{{Afficher}}</label> '
   	tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="isHistorized" checked/>{{Historiser}}</label> '
