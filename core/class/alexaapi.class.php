@@ -441,7 +441,7 @@ class alexaapi extends eqLogic
         }
 
         $d = new Cron\CronExpression('*/15 * * * *', new Cron\FieldFactory);
-        //$d = new Cron\CronExpression('* * * * *', new Cron\FieldFactory);
+       // $d = new Cron\CronExpression('* * * * *', new Cron\FieldFactory);
         $deamon_info = self::deamon_info();
         if ($d->isDue() && $deamon_info['state'] == 'ok') {
             //log::add('alexaapi', 'debug', '---------------------------------------------DEBUT CRON-'.$autorefresh.'-----------------------');
@@ -977,11 +977,15 @@ class alexaapi extends eqLogic
 
                 $ListeDesRoutines = [];
                 foreach ($json as $item) {
-                    //if ($item['utterance'] != '')
-                    if (isset($item['utterance']))
-                        $ListeDesRoutines[] = $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
+                    if (isset($item['utterance'])) {
+						log::add('alexaapi', 'debug', 'routine------------------------------------11111111111111111'.$item['creationTimeEpochMillis'] . '|' . $item['utterance']);
+						if ($item['utterance']=="")
+							$ListeDesRoutines[] = $item['creationTimeEpochMillis'] . '|' . $item['creationTimeEpochMillis'];
+						else
+							$ListeDesRoutines[] = $item['creationTimeEpochMillis'] . '|' . $item['utterance'];
+					}
                     else {
-                        if (isset($item['triggerTime']) && ($item['triggerTime'] != '')) {
+                       if (isset($item['triggerTime']) && ($item['triggerTime'] != '')) {
                             $resultattriggerTime = substr($item['triggerTime'], 0, 2) . ":" . substr($item['triggerTime'], 2, 2);
                             $ListeDesRoutines[] = $item['creationTimeEpochMillis'] . '|' . $resultattriggerTime;
                         }
