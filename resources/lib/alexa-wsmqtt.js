@@ -264,8 +264,11 @@ class AlexaWsMqtt extends EventEmitter {
             this.websocket && this.websocket.terminate();
         });
 
-        this.websocket.on('unexpected-response', (request, response) => {
-            this._options.logger && this._options.logger('{MQTT}   ║ Unexpected Response: ' + JSON.stringify(response)  ,'DEBUG');
+        //modif 4.1.1
+		//this.websocket.on('unexpected-response', (request, response) => {
+        //    this._options.logger && this._options.logger('{MQTT}   ║ Unexpected Response: ' + JSON.stringify(response)  ,'DEBUG');
+        this.websocket.on('unexpected-response', () => {
+            this._options.logger && this._options.logger('{MQTT}   ║ Unexpected Response');		
         });
 
         this.websocket.on('message', async (data) => {

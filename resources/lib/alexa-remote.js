@@ -72,8 +72,11 @@ class AlexaRemote extends EventEmitter {
 
         if (!this.cookie || typeof this.cookie !== 'string') return;
         let ar = this.cookie.match(/csrf=([^;]+)/);
-        if (!ar || ar.length < 2) ar = this.cookie.match(/csrf=([^;]+)/);
-        if (!this.csrf && ar && ar.length >= 2) {
+        // Allow csrf to be updated on cookie refresh
+		//Modif 4.1.1 ->  4.1.2 https://github.com/Apollon77/alexa-remote
+		//if (!ar || ar.length < 2) ar = this.cookie.match(/csrf=([^;]+)/);
+        //if (!this.csrf && ar && ar.length >= 2) {
+		if (ar && ar.length >= 2) {
             this.csrf = ar[1];
         }
         if (!this.csrf) {
@@ -1043,6 +1046,14 @@ this._options.logger && this._options.logger(obj.headers);
     httpsGetCall(path, callback, flags = {}) {
 
         const handleResponse = (err, res, body) => {
+			
+			//4.1.1->4.1.2
+	        if (!err && typeof res.statusCode === 'number' && res.statusCode == 401) {
+                this._options.logger && this._options.logger('{Remote} ║ Réponse: 401 Unauthorized');
+                return callback(new Error('401 Unauthorized'), null);
+            }		
+			
+			
             if (err || !body) { // Method 'DELETE' may return HTTP STATUS 200 without body
                // this._options.logger && this._options.logger('{Remote} ║ Response: No body','DEBUG'); Pour éviter les remarques sur No Body
                 this._options.logger && this._options.logger('{Remote} ║ Réponse: statusCode:'+res.statusCode,'DEBUG');
