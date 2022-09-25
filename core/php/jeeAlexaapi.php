@@ -110,13 +110,11 @@ switch ($nom) {
             $json = file_get_contents($url);
         }
         break;
-    /*
     case 'ws-bluetooth-state-change':
-    if ($result['bluetoothEvent'] == 'DEVICE_CONNECTED') metAJour("bluetoothDevice", "Connexion en cours", 'bluetoothDevice', false , "ECHO", $result['deviceSerialNumber']);
-    if ($result['bluetoothEvent'] == 'DEVICE_DISCONNECTED') metAJour("bluetoothDevice", "Déconnexion en cours", 'bluetoothDevice', false , "ECHO", $result['deviceSerialNumber']);
+    if ($result['bluetoothEvent'] == 'DEVICE_CONNECTED') metAJour("bluetoothDevice", true, 'bluetoothDevice', false , "ECHO", $result['deviceSerialNumber']);
+    if ($result['bluetoothEvent'] == 'DEVICE_DISCONNECTED') metAJour("bluetoothDevice", false, 'bluetoothDevice', false , "ECHO", $result['deviceSerialNumber']);
         metAJourBluetooth($result['deviceSerialNumber'], $result['audioPlayerState'], $alexaapi2, "PLAYER", $result['deviceSerialNumber']);
     break;
-    */
     case 'ws-volume-change':
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "PLAYER", $result['deviceSerialNumber']);
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "ECHO", $result['deviceSerialNumber']);

@@ -136,9 +136,13 @@ class alexaapi extends eqLogic
         );
         $return['info']['binary']['isMutedinfo'] = array(
             'template' => 'isMutedinfo',
-            'replace' => array("#_icon_on_#" => "<i class='icon jeedomapp-audiomute icon_orange'></i>", "#_icon_off_#" => "<i class=''></i>", "#hide_name#" => "hidden", "#message_disable#" => "1")
+            'replace' => array("#_icon_on_#" => "<i class='icon kiko-sound-off icon_orange'></i>", "#_icon_off_#" => "<i class=''></i>", "#hide_name#" => "hidden", "#message_disable#" => "1")
         );
-        $return['action']['other']['shuffle'] = array(
+        $return['info']['binary']['bluetoothDevice'] = array(
+            'template' => 'bluetoothDevice',
+            'replace' => array("#_icon_on_#" => "<i class='icon kiko-bluetooth icon_blue'></i>", "#_icon_off_#" => "<i class=''></i>", "#hide_name#" => "hidden", "#message_disable#" => "1")
+        );        
+		$return['action']['other']['shuffle'] = array(
             'template' => 'tmplicon',
             'replace' => array("#_icon_off_#" => "<i class='fas fa-random fa-ld' style='opacity:0.3'></i>", "#_icon_on_#" => "<i class='fas fa-random fa-ld'></i>", "#hide_name#" => "hidden", "#message_disable#" => "1")
         );
@@ -1162,8 +1166,8 @@ class alexaapi extends eqLogic
             $false = false;
 
             // Volume on traite en premier car c'est fonction de WHA
-            if ($cas6) self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', true, true, null, null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas6);
-            else       self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', false, true, 'fas fa-volume-up', null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 27, $cas9);
+            if ($cas6) self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', true, true, null, null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 1, $cas6);
+            else       self::updateCmd($F, 'volume', 'action', 'slider', false, 'Volume', false, true, 'fas fa-volume-up', null, 'alexaapi::volume', 'volume?value=#slider#', null, null, 1, $cas9);
 
             self::updateCmd($F, 'allDeviceVolumes', 'action', 'other', false, 'Actualise tous les volumes', false, true, 'fas fa-sync', null, null, 'allDeviceVolumes', null, null, 80, $cas9);
 
@@ -1179,7 +1183,7 @@ class alexaapi extends eqLogic
             self::updateCmd($F, 'whennextreminderlabel', 'action', 'other', true, 'whennextreminderlabel', false, false, null, null, null, 'whennextreminderlabel?position=1', 'Reminder Label', null, 34, $false);
 
             self::updateCmd($F, 'interactioninfo', 'info', 'string', false, 'Dernier dialogue avec Alexa', true, false, null, null, 'alexaapi::interaction', null, null, null, 2, $cas7);
-            self::updateCmd($F, 'bluetoothDevice', 'info', 'string', false, 'Est connecté en Bluetooth', true, false, null, null, 'alexaapi::interaction', null, null, null, 2, $cas7);
+            self::updateCmd($F, 'bluetoothDevice', 'info', 'binary', false, 'Est connecté en Bluetooth', true, false, 'fas fa-volume-up', null, 'alexaapi::bluetoothDevice', null, null, null, 2, $cas7);
             self::updateCmd($F, 'updateallalarms', 'action', 'other', true, 'Actualiser les timers', false, false, null, ["musicalalarmmusicentityinfo", "whennextalarminfo", "whennextmusicalalarminfo", "whennextreminderinfo", "whennexttimerinfo", "whennextreminderlabelinfo"], null, 'updateallalarms', null, null, 2, $cas2);
             self::updateCmd($F, 'deleteReminder', 'action', 'message', false, 'Supprimer un rappel', false, false, 'maison-poubelle', null, null, 'deleteReminder?id=#id#', null, null, 2, $cas3);
             self::updateCmd($F, 'subText2', 'info', 'string', false, null, true, false, null, null, 'alexaapi::subText2', null, null, null, 2, $cas1);
@@ -1205,7 +1209,7 @@ class alexaapi extends eqLogic
             self::updateCmd($F, 'volume80', 'action', 'other', false, '80', true, true, null, null, null, 'volume?value=80', null, null, 5, $cas9);
             self::updateCmd($F, 'volume100', 'action', 'other', false, '100', true, true, null, null, null, 'volume?value=100', null, null, 6, $cas9);
             self::updateCmd($F, 'volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fas fa-volume-up', null, null, null, null, null, 28, $cas5);
-            self::updateCmd($F, 'isMutedinfo', 'info', 'binary', false, 'Muet Info', true, false, 'fas fa-volume-up', null, 'alexaapi::isMutedinfo', null, null, null, 29, $cas5);
+            self::updateCmd($F, 'isMutedinfo', 'info', 'binary', false, 'Muet Info', true, false, 'fas fa-volume-up', null, 'alexaapi::isMutedinfo', null, null, null, 2, $cas5);
             self::updateCmd($F, 'whennextalarminfo', 'info', 'string', false, 'Prochaine Alarme', true, false, null, null, 'alexaapi::alarm', null, null, null, 32, $cas2);
             self::updateCmd($F, 'whennextmusicalalarminfo', 'info', 'string', false, 'Prochaine Alarme Musicale', true, false, null, null, 'alexaapi::alarmmusical', null, null, null, 33, $cas2);
             self::updateCmd($F, 'musicalalarmmusicentityinfo', 'info', 'string', false, 'Musique de l alarme musicale', true, false, 'loisir-musical7', null, 'alexaapi::alarmmusicalmusic', null, null, null, 34, $cas2);
