@@ -240,7 +240,7 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
         //console.log("coucou");
         //var el = $(this);
         //console.log(el);
-        var heureMaintenant = Math.round(+new Date() / 1000);
+        //var heureMaintenant = Math.round(+new Date() / 1000);
         var heureMaintenant = "123";
         jeedom.config.save({
             plugin: 'alexaapi',

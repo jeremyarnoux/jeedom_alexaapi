@@ -10,6 +10,10 @@ const alexaserver = process.argv[4];
 alexa.init({
   proxyOnly: true,
   proxyOwnIp: process.argv[2],
+  amazonPage: amazonserver,  // optional: possible to use with different countries, default is 'amazon.de'
+  acceptLanguage: 'fr-FR',   // optional: webpage language, should match to amazon-Page, default is 'de-DE'
+  //baseAmazonPage: amazonserver, // optional: Change the Proxy Amazon Page - all "western countries" directly use amazon.com! Change to amazon.co.jp for Japan
+  amazonPageProxyLanguage: 'fr_FR', // optional: language to be used for the Amazon Sign-in page the proxy calls. default is "de_DE")
   proxyPort: 3457,
   proxyLogLevel: 'info',
   logger: console.log,

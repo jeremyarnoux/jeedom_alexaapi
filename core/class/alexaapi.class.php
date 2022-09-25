@@ -525,6 +525,8 @@ class alexaapi extends eqLogic
                 $device->save();
             }
         }
+	//jeedomUtils.reloadPagePrompt('{{Mise(s) à jour terminée(s) avec succès.}}');
+
     }
 
     public static function forcerDefaultAllCmd()
@@ -549,6 +551,7 @@ class alexaapi extends eqLogic
         // --- Mise à jour des Amazon Echo
         event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
         $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/devices");
+		log::add('alexaapi_scan', 'info', 'Récupération de '."http://" . config::byKey('internalAddr') . ":3456/devices");
         //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         $json = json_decode($json, true);
         $numDevices = 0;
@@ -1075,7 +1078,7 @@ class alexaapi extends eqLogic
 
 
                 if ((!is_object($cmd)) || $forceUpdate) {
-                    //log::add('alexaapi', 'info', 'ajout commande FORCAGE forceUpdate :' . $forceUpdate);
+                    log::add('alexaapi', 'info', 'ajout commande FORCAGE forceUpdate :' . $forceUpdate.' sur '.$LogicalId);
                     if (!is_object($cmd)) $cmd = new alexaapiCmd();
                     $cmd->setType($Type);
                     $cmd->setLogicalId($LogicalId);
@@ -1113,7 +1116,7 @@ class alexaapi extends eqLogic
                         $cmd->setDisplay('forceReturnLineBefore', true);
                     }
                     $cmd->save(); // déplacé le 19/09/2020
-                    //log::add('alexaapi', 'info', 'Enregistre Logical ID :' . $cmd->getLogicalId());
+                    log::add('alexaapi', 'info', 'Enregistre Logical ID :' . $cmd->getLogicalId());
                 }
             } catch (Exception $exc) {
                 log::add('alexaapi', 'error', __('Erreur1 pour ', __FILE__) . ' : ' . $exc->getMessage());
@@ -1177,7 +1180,7 @@ class alexaapi extends eqLogic
 
             self::updateCmd($F, 'interactioninfo', 'info', 'string', false, 'Dernier dialogue avec Alexa', true, false, null, null, 'alexaapi::interaction', null, null, null, 2, $cas7);
             self::updateCmd($F, 'bluetoothDevice', 'info', 'string', false, 'Est connecté en Bluetooth', true, false, null, null, 'alexaapi::interaction', null, null, null, 2, $cas7);
-            self::updateCmd($F, 'updateallalarms', 'action', 'other', true, 'UpdateAllAlarms', false, false, null, ["musicalalarmmusicentityinfo", "whennextalarminfo", "whennextmusicalalarminfo", "whennextreminderinfo", "whennexttimerinfo", "whennextreminderlabelinfo"], null, 'updateallalarms', null, null, 2, $cas2);
+            self::updateCmd($F, 'updateallalarms', 'action', 'other', true, 'Actualiser les timers', false, false, null, ["musicalalarmmusicentityinfo", "whennextalarminfo", "whennextmusicalalarminfo", "whennextreminderinfo", "whennexttimerinfo", "whennextreminderlabelinfo"], null, 'updateallalarms', null, null, 2, $cas2);
             self::updateCmd($F, 'deleteReminder', 'action', 'message', false, 'Supprimer un rappel', false, false, 'maison-poubelle', null, null, 'deleteReminder?id=#id#', null, null, 2, $cas3);
             self::updateCmd($F, 'subText2', 'info', 'string', false, null, true, false, null, null, 'alexaapi::subText2', null, null, null, 2, $cas1);
             self::updateCmd($F, 'subText1', 'info', 'string', false, null, true, false, null, null, 'alexaapi::title', null, null, null, 4, $cas1);
@@ -1202,14 +1205,14 @@ class alexaapi extends eqLogic
             self::updateCmd($F, 'volume80', 'action', 'other', false, '80', true, true, null, null, null, 'volume?value=80', null, null, 5, $cas9);
             self::updateCmd($F, 'volume100', 'action', 'other', false, '100', true, true, null, null, null, 'volume?value=100', null, null, 6, $cas9);
             self::updateCmd($F, 'volumeinfo', 'info', 'string', false, 'Volume Info', false, false, 'fas fa-volume-up', null, null, null, null, null, 28, $cas5);
-            self::updateCmd($F, 'isMutedinfo', 'info', 'binary', false, 'Muet Info', false, false, 'fas fa-volume-up', null, 'alexaapi::isMutedinfo', null, null, null, 29, $cas5);
-            self::updateCmd($F, 'whennextalarminfo', 'info', 'string', false, 'Prochaine Alarme', true, false, null, null, 'alexaapi::alarm', null, null, null, 29, $cas2);
-            self::updateCmd($F, 'whennextmusicalalarminfo', 'info', 'string', false, 'Prochaine Alarme Musicale', true, false, null, null, 'alexaapi::alarmmusical', null, null, null, 30, $cas2);
-            self::updateCmd($F, 'musicalalarmmusicentityinfo', 'info', 'string', false, 'Musical Alarm Music', true, false, 'loisir-musical7', null, 'alexaapi::alarmmusicalmusic', null, null, null, 31, $cas2);
-            self::updateCmd($F, 'whennextreminderinfo', 'info', 'string', false, 'Prochain Rappel', true, false, null, null, 'alexaapi::reminder', null, null, null, 32, $cas3);
-            self::updateCmd($F, 'whennexttimerinfo', 'info', 'string', false, 'Prochain Minuteur', true, false, null, null, 'alexaapi::timer', null, null, null, 32, $cas3);
-            self::updateCmd($F, 'whennextreminderlabelinfo', 'info', 'string', false, 'Reminder Label', true, false, 'loisir-musical7', null, 'alexaapi::alarmmusicalmusic', null, null, null, 35, $cas2);
-            self::updateCmd($F, 'alarm', 'action', 'select', false, 'Lancer une alarme', true, false, null, null, 'alexaapi::list', 'alarm?when=#when#&recurring=#recurring#&sound=#sound#', null, 'system_alerts_melodic_01|Alarme simple;system_alerts_melodic_01|Timer simple;system_alerts_melodic_02|A la dérive;system_alerts_atonal_02|Métallique;system_alerts_melodic_05|Clarté;system_alerts_repetitive_04|Comptoir;system_alerts_melodic_03|Focus;system_alerts_melodic_06|Lueur;system_alerts_repetitive_01|Table de chevet;system_alerts_melodic_07|Vif;system_alerts_soothing_05|Orque;system_alerts_atonal_03|Lumière du porche;system_alerts_rhythmic_02|Pulsar;system_alerts_musical_02|Pluvieux;system_alerts_alarming_03|Ondes carrées', 36, $cas3);
+            self::updateCmd($F, 'isMutedinfo', 'info', 'binary', false, 'Muet Info', true, false, 'fas fa-volume-up', null, 'alexaapi::isMutedinfo', null, null, null, 29, $cas5);
+            self::updateCmd($F, 'whennextalarminfo', 'info', 'string', false, 'Prochaine Alarme', true, false, null, null, 'alexaapi::alarm', null, null, null, 32, $cas2);
+            self::updateCmd($F, 'whennextmusicalalarminfo', 'info', 'string', false, 'Prochaine Alarme Musicale', true, false, null, null, 'alexaapi::alarmmusical', null, null, null, 33, $cas2);
+            self::updateCmd($F, 'musicalalarmmusicentityinfo', 'info', 'string', false, 'Musique de l alarme musicale', true, false, 'loisir-musical7', null, 'alexaapi::alarmmusicalmusic', null, null, null, 34, $cas2);
+            self::updateCmd($F, 'whennextreminderinfo', 'info', 'string', false, 'Prochain Rappel', true, false, null, null, 'alexaapi::reminder', null, null, null, 35, $cas3);
+            self::updateCmd($F, 'whennexttimerinfo', 'info', 'string', false, 'Prochain Minuteur', true, false, null, null, 'alexaapi::timer', null, null, null, 36, $cas3);
+            self::updateCmd($F, 'whennextreminderlabelinfo', 'info', 'string', false, 'Reminder Label', true, false, 'loisir-musical7', null, 'alexaapi::alarmmusicalmusic', null, null, null, 37, $cas2);
+            self::updateCmd($F, 'alarm', 'action', 'select', false, 'Lancer une alarme', true, false, null, null, 'alexaapi::list', 'alarm?when=#when#&recurring=#recurring#&sound=#sound#', null, 'system_alerts_melodic_01|Alarme simple;system_alerts_melodic_01|Timer simple;system_alerts_melodic_02|A la dérive;system_alerts_atonal_02|Métallique;system_alerts_melodic_05|Clarté;system_alerts_repetitive_04|Comptoir;system_alerts_melodic_03|Focus;system_alerts_melodic_06|Lueur;system_alerts_repetitive_01|Table de chevet;system_alerts_melodic_07|Vif;system_alerts_soothing_05|Orque;system_alerts_atonal_03|Lumière du porche;system_alerts_rhythmic_02|Pulsar;system_alerts_musical_02|Pluvieux;system_alerts_alarming_03|Ondes carrées', 38, $cas3);
             //self::updateCmd ($F, 'rwd', 'action', 'other', false, 'Rwd', true, true, 'fas fa-fast-backard', null, null, 'command?command=rwd', null, null, 80, $cas1);
 
             //self::updateCmd ($F, 'fwd', 'action', 'other', false, 'Fwd', true, true, 'fas fa-step-forward', null, null, 'command?command=fwd', null, null, 20, $cas1);
@@ -1222,6 +1225,8 @@ class alexaapi extends eqLogic
             self::updateCmd($F, 'turnOn', 'action', 'other', false, 'turnOn', true, true, "fas fa-circle", null, null, 'SmarthomeCommand?command=turnOn', null, null, 79, $cas8);
             self::updateCmd($F, 'turnOff', 'action', 'other', false, 'turnOff', true, true, "far fa-circle", null, null, 'SmarthomeCommand?command=turnOff', null, null, 79, $cas8);
             self::updateCmd($F, 'command', 'action', 'message', false, 'Command', false, true, "fas fa-play-circle", null, null, 'command?command=#select#', null, null, 79, $cas1);
+            self::updateCmd($F, 'mute', 'action', 'other', false, 'Mettre en sourdine', true, false, "icon kiko-sound-off", null, 'alexaapi::message', 'textCommand?text=mute', null, null, 30, $cas1bis);
+            self::updateCmd($F, 'unmute', 'action', 'other', false, 'Désactiver la sourdine', true, false, "icon kiko-sound-on", null, 'alexaapi::message', 'textCommand?text=unmute', null, null, 31, $cas1bis);
             self::updateCmd($F, 'textCommand', 'action', 'message', false, 'Parler à Alexa', true, false, null, null, 'alexaapi::message', 'textCommand?text=#message#', null, null, 39, $cas1bis);
             self::updateCmd($F, 'speak', 'action', 'message', false, 'Faire parler Alexa', true, false, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#', null, null, 40, $cas1bis);
             self::updateCmd($F, 'speaklegacy', 'action', 'message', false, 'Faire parler Alexa (legacy)', false, false, null, null, 'alexaapi::message', 'speak?text=#message#&volume=#volume#&legacy=1', null, null, 43, $cas1bis);
@@ -1288,7 +1293,7 @@ class alexaapi extends eqLogic
         }
 
         event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Mise à jour de [' . $this->getName() . ']', __FILE__),));
-        $this->refresh();
+        //$this->refresh();
 
         if ($widgetPlayer) {
             $device_playlist = str_replace("_player", "", $this->getConfiguration('serial')) . "_playlist"; //Nom du device de la playlist

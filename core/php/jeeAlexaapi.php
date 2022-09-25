@@ -41,14 +41,14 @@ log::add('alexaapi', 'debug', 'Réception données sur jeeAlexaapi [' . $nom . '
 log::add('alexaapi_mqtt', 'info', " -------------------------------------------------------------------------------------------------------------");
 //log::add('alexaapi_widget', 'info', " -------------------------------------------------------------------------------------------------------------");
 
-log::add('alexaapi_mqtt', 'debug', "chaineRecuperee: " . $chaineRecuperee);
+log::add('alexaapi_mqtt', 'info', "chaineRecuperee: " . $chaineRecuperee);
 
 
 $debut = strpos($chaineRecuperee, "{");
 $fin = strrpos($chaineRecuperee, "}");
 $longeur = 1 + intval($fin) - intval($debut);
 $chaineRecupereeCorrigee = substr($chaineRecuperee, $debut, $longeur);
-//log::add('alexaapi_mqtt', 'debug', "->" . $chaineRecupereeCorrigee);
+//log::add('alexaapi_mqtt', 'info', "->" . $chaineRecupereeCorrigee);
 
 /*if ($nom !="commandesEnErreur") {
     $chaineRecupereeCorrigee=str_replace ("[", "", $chaineRecupereeCorrigee);
@@ -139,7 +139,7 @@ switch ($nom) {
                     log::add('alexaapi', 'debug', 'Interaction demandée : ' . $demandeinteract);*/		
         break;
     case 'ws-notification-change': //changement d'une alarme/rappel
-        log::add('alexaapi_node', 'info', 'Alexa-jee: notificationVersion: ' . $result['notificationVersion']);
+        //log::add('alexaapi_node', 'info', 'Alexa-jee: notificationVersion: ' . $result['notificationVersion']);
 
         $alexaapi2->refresh();    // Lance un refresh du device principal
         break;

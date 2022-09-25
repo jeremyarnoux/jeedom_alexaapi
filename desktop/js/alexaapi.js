@@ -64,6 +64,7 @@ $('#bt_forcerDefaultCmd').off('click').on('click', function () {
                 level: 'success'
               });
               $('.eqLogicDisplayCard[data-eqLogic_id=' + $('.eqLogicAttr[data-l1key=id]').value() + ']').click();
+			jeedomUtils.reloadPagePrompt('{{Equipement réinitialisé à sa configuration par défaut.}}');
             }
           });
 
@@ -291,9 +292,9 @@ function addCmdToTable(_cmd) {
     DefinitionDivPourCommandesPredefinies = "";
   //  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == '00whennextalarm') || (init(_cmd.logicalId) == 'whennextreminderlabel') || (init(_cmd.logicalId) == 'musicalalarmmusicentity') || (init(_cmd.logicalId) == 'whennextmusicalalarm')) {
 
-  if ((init(_cmd.logicalId) == 'updateallalarms')) {
+  /*if ((init(_cmd.logicalId) == 'updateallalarms')) {
     return;
-  }
+  }*/
 
   //console.log("addCmdToTable : " + init(_cmd.logicalId));
 
