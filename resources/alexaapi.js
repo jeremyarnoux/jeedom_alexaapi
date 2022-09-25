@@ -1256,8 +1256,6 @@ app.get('/alarm', (req, res) => {
 
 	if ('device' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Missing parameter "device"'));
-		//config.logger('{API}    ╠═══> Device : ' + req.query.device, 'DEBUG');
-
 
 	if ('when' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Missing parameter "when"'));
