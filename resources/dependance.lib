@@ -28,7 +28,7 @@ echo_success() {
 
 echo_failure() {
 	if [ "$LANG_DEP" = "fr" ]; then
-		echo -en "[ERREUR]\r"
+		echo -en "[Erreur]\r"
 	else
 		echo -en "[ERROR]\r"
 	fi
@@ -96,6 +96,14 @@ pre() {
 		if [ "$hasRepo" -ne "0" ]; then
 			sudo apt-add-repository -r "deb http://repo.jeedom.com/odroid/ stable main" &>/dev/null
 		fi
+	fi
+	# remove repo.distrib.works
+	DISTRIB_WORKS=`grep "repo.distrib.works" /etc/apt/sources.list`
+	if [[ $? -eq 0 ]]; then
+		reAddDistribWorks=1
+		sudo sed -i '/repo.distrib.works/d' /etc/apt/sources.list
+	else
+		reAddDistribWorks=0
 	fi
 }
 
@@ -224,6 +232,9 @@ post() {
 	if [ -f /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${PLUGIN} ]; then
 		sudo mv /etc/apt/sources.list.d/deb-multimedia.list.disabledBy${PLUGIN} /etc/apt/sources.list.d/deb-multimedia.list &>/dev/null
 	fi
+	if [[ $reAddDistribWorks -eq 1 ]]; then
+		sudo echo "$DISTRIB_WORKS" >> /etc/apt/sources.list
+	fi
 	if [[ $STEP_IN_PROG -eq 1 ]]; then
 		STEP=99
 		next
@@ -294,3 +305,7 @@ add_fix_handler "sudo dpkg --configure -a" "*dpkg --configure -a" "sudo dpkg --c
 
 # if debian have changed the Suite value, allow releaseinfo change in apt-get
 add_fix_handler "changed its 'Suite' value from" "*changed its Suite value from" "sudo apt-get --allow-releaseinfo-change update"
+
+# debian signatures are missing
+add_fix_handler "NO_PUBKEY 648ACFD622F3D138" "" "sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138"
+add_fix_handler "NO_PUBKEY 0E98404D386FA1D9" "" "sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9"
