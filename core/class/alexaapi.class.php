@@ -1160,7 +1160,7 @@ class alexaapi extends eqLogic
             $cas5 = (($this->hasCapaorFamilyorType("VOLUME_SETTING")) || ($this->hasCapaorFamilyorType("SOUND_SETTINGS")));
             $cas6 = ($cas5 && (!$this->hasCapaorFamilyorType("WHA")));
             $cas7 = ((!$this->hasCapaorFamilyorType("WHA")) && ($this->getConfiguration('devicetype') != "Player") && ((!$this->hasCapaorFamilyorType("FIRE_TV")) || ($this->hasCapaorFamilyorType("A2JKHJ0PX4J3L3"))) && !$widgetSmarthome && (!$this->hasCapaorFamilyorType("AMAZONMOBILEMUSIC_ANDROID")));
-            $cas8 = (($this->hasCapaorFamilyorType("turnOff")) && $widgetSmarthome);
+            $cas8 = (($this->hasCapaorFamilyorType("turnOff")) && $widgetSmarthome); 
             $cas9 = ($this->hasCapaorFamilyorType("WHA") && $widgetEcho);
             $cas10 = ($this->hasCapaorFamilyorType("CLOCK_FORMAT_24_HR") && $widgetEcho); // Echo Dot avec Horloge
             $false = false;

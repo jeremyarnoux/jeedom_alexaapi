@@ -2842,6 +2842,7 @@ return this.parseValue4Notification(notification, value);
 
     sendMultiSequenceCommand(serialOrName, commands, sequenceType, overrideCustomerId, callback) {
         try {
+			//this._options.logger && this._options.logger('------------------->>>>>>>>>>>>>>>>>>>>>'+sequenceType);
             const sequenceObj = {
                 'sequence': {
                     '@type': 'com.amazon.alexa.behaviors.model.Sequence',
@@ -2895,7 +2896,7 @@ return this.parseValue4Notification(notification, value);
             reqObj.sequenceJson = reqObj.sequenceJson.replace(/"deviceSerialNumber":"ALEXA_CURRENT_DSN"/g, `"deviceSerialNumber":"${dev.serialNumber}"`);
             reqObj.sequenceJson = reqObj.sequenceJson.replace(/"customerId":"ALEXA_CUSTOMER_ID"/g, `"customerId":"${dev.deviceOwnerCustomerId}"`);
         }
-        reqObj.sequenceJson = reqObj.sequenceJson.replace(/"locale":"ALEXA_CURRENT_LOCALE"/g, `"locale":"de-DE"`);
+        reqObj.sequenceJson = reqObj.sequenceJson.replace(/"locale":"ALEXA_CURRENT_LOCALE"/g, `"locale":"fr-FR"`);
 
         this.httpsGet (`/api/behaviors/preview`,
             callback,
