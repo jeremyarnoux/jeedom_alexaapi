@@ -155,6 +155,7 @@ $listRoutinesValidDebut = date("d-m-Y H:i:s", config::byKey("listRoutinesValidDe
 $listRoutinesValidFin = date("d-m-Y H:i:s", config::byKey("listRoutinesValidFin", "alexaapi", ""));
 $listRoutinesProchain = date("d-m-Y H:i:s", config::byKey("listRoutinesProchain", "alexaapi", ""));
 if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutinesValidFin = $listRoutinesProchain; //si on a appuyé sur Reset
+print ($listRoutinesProchain);
 ?>
 <form class="form-horizontal">
     <fieldset>

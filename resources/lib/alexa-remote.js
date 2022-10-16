@@ -61,6 +61,58 @@ class AlexaRemote extends EventEmitter {
 //---------------------------------------------Ajouté par Sigalou--------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+	// Liste les Playlists
+    Playlists(serialOrName, callback) {
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
+		this.httpsGet (`/api/cloudplayer/playlists?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&mediaOwnerCustomerId=${dev.deviceOwnerCustomerId}&_=%t`, callback);
+   }
+   
+   // Lit une playlist
+   //http://192.168.0.21:3456/playlist?playlist=a8feaaf9-40a4-4e33-bd4d-b6dd71af85fd&device=G0911W079304113M
+    playList(serialOrName, _playlistId, callback) {
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
+		
+		//JSON='{"contentToken":"music:'$(echo '["music/tuneIn/stationId","'${STATIONID}'"]|{"previousPageId":"TuneIn_SEARCH"}'| base64 -w 0| base64 -w 0 )'"}'
+        const flags = {
+            data: JSON.stringify({
+                playlistId: _playlistId,
+                playQueuePrime: true
+            }),
+            method: 'POST'
+        };	
+		
+		this.httpsGet (`/api/cloudplayer/queue-and-play?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&mediaOwnerCustomerId=${dev.deviceOwnerCustomerId}&shuffle=false&_=%t`, callback, flags);
+//		this.httpsGet (`/api/entertainment/v1/player/queue?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&_=%t`, callback, flags);
+		
+//		 "https://${ALEXA}/api/tunein/queue-and-play?deviceSerialNumber=${DEVICESERIALNUMBER}&deviceType=${DEVICETYPE}&guideId=${STATIONID}&contentType=station&callSign=&mediaOwnerCustomerId=${MEDIAOWNERCUSTOMERID}"
+//		 "https://${ALEXA}/api/entertainment/v1/player/queue?deviceSerialNumber=${DEVICESERIALNUMBER}&deviceType=${DEVICETYPE}"
+   }
+   
+   // Lit une MusicTrack
+   //http://192.168.0.21:3456/playmusictrack?trackId=53bfa26d-f24c-4b13-97a8-8c3debdf06f0&device=G0911W079304113M
+    playMusicTrack(serialOrName, _trackId, callback) {
+		const dev = this.find(serialOrName);
+        if (!dev) return callback && callback(new Error('Unknown Device or Serial number'), null);
+		
+        const flags = {
+            data: JSON.stringify({
+                trackId: _trackId,
+                playQueuePrime: true
+            }),
+            method: 'POST'
+        };	
+		
+		this.httpsGet (`/api/cloudplayer/queue-and-play?deviceSerialNumber=${dev.serialNumber}&deviceType=${dev.deviceType}&mediaOwnerCustomerId=${dev.deviceOwnerCustomerId}&shuffle=false&_=%t`, callback, flags);
+   }	
+	
+
+
+
+
+
 /*
 	getNotifications2(callback) 
 	{
