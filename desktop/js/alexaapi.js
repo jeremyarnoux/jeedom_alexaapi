@@ -336,8 +336,8 @@ function addCmdToTable(_cmd) {
     } else {*/
         tr += '</td>';
 	  tr += '<td>';
-  tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>'; 
-  tr += '</td>';
+	  tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>'; 
+	  tr += '</td>';
         tr += '<td>';
    //}
 
