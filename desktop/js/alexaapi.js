@@ -335,6 +335,9 @@ function addCmdToTable(_cmd) {
         tr += '1<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">';
     } else {*/
         tr += '</td>';
+	  tr += '<td>';
+  tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>'; 
+  tr += '</td>';
         tr += '<td>';
    //}
 
