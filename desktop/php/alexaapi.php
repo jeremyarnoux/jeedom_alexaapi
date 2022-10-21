@@ -441,6 +441,7 @@ foreach ($eqLogics as $eqLogic) {
                                 <th style="min-width:200px;width:350px;">{{Nom}}</th>
                                 <th>{{Type}}</th>
                                 <th style="width: 600px;">{{Commande & Variable}}</th>
+				<th>{{Valeurs}}</th>
                                 <th style="min-width:360px;">{{Options}}</th>
                                 <th style="min-width:80px;width:200px;">{{Actions}}</th>
                             </tr>
