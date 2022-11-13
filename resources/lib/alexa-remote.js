@@ -9,7 +9,7 @@ const fsPath = require('path');
 
 const EventEmitter = require('events');
 
-const officialUserAgent = 'AppleWebKit PitanguiBridge/2.2.483723.0-[HARDWARE=iPhone10_4][SOFTWARE=15.5][DEVICE=iPhone]';
+const officialUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15';
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------Ajouté par Sigalou--------------------------------------------------------------------------------------
