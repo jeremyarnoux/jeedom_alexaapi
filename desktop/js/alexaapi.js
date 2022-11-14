@@ -27,6 +27,7 @@ $('#bt_forcerDefaultCmd').off('click').on('click', function () {
   dialog_message += '<label class="lbl lbl-warning" for="name">{{Notez que cette fonction ne supprime pas votre équipement ni ses commandes, cela évite d\'avoir à refaire les scénarios. Elle va supprimer toute personnalisation et toutes les commandes vont revenir à leur état initial.}}</label> ';
   dialog_message += '</form>';
   bootbox.dialog({
+<<<<<<< HEAD
     title: dialog_title,
     message: dialog_message,
     buttons: {
@@ -66,10 +67,52 @@ $('#bt_forcerDefaultCmd').off('click').on('click', function () {
               $('.eqLogicDisplayCard[data-eqLogic_id=' + $('.eqLogicAttr[data-l1key=id]').value() + ']').click();
             }
           });
+=======
+	title: dialog_title,
+	message: dialog_message,
+	buttons: {
+	  "{{Annuler}}": {
+		className: "btn-danger",
+		callback: function () {}
+	  },
+	  success: {
+		label: "{{Démarrer}}",
+		className: "btn-success",
+		callback: function () {
+		  $.ajax({
+			type: "POST",
+			url: "plugins/alexaapi/core/ajax/alexaapi.ajax.php",
+			data: {
+			  action: "forcerDefaultCmd",
+			  id: $('.eqLogicAttr[data-l1key=id]').value(),
+			  createcommand: 0,
+			},
+			dataType: 'json',
+			global: false,
+			error: function (request, status, error) {
+			  handleAjaxError(request, status, error);
+			},
+			success: function (data) {
+			  if (data.state != 'ok') {
+				$('#div_alert').showAlert({
+				  message: data.result,
+				  level: 'danger'
+				});
+				return;
+			  }
+			  $('#div_alert').showAlert({
+				message: '{{Opération réalisée avec succès}}',
+				level: 'success'
+			  });
+			  $('.eqLogicDisplayCard[data-eqLogic_id=' + $('.eqLogicAttr[data-l1key=id]').value() + ']').click();
+			jeedomUtils.reloadPagePrompt('{{Equipement réinitialisé à sa configuration par défaut.}}');
+			}
+		  });
+>>>>>>> e0ce9ac426e24139d3cae4a7a9dc6f494852fdd2
 
-        }
-      },
-    }
+		}
+	  },
+	}
   });
 
 });
@@ -78,10 +121,10 @@ $('#bt_forcerDefaultCmd').off('click').on('click', function () {
 $('#bt_Lancer').off('click').on('click', function () {
   var tempo = 0;
   if (requeteremotevidecache.checked) {
-    tempo = 2000;
-    jeedom.log.clear({
-      log: log_display_name,
-    });
+	tempo = 2000;
+	jeedom.log.clear({
+	  log: log_display_name,
+	});
   }
 
   setTimeout("envoiQuery(requeteremote.value, requetedata.value)", tempo);
@@ -99,17 +142,17 @@ $('#in_searchEqlogic2').off('keyup').keyup(function () {
   var search = $(this).value().toLowerCase();
   search = search.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
   if (search == '') {
-    $('.eqLogicDisplayCard.second').show();
-    $('.eqLogicThumbnailContainer.second').packery();
-    return;
+	$('.eqLogicDisplayCard.second').show();
+	$('.eqLogicThumbnailContainer.second').packery();
+	return;
   }
   $('.eqLogicDisplayCard.second').hide();
   $('.eqLogicDisplayCard.second .name').each(function () {
-    var text = $(this).text().toLowerCase();
-    text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
-    if (text.indexOf(search) >= 0) {
-      $(this).closest('.eqLogicDisplayCard.second').show();
-    }
+	var text = $(this).text().toLowerCase();
+	text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+	if (text.indexOf(search) >= 0) {
+	  $(this).closest('.eqLogicDisplayCard.second').show();
+	}
   });
   $('.eqLogicThumbnailContainer.second').packery();
 });
@@ -122,17 +165,17 @@ $('#in_searchEqlogic3').off('keyup').keyup(function () {
   var search = $(this).value().toLowerCase();
   search = search.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
   if (search == '') {
-    $('.eqLogicDisplayCard.third').show();
-    $('.eqLogicThumbnailContainer.third').packery();
-    return;
+	$('.eqLogicDisplayCard.third').show();
+	$('.eqLogicThumbnailContainer.third').packery();
+	return;
   }
   $('.eqLogicDisplayCard.third').hide();
   $('.eqLogicDisplayCard.third .name').each(function () {
-    var text = $(this).text().toLowerCase();
-    text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
-    if (text.indexOf(search) >= 0) {
-      $(this).closest('.eqLogicDisplayCard.third').show();
-    }
+	var text = $(this).text().toLowerCase();
+	text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+	if (text.indexOf(search) >= 0) {
+	  $(this).closest('.eqLogicDisplayCard.third').show();
+	}
   });
   $('.eqLogicThumbnailContainer.third').packery();
 });
@@ -157,66 +200,66 @@ function envoiQuery(query, data) {
 
 $('#bt_cronGenerator').off('click').on('click', function () {
   jeedom.getCronSelectModal({}, function (result) {
-    $('.configKey[data-l1key=autorefresh]').value(result.value);
+	$('.configKey[data-l1key=autorefresh]').value(result.value);
   });
 });
 
 $("#bt_addespeasyAction").off('click').on('click', function (event) {
   var _cmd = {
-    type: 'action'
+	type: 'action'
   };
   addCmdToTable(_cmd);
 });
 $('#bt_addEvent').off('click').on('click', function () {
   $('#bt_calendartab').trigger('click');
   $('#md_modal').dialog({
-    title: "{{Ajouter évènement}}"
+	title: "{{Ajouter évènement}}"
   });
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=alarm&eqLogic_id=' + $('.eqLogicAttr[data-l1key=id]').value()).dialog('open');
 });
 
 $('#bt_media').off('click').on('click', function () {
   $('#md_modal').dialog({
-    title: "{{Info Media}}"
+	title: "{{Info Media}}"
   });
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=media&iddevice=' + $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
 });
 $('#bt_req').off('click').on('click', function () {
   $('#md_modal').dialog({
-    title: "{{Requêteur JSON}}"
+	title: "{{Requêteur JSON}}"
   });
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=req&iddevice=' + $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
 });
 $('#bt_req2').off('click').on('click', function () {
   $('#md_modal').dialog({
-    title: "{{Requêteur}}"
+	title: "{{Requêteur}}"
   });
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=req2&iddevice=' + $('.eqLogicAttr[data-l1key=logicalId]').value()).dialog('open');
 });
 $('#bt_sante').off('click').on('click', function () {
   $('#md_modal').dialog({
-    title: "{{Liste Amazon Echo}}"
+	title: "{{Liste Amazon Echo}}"
   });
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=health').dialog('open');
 });
 
 $('#bt_reminders').off('click').on('click', function () {
   $('#md_modal').dialog({
-    title: "{{Rappels/Alarmes}}"
+	title: "{{Rappels/Alarmes}}"
   });
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=reminders').dialog('open');
 });
 
 $('#bt_history').off('click').on('click', function () {
   $('#md_modal').dialog({
-    title: "{{Historique}}"
+	title: "{{Historique}}"
   });
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=history').dialog('open');
 });
 
 $('#bt_routines').off('click').on('click', function () {
   $('#md_modal').dialog({
-    title: "{{Routines}}"
+	title: "{{Routines}}"
   });
   $('#md_modal').load('index.php?v=d&plugin=alexaapi&modal=routines').dialog('open');
 });
@@ -230,43 +273,43 @@ $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').on('change', functi
   // Ici il faudra faire comme dans desktop/php/alexaapi.php ligne 268 chercher type et à défaut family
   $icon = $('.eqLogicAttr[data-l1key=configuration][data-l2key=type]').value();
   if ($icon != '' && $icon != null)
-    $('#img_device').attr("src", 'plugins/alexaapi/core/config/devices/' + $icon + '.png');
+	$('#img_device').attr("src", 'plugins/alexaapi/core/config/devices/' + $icon + '.png');
 
   var id = $('.eqLogicAttr[data-l1key=id]')[0].value;
   if (id) {
-    jeedom.eqLogic.byId({
-      "id": $('.eqLogicAttr[data-l1key=id]')[0].value,
-      noCache: true,
-      success: function (obj) {
-        if (obj && obj.configuration && obj.configuration.capabilities && obj.configuration.capabilities.length && obj.configuration.capabilities instanceof Array) {
-          $('.eqLogicAttr[data-l1key=configuration][data-l2key=capabilities]')[0].innerHTML = obj.configuration.capabilities.join(', ');
-        }
-      }
-    });
+	jeedom.eqLogic.byId({
+	  "id": $('.eqLogicAttr[data-l1key=id]')[0].value,
+	  noCache: true,
+	  success: function (obj) {
+		if (obj && obj.configuration && obj.configuration.capabilities && obj.configuration.capabilities.length && obj.configuration.capabilities instanceof Array) {
+		  $('.eqLogicAttr[data-l1key=configuration][data-l2key=capabilities]')[0].innerHTML = obj.configuration.capabilities.join(', ');
+		}
+	  }
+	});
   }
 });
 
 function scanAmazonAlexa() {
   $.ajax({
-    type: "POST",
-    url: "plugins/alexaapi/core/ajax/alexaapi.ajax.php",
-    data: {
-      action: "scanAmazonAlexa",
-    },
-    dataType: 'json',
-    error: function (request, status, error) {
-      handleAjaxError(request, status, error);
-    },
-    success: function (data) {
-      if (data.state != 'ok') {
-        $('#div_alert').showAlert({
-          message: data.result,
-          level: 'danger'
-        });
-        return;
-      }
-      window.location.reload();
-    }
+	type: "POST",
+	url: "plugins/alexaapi/core/ajax/alexaapi.ajax.php",
+	data: {
+	  action: "scanAmazonAlexa",
+	},
+	dataType: 'json',
+	error: function (request, status, error) {
+	  handleAjaxError(request, status, error);
+	},
+	success: function (data) {
+	  if (data.state != 'ok') {
+		$('#div_alert').showAlert({
+		  message: data.result,
+		  level: 'danger'
+		});
+		return;
+	  }
+	  window.location.reload();
+	}
   });
 }
 
@@ -282,6 +325,7 @@ $("#table_cmd").sortable({
 
 function addCmdToTable(_cmd) {
   if (!isset(_cmd))
+<<<<<<< HEAD
     var _cmd = {
       configuration: {}
     };
@@ -296,8 +340,18 @@ function addCmdToTable(_cmd) {
   }
 
   //console.log("addCmdToTable : " + init(_cmd.logicalId));
+=======
+	var _cmd = {
+	configuration: {}
+	};
+>>>>>>> e0ce9ac426e24139d3cae4a7a9dc6f494852fdd2
 
+	var DefinitionDivPourCommandesPredefinies = 'style="display: none;"';
+	if (init(_cmd.logicalId) == "") {
+		DefinitionDivPourCommandesPredefinies = "";
+	}
  
+<<<<<<< HEAD
   var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
 	  tr += '<td class="hidden-xs">'
   	tr += '<span class="cmdAttr" data-l1key="id"></span>'
@@ -345,16 +399,63 @@ function addCmdToTable(_cmd) {
   	tr += '</div>'
   	tr += '</td>'
   	tr += '<td>'
+=======
+	var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
+	tr += '<td class="hidden-xs">';
+		tr += '<span class="cmdAttr" data-l1key="id"></span>';
+	tr += '</td>';
+	
+	tr += '<td>';
+		tr += '<div class="input-group">';
+			tr += '<input class="cmdAttr form-control input-sm roundedLeft" data-l1key="name" placeholder="{{Nom du capteur}}">';
+			tr += '<span class="input-group-btn"><a class="cmdAction btn btn-sm btn-default" data-l1key="chooseIcon" title="{{Choisir une icône}}"><i class="fas fa-icons"></i></a></span>';
+			tr += '<span class="cmdAttr input-group-addon roundedRight" data-l1key="display" data-l2key="icon" style="font-size:19px;padding:0 5px 0 0!important;"></span>';
+		tr += '</div>';
+		tr += '<select class="cmdAttr form-control input-sm disabled" data-l1key="value" style="display:none;margin-top:5px;" title="{{Commande info liée}}">';
+			tr += '<option value="">{{Aucune}}</option>';
+		tr += '</select>';
+	tr += '</td>';
+	
+	tr += '<td>';
+		tr += '<span class="type" type="' + init(_cmd.type) + '" disabled = "false">' + jeedom.cmd.availableType() + '</span>';
+		tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
+	tr += '</td>';
+		
+	tr += '<td>';
+	if (init(_cmd.type) == 'action' && init(_cmd.logicalId) != 'refresh') {
+		tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="request">';
+	} 
+	tr += '</td>';
+		
+	tr += '<td>';
+		tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>'; 
+	tr += '</td>';
+	
+	tr += '<td>';
+		tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="isVisible" checked/>{{Afficher}}</label> ';
+		tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="isHistorized" checked/>{{Historiser}}</label> ';
+		tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="invertBinary"/>{{Inverser}}</label> ';
+		tr += '<div style="margin-top:7px;">';
+			tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}}" style="width:30%;max-width:80px;display:inline-block;margin-right:2px;">';
+			tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}}" style="width:30%;max-width:80px;display:inline-block;margin-right:2px;">';
+			tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="unite" placeholder="{{Unité}}" title="{{Unité}}" style="width:30%;max-width:80px;display:inline-block;margin-right:2px;">';
+		tr += '</div>';
+	tr += '</td>';
+	
+	tr += '<td>';
+>>>>>>> e0ce9ac426e24139d3cae4a7a9dc6f494852fdd2
 	if (is_numeric(_cmd.id)) {
-        tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> '
-        if (!((init(_cmd.name) == "Routine") || (init(_cmd.name) == "xxxxxxxx"))) //Masquer le bouton Tester
-            tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> Tester</a>'
-        
+			tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> ';
+			if (!((init(_cmd.name) == "Routine") || (init(_cmd.name) == "xxxxxxxx"))) { //Masquer le bouton Tester
+					tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> Tester</a>';
+		}
 	}
-	tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove" title="{{Supprimer la commande}}"></i></td>'
-    tr += '</tr>'
-    $('#table_cmd tbody').append(tr);
-	var tr = $('#table_cmd tbody tr').last();
+	tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove" title="{{Supprimer la commande}}"></i>';
+	tr += '</td>';
+	tr += '</tr>';
+	$('#table_cmd tbody').append(tr);
+	
+	tr = $('#table_cmd tbody tr').last();
 	jeedom.eqLogic.buildSelectCmd({
 		id: $('.eqLogicAttr[data-l1key=id]').value(),
 		filter: { type: 'info' },
@@ -367,171 +468,29 @@ function addCmdToTable(_cmd) {
 			jeedom.cmd.changeType(tr, init(_cmd.subType));
 		}
 	});
-	 $('#table_cmd tbody tr').last().setValues(_cmd, '.cmdAttr');
+	$('#table_cmd tbody tr').last().setValues(_cmd, '.cmdAttr');
 	if (isset(_cmd.type)) {
 		$('#table_cmd tbody tr:last .cmdAttr[data-l1key=type]').value(init(_cmd.type));
-  }
-  /*
-  if (init(_cmd.type) == 'info') {
-    var tr =
-      '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">' +
-      '<td>' +
-      '<small><small><span class="cmdAttr" data-l1key="id"></span></small></small>' +
-      '</td>' +
-      '<td>' +
-      '<div class="row">' +
-      '<div class="col-lg-1">'
-      //    +         '<a class="cmdAction btn btn-default btn-sm" data-l1key="chooseIcon"><i class="fas fa-flag"></i> Icone</a>'
-      +
-      '<span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>' +
-      '</div>' +
-      '<div class="col-lg-8">' +
-      '<input class="cmdAttr form-control input-sm" data-l1key="name" placeholder="{{Nom du capteur}}"></td>' +
-      '<td>'
-      //     +     '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
-      +
-      '<input class="cmdAttr form-control type input-sm" data-l1key="type" value="info" disabled style="margin-bottom : 5px;" />'
-      //     +     '<span class="subType" subType="' + init(_cmd.subType) + '"></span>'
-      +
-      '</td>' +
-      '<td>'
-      //     +     '<small><span class="cmdAttr"  data-l1key="configuration" data-l2key="cmd"></span> Résultat de la commande <span class="cmdAttr"  data-l1key="configuration" data-l2key="taskname"></span> (<span class="cmdAttr"  data-l1key="configuration" data-l2key="taskid"></span>)</small>'
-
-      //    +     '<span class="cmdAttr"  data-l1key="configuration" data-l2key="value"></span>'
-      +
-      '</td>' +
-      '<td>'
-      //   +     '<input class="cmdAttr form-control input-sm" data-l1key="unite" style="width : 90px;" placeholder="{{Unite}}">'
-      +
-      '</td>' +
-      '<td>' +
-      '</td>' +
-      '<td>' +
-      '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></span> ' +
-      '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ' +
-      '</td>' +
-      '<td>';
-
-    if (is_numeric(_cmd.id)) {
-      tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fas fa-cogs"></i></a> ' +
-        '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> {{Tester}}</a>';
-    }
-
-    tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>' +
-      '</td>' +
-      '</tr>';
-
-    $('#table_cmd tbody').append(tr);
-    $('#table_cmd tbody tr:last').setValues(_cmd, '.cmdAttr');
-  }*/
-
-  /*
-  if (init(_cmd.type) == 'action') {
-    var tr =
-      '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">' +
-      '<td>' +
-      '<small><small><span class="cmdAttr" data-l1key="id"></span></small></small>' +
-      '</td>' +
-      '<td>' +
-      '<div class="row">' +
-      '<div class="col-lg-1">' +
-      '<span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>' +
-      '</div>' +
-      '<div class="col-lg-8">' +
-      '<input class="cmdAttr form-control input-sm" data-l1key="name">' +
-      '</div>' +
-      '</div>';
-
-    tr += '</td>';
-
-
-    tr += '<td>';
-    tr += '<input class="cmdAttr form-control type input-sm" data-l1key="type" value="action" disabled />';
-    tr += '<div ' + DefinitionDivPourCommandesPredefinies + '>';
-    tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
-    tr += '</div></td>';
-    tr += '<td>' +
-      '<input class="cmdAttr form-control input-sm"';
-    if (init(_cmd.logicalId) != "")
-      tr += 'readonly';
-
-    if (init(_cmd.logicalId) == "refresh")
-      tr += ' style="display:none;" ';
-
-    tr += ' data-l1key="configuration" data-l2key="request">';
-
-    if (init(_cmd.subType) == 'select') {
-      tr += '<input class="tooltips cmdAttr form-control input-sm expertModeVisible" data-l1key="configuration" data-l2key="listValue" placeholder="{{Liste de valeur|texte séparé par ;}}" title="{{Liste}}">';
-    }
-
-    tr += '</td>';
-    tr += '<td>';
-
-    if ((init(_cmd.logicalId) == "") || (init(_cmd.logicalId) == "volume")) {
-      tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite"  style="width : 100px;" placeholder="{{Unité}}" title="{{Unité}}" >';
-      tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}"  title="{{Min}} style="margin-top : 3px;"> ';
-      tr += '</td>';
-      tr += '<td>';
-      tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">';
-    } else {
-      tr += '</td>';
-      tr += '<td>';
-    }
-
-    tr += '</td>' +
-      '<td>' +
-      '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ' +
-      '</td>' +
-      '<td>';
-
-    if (is_numeric(_cmd.id)) {
-      tr += '<a class="btn btn-default btn-xs cmdAction expertModeVisible" data-action="configure"><i class="fas fa-cogs"></i></a> ';
-      if (!((init(_cmd.name) == "Routine") || (init(_cmd.name) == "xxxxxxxx"))) //Masquer le bouton Tester
-        tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> {{Tester}}</a>';
-    }
-    tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>' +
-      '  </td>' +
-      '</tr>';
-
-    $('#table_cmd tbody').append(tr);
-    var tr = $('#table_cmd tbody tr:last');
-    jeedom.eqLogic.buildSelectCmd({
-      id: $(".li_eqLogic.active").attr('data-eqLogic_id'),
-      filter: {
-        type: 'i'
-      },
-      error: function (error) {
-        $('#div_alert').showAlert({
-          message: error.message,
-          level: 'danger'
-        });
-      },
-      success: function (result) {
-        tr.find('.cmdAttr[data-l1key=value]').append(result);
-        tr.setValues(_cmd, '.cmdAttr');
-        jeedom.cmd.changeType(tr, init(_cmd.subType));
-      }
-    });
-  }*/
+	}
 }
 
 jeedom.plugin.getDeamonCookieInfo = function (_params) {
   var paramsRequired = ['id'];
   var paramsSpecifics = {
-    global: false,
+	global: false,
   };
   try {
-    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+	jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
   } catch (e) {
-    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
-    return;
+	(_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+	return;
   }
   var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
   var paramsAJAX = jeedom.private.getParamsAJAX(params);
   paramsAJAX.url = 'plugins/alexaapi/core/ajax/alexaapi.ajax.php';
   paramsAJAX.data = {
-    action: 'getDeamonCookieInfo',
-    id: _params.id
+	action: 'getDeamonCookieInfo',
+	id: _params.id
   };
   $.ajax(paramsAJAX);
 };
@@ -540,19 +499,19 @@ jeedom.plugin.deamonCookieStart = function (_params) {
   var paramsRequired = ['id'];
   var paramsSpecifics = {};
   try {
-    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+	jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
   } catch (e) {
-    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
-    return;
+	(_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+	return;
   }
   var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
   var paramsAJAX = jeedom.private.getParamsAJAX(params);
   paramsAJAX.url = 'plugins/alexaapi/core/ajax/alexaapi.ajax.php';
   paramsAJAX.data = {
-    action: 'deamonCookieStart',
-    id: _params.id,
-    debug: _params.debug || 0,
-    forceRestart: _params.forceRestart || 0
+	action: 'deamonCookieStart',
+	id: _params.id,
+	debug: _params.debug || 0,
+	forceRestart: _params.forceRestart || 0
   };
   $.ajax(paramsAJAX);
 };
@@ -561,17 +520,17 @@ jeedom.plugin.deamonCookieStop = function (_params) {
   var paramsRequired = ['id'];
   var paramsSpecifics = {};
   try {
-    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+	jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
   } catch (e) {
-    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
-    return;
+	(_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+	return;
   }
   var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
   var paramsAJAX = jeedom.private.getParamsAJAX(params);
   paramsAJAX.url = 'plugins/alexaapi/core/ajax/alexaapi.ajax.php';
   paramsAJAX.data = {
-    action: 'deamonCookieStop',
-    id: _params.id
+	action: 'deamonCookieStop',
+	id: _params.id
   };
   $.ajax(paramsAJAX);
 };
@@ -582,17 +541,17 @@ jeedom.plugin.VerifiePresenceCookie = function (_params) {
   var paramsRequired = ['id'];
   var paramsSpecifics = {};
   try {
-    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+	jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
   } catch (e) {
-    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
-    return;
+	(_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+	return;
   }
   var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
   var paramsAJAX = jeedom.private.getParamsAJAX(params);
   paramsAJAX.url = 'plugins/alexaapi/core/ajax/alexaapi.ajax.php';
   paramsAJAX.data = {
-    action: 'VerifiePresenceCookie',
-    id: _params.id
+	action: 'VerifiePresenceCookie',
+	id: _params.id
   };
   $.ajax(paramsAJAX);
 };
@@ -605,17 +564,17 @@ jeedom.plugin.node.action = function (_params) { //Delete reminder
   var paramsRequired = ['action', 'node_id'];
   var paramsSpecifics = {};
   try {
-    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+	jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
   } catch (e) {
-    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
-    return;
+	(_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+	return;
   }
 
   var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
   var paramsAJAX = jeedom.private.getParamsAJAX(params);
   paramsAJAX.url = 'plugins/alexaapi/desktop/php/alexaapiProxy.php';
   paramsAJAX.data = {
-    request: _params.action + 'reminder?id=' + _params.node_id + '&type=action&action=' + _params.action,
+	request: _params.action + 'reminder?id=' + _params.node_id + '&type=action&action=' + _params.action,
   };
   $.ajax(paramsAJAX);
 }
@@ -624,16 +583,16 @@ jeedom.plugin.node.action2 = function (_params) { //Lancement d'une routine
   var paramsRequired = ['action', 'node_id', 'node_id2'];
   var paramsSpecifics = {};
   try {
-    jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
+	jeedom.private.checkParamsRequired(_params || {}, paramsRequired);
   } catch (e) {
-    (_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
-    return;
+	(_params.error || paramsSpecifics.error || jeedom.private.default_params.error)(e);
+	return;
   }
   var params = $.extend({}, jeedom.private.default_params, paramsSpecifics, _params || {});
   var paramsAJAX = jeedom.private.getParamsAJAX(params);
   paramsAJAX.url = 'plugins/alexaapi/desktop/php/alexaapiProxy.php';
   paramsAJAX.data = {
-    request: 'routine?device=' + _params.node_id2 + '&routine=' + _params.node_id,
+	request: 'routine?device=' + _params.node_id2 + '&routine=' + _params.node_id,
   };
   $.ajax(paramsAJAX);
 }
