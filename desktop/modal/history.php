@@ -66,9 +66,8 @@ $json = json_decode($json, true);
         <tr>
             <th>{{Date Heure}}</th>
             <th>{{Alexa}}</th>
-            <th>{{Qui}}</th>
             <th>{{Texte}}</th>
-            <th>{{Réponse}}</th>
+            <th>{{Status}}</th>
 
         </tr>
         </thead>
@@ -109,13 +108,10 @@ $json = json_decode($json, true);
                 echo '<td>' . $compteur . '<span class="label label-danger" style="font-size : 1em; cursor : default;">?????</span></td>';
 
             $compteur++;
-            //echo '<td><span style="font-size : 1em; cursor : default;">' . $item['personFirstName'] . '</span></td>';
-            echo '<td><span class="label label-primary" style="font-size : 1em; cursor : default;">' . $item['personFirstName'] . '</span></td>';
             echo '<td><span style="font-size : 1em; cursor : default;">' . str_replace("jacques dit", "(via Jeedom)", $item['summary']) . '</span></td>';
-            echo '<td><span style="font-size : 1em; cursor : default;">' . $item['alexaResponse'] . '</span></td>';
 
 
-          //  echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $activityStatus . '</span></td>';
+            echo '<td><span class="label label-' . $couleur . '" style="font-size : 1em; cursor : default;">' . $activityStatus . '</span></td>';
 
 
             echo '</tr>';

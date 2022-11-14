@@ -41,14 +41,14 @@ log::add('alexaapi', 'debug', 'Réception données sur jeeAlexaapi [' . $nom . '
 log::add('alexaapi_mqtt', 'info', " -------------------------------------------------------------------------------------------------------------");
 //log::add('alexaapi_widget', 'info', " -------------------------------------------------------------------------------------------------------------");
 
-log::add('alexaapi_mqtt', 'info', "chaineRecuperee: " . $chaineRecuperee);
+//log::add('alexaapi_mqtt', 'info', "chaineRecuperee:----------> " . $chaineRecuperee);
 
 
 $debut = strpos($chaineRecuperee, "{");
 $fin = strrpos($chaineRecuperee, "}");
 $longeur = 1 + intval($fin) - intval($debut);
 $chaineRecupereeCorrigee = substr($chaineRecuperee, $debut, $longeur);
-//log::add('alexaapi_mqtt', 'info', "->" . $chaineRecupereeCorrigee);
+//log::add('alexaapi_mqtt', 'debug', "->" . $chaineRecupereeCorrigee);
 
 /*if ($nom !="commandesEnErreur") {
     $chaineRecupereeCorrigee=str_replace ("[", "", $chaineRecupereeCorrigee);
@@ -110,11 +110,13 @@ switch ($nom) {
             $json = file_get_contents($url);
         }
         break;
+    /*
     case 'ws-bluetooth-state-change':
-    if ($result['bluetoothEvent'] == 'DEVICE_CONNECTED') metAJour("bluetoothDevice", true, 'bluetoothDevice', false , "ECHO", $result['deviceSerialNumber']);
-    if ($result['bluetoothEvent'] == 'DEVICE_DISCONNECTED') metAJour("bluetoothDevice", false, 'bluetoothDevice', false , "ECHO", $result['deviceSerialNumber']);
+    if ($result['bluetoothEvent'] == 'DEVICE_CONNECTED') metAJour("bluetoothDevice", "Connexion en cours", 'bluetoothDevice', false , "ECHO", $result['deviceSerialNumber']);
+    if ($result['bluetoothEvent'] == 'DEVICE_DISCONNECTED') metAJour("bluetoothDevice", "Déconnexion en cours", 'bluetoothDevice', false , "ECHO", $result['deviceSerialNumber']);
         metAJourBluetooth($result['deviceSerialNumber'], $result['audioPlayerState'], $alexaapi2, "PLAYER", $result['deviceSerialNumber']);
     break;
+    */
     case 'ws-volume-change':
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "PLAYER", $result['deviceSerialNumber']);
         metAJour("Volume", $result['volume'], 'volumeinfo', false, "ECHO", $result['deviceSerialNumber']);
@@ -137,7 +139,7 @@ switch ($nom) {
                     log::add('alexaapi', 'debug', 'Interaction demandée : ' . $demandeinteract);*/		
         break;
     case 'ws-notification-change': //changement d'une alarme/rappel
-        //log::add('alexaapi_node', 'info', 'Alexa-jee: notificationVersion: ' . $result['notificationVersion']);
+        log::add('alexaapi_node', 'info', 'Alexa-jee: notificationVersion: ' . $result['notificationVersion']);
 
         $alexaapi2->refresh();    // Lance un refresh du device principal
         break;
@@ -381,8 +383,8 @@ function metAJourPlayer($serialdevice, $audioPlayerState)
 
 function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour = 'personne')
 {
-    //log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist par '.$_quiMetaJour.'********************');
-    //log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist AVEC '.$result.'********************');
+    log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist par '.$_quiMetaJour.'********************');
+    log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist AVEC '.$result.'********************');
     try {
 //		if (($audioPlayerState!="FINISHED") && (isset($result['playerInfo']['miniArt']['url']))) 	{	//modif Sigalou 24/08/2020 ? Pourquoi 2eme partie du test ?
         if (($audioPlayerState != "FINISHED")) {

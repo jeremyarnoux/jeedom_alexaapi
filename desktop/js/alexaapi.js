@@ -64,7 +64,6 @@ $('#bt_forcerDefaultCmd').off('click').on('click', function () {
                 level: 'success'
               });
               $('.eqLogicDisplayCard[data-eqLogic_id=' + $('.eqLogicAttr[data-l1key=id]').value() + ']').click();
-			jeedomUtils.reloadPagePrompt('{{Equipement réinitialisé à sa configuration par défaut.}}');
             }
           });
 
@@ -292,9 +291,9 @@ function addCmdToTable(_cmd) {
     DefinitionDivPourCommandesPredefinies = "";
   //  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == '00whennextalarm') || (init(_cmd.logicalId) == 'whennextreminderlabel') || (init(_cmd.logicalId) == 'musicalalarmmusicentity') || (init(_cmd.logicalId) == 'whennextmusicalalarm')) {
 
-  /*if ((init(_cmd.logicalId) == 'updateallalarms')) {
+  if ((init(_cmd.logicalId) == 'updateallalarms')) {
     return;
-  }*/
+  }
 
   //console.log("addCmdToTable : " + init(_cmd.logicalId));
 
@@ -314,7 +313,7 @@ function addCmdToTable(_cmd) {
   	tr += '</select>'
   	tr += '</td>'
   	tr += '<td>'
-    tr += '<span class="type" type="' + init(_cmd.type) + '" disabled = "false">' + jeedom.cmd.availableType() + '</span>'
+    tr += '<span class="type disabled" type="' + init(_cmd.type) + '" disabled = "false">' + jeedom.cmd.availableType() + '</span>'
     tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>'
     
     if (init(_cmd.type) == 'action' && init(_cmd.logicalId) != 'refresh') {
@@ -325,18 +324,16 @@ function addCmdToTable(_cmd) {
         tr += '<td>'
     }
       tr += '</td>'
-  /*  
-  Supprimé le 09/05/2022 doubloni d'unité et max ?? pouruqoi ce test ???????
-  if ((init(_cmd.logicalId) == "") || (init(_cmd.logicalId) == "volume")) {
+    if ((init(_cmd.logicalId) == "") || (init(_cmd.logicalId) == "volume")) {
         tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite"  style="width : 100px;" placeholder="{{Unité}}" title="{{Unité}}" >';
-        tr += '55<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}"  title="{{Min}} style="margin-top : 3px;"> ';
+        tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}"  title="{{Min}} style="margin-top : 3px;"> ';
         tr += '</td>';
         tr += '<td>';
-        tr += '1<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">';
-    } else {*/
+        tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">';
+    } else {
         tr += '</td>';
         tr += '<td>';
-   //}
+    }
 
 	tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="isVisible" checked/>{{Afficher}}</label> '
   	tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="isHistorized" checked/>{{Historiser}}</label> '

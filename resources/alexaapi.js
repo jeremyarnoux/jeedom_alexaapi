@@ -24,8 +24,6 @@ const config = {
 	cookieRefreshInterval: 3 * 24 * 60 * 60 * 1000,
 	logger: consoleSigalou,
 	alexaServiceHost: alexaserver,
-	amazonserver: alexaserver,
-	amazonPage: amazonserver,
     useWsMqtt: useWsMqtt, 
 	listeningPort: 3456
 };
@@ -57,7 +55,7 @@ function isEmpty(obj) {
 
     // Otherwise, does it have any properties of its own?
     // Note that this doesn't handle
-    // toString andmerci valueOf enumeration bugs in IE < 9
+    // toString and valueOf enumeration bugs in IE < 9
     for (var key in obj) {
         if (hasOwnProperty.call(obj, key)) return false;
     }
@@ -73,7 +71,7 @@ function isEmpty(obj) {
 	//niveaudeLog=2 c'est reduit
 	
 
-function consoleSigalou(text, level='DEBUG') {
+function consoleSigalou(text, level='') {
 	var today = new Date();
 
 	// 100=DEBUG
@@ -136,39 +134,12 @@ function forEachDevices(nameOrSerial, callback) {
 	}
 }
 
-function getNotifications3(callback) {
-	alexa.getNotifications((err, res) => 
-		{
-			if (err || !res || !res.notifications || !Array.isArray(res.notifications)) return callback && callback();
-			callback && callback(res.notifications);
-		});
-}
-
-function getHistory3(options,callback) 
-	{
-		alexa.getCustomerHistoryRecords(options, (err, res) => 
-		{
-			if (err || !res || !res || !Array.isArray(res)) return callback && callback();
-			callback && callback(res);
-		});
-	}
-
-
 
 function LancementCommande(commande, req) 
 {
 	config.logger('{API}    ╔═══════[Lancement /'+commande, "INFO");
 
 }
-/*
-function getNotification2(callback) {
-alexa.getNotifications((err, res) => 
-		{
-			if (err || !res || !res.notifications || !Array.isArray(res.notifications)) return callback && callback();
-			callback && callback(res.notifications);
-		});
-}
-*/
 
 CommandAlexa.query = function(req,res){
 	
@@ -252,9 +223,7 @@ CommandAlexa.Speak = function(req,res){
   	var Phrase2 = '';
   	var Phrase = '';
   
-if (TXTchaine.length <= LimiteAlexa)	{	
-
-	config.logger('{API}    ║Speak sans coupe', 'INFO');
+if (TXTchaine.length <= LimiteAlexa)	{				
     Commands.push({command: SpeakouAnnouncement, value: req.query.text});
 }
 else {	
@@ -305,35 +274,11 @@ else {
   		
 } 
 	if (('lastvolume' in req.query === true) && test) 	Commands.push({command: 'volume', value: req.query.lastvolume});
-
-	config.logger('{API}    ║envoie commande boucleSurSerials_sendMultiSequenceCommand', 'INFO');
 	
 	boucleSurSerials_sendMultiSequenceCommand(req, Commands);
 
 	res.status(200).json({value: "Send"});	//ne teste pas le résultat//supprimé 16/11/2019
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 CommandAlexa.DisplayPower = function(req,res){
 
@@ -414,6 +359,8 @@ CommandAlexa.Announcement = function(req,res){
 	
 	res.status(200).json({value: "Send2"});	//ne teste pas le résultat//supprimé 16/11/2019
 };
+
+
 
 
 
@@ -951,10 +898,9 @@ Version initiale qui donne le résultat
 														Commands.push({command: SpeakouAnnouncement, value: req.query.text});
 	if (('lastvolume' in req.query === true) && test) 	Commands.push({command: 'volume', value: req.query.lastvolume});
 */
-	config.logger('{API}    ║boucleSurSerials_sendMultiSequenceCommand', 'INFO');
 
 		forEachDevices(req.query.device, (serial) => {
-			alexa.sendMultiSequenceCommand(serial, actions, "SerialNode", null, 
+			alexa.sendMultiSequenceCommand(serial, actions, "SerialNode",
 				function(testErreur){
 					if (testErreur) {
 						traiteErreur(testErreur, actions, req.query);
@@ -1207,7 +1153,7 @@ app.get('/routine', CommandAlexa.Routine);
   Otherwise, an error object is returned.
 */
 app.get('/reminder', (req, res) => {
-	//config.logger('{API}: Alexa.Reminder');
+	config.logger('{API}: Alexa.Reminder');
 	res.type('json');
 
 	if ('device' in req.query === false)
@@ -1217,13 +1163,16 @@ app.get('/reminder', (req, res) => {
 
 	if ('text' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Reminder', 'Missing parameter "text"'));
+	config.logger('{API}: text: ' + req.query.text);
 
 	if ('when' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Reminder', 'Missing parameter "when"'));
+	config.logger('{API}: when: ' + req.query.when);
 
 	// Fix Aidom 01/03/2020
 	if ('recurring' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Reminder', 'Missing parameter "recurring"'));
+	config.logger('{API}: recurring: ' + req.query.recurring);
 	// End Fix
 
 	// when: YYYY-MM-DD HH:MI:SS
@@ -1231,7 +1180,7 @@ app.get('/reminder', (req, res) => {
 	if (dateValues === null)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Reminder', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
 	let when = new Date(dateValues[1], dateValues[2] - 1, dateValues[3], dateValues[4], dateValues[5], dateValues[6]);
-	//config.logger('{API}: when: ' + when);
+	config.logger('{API}: when: ' + when);
 
 	alexa.setReminder(req.query.device, when.getTime(), req.query.text, req.query.recurring, function(err) { // Fix Aidom 01/03/2020
 		if (err)
@@ -1251,20 +1200,22 @@ app.get('/reminder', (req, res) => {
   Otherwise, an error object is returned.
 */
 app.get('/alarm', (req, res) => {
-	//config.logger('{API}: Alexa.Alarm');
+	config.logger('{API}: Alexa.Alarm');
 	res.type('json');
 
 	if ('device' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Missing parameter "device"'));
+		config.logger('{API}    ╠═══> Device : ' + req.query.device, 'DEBUG');
+
 
 	if ('when' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Missing parameter "when"'));
-	//config.logger('{API}: when: ' + req.query.when);
+	config.logger('{API}: when: ' + req.query.when);
 
 	if ('recurring' in req.query === false)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Missing parameter "recurring"'));
-//	config.logger('{API}: recurring: ' + req.query.recurring);
-//	config.logger('{API}: sound: ' + req.query.sound);
+	config.logger('{API}: recurring: ' + req.query.recurring);
+	config.logger('{API}: sound: ' + req.query.sound);
 
 
 	// when: YYYY-MM-DD HH:MI:SS
@@ -1272,7 +1223,7 @@ app.get('/alarm', (req, res) => {
 	if (dateValues === null)
 		return res.status(500).json(error(500, req.route.path, 'Alexa.Alarm', 'Invalid "when" format. Expected: YYYY-MM-DD HH:MI:SS'));
 	let when = new Date(dateValues[1], dateValues[2] - 1, dateValues[3], dateValues[4], dateValues[5], dateValues[6]);
-//	config.logger('{API}: when: ' + when);
+	config.logger('{API}: when: ' + when);
 
 	alexa.setAlarm(req.query.device, when.getTime(), req.query.recurring, req.query.sound, function(err) {
 		if (err)
@@ -1300,8 +1251,6 @@ app.get('/devices', (req, res) => {
 	res.type('json');
 
 	alexa.getDevices(function(devices) {
-	//config.logger('***  '+JSON.stringify(devices), 'INFO');
-	//console.log(res);
 		var toReturn = [];
 		for (var serial in devices) {
 			if (devices.hasOwnProperty(serial)) {
@@ -1663,26 +1612,6 @@ CommandAlexa.activities = function(req, res) {
 	});
 };
 
-CommandAlexa.PlayerQueue = function(req, res) {
-	var commandeEnvoyee = req.path.replace("/", "");
-	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
-	res.type('json');
-
-	if ('device' in req.query === false) return res.status(500).json(error(500, req.route.path, 'Alexa.'+commandeEnvoyee, 'Missing "device"'));
-	config.logger('{API}    ╠═══> Device : ' + req.query.device, 'DEBUG');
-
-	Appel_getPlayerQueue(req.query.device, function(retourAmazon) {
-		var fichierjson = __dirname + '/data/'+commandeEnvoyee+'-'+req.query.device+'.json';
-		if(typeof JSON.stringify(retourAmazon, null, 2) == "undefined") {
-			config.logger('{API}    ╠═══> Réponse est undefined - Elle est donc ignorée', 'DEBUG');
-			return res.sendStatus(500);
-			}		
-		fs.writeFile(fichierjson, JSON.stringify(retourAmazon, null, 2), err =>
-			{if (err) return res.sendStatus(500);});
-		res.status(200).json(retourAmazon);
-	});
-};
-
 CommandAlexa.deviceNotificationState = function(req, res) {
 	var commandeEnvoyee = req.path.replace("/", "");
 	config.logger('{API}    ╔═══════[Lancement  /'+commandeEnvoyee+' sur '+req.query.device, 'INFO');
@@ -1846,18 +1775,12 @@ function Appel_getActivities(serialOrName,callback)
 	callback && callback(res);});
 	}
 
-function Appel_getPlayerQueue(serialOrName, callback) 
-	{
-	alexa.getPlayerQueue(serialOrName,50, (err, res) => {if (err || !res ) return callback && callback();
-	callback && callback(res);});
-	}
-	
 
+	
 	
 	// Tous les appels GET
 
 app.get('/wakeWords', CommandAlexa.wakeWords);
-app.get('/PlayerQueue', CommandAlexa.PlayerQueue);
 app.get('/media', CommandAlexa.media);
 app.get('/playerInfo', CommandAlexa.playerInfo);
 app.get('/bluetooth', CommandAlexa.Bluetooth);
@@ -1907,12 +1830,12 @@ app.get('/getvolume', (req, res) => {
 });
 
 app.get('/history', (req, res) => {
-	config.logger('{API}    ╔═══════[Lancement  '+req.path+' Nb éléments : ' + req.query.maxRecordSize, 'INFO');
+	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
 
 	if ('maxRecordSize' in req.query === false)
-		req.query.maxRecordSize = 50; // semble inutile et toujours renvoyer 20
+		req.query.maxRecordSize = 5;
 	if ('recordType' in req.query === false)
 		req.query.recordType = 'VOICE_HISTORY';
 
@@ -1921,37 +1844,22 @@ app.get('/history', (req, res) => {
 		recordType: req.query.recordType
 	};
 
-	getHistory3(options, function(devices) {
+	alexa.getHistory2(options, function(devices) {
 		var toReturn = [];
 
+		//console.log(devices);
 
 		for (var serial in devices) {
-		//console.log("-------------------------------------------------------");
-		//console.log(serial);
 			if (devices.hasOwnProperty(serial)) {
 				var activities = devices[activities];
 				var device = devices[serial];
-
-				if (device.description.summary!='') {
-					console.log(JSON. stringify(device));
-					var personsInfo = "";
-					if (typeof device.data.personsInfo[0] !== 'undefined')  personsInfo=device.data.personsInfo[0];
-					var personFirstName = '?';
-					if (typeof device.data.personsInfo[0] == 'object')  personFirstName=device.data.personsInfo[0].personFirstName;
-					//if (typeof device.data.personsInfo[0] !== 'object')  personFirstName=personsInfo[0].personFirstName;
-					//console.log(personFirstName);					
-					
-					
-					toReturn.push({
-						'serial': serial,
-						//'activityStatus': device.activityStatus,
-						'personFirstName': personFirstName,
-						'deviceSerialNumber': device.deviceSerialNumber,
-						'creationTimestamp': device.creationTimestamp,
-						'alexaResponse': device.alexaResponse,
-						'summary': device.description.summary
-					});
-				}
+				toReturn.push({
+					'serial': serial,
+					'activityStatus': device.activityStatus,
+					'deviceSerialNumber': device.deviceSerialNumber,
+					'creationTimestamp': device.creationTimestamp,
+					'summary': device.description.summary
+				});
 			}
 		}
 		res.status(200).json(toReturn);
@@ -1992,12 +1900,12 @@ app.get('/routines', (req, res) => {
 
 				var routine = niveau0[serial];
 
-				config.logger('(general)----- '+routine.status);
+				//config.logger('(general)----- '+routine.status);
 				//config.logger('(general)----- '+routine.creationTimeEpochMillis);
 
 				if (routine.status === 'ENABLED') {
 					//config.logger('(SUPPRESSION)----- '+routine.creationTimeEpochMillis);
-					alexa.executeAutomationRoutine("", "inutilemaissanscabug", routine, function(err) {
+					alexa.executeAutomationRoutine("", routine, function(err) {
 						//config.logger('(SUPPRESSION DEDANS)----- '+routine.creationTimeEpochMillis);
 						//executeAutomationRoutine(serialOrName, routine, callback)
 						//res.status(200).json({});
@@ -2120,7 +2028,7 @@ app.get('/reminders', (req, res) => {
 
 	//config.logger('{API}: (reminders) Lancement','DEBUG');
 
-	getNotifications3(function(notifications) {
+	alexa.getNotifications2(function(notifications) {
 		//config.logger('{API}: (reminders) function','DEBUG');
 		var toReturn = [];
 
@@ -2164,7 +2072,7 @@ app.get('/deleteallalarms', (req, res) => {
 	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
-	getNotifications3(function(notifications) {
+	alexa.getNotifications2(function(notifications) {
 		//var toReturn = [];
 		//config.logger('{API} - prepa boucle 1:'+JSON.stringify(notifications),'INFO');
 		//config.logger('{API} - prepa boucle 1 nb:'+Object.keys(notifications).length,'INFO');
@@ -2250,7 +2158,7 @@ app.get('/whennextalarm', (req, res) => {
 	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
-	getNotifications3(function(notifications) {
+	alexa.getNotifications2(function(notifications) {
 		//config.logger('{API}: (WhenNextAlarm) function' );
 		//var toReturn = [];
 
@@ -2335,10 +2243,6 @@ app.get('/whennextalarm', (req, res) => {
   URL: /updateallalarms
 
 */
-
-
-
-
 app.get('/updateallalarms', (req, res) => {
 	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
@@ -2358,7 +2262,8 @@ function ajouteZero(n){
   return n;
 }
 
-	getNotifications3(function(notifications) {
+
+	alexa.getNotifications2(function(notifications) {
 		//config.logger('{API}: (WhenNextAlarm) function' );
 		//var toReturn = [];
 
@@ -2500,7 +2405,7 @@ app.get('/whennextmusicalalarm', (req, res) => {
 	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
-	getNotifications3(function(notifications) {
+	alexa.getNotifications2(function(notifications) {
 		//config.logger('{API}: (WhenNextAlarm) function' );
 		//var toReturn = [];
 
@@ -2597,7 +2502,7 @@ app.get('/musicalalarmmusicentity', (req, res) => {
 	config.logger('{API}    ╔═══════[Lancement  '+req.path+' sur '+req.query.device, 'INFO');
 	res.type('json');
 
-	getNotifications3(function(notifications) {
+	alexa.getNotifications2(function(notifications) {
 
 
 		if (isEmpty(notifications))
@@ -2694,7 +2599,7 @@ app.get('/whennextreminder', (req, res) => {
 	res.type('json');
 
 
-	getNotifications3(function(notifications) {
+	alexa.getNotifications2(function(notifications) {
 
 		if (isEmpty(notifications))
 			return res.status(500).json(error(500, req.route.path, 'Alexa.whennextreminder', 'Retour vide'));
@@ -2784,7 +2689,7 @@ app.get('/whennextreminderlabel', (req, res) => {
 	res.type('json');
 
 
-	getNotifications3(function(notifications) {
+	alexa.getNotifications2(function(notifications) {
 
 		if (isEmpty(notifications))
 			return res.status(500).json(error(500, req.route.path, 'Alexa.whennextreminder', 'Retour vide'));
@@ -2931,10 +2836,7 @@ function startServer(force=false) { //force=true pour la relance avec nouveau co
 				logger: config.logger,
 				alexaServiceHost: config.alexaServiceHost,
 				cookieRefreshInterval: config.cookieRefreshInterval,
-		        apiUserAgentPostFix: 'AlexaRemote/5.7.2', // optional: postfix to add to api useragent, leave empty to use a default one
-				useWsMqtt: lancerOuPasMQTT,
-				amazonPage: config.amazonPage
-
+				useWsMqtt: lancerOuPasMQTT
 			},
 			(err) => {
 				// Unable to init alexa

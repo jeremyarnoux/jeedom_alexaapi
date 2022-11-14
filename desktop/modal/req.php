@@ -28,8 +28,6 @@ $masquedevice = true;
 switch ($_GET['json']) {
     case 'activities':
     case 'media':
-    case 'PlayerQueue':
-   // case 'DisplayPowerSetting':
   //  case 'lists':
     case 'deviceNotificationState':
     case 'notificationSounds':
@@ -69,8 +67,7 @@ include_file('desktop', 'jsonviewer', 'php', 'alexaapi');
                 <option value="activities" <?php if ($_GET['json'] == "activities") echo "selected" ?>>Activities
                 </option>
                 <option value="wakeWords" <?php if ($_GET['json'] == "wakeWords") echo "selected" ?>>WakeWords</option>
-                <option value="PlayerQueue" <?php if ($_GET['json'] == "PlayerQueue") echo "selected" ?>>PlayerQueue</option>
-               <option value="devicesFull" <?php if ($_GET['json'] == "devicesFull") echo "selected" ?>>Devices
+                <option value="devicesFull" <?php if ($_GET['json'] == "devicesFull") echo "selected" ?>>Devices
                 </option>
 				<option value="historyFull" <?php if ($_GET['json'] == "historyFull") echo "selected" ?>>History
                 </option>
