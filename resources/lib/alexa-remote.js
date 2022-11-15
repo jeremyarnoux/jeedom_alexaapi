@@ -21,14 +21,11 @@ const extend = require('extend');
 const AlexaWsMqtt = require('./alexa-wsmqtt.js');
 const { v1: uuidv1 } = require('uuid');
 const EventEmitter = require('events');
-<<<<<<< HEAD
-=======
 
 const officialUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15';
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------Ajouté par Sigalou--------------------------------------------------------------------------------------
->>>>>>> e0ce9ac426e24139d3cae4a7a9dc6f494852fdd2
 const request = require('request');
 const zlib = require('zlib');
 
