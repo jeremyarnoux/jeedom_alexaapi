@@ -27,47 +27,6 @@ $('#bt_forcerDefaultCmd').off('click').on('click', function () {
   dialog_message += '<label class="lbl lbl-warning" for="name">{{Notez que cette fonction ne supprime pas votre équipement ni ses commandes, cela évite d\'avoir à refaire les scénarios. Elle va supprimer toute personnalisation et toutes les commandes vont revenir à leur état initial.}}</label> ';
   dialog_message += '</form>';
   bootbox.dialog({
-<<<<<<< HEAD
-    title: dialog_title,
-    message: dialog_message,
-    buttons: {
-      "{{Annuler}}": {
-        className: "btn-danger",
-        callback: function () {}
-      },
-      success: {
-        label: "{{Démarrer}}",
-        className: "btn-success",
-        callback: function () {
-          $.ajax({
-            type: "POST",
-            url: "plugins/alexaapi/core/ajax/alexaapi.ajax.php",
-            data: {
-              action: "forcerDefaultCmd",
-              id: $('.eqLogicAttr[data-l1key=id]').value(),
-              createcommand: 0,
-            },
-            dataType: 'json',
-            global: false,
-            error: function (request, status, error) {
-              handleAjaxError(request, status, error);
-            },
-            success: function (data) {
-              if (data.state != 'ok') {
-                $('#div_alert').showAlert({
-                  message: data.result,
-                  level: 'danger'
-                });
-                return;
-              }
-              $('#div_alert').showAlert({
-                message: '{{Opération réalisée avec succès}}',
-                level: 'success'
-              });
-              $('.eqLogicDisplayCard[data-eqLogic_id=' + $('.eqLogicAttr[data-l1key=id]').value() + ']').click();
-            }
-          });
-=======
 	title: dialog_title,
 	message: dialog_message,
 	buttons: {
@@ -108,8 +67,6 @@ $('#bt_forcerDefaultCmd').off('click').on('click', function () {
 			jeedomUtils.reloadPagePrompt('{{Equipement réinitialisé à sa configuration par défaut.}}');
 			}
 		  });
->>>>>>> e0ce9ac426e24139d3cae4a7a9dc6f494852fdd2
-
 		}
 	  },
 	}
@@ -325,81 +282,17 @@ $("#table_cmd").sortable({
 
 function addCmdToTable(_cmd) {
   if (!isset(_cmd))
-<<<<<<< HEAD
-    var _cmd = {
-      configuration: {}
-    };
 
-  var DefinitionDivPourCommandesPredefinies = 'style="display: none;"';
-  if (init(_cmd.logicalId) == "")
-    DefinitionDivPourCommandesPredefinies = "";
-  //  if ((init(_cmd.logicalId) == 'whennextreminder') || (init(_cmd.logicalId) == '00whennextalarm') || (init(_cmd.logicalId) == 'whennextreminderlabel') || (init(_cmd.logicalId) == 'musicalalarmmusicentity') || (init(_cmd.logicalId) == 'whennextmusicalalarm')) {
-
-  if ((init(_cmd.logicalId) == 'updateallalarms')) {
-    return;
-  }
-
-  //console.log("addCmdToTable : " + init(_cmd.logicalId));
-=======
 	var _cmd = {
 	configuration: {}
 	};
->>>>>>> e0ce9ac426e24139d3cae4a7a9dc6f494852fdd2
 
 	var DefinitionDivPourCommandesPredefinies = 'style="display: none;"';
 	if (init(_cmd.logicalId) == "") {
 		DefinitionDivPourCommandesPredefinies = "";
 	}
  
-<<<<<<< HEAD
-  var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
-	  tr += '<td class="hidden-xs">'
-  	tr += '<span class="cmdAttr" data-l1key="id"></span>'
-  	tr += '</td>'
-  	tr += '<td>'
-  	tr += '<div class="input-group">'
-  	tr += '<input class="cmdAttr form-control input-sm roundedLeft" data-l1key="name" placeholder="{{Nom du capteur}}">'
-  	tr += '<span class="input-group-btn"><a class="cmdAction btn btn-sm btn-default" data-l1key="chooseIcon" title="{{Choisir une icône}}"><i class="fas fa-icons"></i></a></span>'
-  	tr += '<span class="cmdAttr input-group-addon roundedRight" data-l1key="display" data-l2key="icon" style="font-size:19px;padding:0 5px 0 0!important;"></span>'
-  	tr += '</div>'
-  	tr += '<select class="cmdAttr form-control input-sm disabled" data-l1key="value" style="display:none;margin-top:5px;" title="{{Commande info liée}}">'
-  	tr += '<option value="">{{Aucune}}</option>'
-  	tr += '</select>'
-  	tr += '</td>'
-  	tr += '<td>'
-    tr += '<span class="type disabled" type="' + init(_cmd.type) + '" disabled = "false">' + jeedom.cmd.availableType() + '</span>'
-    tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>'
-    
-    if (init(_cmd.type) == 'action' && init(_cmd.logicalId) != 'refresh') {
-        tr += '<td>'
-        + '<input class="cmdAttr form-control input-sm"';
-        tr += ' data-l1key="configuration" data-l2key="request">';
-    } else {
-        tr += '<td>'
-    }
-      tr += '</td>'
-    if ((init(_cmd.logicalId) == "") || (init(_cmd.logicalId) == "volume")) {
-        tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite"  style="width : 100px;" placeholder="{{Unité}}" title="{{Unité}}" >';
-        tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}"  title="{{Min}} style="margin-top : 3px;"> ';
-        tr += '</td>';
-        tr += '<td>';
-        tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}} style="margin-top : 3px;">';
-    } else {
-        tr += '</td>';
-        tr += '<td>';
-    }
 
-	tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="isVisible" checked/>{{Afficher}}</label> '
-  	tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="isHistorized" checked/>{{Historiser}}</label> '
-	tr += '<label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="invertBinary"/>{{Inverser}}</label> '
-  	tr += '<div style="margin-top:7px;">'
-  	tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}}" style="width:30%;max-width:80px;display:inline-block;margin-right:2px;">'
-  	tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}}" style="width:30%;max-width:80px;display:inline-block;margin-right:2px;">'
-  	tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="unite" placeholder="{{Unité}}" title="{{Unité}}" style="width:30%;max-width:80px;display:inline-block;margin-right:2px;">'
-  	tr += '</div>'
-  	tr += '</td>'
-  	tr += '<td>'
-=======
 	var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
 	tr += '<td class="hidden-xs">';
 		tr += '<span class="cmdAttr" data-l1key="id"></span>';
@@ -443,7 +336,7 @@ function addCmdToTable(_cmd) {
 	tr += '</td>';
 	
 	tr += '<td>';
->>>>>>> e0ce9ac426e24139d3cae4a7a9dc6f494852fdd2
+
 	if (is_numeric(_cmd.id)) {
 			tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> ';
 			if (!((init(_cmd.name) == "Routine") || (init(_cmd.name) == "xxxxxxxx"))) { //Masquer le bouton Tester
