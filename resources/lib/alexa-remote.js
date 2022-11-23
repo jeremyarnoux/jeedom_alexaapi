@@ -23,7 +23,7 @@ const { v1: uuidv1 } = require('uuid');
 const EventEmitter = require('events');
 
 //const officialUserAgent = 'AppleWebKit PitanguiBridge/2.2.483723.0-[HARDWARE=iPhone10_4][SOFTWARE=15.5][DEVICE=iPhone]'; MODIF SKILLIX 14-11-2022
-const officialUserAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.5 Safari/605.1.15';
+const officialUserAgent = 'Mozilla/5.0 (Linux; U; Android 2.1-update1; fr-fr; GTI9000 Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17';
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------Ajouté par Sigalou--------------------------------------------------------------------------------------
@@ -101,13 +101,13 @@ class AlexaRemote extends EventEmitter {
                 //let platform = os.platform();
                 const platform = os.platform();
                 if (platform === 'win32') {
-                    this._options.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0';
+                    this._options.userAgent = 'Mozilla/5.0 (Linux; U; Android 2.1-update1; fr-fr; GTI9000 Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17';
                 }
                 /*else if (platform === 'darwin') {
                     this._options.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
                 }*/
                 else {
-                    this._options.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
+                    this._options.userAgent = 'Mozilla/5.0 (Linux; U; Android 2.1-update1; fr-fr; GTI9000 Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17';
                 }
             }
             this._options.amazonPage = this._options.amazonPage || amazonserver;
