@@ -825,7 +825,7 @@ class alexaapi extends eqLogic
                                             if ($alexasmarthome->getLogicalId() == $value7['entityId']) {
                                                 $alexasmarthome->setConfiguration('applianceId', $value7['applianceId']);
                                                 log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════[' . $alexasmarthome->getName() . ']═══════════════════════════════════════════════════════════════════════════');
-                                                log::add('alexasmarthome_scan', 'info', ' ║ Lien entre Alexa-API (' . $alexasmarthome->getName() . ') et smarHome (' . json_encode($value7['friendlyName']) . ') trouvé et mis à jour');
+                                                log::add('alexasmarthome_scan', 'info', ' ║ Lien entre Alexa-API (' . $alexasmarthome->getName() . ') et SmartHome (' . json_encode($value7['friendlyName']) . ') trouvé et mis à jour');
                                                 log::add('alexasmarthome_scan', 'info', ' ║ Equipement trouvé et mis à jour');
                                                 //Détection du lien entre entityId (protocole Alexa-API) et applianceId (protocole smartHome)
                                                 log::add('alexasmarthome_scan', 'info', ' ║ ' . json_encode($value7['entityId']) . ' <═> ' . json_encode($value7['applianceId']));
@@ -870,7 +870,7 @@ class alexaapi extends eqLogic
                                             event::add('jeedom::alert', array(
                                                 'level' => 'success',
                                                 'page' => 'alexaapi',
-                                                'message' => __('Mise à jour de [' . $chaineName, __FILE__),
+                                                'message' => __('Mise à jour de [' . $chaineName . ']', __FILE__ ),
                                                 'ttl' => 1000
                                             ));
 
@@ -881,14 +881,42 @@ class alexaapi extends eqLogic
                                             //log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT AJOUTER UN DEVICE !!!!!!!!!!');
                                             self::ajouteAmazonSmartHome($value7);
                                         }
-                                        /*
-										if (json_encode($value7['applianceId']) != json_encode($value7['mergedApplianceIds']['0'])) {
+                                        
+										if (json_encode($value7['applianceId']) != json_encode($value7['mergedApplianceIds']['0'])) {       //ajout skillix 01/12/2022  test si il existe des merge non detecté lors du scan
                                                 log::add('alexasmarthome_scan', 'info', ' ╔══════════════════════['.json_encode($value7['friendlyName']).']═══════════════════════════════════════════════════════════════════════════');
                                                 log::add('alexasmarthome_scan', 'info', ' ║ ' . json_encode($value7['applianceId']).' <═> '.json_encode($value7['mergedApplianceIds']['0']));
                                                 log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
                                             //log::add('alexasmarthome_scan', 'info', '!!!!!!!!!!!!!!!!FAUT AJOUTER UN DEVICE !!!!!!!!!!');
-											self::ajouteAmazonSmartHome($value7['mergedApplianceIds']['0']);
-										}	*/
+                                          
+                                          
+                                          if(substr($value7['mergedApplianceIds']['0'], 0, 12) === "AlexaBridge_"){               //ajout skillix 01/12/2022  si le merge est un bridge alors je le cree
+                                          $alexasmarthome = alexasmarthome::byLogicalId($value7['friendlyName'].'_Bridge', 'alexasmarthome');
+                                          $alexasmarthome = alexasmarthome::createNewDevice($value7['friendlyName'], $value7['mergedApplianceIds']['0']);
+                                          $alexasmarthome->setConfiguration('applianceId', $value7['mergedApplianceIds']['0']);
+                                          $manufacturerName = $value7['manufacturerName'];
+                                          if ($manufacturerName == "Amazon Inc.") $manufacturerName = "Amazon";
+                                          $alexasmarthome->setConfiguration('manufacturerName', $manufacturerName);
+                                          $alexasmarthome->setConfiguration('friendlyDescription', 'Alexa App from Amazon Inc.');  
+                                          $capabilitiesjson = $value7['capabilities'];  
+                                          $alexasmarthome->setConfiguration('typeSmartHome', $value7['applianceTypes']['0']);  
+                                            
+                                            $alexasmarthome->save();
+                                          }
+                                          
+                                          if(substr($value7['mergedApplianceIds']['0'], 0, 4) === "AAA_"){                         //ajout skillix 01/12/2022  si le merge est un echo alors je le cree
+                                          $alexasmarthome = alexasmarthome::byLogicalId($value7['friendlyName'].'_AAA', 'alexasmarthome');
+                                          $alexasmarthome = alexasmarthome::createNewDevice($value7['friendlyName'], $value7['mergedApplianceIds']['0']);
+                                          $alexasmarthome->setConfiguration('applianceId', $value7['mergedApplianceIds']['0']);
+                                          $manufacturerName = $value7['manufacturerName'];
+                                          if ($manufacturerName == "Amazon Inc.") $manufacturerName = "Amazon";
+                                          $alexasmarthome->setConfiguration('manufacturerName', $manufacturerName);
+                                          $alexasmarthome->setConfiguration('friendlyDescription', 'Amazon smart device');  
+                                          $capabilitiesjson = $value7['capabilities'];  
+                                          $alexasmarthome->setConfiguration('typeSmartHome', $value7['applianceTypes']['0']);  
+                                            
+                                            $alexasmarthome->save();
+                                          }
+										}	
                                     }
                                 }
                             }
