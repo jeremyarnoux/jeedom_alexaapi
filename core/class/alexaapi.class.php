@@ -897,7 +897,7 @@ class alexaapi extends eqLogic
                                           if ($manufacturerName == "Amazon Inc.") $manufacturerName = "Amazon";
                                           $alexasmarthome->setConfiguration('manufacturerName', $manufacturerName);
                                           $alexasmarthome->setConfiguration('friendlyDescription', 'Alexa App from Amazon Inc.');  
-                                          $capabilitiesjson = $value7['capabilities'];  
+                                          $alexasmarthome->setConfiguration('capabilities', $value7['capabilities']);
                                           $alexasmarthome->setConfiguration('typeSmartHome', $value7['applianceTypes']['0']);  
                                             
                                             $alexasmarthome->save();
@@ -911,7 +911,7 @@ class alexaapi extends eqLogic
                                           if ($manufacturerName == "Amazon Inc.") $manufacturerName = "Amazon";
                                           $alexasmarthome->setConfiguration('manufacturerName', $manufacturerName);
                                           $alexasmarthome->setConfiguration('friendlyDescription', 'Amazon smart device');  
-                                          $capabilitiesjson = $value7['capabilities'];  
+                                          $alexasmarthome->setConfiguration('capabilities', $value7['capabilities']);
                                           $alexasmarthome->setConfiguration('typeSmartHome', $value7['applianceTypes']['0']);  
                                             
                                             $alexasmarthome->save();
