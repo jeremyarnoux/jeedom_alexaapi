@@ -834,8 +834,7 @@ class alexaapi extends eqLogic
         //$alexasmarthome = alexasmarthome::byLogicalId($value7['friendlyName'].'_AAA', 'alexasmarthome');
             $device->setConfiguration('friendlyDescription', 'Amazon smart device');  
         }
-                                          
- 		$device->save();
+
         try {
             $device->save();
         } catch (Exception $e) {
