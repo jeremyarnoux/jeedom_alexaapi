@@ -542,8 +542,13 @@ class alexaapi extends eqLogic
         event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Mise à jour terminée', __FILE__)));
     }
 
+
     public static function scanAmazonAlexa()
     {
+        log::add('alexaapi', 'debug', '*************************** Lancement scanAmazonAlexa ***********************************');
+        event::add('jeedom::alert', array('level' => 'success', 'page' => 'alexaapi', 'message' => __('Scan en cours...', __FILE__),));
+	
+		
         $deamon_info = self::deamon_info();
         if ($deamon_info['launchable'] != "ok") {
             event::add('jeedom::alert', array('level' => 'danger', 'page' => 'alexaapi', 'message' => __('Cookie Amazon Absent, allez dans la Configuration du plugin', __FILE__),));
@@ -774,7 +779,8 @@ class alexaapi extends eqLogic
         //log::add('alexasmarthome_scan', 'debug', '[capabilities  ] ->> [' . json_encode($capabilities) . "]" . $device->getName());// ou applianceKey
         $device->setConfiguration('capabilitiesSmartHome', $capabilities);
         $manufacturerName = $item['manufacturerName'];
-        if ($manufacturerName == "Amazon Inc.") $manufacturerName = "Amazon";
+		if ($manufacturerName == "Amazon Inc." || $manufacturerName == "amazon") $manufacturerName = "Amazon";
+		if ($manufacturerName == "smart_life") $manufacturerName = "Smart Life";
         $device->setConfiguration('manufacturerName', $manufacturerName);
         $device->setConfiguration('friendlyDescription', $item['friendlyDescription']);
 
@@ -822,7 +828,8 @@ class alexaapi extends eqLogic
         //log::add('alexasmarthome_scan', 'debug', '[capabilities  ] ->> [' . json_encode($capabilities) . "]" . $device->getName());// ou applianceKey
         $device->setConfiguration('capabilitiesSmartHome', $capabilities);
         $manufacturerName = $item['manufacturerName'];
-        if ($manufacturerName == "Amazon Inc.") $manufacturerName = "Amazon";
+		if ($manufacturerName == "Amazon Inc." || $manufacturerName == "amazon") $manufacturerName = "Amazon";
+		if ($manufacturerName == "smart_life") $manufacturerName = "Smart Life";
         $device->setConfiguration('manufacturerName', $manufacturerName);
     
  		if(substr($item2, 0, 12) === "AlexaBridge_"){
@@ -889,7 +896,8 @@ class alexaapi extends eqLogic
                                                 log::add('alexasmarthome_scan', 'info', ' ║         protocole Alexa-API            <═>             protocole smartHome');
                                                 log::add('alexasmarthome_scan', 'info', ' ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
                                                 $manufacturerName = $value7['manufacturerName'];
-                                                if ($manufacturerName == "Amazon Inc.") $manufacturerName = "Amazon";
+												if ($manufacturerName == "Amazon Inc." || $manufacturerName == "amazon") $manufacturerName = "Amazon";
+												if ($manufacturerName == "smart_life") $manufacturerName = "Smart Life";
                                                 if ($manufacturerName == "FREEBOX") $manufacturerName = "Freebox";
                                                 $alexasmarthome->setConfiguration('manufacturerName', $manufacturerName);
                                                 $alexasmarthome->setConfiguration('friendlyDescription', $value7['friendlyDescription']);
