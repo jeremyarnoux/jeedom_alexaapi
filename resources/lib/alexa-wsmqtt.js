@@ -374,7 +374,7 @@ class AlexaWsMqtt extends EventEmitter {
                 let command = message.content.payload.command;
                 let payload = message.content.payload.payload;
 
-                this._options.logger && this._options.logger('{MQTT}   ║ Command ' + command + ': ' + JSON.stringify(payload, null, 4));
+                //this._options.logger && this._options.logger('{MQTT}   ║ Command ' + command + ': ' + JSON.stringify(payload, null, 4));
                 //this._options.logger && this._options.logger('{MQTT}   ╠═══> Command --{' + command + '}-- : détail désactivé' ,'INFO');
                 this.emit('command', command, payload);
                 return;
