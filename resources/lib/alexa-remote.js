@@ -21,6 +21,12 @@ const extend = require('extend');
 const AlexaWsMqtt = require('./alexa-wsmqtt.js');
 const { v1: uuidv1 } = require('uuid');
 const EventEmitter = require('events');
+
+//const officialUserAgent = 'AppleWebKit PitanguiBridge/2.2.483723.0-[HARDWARE=iPhone10_4][SOFTWARE=15.5][DEVICE=iPhone]'; MODIF SKILLIX 14-11-2022
+const officialUserAgent = 'Mozilla/5.0 (Linux; U; Android 2.1-update1; fr-fr; GTI9000 Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17';
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------Ajouté par Sigalou--------------------------------------------------------------------------------------
 const request = require('request');
 const zlib = require('zlib');
 
@@ -72,11 +78,8 @@ class AlexaRemote extends EventEmitter {
 
         if (!this.cookie || typeof this.cookie !== 'string') return;
         let ar = this.cookie.match(/csrf=([^;]+)/);
-        // Allow csrf to be updated on cookie refresh
-		//Modif 4.1.1 ->  4.1.2 https://github.com/Apollon77/alexa-remote
-		//if (!ar || ar.length < 2) ar = this.cookie.match(/csrf=([^;]+)/);
-        //if (!this.csrf && ar && ar.length >= 2) {
-		if (ar && ar.length >= 2) {
+        if (!ar || ar.length < 2) ar = this.cookie.match(/csrf=([^;]+)/);
+        if (!this.csrf && ar && ar.length >= 2) {
             this.csrf = ar[1];
         }
         if (!this.csrf) {
@@ -98,13 +101,13 @@ class AlexaRemote extends EventEmitter {
                 //let platform = os.platform();
                 const platform = os.platform();
                 if (platform === 'win32') {
-                    this._options.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0';
+                    this._options.userAgent = 'Mozilla/5.0 (Linux; U; Android 2.1-update1; fr-fr; GTI9000 Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17';
                 }
                 /*else if (platform === 'darwin') {
                     this._options.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36';
                 }*/
                 else {
-                    this._options.userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36';
+                    this._options.userAgent = 'Mozilla/5.0 (Linux; U; Android 2.1-update1; fr-fr; GTI9000 Build/ECLAIR) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17';
                 }
             }
             this._options.amazonPage = this._options.amazonPage || amazonserver;
@@ -1046,14 +1049,6 @@ this._options.logger && this._options.logger(obj.headers);
     httpsGetCall(path, callback, flags = {}) {
 
         const handleResponse = (err, res, body) => {
-			
-			//4.1.1->4.1.2
-	        if (!err && typeof res.statusCode === 'number' && res.statusCode == 401) {
-                this._options.logger && this._options.logger('{Remote} ║ Réponse: 401 Unauthorized');
-                return callback(new Error('401 Unauthorized'), null);
-            }		
-			
-			
             if (err || !body) { // Method 'DELETE' may return HTTP STATUS 200 without body
                // this._options.logger && this._options.logger('{Remote} ║ Response: No body','DEBUG'); Pour éviter les remarques sur No Body
                 this._options.logger && this._options.logger('{Remote} ║ Réponse: statusCode:'+res.statusCode,'DEBUG');

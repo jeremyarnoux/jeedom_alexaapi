@@ -147,10 +147,10 @@ foreach ($eqLogics as $eqLogic) {
 
                             if (($eqLogic->getStatus('online') != 'true') && (!strstr($eqLogic->getName(), "Alexa Apps")) && (!strstr($eqLogic->getName(), "Ultimate Alexa"))) {
                                 //echo '<i class="fas fa-power-off" style="color: red;text-shadow: 4px 4px 4px #ccc;float:right" title="Offline"></i>';
-                                echo '<span class="badge badge-danger">Off</span>';
+                                echo '<span class="badge-alexaapi badge-danger">Off</span>';
                             } else {
                                 if ($interval->format('%a') < 1) {
-                                    echo '<span class="badge badge-success">Nouveau</span>';
+                                    echo '<span class="badge-alexaapi badge-success">Nouveau</span>';
                                 }
                             }
 
@@ -199,7 +199,7 @@ foreach ($eqLogics as $eqLogic) {
                                 if (($pluginAlexaUnparUn['pluginId'] != 'alexafiretv') && ($pluginAlexaUnparUn['pluginId'] != 'alexasmarthome')) $compteNombrePlayeurs++;
 
                             echo '">';
-                            if ($pluginAlexaUnparUn['nb'] != "0") echo '<span class="badge">' . $pluginAlexaUnparUn['nb'] . '</span>';
+                            if ($pluginAlexaUnparUn['nb'] != "0") echo '<span class="badge-alexaapi">' . $pluginAlexaUnparUn['nb'] . '</span>';
                             echo '<a href="';
 
                             if ($pluginAlexaUnparUn['install'] == true)
@@ -441,6 +441,7 @@ foreach ($eqLogics as $eqLogic) {
                                 <th style="min-width:200px;width:350px;">{{Nom}}</th>
                                 <th>{{Type}}</th>
                                 <th style="width: 600px;">{{Commande & Variable}}</th>
+				<th>{{Valeurs}}</th>
                                 <th style="min-width:360px;">{{Options}}</th>
                                 <th style="min-width:80px;width:200px;">{{Actions}}</th>
                             </tr>

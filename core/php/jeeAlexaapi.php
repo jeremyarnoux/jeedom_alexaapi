@@ -41,7 +41,7 @@ log::add('alexaapi', 'debug', 'Réception données sur jeeAlexaapi [' . $nom . '
 log::add('alexaapi_mqtt', 'info', " -------------------------------------------------------------------------------------------------------------");
 //log::add('alexaapi_widget', 'info', " -------------------------------------------------------------------------------------------------------------");
 
-log::add('alexaapi_mqtt', 'debug', "chaineRecuperee: " . $chaineRecuperee);
+//log::add('alexaapi_mqtt', 'info', "chaineRecuperee:----------> " . $chaineRecuperee);
 
 
 $debut = strpos($chaineRecuperee, "{");
@@ -383,8 +383,8 @@ function metAJourPlayer($serialdevice, $audioPlayerState)
 
 function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour = 'personne')
 {
-    //log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist par '.$_quiMetaJour.'********************');
-    //log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist AVEC '.$result.'********************');
+    log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist par '.$_quiMetaJour.'********************');
+    log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist AVEC '.$result.'********************');
     try {
 //		if (($audioPlayerState!="FINISHED") && (isset($result['playerInfo']['miniArt']['url']))) 	{	//modif Sigalou 24/08/2020 ? Pourquoi 2eme partie du test ?
         if (($audioPlayerState != "FINISHED")) {

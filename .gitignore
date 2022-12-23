@@ -1,4 +1,5 @@
 resources/node_modules/
 resources/package-lock.json
 resources/install_nodejs.sh
+resources/dependance.lib
 resources/lib/formerDataStore.json 

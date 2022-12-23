@@ -732,6 +732,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 */
 	alexa.querySmarthomeDevices2(req.query.device, entityType,
 		function(deviceStatesErrors){
+		var erreur = 0 ; //ajout 22/11/22 skillix bricolage toomany commandes parasites - a optimiser
 		try {
 			
 			deviceStates=deviceStatesErrors.deviceStates;
@@ -740,6 +741,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 		catch(error) {
 				//config.logger('Souci, le serveur Amazon est bien disponible ? Erreur sur '+entityType+"/"+req.query.device,'DEBUG');
 				config.logger('{Remote} ║ Souci, le serveur Amazon est bien disponible ? Erreur sur : ['+entityType+"/"+req.query.device+"]",'ERROR');
+			erreur = 1 ;//ajout 22/11/22 skillix bricolage toomany commandes parasites - a optimiser
 		}			
 		//config.logger('deviceStatesErrors>'+JSON.stringify(deviceStatesErrors),'DEBUG');
 		//config.logger('>'+JSON.stringify(deviceStates),'DEBUG');
@@ -750,7 +752,7 @@ CommandAlexa.querySmarthomeDevices = function(req,res){
 			//config.logger('1','DEBUG');
 		//config.logger('deviceStatesErrors>'+JSON.stringify(deviceStatesErrors),'DEBUG');
 			
-			if (JSON.stringify(deviceStates[0]) === undefined) {
+			if ( erreur == 1 ) {    //ajout 22/11/22 skillix bricolage toomany commandes parasites - a optimiser    //if (JSON.stringify(deviceStates[0]) === undefined) {
 			//config.logger('2','DEBUG');
 			//config.logger('0>'+JSON.stringify(errors[0]),'DEBUG');
 			//config.logger('--->'+JSON.stringify(errors),'DEBUG');
