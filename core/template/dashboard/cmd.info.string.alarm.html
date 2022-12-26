@@ -1,5 +1,4 @@
 <div class="cmd cmd-widget #history#" data-type="info" data-subtype="numeric" data-template="tmplmultistate" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#" style="display: block;margin-left: #marge_gauche#;margin-top: #marge_haut#;">
-
     <div class="title #hide_name#">
         <div  class="cmdName">#name_display#</div>
     </div>
@@ -59,8 +58,13 @@
                 cmd.find('.iconCmd img').attr('style',style);
             });
         }
-        jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
-        $('body').on('changeThemeEvent', function (event, theme) {
+        
+		//A Supprimé plantage en Alpha 4.4.0
+		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
+        
+		
+		
+		$('body').on('changeThemeEvent', function (event, theme) {
             $('.cmd[data-cmd_id=#id#]').trigger('changeThemeEventCmd',theme);
         });
     </script>

@@ -221,7 +221,9 @@ class alexaapi extends eqLogic
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>"
                 )
             )
-        );
+        );        
+	
+	
         $return['info']['string']['reminder'] = array(
             'template' => 'alarm',
             'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "4px"),
