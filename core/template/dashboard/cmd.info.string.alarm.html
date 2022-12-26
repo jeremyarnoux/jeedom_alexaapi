@@ -59,9 +59,12 @@
             });
         }
         
-		//Supprimé suite à plantage en Alpha 4.4.0
-		//jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
-        $('body').on('changeThemeEvent', function (event, theme) {
+		//A Supprimé plantage en Alpha 4.4.0
+		jeedom.cmd.update['#id#']({display_value:'#state#',valueDate:'#valueDate#',collectDate:'#collectDate#',alertLevel:'#alertLevel#'});
+        
+		
+		
+		$('body').on('changeThemeEvent', function (event, theme) {
             $('.cmd[data-cmd_id=#id#]').trigger('changeThemeEventCmd',theme);
         });
     </script>
