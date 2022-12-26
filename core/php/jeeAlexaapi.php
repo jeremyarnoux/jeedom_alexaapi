@@ -383,8 +383,8 @@ function metAJourPlayer($serialdevice, $audioPlayerState)
 
 function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour = 'personne')
 {
-    log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist par '.$_quiMetaJour.'********************');
-    log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist AVEC '.$result.'********************');
+    //log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist par '.$_quiMetaJour.'********************');
+   // log::add('alexaapi_widget', 'debug', '*********************************metAJourPlaylist AVEC '.$result.'********************');
     try {
 //		if (($audioPlayerState!="FINISHED") && (isset($result['playerInfo']['miniArt']['url']))) 	{	//modif Sigalou 24/08/2020 ? Pourquoi 2eme partie du test ?
         if (($audioPlayerState != "FINISHED")) {
