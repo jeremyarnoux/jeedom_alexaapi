@@ -123,6 +123,10 @@ try {
             $ret = alexaapi::supprimeTouslesDevicesSmartHome();
             ajax::success($ret);
             break;    
+        case 'supprimeTouslesDevicesDesactives':
+            $ret = alexaapi::supprimeTouslesDevicesDesactives();
+            ajax::success($ret);
+            break; 	
 	}
     throw new \Exception('Aucune methode correspondante');
 } catch (\Exception $e) {

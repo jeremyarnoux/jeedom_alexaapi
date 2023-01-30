@@ -6,11 +6,11 @@ error_reporting(E_ALL);
 # Fichier : nec.php (Nombres En Chiffres)
 #
 # Auteur : Olivier Miakinen
-# Création : vendredi 18 avril 2003
-# Dernière modification : vendredi 16 mai 2003
+# CrÃ©ation : vendredi 18 avril 2003
+# DerniÃ¨re modification : vendredi 16 mai 2003
 #
-# La fonction enchiffres($nom) reçoit en entrée le nom d'un nombre
-# écrit en toutes lettres et l'écrit en chiffres.
+# La fonction enchiffres($nom) reÃ§oit en entrÃ©e le nom d'un nombre
+# Ã©crit en toutes lettres et l'Ã©crit en chiffres.
 #
 # Toute la documentation sur trouve sur :
 #  http://www.miakinen.net/vrac/nombres
@@ -64,11 +64,11 @@ function enchiffres_petit($mot)
 
 function enchiffres_zilli($mot)
 {
- # Noms des 0ème à 9ème zillions
+ # Noms des 0Ã¨me Ã  9Ã¨me zillions
  static $petits = array(
     'n', 'm', 'b', 'tr', 'quadr', 'quint', 'sext', 'sept', 'oct', 'non'
  );
- # Composantes des 10ème à 999ème zillions
+ # Composantes des 10Ã¨me Ã  999Ã¨me zillions
  static $unites = array(
     '', 'un', 'duo', 'tre', 'quattuor', 'quin', 'se', 'septe', 'octo', 'nove'
  );
@@ -108,19 +108,19 @@ function enchiffres_zilli($mot)
 
 function enchiffres_grand($mot)
 {
- # Quelques remplacements initiaux pour simplifier (les 'é' ont déjà
- # été tous transformés en 'e').
+ # Quelques remplacements initiaux pour simplifier (les 'Ã©' ont dÃ©jÃ 
+ # Ã©tÃ© tous transformÃ©s en 'e').
  # (1) Je supprime le 's' final de '-illions' ou '-illiards' pour ne
  #     tester que '-illion' ou '-illiard'.
- # (2) Les deux orthographes étant possibles pour quadrillion ou
+ # (2) Les deux orthographes Ã©tant possibles pour quadrillion ou
  #     quatrillion, je teste les deux. Noter que j'aurais pu changer
  #     'quadr' en 'quatr' au lieu de l'inverse, mais alors cela aurait
- #     aussi changé 'quadragintillion' en 'quatragintillion', ce qui
- #     n'est pas franchement le but recherché.
- # (3) En latin, on trouve parfois 'quatuor' au lieu de 'quattuor'. De même,
+ #     aussi changÃ© 'quadragintillion' en 'quatragintillion', ce qui
+ #     n'est pas franchement le but recherchÃ©.
+ # (3) En latin, on trouve parfois 'quatuor' au lieu de 'quattuor'. De mÃªme,
  #     avec google on trouve quelques 'quatuordecillions' au milieu des
  #     'quattuordecillions' (environ 1 sur 10).
- # (4) La règle de John Conway et Allan Wechsler préconisait le préfixe
+ # (4) La rÃ¨gle de John Conway et Allan Wechsler prÃ©conisait le prÃ©fixe
  #     'quinqua' au lieu de 'quin' que j'ai choisi. Pour accepter les deux,
  #     je remplace 'quinqua' par 'quin', sauf dans 'quinquaginta' (50)
  #     et dans 'quinquadraginta' (45).
@@ -167,7 +167,7 @@ function enchiffres_grand($mot)
   $nombre .= $par3;
  }
  if (strlen($nombre) > 3) {
-  # On n'accepte que les nombres inférieurs au millinillion
+  # On n'accepte que les nombres infÃ©rieurs au millinillion
   # pour limiter le temps de calcul
   return 0;
  }
@@ -225,7 +225,7 @@ function enchiffres_ajouter_grand(&$table_grands, $mantisse, $exposant)
 
 function enchiffres($nom)
 {
- $nom = preg_replace('/[éèÉÈ]/', 'e', $nom);
+ $nom = preg_replace('/[Ã©Ã¨Ã‰Ãˆ]/', 'e', $nom);
  $nom = strtolower($nom);
  $table_mots = preg_split('/[^a-z]+/', $nom);
 
@@ -251,7 +251,7 @@ function enchiffres($nom)
   }
 
   if ($grand == 0) {
-   # Ce nombre était trop grand (millinillion et plus) : on annule le
+   # Ce nombre Ã©tait trop grand (millinillion et plus) : on annule le
    # tout pour limiter le temps de calcul.
    $mantisse = 0;
    $exposant = 0;
@@ -292,7 +292,7 @@ function enchiffres($nom)
 
 function enchiffres_aerer($nombre, $blanc=' ', $virgule=',', $tranche=3)
 {
- # Si c'est un nombre à virgule, on traite séparément les deux parties
+ # Si c'est un nombre Ã  virgule, on traite sÃ©parÃ©ment les deux parties
  if ($virgule !== NULL) {
   $ent_dec = preg_split("/$virgule/", $nombre);
   if (count($ent_dec) >= 2) {
@@ -306,18 +306,18 @@ function enchiffres_aerer($nombre, $blanc=' ', $virgule=',', $tranche=3)
  $nombre = preg_replace('/[^0-9]/', '', $nombre);
 
  # Il est plus logique d'avoir un nombre positif pour les entiers,
- # donc négatif pour la partie décimale, mais plus pratique de
+ # donc nÃ©gatif pour la partie dÃ©cimale, mais plus pratique de
  # faire le contraire pour les substr().
  $tranche = - (int)$tranche;
 
  if ($tranche == 0) {
-  # on voulait juste supprimer les caractères en trop, pas en rajouter
+  # on voulait juste supprimer les caractÃ¨res en trop, pas en rajouter
   return $nombre;
  }
 
  $nombre_aere = '';
  if ($tranche < 0) {
-  # entier, ou partie entière d'un nombre décimal
+  # entier, ou partie entiÃ¨re d'un nombre dÃ©cimal
   while ($nombre != '') {
    $par3 = substr($nombre, $tranche);
    $nombre = substr($nombre, 0, $tranche);
@@ -328,7 +328,7 @@ function enchiffres_aerer($nombre, $blanc=' ', $virgule=',', $tranche=3)
    }
   }
  } else {
-  # partie décimale
+  # partie dÃ©cimale
   while ($nombre != '') {
    $par3 = substr($nombre, 0, $tranche);
    $nombre = substr($nombre, $tranche);

@@ -425,7 +425,16 @@ class alexaapi extends eqLogic
         }
     }
 
-
+    public static function supprimeTouslesDevicesDesactives()
+    {
+        foreach (eqLogic::byType('alexasmarthome', false) as $eqLogic) {
+			if (!($eqLogic->getIsEnable())) {
+           //log::add('alexasmarthome_scan', 'debug', 'TEST---------->>>>> ' . $eqLogic->getName());
+             $eqLogic->remove();
+			}
+        }
+    }
+	
     public static function cron($_eqlogic_id = null)
     {
         // Toutes les minutes, on cherche les players en lecture et on les actualise
