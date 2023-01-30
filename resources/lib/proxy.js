@@ -164,7 +164,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
 
     function router(req) {
         const url = (req.originalUrl || req.url);
-        _options.logger && _options.logger('{Router} ║ │ ' + url + ' / ' + req.method + ' / ' + JSON.stringify(req.headers));
+        _options.logger && _options.logger('{Router} ║ │ ' + url + ' / ' + req.method + ' / ' + JSON.stringify(req.headers),'DEBUG');
         if (req.headers.host === `${_options.proxyOwnIp}:${_options.proxyPort}`) {
             if (url.startsWith(`/www.${_options.baseAmazonPage}/`)) {
                 return `https://www.${_options.baseAmazonPage}`;
@@ -179,7 +179,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             }
             if (url === '/') { // initial redirect
                 returnedInitUrl =  `https://www.${_options.baseAmazonPage}/ap/signin?openid.return_to=https%3A%2F%2Fwww.${_options.baseAmazonPage}%2Fap%2Fmaplanding&openid.assoc_handle=amzn_dp_project_dee_ios${_options.baseAmazonPageHandle}&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&pageId=amzn_dp_project_dee_ios${_options.baseAmazonPageHandle}&accountStatusPolicy=P1&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns.oa2=http%3A%2F%2Fwww.${_options.baseAmazonPage}%2Fap%2Fext%2Foauth%2F2&openid.oa2.client_id=device%3A${deviceId}&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.oa2.response_type=token&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.pape.max_auth_age=0&openid.oa2.scope=device_auth_access&language=${_options.amazonPageProxyLanguage}`;
-                _options.logger && _options.logger('{Proxy}  ║ │ Initial Page Request: ' + returnedInitUrl);
+                _options.logger && _options.logger('{Proxy}  ║ │ Initial Page Request: ' + returnedInitUrl,'DEBUG');
                 return returnedInitUrl;
             }
             else {
@@ -190,7 +190,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
     }
 
     function onError(err, req, res) {
-        _options.logger && _options.logger('ERROR: ' + err);
+        _options.logger && _options.logger('ERROR: ' + err,'ERROR');
         try {
             res.writeHead(500, {
                 'Content-Type': 'text/plain'
@@ -296,7 +296,7 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
             }
             proxyCookies = addCookies(proxyCookies, proxyRes.headers);
         }
-        _options.logger && _options.logger('{Proxy}  ║ │ Cookies handled: ' + JSON.stringify(proxyCookies));
+        _options.logger && _options.logger('{Proxy}  ║ │ Cookies handled: ' + JSON.stringify(proxyCookies),'DEBUG');
 
         if (
             (proxyRes.socket && proxyRes.socket._host === `www.${_options.baseAmazonPage}` && proxyRes.socket.parser.outgoing && proxyRes.socket.parser.outgoing.method === 'GET' && proxyRes.socket.parser.outgoing.path.startsWith('/ap/maplanding')) ||
@@ -327,12 +327,12 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
 
         // If we detect a redirect, rewrite the location header
         if (proxyRes.headers.location) {
-            _options.logger && _options.logger('Redirect: Original Location ----> ' + proxyRes.headers.location);
+            _options.logger && _options.logger('Redirect: Original Location ----> ' + proxyRes.headers.location,'DEBUG');
             proxyRes.headers.location = replaceHosts(proxyRes.headers.location);
             if (reqestHost && proxyRes.headers.location.startsWith('/')) {
                 proxyRes.headers.location = `http://${_options.proxyOwnIp}:${_options.proxyPort}/` + reqestHost + proxyRes.headers.location;
             }
-            _options.logger && _options.logger('Redirect: Final Location ----> ' + proxyRes.headers.location);
+            _options.logger && _options.logger('Redirect: Final Location ----> ' + proxyRes.headers.location,'DEBUG');
             return;
         }
 
@@ -363,11 +363,11 @@ function initAmazonProxy(_options, callbackCookie, callbackListening) {
 		res.send('<center><img src="http://jeedom.sigalou-domotique.fr/wp-content/uploads/2020/07/poucegauche.png" width="400" height="490"><br><br><b>Bravo !!! Le Cookie Amazon Alexa a été généré.</b><br>Vous pouvez fermer cette fenêtre.</b><br><br><img src="http://jeedom.sigalou-domotique.fr/wp-content/uploads/2020/07/sigaloupetit.png" width="50" height="76">');
     });
     let server = app.listen(_options.proxyPort, _options.proxyListenBind, function() {
-        _options.logger && _options.logger('{Proxy}  ║ │ OK ! Proxy-Server en écoute sur le port ' + server.address().port);
+        _options.logger && _options.logger('{Proxy}  ║ │ OK ! Proxy-Server en écoute sur le port ' + server.address().port,'DEBUG');
         callbackListening && callbackListening(server);
         callbackListening = null;
     }).on('error', err => {
-        _options.logger && _options.logger('{Proxy}  ║ │ Proxy-Server Error: ' + err);
+        _options.logger && _options.logger('{Proxy}  ║ │ Proxy-Server Error: ' + err,'DEBUG');
         callbackListening && callbackListening(null);
         callbackListening = null;
     });
