@@ -148,7 +148,7 @@ function AlexaCookie() {
         if (_options.formerRegistrationData && _options.formerRegistrationData.amazonPage) _options.amazonPage = _options.formerRegistrationData.amazonPage;
 
 		_options.logger('{Cookie} ║ ┌────────────────────────────────────────────────────────────────────────────────────────────────────','INFO');
-		_options.logger('{Cookie} ║ │        Récupération d\'un nouveau Cookie Amazon   ' ,'INFO');
+		_options.logger('{Cookie} ║ │        Récupération d\'un nouveau Cookie Amazon   ','INFO');
  		_options.logger('{Cookie} ║ ├────────────────────────────────────────────────────────────────────────────────────────────────────','INFO');
       // _options.logger('{Cookie} ║ │ Use as Login-Amazon-URL: ' + _options.amazonPage,'DEBUG');
 
