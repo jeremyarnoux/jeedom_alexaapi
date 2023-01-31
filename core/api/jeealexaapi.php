@@ -17,8 +17,8 @@
  */
 require_once dirname(__FILE__) . "/../../../../core/php/core.inc.php";
 
-if (!jeedom::apiAccess(init('apikey'), 'alexaapi')) {
-    echo __('Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action (alexaapi)', __FILE__);
+if (!jeedom::apiAccess(init('apikey'), __CLASS__)) {
+    echo __('Clef API non valide, vous n\'êtes pas autorisé à effectuer cette action ('.__CLASS__.')', __FILE__);
     die();
 }
 
@@ -28,20 +28,20 @@ $taskid = init('taskid');
 $cmd = init('cmd');
 $value = init('value');
 
-$elogic = alexaapi::byLogicalId($ip, 'alexaapi');
+$elogic = alexaapi::byLogicalId($ip, __CLASS__);
 if (!is_object($elogic)) {
-    if (config::byKey('include_mode', 'alexaapi') != 1) {
+    if (config::byKey('include_mode', __CLASS__) != 1) {
         return false;
     }
     $elogic = new alexaapi();
-    $elogic->setEqType_name('alexaapi');
+    $elogic->setEqType_name(__CLASS__);
     $elogic->setLogicalId($ip);
     $elogic->setName($device);
     $elogic->setIsEnable(true);
     $elogic->setConfiguration('ip', $ip);
     $elogic->setConfiguration('device', $device);
     $elogic->save();
-    event::add('alexaapi::includeDevice',
+    event::add(__CLASS__.'::includeDevice',
         array(
             'state' => 1
         )
