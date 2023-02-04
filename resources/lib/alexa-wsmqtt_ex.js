@@ -1,4 +1,8 @@
-//Version Sigalou
+/* jshint -W097 */
+/* jshint -W030 */
+/* jshint strict: false */
+/* jslint node: true */
+/* jslint esversion: 6 */
 const WebSocket = require('ws');
 const EventEmitter = require('events');
 const crypto = require('crypto');
@@ -24,14 +28,9 @@ class AlexaWsMqtt extends EventEmitter {
         this.errorRetryCounter = 0;
         this.reconnectTimeout = null;
         this.pongTimeout = null;
-        this.initTimeout = null;
         this.connectionActive = false;
 
         this.messageId = Math.floor(1E9 * Math.random());
-    }
-
-    isConnected() {
-        return this.connectionActive;
     }
 
     connectType1() {
@@ -182,7 +181,7 @@ class AlexaWsMqtt extends EventEmitter {
             return;
         }
         let msgCounter = 0;
-        this.initTimeout && clearTimeout(this.initTimeout);
+        let initTimeout = null;
 
         const onWebsocketClose = (code, reason) => {
             if (reason) {
@@ -190,10 +189,10 @@ class AlexaWsMqtt extends EventEmitter {
             }
             this.websocket = null;
             this.connectionActive = false;
-            this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Close: ' + code + ': ' + reason);
-            if (this.initTimeout) {
-                clearTimeout(this.initTimeout);
-                this.initTimeout = null;
+            this._options.logger && this._options.logger('{MQTT}   ║ Close: ' + code + ': ' + reason,'INFO');
+            if (initTimeout) {
+                clearTimeout(initTimeout);
+                initTimeout = null;
             }
             if (this.pingPongInterval) {
                 clearInterval(this.pingPongInterval);
@@ -216,7 +215,7 @@ class AlexaWsMqtt extends EventEmitter {
                 this.errorRetryCounter++;
             }
 
-            const retryDelay = Math.min(60, (this.errorRetryCounter * 5) + 5);
+            let retryDelay = Math.min(60, (this.errorRetryCounter * 5) + 5);
             this._options.logger && this._options.logger('{MQTT}   ║ Retry Connection in ' + retryDelay + 's','INFO');
             this.emit('disconnect', true, 'Retry Connection in ' + retryDelay + 's');
             this.reconnectTimeout && clearTimeout(this.reconnectTimeout);
@@ -226,7 +225,7 @@ class AlexaWsMqtt extends EventEmitter {
             }, retryDelay * 1000);
         };
 
-        this.initTimeout = setTimeout(() => {
+        initTimeout = setTimeout(() => {
             this._options.logger && this._options.logger('{MQTT}   ║ Initialization not done within 30s','INFO');
             try {
                 this.websocket && this.websocket.close();
@@ -265,7 +264,7 @@ class AlexaWsMqtt extends EventEmitter {
             this.websocket && this.websocket.terminate();
         });
 
-        this.websocket.on('unexpected-response', () => {
+        this.websocket.on('unexpected-response', (request, response) => {
             this._options.logger && this._options.logger('{MQTT}   ║ Unexpected Response: ' + JSON.stringify(response),'INFO');
         });
 
@@ -273,8 +272,8 @@ class AlexaWsMqtt extends EventEmitter {
             if (!this.websocket || this.websocket.readyState !== 1 /* OPEN */) {
                 return;
             }
-            this._options.logger && this._options.logger('{MQTT}   ║ Incoming RAW message: ' + data.toString('hex'),'DEBUG');
-            const message = this.parseIncomingMessage(data);
+            this._options.logger && this._options.logger('{MQTT}   ║ Incoming RAW message: ' + data.toString('hex'),'INFO');
+            let message = this.parseIncomingMessage(data);
             this._options.logger && this._options.logger('{MQTT}   ║ Incoming message: ' + JSON.stringify(message),'INFO');
 
             if (msgCounter === 0) { // initialization
@@ -317,7 +316,7 @@ class AlexaWsMqtt extends EventEmitter {
             if (msgCounter === 1) {
                 if (this.protocolName === 'A:H') {
                     //let msg = new Buffer('MSG 0x00000362 0x0e414e46 f 0x00000001 0xf904b9f5 0x00000109 GWM MSG 0x0000b479 0x0000003b urn:tcomm-endpoint:device:deviceType:0:deviceSerialNumber:0 0x00000041 urn:tcomm-endpoint:service:serviceName:DeeWebsiteMessagingService {"command":"REGISTER_CONNECTION"}FABE');
-                    const msg = this.encodeGWRegisterAH();
+                    let msg = this.encodeGWRegisterAH();
                     this._options.logger && this._options.logger('{MQTT}   ║ Initialization Msg 4 (Register Connection) sent','INFO');
                     //console.log('SEND: ' + msg.toString('ascii'));
                     await this.sendWs(msg);
@@ -329,7 +328,7 @@ class AlexaWsMqtt extends EventEmitter {
                     }
 
                     //msg = new Buffer('4D53472030783030303030303635203078306534313465343720662030783030303030303031203078626332666262356620307830303030303036322050494E00000000D1098D8CD1098D8C000000070052006500670075006C0061007246414245', 'hex'); // "MSG 0x00000065 0x0e414e47 f 0x00000001 0xbc2fbb5f 0x00000062 PIN" + 30 + "FABE"
-                    const msg = this.encodePing();
+                    let msg = this.encodePing();
                     this._options.logger && this._options.logger('{MQTT}   ║ Ping MQTT ►►► sur '+ url,'INFO');
                     //console.log('SEND: ' + msg.toString('hex'));
                     this.websocket.send(msg);
@@ -337,7 +336,7 @@ class AlexaWsMqtt extends EventEmitter {
                     this.pingPongInterval = setInterval(() => {
                         if (!this.websocket) return;
                         //let msg = new Buffer('4D53472030783030303030303635203078306534313465343720662030783030303030303031203078626332666262356620307830303030303036322050494E00000000D1098D8CD1098D8C000000070052006500670075006C0061007246414245', 'hex'); // "MSG 0x00000065 0x0e414e47 f 0x00000001 0xbc2fbb5f 0x00000062 PIN" + 30 + "FABE"
-                        const msg = this.encodePing();
+                        let msg = this.encodePing();
                         this._options.logger && this._options.logger('{MQTT}   ║ Send Ping','INFO');
                         //console.log('SEND: ' + msg.toString('hex'));
                         this.websocket.send(msg);
@@ -357,9 +356,9 @@ class AlexaWsMqtt extends EventEmitter {
             //if (incomingMsg.includes('PON') && incomingMsg.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
             if (message.service === 'FABE' && message.content && message.content.messageType === 'PON' && message.content.payloadData && message.content.payloadData.includes('\u0000R\u0000e\u0000g\u0000u\u0000l\u0000a\u0000r')) {
                 this._options.logger && this._options.logger('{MQTT}   ║ ◄◄◄  MQTT Pong','INFO');
-                if (this.initTimeout) {
-                    clearTimeout(this.initTimeout);
-                    this.initTimeout = null;
+                if (initTimeout) {
+                    clearTimeout(initTimeout);
+                    initTimeout = null;
                     this._options.logger && this._options.logger('{MQTT}   ║ Initialisation MQTT OK','INFO');
                     this._options.logger && this._options.logger('{MQTT}   ╚═══════════════════════════════════════════════════════════════════════════════','INFO');
                     this.emit('connect');
@@ -372,8 +371,8 @@ class AlexaWsMqtt extends EventEmitter {
                 return;
             }
             else if (message.content && message.content.payload) {
-                const command = message.content.payload.command;
-                const payload = message.content.payload.payload;
+                let command = message.content.payload.command;
+                let payload = message.content.payload.payload;
 
                 //this._options.logger && this._options.logger('{MQTT}   ║ Command ' + command + ': ' + JSON.stringify(payload, null, 4));
                 //this._options.logger && this._options.logger('{MQTT}   ╠═══> Command --{' + command + '}-- : détail désactivé' ,'INFO');
@@ -393,17 +392,16 @@ class AlexaWsMqtt extends EventEmitter {
     }
 
     generateUUID() {
-        const a =  [];
-        for (let b = 0; 36 > b; b++) {
-            const c = 'rrrrrrrr-rrrr-4rrr-srrr-rrrrrrrrrrrr'.charAt(b);
-            if ('r' === c || 's' === c) {
-                let d = Math.floor(16 * Math.random());
-                's' === c && (d = d & 3 | 8);
+        for (var a = [], b = 0; 36 > b; b++) {
+            var c = "rrrrrrrr-rrrr-4rrr-srrr-rrrrrrrrrrrr".charAt(b);
+            if ("r" === c || "s" === c) {
+                var d = Math.floor(16 * Math.random());
+                "s" === c && (d = d & 3 | 8);
                 a.push(d.toString(16));
             }
             else a.push(c);
         }
-        return a.join('');
+        return a.join("");
     }
 
     encodeGWHandshake() {
@@ -411,19 +409,19 @@ class AlexaWsMqtt extends EventEmitter {
         this.messageId++;
         let msg = 'MSG 0x00000361 '; // Message-type and Channel = GW_HANDSHAKE_CHANNEL;
         msg += this.encodeNumber(this.messageId) + ' f 0x00000001 ';
-        const idx1 = msg.length;
+        let idx1 = msg.length;
         msg += '0x00000000 '; // Checksum!
-        const idx2 = msg.length;
+        let idx2 = msg.length;
         msg += '0x0000009b '; // length content
         msg += 'INI 0x00000003 1.0 0x00000024 '; // content part 1
         msg += this.generateUUID();
         msg += ' ';
         msg += this.encodeNumber(Date.now(), 16);
         msg += ' END FABE';
-        const completeBuffer = Buffer.from(msg, 'ascii');
+        let completeBuffer = Buffer.from(msg, 'ascii');
 
-        const checksum = this.computeChecksum(completeBuffer, idx1, idx2);
-        const checksumBuf = Buffer.from(this.encodeNumber(checksum));
+        let checksum = this.computeChecksum(completeBuffer, idx1, idx2);
+        let checksumBuf = Buffer.from(this.encodeNumber(checksum));
         checksumBuf.copy(completeBuffer, 39);
         return completeBuffer;
     }
@@ -433,15 +431,15 @@ class AlexaWsMqtt extends EventEmitter {
         this.messageId++;
         let msg = 'MSG 0x00000362 '; // Message-type and Channel = GW_CHANNEL;
         msg += this.encodeNumber(this.messageId) + ' f 0x00000001 ';
-        const idx1 = msg.length;
+        let idx1 = msg.length;
         msg += '0x00000000 '; // Checksum!
-        const idx2 = msg.length;
+        let idx2 = msg.length;
         msg += '0x00000109 '; // length content
         msg += 'GWM MSG 0x0000b479 0x0000003b urn:tcomm-endpoint:device:deviceType:0:deviceSerialNumber:0 0x00000041 urn:tcomm-endpoint:service:serviceName:DeeWebsiteMessagingService {"command":"REGISTER_CONNECTION"}FABE';
-        const completeBuffer = Buffer.from(msg, 'ascii');
+        let completeBuffer = Buffer.from(msg, 'ascii');
 
-        const checksum = this.computeChecksum(completeBuffer, idx1, idx2);
-        const checksumBuf = Buffer.from(this.encodeNumber(checksum));
+        let checksum = this.computeChecksum(completeBuffer, idx1, idx2);
+        let checksumBuf = Buffer.from(this.encodeNumber(checksum));
         checksumBuf.copy(completeBuffer, 39);
         return completeBuffer;
     }
@@ -458,7 +456,7 @@ class AlexaWsMqtt extends EventEmitter {
         completeBuffer.writeUInt32BE(0x000000e4, 20); // length content
         completeBuffer.write('GWM MSG 0x0000b479 0x0000003b urn:tcomm-endpoint:device:deviceType:0:deviceSerialNumber:0 0x00000041 urn:tcomm-endpoint:service:serviceName:DeeWebsiteMessagingService {"command":"REGISTER_CONNECTION"}FABE', 24, 'ascii');
 
-        const checksum = this.computeChecksum(completeBuffer, 16, 20);
+        let checksum = this.computeChecksum(completeBuffer, 16, 20);
         completeBuffer.writeUInt32BE(checksum, 16); // Checksum!
         return completeBuffer;
     }
@@ -480,22 +478,22 @@ class AlexaWsMqtt extends EventEmitter {
         this.messageId++;
         let msg = 'MSG 0x00000065 '; // Message-type and Channel = CHANNEL_FOR_HEARTBEAT;
         msg += this.encodeNumber(this.messageId) + ' f 0x00000001 ';
-        const idx1 = msg.length;
+        let idx1 = msg.length;
         msg += '0x00000000 '; // Checksum!
-        const idx2 = msg.length;
+        let idx2 = msg.length;
         msg+= '0x00000062 '; // length content
 
-        const completeBuffer = Buffer.alloc(0x62, 0);
-        const startBuffer = Buffer.from(msg, 'ascii');
+        let completeBuffer = Buffer.alloc(0x62, 0);
+        let startBuffer = Buffer.from(msg, 'ascii');
         startBuffer.copy(completeBuffer);
 
         const header = 'PIN';
         const payload = 'Regular'; // g = h.length
-        const n = new ArrayBuffer(header.length + 4 + 8 + 4 + 2 * payload.length);
+        let n = new ArrayBuffer(header.length + 4 + 8 + 4 + 2 * payload.length);
         let idx = 0;
         let u = new Uint8Array(n, idx, header.length);
-        const l = 0;
-        const e = Date.now();
+        let l = 0;
+        let e = Date.now();
 
         for (let q = 0; q < header.length; q++) u[q] = header.charCodeAt(q);
         idx += header.length;
@@ -511,14 +509,14 @@ class AlexaWsMqtt extends EventEmitter {
             u[q * 2] = 0;
             u[q * 2 + 1] = payload.charCodeAt(q);
         }
-        const buf = Buffer.from(n);
+        let buf = Buffer.from(n);
         buf.copy(completeBuffer, msg.length);
 
-        const buf2End = Buffer.from('FABE', 'ascii');
+        let buf2End = Buffer.from('FABE', 'ascii');
         buf2End.copy(completeBuffer, msg.length + buf.length);
 
-        const checksum = this.computeChecksum(completeBuffer, idx1, idx2);
-        const checksumBuf = Buffer.from(this.encodeNumber(checksum));
+        let checksum = this.computeChecksum(completeBuffer, idx1, idx2);
+        let checksumBuf = Buffer.from(this.encodeNumber(checksum));
         checksumBuf.copy(completeBuffer, 39);
         return completeBuffer;
     }
@@ -541,11 +539,11 @@ class AlexaWsMqtt extends EventEmitter {
 
         const header = 'PIN';
         const payload = 'Regular'; // g = h.length
-        const n = new ArrayBuffer(header.length + 4 + 8 + 4 + 2 * payload.length);
+        let n = new ArrayBuffer(header.length + 4 + 8 + 4 + 2 * payload.length);
         let idx = 0;
         let u = new Uint8Array(n, idx, header.length);
-        const l = 0;
-        const e = Date.now();
+        let l = 0;
+        let e = Date.now();
 
         for (let q = 0; q < header.length; q++) u[q] = header.charCodeAt(q);
         idx += header.length;
@@ -561,12 +559,12 @@ class AlexaWsMqtt extends EventEmitter {
             u[q * 2] = 0;
             u[q * 2 + 1] = payload.charCodeAt(q);
         }
-        const buf = Buffer.from(n);
+        let buf = Buffer.from(n);
         buf.copy(completeBuffer, 24);
 
         completeBuffer.write('FABE', buf.length + 24, 'ascii');
 
-        const checksum = this.computeChecksum(completeBuffer, 16, 20);
+        let checksum = this.computeChecksum(completeBuffer, 16, 20);
         completeBuffer.writeUInt32BE(checksum, 16); // Checksum!
         return completeBuffer;
     }
@@ -582,10 +580,9 @@ class AlexaWsMqtt extends EventEmitter {
             return a;
         }
 
-        if (k < f) throw 'Invalid checksum exclusion window!';
+        if (k < f) throw "Invalid checksum exclusion window!";
         a = new Uint8Array(a);
-        let h = 0, l = 0;
-        for (let e = 0; e < a.length; e++) e != f ? (l += c(a[e] << ((e & 3 ^ 3) << 3)), h += b(l, 32), l = c(l & 4294967295)) : e = k - 1;
+        for (var h = 0, l = 0, e = 0; e < a.length; e++) e != f ? (l += c(a[e] << ((e & 3 ^ 3) << 3)), h += b(l, 32), l = c(l & 4294967295)) : e = k - 1;
         for (; h;) l += h, h = b(l, 32), l &= 4294967295;
         return c(l);
     }
@@ -616,16 +613,14 @@ class AlexaWsMqtt extends EventEmitter {
         if (message.service === 'TUNE') {
             message.checksum = readHex(idx, 10);
             idx += 11; // 10 + delimiter;
-            const contentLength = readHex(idx, 10);
+            let contentLength = readHex(idx, 10);
             idx += 11; // 10 + delimiter;
             message.content = readString(idx, contentLength - 4 - idx);
             if (message.content.startsWith('{') && message.content.endsWith('}')) {
                 try {
                     message.content = JSON.parse(message.content);
                 }
-                catch (e) {
-                    // ignore
-                }
+                catch (e) {}
             }
         }
         else if (message.service === 'FABE') {
@@ -642,7 +637,7 @@ class AlexaWsMqtt extends EventEmitter {
             message.checksum = readHex(idx, 10);
             idx += 11; // 10 + delimiter;
 
-            //const contentLength = readHex(idx, 10);
+            let contentLength = readHex(idx, 10);
             idx += 11; // 10 + delimiter;
 
             message.content = {};
@@ -698,9 +693,7 @@ class AlexaWsMqtt extends EventEmitter {
                                     message.content.payload.payload = JSON.parse(message.content.payload.payload);
                                 }
                             }
-                            catch (e) {
-                                // Ignore
-                            }
+                            catch (e) {}
                         }
                     }
                 }
@@ -729,21 +722,19 @@ class AlexaWsMqtt extends EventEmitter {
         const message = {};
         message.service = readString(data.length - 4, 4);
 
-        //this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Incoming message Service: ' + message.service,'INFO');
+        this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Incoming message Service: ' + message.service,'INFO');
 
         if (message.service === 'TUNE') {
             message.checksum = readHex(idx, 10);
             idx += 11; // 10 + delimiter;
-            const contentLength = readHex(idx, 10);
+            let contentLength = readHex(idx, 10);
             idx += 11; // 10 + delimiter;
             message.content = readString(idx, contentLength - 4 - idx);
             if (message.content.startsWith('{') && message.content.endsWith('}')) {
                 try {
                     message.content = JSON.parse(message.content);
                 }
-                catch (e) {
-                    // Ignore
-                }
+                catch (e) {}
             }
         }
         else if (message.service === 'FABE') {
@@ -754,13 +745,13 @@ class AlexaWsMqtt extends EventEmitter {
             message.seq = data.readUInt32BE(12);
             message.checksum = data.readUInt32BE(16);
 
-            //const contentLength = data.readUInt32BE(20);
+            let contentLength = data.readUInt32BE(20);
 
             message.content = {};
             message.content.messageType = readString(24, 3);
             idx = 28;
 
-            //this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Incoming message Service Channel: ' + message.channel,'INFO');
+            this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Incoming message Service Channel: ' + message.channel,'INFO');
 
             if (message.channel === 0x361) { // GW_HANDSHAKE_CHANNEL
                 if (message.content.messageType === 'ACK') {
@@ -811,9 +802,7 @@ class AlexaWsMqtt extends EventEmitter {
                                     message.content.payload.payload = JSON.parse(message.content.payload.payload);
                                 }
                             }
-                            catch (e) {
-                                // Ignore
-                            }
+                            catch (e) {}
                         }
                     }
                 }
@@ -823,7 +812,7 @@ class AlexaWsMqtt extends EventEmitter {
             }
         }
         //console.log(JSON.stringify(message, null, 4));
-        //this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Parsed Message: ' + JSON.stringify(message),'DEBUG');
+        this._options.logger && this._options.logger('Alexa-Remote WS-MQTT: Parsed Message: ' + JSON.stringify(message),'DEBUG');
         return message;
     }
 
@@ -832,20 +821,12 @@ class AlexaWsMqtt extends EventEmitter {
             clearTimeout(this.reconnectTimeout);
             this.reconnectTimeout = null;
         }
-        if (this.pollingTimeout) {
-            clearTimeout(this.pollingTimeout);
-            this.pollingTimeout = null;
-        }
-        if (this.initTimeout) {
-            clearTimeout(this.initTimeout);
-            this.initTimeout = null;
-        }
         this.stop = true;
         if (!this.websocket) return;
         try {
             this.websocket.close();
         } catch (e) {
-            this.connectionActive &&this._options.logger && this._options.logger('{MQTT}   ║ Disconnect error: ' +e ,'INFO');
+            this._options.logger && this._options.logger('{MQTT}   ║ Disconnect error: ' +e ,'INFO');
         }
     }
 }
