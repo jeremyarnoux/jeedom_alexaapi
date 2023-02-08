@@ -37,8 +37,8 @@ if (init('test') != '') {
 
 $chaineRecuperee = file_get_contents("php://input");
 $nom = $_GET["nom"];
-log::add(__CLASS__, 'debug', 'Réception données sur jeeAlexaapi [' . $nom . ']');
-log::add('__CLASS__', 'info', " -------------------------------------------------------------------------------------------------------------");
+log::add('alexaapi', 'debug', 'Réception données sur jeeAlexaapi [' . $nom . ']');
+log::add('alexaapi_mqtt', 'info', " -------------------------------------------------------------------------------------------------------------");
 //log::add('alexaapi_widget', 'info', " -------------------------------------------------------------------------------------------------------------");
 
 //log::add('alexaapi_mqtt', 'info', "chaineRecuperee:----------> " . $chaineRecuperee);
@@ -63,13 +63,13 @@ $result = json_decode($chaineRecupereeCorrigee, true);
 //log::add('alexaapi_mqtt', 'debug',  "result: ".$result); // Attention déclenche un PHP Notice:  Array to string conversion
 
 if (!is_array($result)) {
-    log::add(__CLASS__, 'debug', 'Format Invalide');
+    log::add('alexaapi_mqtt', 'debug', 'Format Invalide');
     die();
 
 }
 
 if (!isset($result['deviceSerialNumber'])) {
-    log::add(__CLASS__, 'debug', 'Trame dans jeeAlexaapi sans aucun deviceSerialNumber... à voir pourquoi, trame ignorée.');
+    log::add('alexaapi', 'debug', 'Trame dans jeeAlexaapi sans aucun deviceSerialNumber... à voir pourquoi, trame ignorée.');
     die();
 }
 
@@ -78,7 +78,7 @@ if (!isset($result['deviceSerialNumber'])) {
 $logical_id = $result['deviceSerialNumber'] . "_player";
 
 //$alexaapi_player=eqLogic::byLogicalId($logical_id, 'alexaamazonmusic'); // PLAYER
-$alexaapi2 = eqLogic::byLogicalId($result['deviceSerialNumber'], __CLASS__); // ECHO
+$alexaapi2 = eqLogic::byLogicalId($result['deviceSerialNumber'], 'alexaapi'); // ECHO
 //$alexaapi3=alexaamazonmusic::byLogicalId($result['deviceSerialNumber']."_playlist", 'alexaamazonmusic'); // PLAYLIST
 
 // Choix de ce qu'on doit mettre à jour
@@ -91,7 +91,7 @@ $alexaapi2 = eqLogic::byLogicalId($result['deviceSerialNumber'], __CLASS__); // 
 switch ($nom) {
 
     case 'commandesEnErreur':
-        log::add(__CLASS__, 'warning', "Alexa-jee: Il va falloir relancer: " . $chaineRecupereeCorrigee . " Pause 8s");
+        log::add('alexaapi_node', 'warning', "Alexa-jee: Il va falloir relancer: " . $chaineRecupereeCorrigee . " Pause 8s");
         sleep(8);
         $commandeaRelancer = json_decode($chaineRecupereeCorrigee, true);
         $queryEnErreur = $commandeaRelancer['queryEnErreur'];
@@ -139,7 +139,7 @@ switch ($nom) {
                     log::add('alexaapi', 'debug', 'Interaction demandée : ' . $demandeinteract);*/		
         break;
     case 'ws-notification-change': //changement d'une alarme/rappel
-        log::add(__CLASS__, 'info', 'Alexa-jee: notificationVersion: ' . $result['notificationVersion']);
+        log::add('alexaapi_node', 'info', 'Alexa-jee: notificationVersion: ' . $result['notificationVersion']);
 
         $alexaapi2->refresh();    // Lance un refresh du device principal
         break;
@@ -172,7 +172,7 @@ switch ($nom) {
             metAJour("Interaction", $result['description']['summary'], 'interactioninfo', true, "ECHO", $result['deviceSerialNumber']);
 
             $alexaapieqlogic = eqLogic::byLogicalId($result['deviceSerialNumber'], 'alexaapi');
-            log::add(__CLASS__, 'debug', 'Interaction ' . $alexaapieqlogic->getConfiguration('interactionjeedom') == 1);
+            log::add('alexaapi', 'debug', 'Interaction ' . $alexaapieqlogic->getConfiguration('interactionjeedom') == 1);
             if ($alexaapieqlogic->getConfiguration('interactionjeedom') == 1) {
                 $demandeinteract = $result['description']['summary'];
                 if (strpos($demandeinteract, 'jacques dit') === false && $demandeinteract != "alexa") {
@@ -182,27 +182,27 @@ switch ($nom) {
 					//$demandeinteract ="ceci est un test qui contien vingt deux et qu'il faut extraire";
 					$enchiffres=enchiffres($demandeinteract);
 					if ($enchiffres != 0) {
-                    log::add(__CLASS__, 'debug', 'Nombre détecté : ' . $enchiffres);
+                    log::add('alexaapi', 'debug', 'Nombre détecté : ' . $enchiffres);
 					$enlettres=enlettres($enchiffres);
 					$enlettres=str_replace("-", " ", $enlettres);					
 
 					$demandeinteract=str_replace($enlettres, $enchiffres, $demandeinteract);					
-                    log::add(__CLASS__, 'debug', 'remplace ' . $enlettres. " par ". $enchiffres);
+                    log::add('alexaapi', 'debug', 'remplace ' . $enlettres. " par ". $enchiffres);
 					} else 
-                    log::add(__CLASS__, 'debug', 'Pas de nombre détecté dans' .$demandeinteract);
+                    log::add('alexaapi', 'debug', 'Pas de nombre détecté dans' .$demandeinteract);
 
-                    log::add(__CLASS__, 'debug', 'Interaction demandée : ' . $demandeinteract);
+                    log::add('alexaapi', 'debug', 'Interaction demandée : ' . $demandeinteract);
 
                     $parameters['plugin'] = 'alexaapi';
                     $reply = interactQuery::tryToReply(trim($demandeinteract), $parameters);
-                    log::add(__CLASS__, 'debug', 'Interaction ' . print_r($reply, true));
+                    log::add('alexaapi', 'debug', 'Interaction ' . print_r($reply, true));
                     if ($reply['reply'] != "Désolé je n'ai pas compris" && $reply['reply'] != "Désolé je n'ai pas compris la demande" && $reply['reply'] != "Désolé je ne comprends pas la demande" && $reply['reply'] != "Je ne comprends pas" && $reply['reply'] != "ceci est un message de test" && $reply['reply'] != "" && $reply['reply'] != " ") {
-                        log::add(__CLASS__, 'debug', "La reponse : " . $reply['reply'] . " et valide je vous l'ai donc renvoyée");
+                        log::add('alexaapi', 'debug', "La reponse : " . $reply['reply'] . " et valide je vous l'ai donc renvoyée");
                         $cmd = $alexaapieqlogic->getCmd('action', 'speak');
                         $option = array('message' => $reply['reply']);
                         $cmd->execute($option);
                     } else {
-                        log::add(__CLASS__, 'debug', "La reponse : " . $reply['reply'] . " est une reponse générique je vous l'ai donc pas renvoyée");
+                        log::add('alexaapi', 'debug', "La reponse : " . $reply['reply'] . " est une reponse générique je vous l'ai donc pas renvoyée");
                     }
                 }
             }
@@ -236,7 +236,7 @@ switch ($nom) {
         break;
     case 'message_add':
         //log::add('alexaapi_node', 'info',  'Alexa-jee: '.$result['message']);
-        message::add(__CLASS__, $result['message']);
+        message::add('alexaapi', $result['message']);
         break;
     case 'ws-audio-player-state-change': // elle a visiblement disparue cette balise des logs mqtt
         metAJour("Audio Player State", $result['audioPlayerState'], 'audioPlayerState', true, "PLAYER", $result['deviceSerialNumber']);
@@ -250,15 +250,15 @@ switch ($nom) {
     default:
 
         if (!is_object($alexaapi2)) {
-            log::add(__CLASS__, 'debug', 'MQTT Device non trouvé: ' . $logical_id);
+            log::add('alexaapi_mqtt', 'debug', 'Device non trouvé: ' . $logical_id);
             die();
         } else {
-            log::add(__CLASS__, 'debug', 'MQTT Device trouvé: ' . $logical_id);
+            log::add('alexaapi_mqtt', 'debug', 'Device trouvé: ' . $logical_id);
         }
 
 }
 //log::add('alexaapi_mqtt', 'info',  " ------------------------------------------------------------------------------------------------" );
-log::add(__CLASS__, 'info', " -------------------------------------------------------------------------------------------------");
+log::add('alexaapi_widget', 'info', " -------------------------------------------------------------------------------------------------");
 
 //	if (is_object($alexaapi)) $alexaapi_player->refreshWidget();
 
@@ -291,22 +291,22 @@ function metAJour2($nom, $variable, $commandejeedom, $effaceSiNull, $_alexaapi)
     try {
         if (isset($variable)) {
             if ($nom != 'playlisthtml') { // on supprime playlisthtml des logs sinon ils deviennent illisibles
-                //log::add('alexaapi_widget', 'info', '   [' . $nom . ':' . $commandejeedom . '] find: ' . json_encode($variable) . " sur {" . $_alexaapi->getName() . "}");
-                log::add(__CLASS__, 'info', '{MQTT}   [' . $nom . ':' . $commandejeedom . '] find: ' . json_encode($variable) . " sur {" . $_alexaapi->getName() . "}");
+                log::add('alexaapi_widget', 'info', '   [' . $nom . ':' . $commandejeedom . '] find: ' . json_encode($variable) . " sur {" . $_alexaapi->getName() . "}");
+                log::add('alexaapi_mqtt', 'info', '   [' . $nom . ':' . $commandejeedom . '] find: ' . json_encode($variable) . " sur {" . $_alexaapi->getName() . "}");
             }
             $_alexaapi->checkAndUpdateCmd($commandejeedom, $variable);
         } else {
-            log::add(__CLASS__, 'info', '{WIDGET}   [' . $nom . ':' . $commandejeedom . '] non trouvé: ' . $variable);
+            log::add('alexaapi_widget', 'info', '   [' . $nom . ':' . $commandejeedom . '] non trouvé: ' . $variable);
             if ($effaceSiNull) {
                 $_alexaapi->checkAndUpdateCmd($commandejeedom, null);
-                log::add(__CLASS__, 'info', '{WIDGET}   [' . $nom . ':' . $commandejeedom . '] non trouvé et vidé');
+                log::add('alexaapi_widget', 'info', '   [' . $nom . ':' . $commandejeedom . '] non trouvé et vidé');
             }
         }
     } catch (Exception $e) {
-        log::add(__CLASS__, 'info', '{WIDGET} [' . $nom . ':' . $commandejeedom . '] erreur: ' . $e);
+        log::add('alexaapi_mqtt', 'info', ' [' . $nom . ':' . $commandejeedom . '] erreur1: ' . $e);
 
     } catch (Error $e) {
-        log::add(__CLASS__, 'info', '{MQTT} [' . $nom . ':' . $commandejeedom . '] erreur: ' . $e);
+        log::add('alexaapi_mqtt', 'info', ' [' . $nom . ':' . $commandejeedom . '] erreur22: ' . $e);
 
     }
 }
@@ -326,18 +326,18 @@ function metAJourImage2($nom, $variable, $commandejeedom, $effaceSiNull, $_alexa
 
     try {
         if (isset($variable)) {
-            //log::add('alexaapi_widget', 'info', '   [' . $nom . ':' . $commandejeedom . '] find: ' . json_encode($variable));
-            log::add(__CLASS__, 'info', '   [' . $nom . ':' . $commandejeedom . '] find: ' . json_encode($variable));
+            log::add('alexaapi_widget', 'info', '   [' . $nom . ':' . $commandejeedom . '] find: ' . json_encode($variable));
+            log::add('alexaapi_mqtt', 'info', '   [' . $nom . ':' . $commandejeedom . '] find: ' . json_encode($variable));
             $_alexaapi->checkAndUpdateCmd($commandejeedom, $variable);
         } else {
-            log::add(__CLASS__, 'debug', '{MQTT} [' . $nom . ':' . $commandejeedom . '] non trouvé');
+            log::add('alexaapi_mqtt', 'debug', '[' . $nom . ':' . $commandejeedom . '] non trouvé');
             $_alexaapi->checkAndUpdateCmd($commandejeedom, "plugins/alexaapi/core/img/vide.gif");
         }
     } catch (Exception $e) {
-        log::add(__CLASS__, 'info', '{MQTT} [' . $nom . ':' . $commandejeedom . '] erreur1: ' . $e);
+        log::add('alexaapi_mqtt', 'info', ' [' . $nom . ':' . $commandejeedom . '] erreur1: ' . $e);
 
     } catch (Error $e) {
-        log::add(__CLASS__, 'info', '{MQTT} [' . $nom . ':' . $commandejeedom . '] erreur21: ' . $e);
+        log::add('alexaapi_mqtt', 'info', ' [' . $nom . ':' . $commandejeedom . '] erreur21: ' . $e);
     }
 }
 
@@ -354,12 +354,12 @@ function metAJourStatusPlayer($_Status, $_deviceSerialNumber)
 
 function metAJourPlayer($serialdevice, $audioPlayerState)
 {
-    log::add(__CLASS__, 'info', "{WIDGET} ***********************[metAJourPlayer]*********************************" . $serialdevice);
+    log::add('alexaapi_widget', 'info', " ***********************[metAJourPlayer]*********************************" . $serialdevice);
 
     try {
         $json = file_get_contents("http://" . config::byKey('internalAddr') . ":3456/playerInfo?device=" . $serialdevice);
         $result = json_decode($json, true);
-        log::add(__CLASS__, 'debug', '{WIDGET} JSON:' . $json);
+        log::add('alexaapi_widget', 'debug', ' JSON:' . $json);
 
         if (isset($result['playerInfo']['infoText']['subText1'])) metAJour("subText1", $result['playerInfo']['infoText']['subText1'], 'subText1', true, "PLAYER", $serialdevice);
         if (isset($result['playerInfo']['infoText']['subText2'])) metAJour("subText2", $result['playerInfo']['infoText']['subText2'], 'subText2', true, "PLAYER", $serialdevice);
@@ -373,9 +373,9 @@ function metAJourPlayer($serialdevice, $audioPlayerState)
         //$alexaapi_player->setStatus('Playing', ($result['playerInfo']['state']=="PLAYING"));
 
     } catch (Exception $e) {
-        log::add(__CLASS__, 'info', '{WIDGET} [' . $serialdevice . '] erreur1: ' . $e);
+        log::add('alexaapi_widget', 'info', ' [' . $serialdevice . '] erreur1: ' . $e);
     } catch (Error $e) {
-        log::add(__CLASS__, 'info', '{WIDGET} [' . $serialdevice . '] erreur25: ' . $e);
+        log::add('alexaapi_widget', 'info', ' [' . $serialdevice . '] erreur25: ' . $e);
     }
 //if (is_object($alexaapi_player)) $alexaapi_player->refreshWidget(); //refresh Tuile Player
     log::add('alexaapi_widget', 'debug', '** Mise à jour Tuile du Player **');
@@ -472,9 +472,9 @@ function metAJourPlaylist($serialdevice, $audioPlayerState, $_quiMetaJour = 'per
             $alexaapi3->refreshWidget(); //refresh Tuile Playlist
         }
     } catch (Exception $e) {
-        log::add(__CLASS__, 'info', '{WIDGET} [' . $serialdevice . '] erreur1: ' . $e);
+        log::add('alexaapi_widget', 'info', ' [' . $serialdevice . '] erreur1: ' . $e);
     } catch (Error $e) {
-        log::add(__CLASS__, 'info', '{WIDGET} [' . $serialdevice . '] erreur26: ' . $e);
+        log::add('alexaapi_widget', 'info', ' [' . $serialdevice . '] erreur26: ' . $e);
     }
 
     //log::add('alexaapi_widget', 'debug', '*********************************FINmetAJourPlaylist par '.$_quiMetaJour.'********************');
