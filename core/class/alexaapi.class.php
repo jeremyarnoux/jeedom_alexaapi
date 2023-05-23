@@ -244,22 +244,6 @@ class alexaapi extends eqLogic
     }
 
 
-    public static function callProxyAlexaapi($_url)
-    {
-        //$url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('openzwave');
-        $url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('alexaapi');
-        $ch = curl_init();
-        curl_setopt_array($ch, array(CURLOPT_URL => $url, CURLOPT_HEADER => false, CURLOPT_RETURNTRANSFER => true,));
-        $result = curl_exec($ch);
-        if (curl_errno($ch)) {
-            $curl_error = curl_error($ch);
-            curl_close($ch);
-            throw new Exception(__('Echec de la requête http : ', __FILE__) . $url . ' Curl error : ' . $curl_error, 404);
-        }
-        curl_close($ch);
-        return (is_json($result)) ? json_decode($result, true) : $result;
-    }
-	
     public static function callProxyalexaapi($_url)
     {
         //$url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('openzwave');
@@ -275,7 +259,7 @@ class alexaapi extends eqLogic
         curl_close($ch);
         return (is_json($result)) ? json_decode($result, true) : $result;
     }
-	
+
     public static function deamon_info()
     {
         $return = array();

@@ -65,7 +65,7 @@ try {
         case 'forcerDefaultCmd':
             $eqLogic = alexaapi::byId(init('id'));
             if (!is_object($eqLogic)) {
-                throw new Exception(__('Alexaapi eqLogic non trouvé : ', __FILE__) . init('id'));
+                throw new Exception(__('alexaapi eqLogic non trouvé : ', __FILE__) . init('id'));
             }
             alexaapi::forcerDefaultCmd(init('id'));
             ajax::success();
@@ -130,10 +130,6 @@ try {
 	}
     throw new \Exception('Aucune methode correspondante');
 } catch (\Exception $e) {
-	if(version_compare(jeedom::version(), '4.4', '>=')) {
-		ajax::error(displayException($e), $e->getCode());
-	} else {
-		ajax::error(displayExeption($e), $e->getCode());
-	}
-    	log::add('alexaapi', 'error', $e);
+    ajax::error(displayException($e), $e->getCode());
+    log::add('alexaapi', 'error', $e);
 }
