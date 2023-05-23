@@ -176,31 +176,31 @@ class alexaapi extends eqLogic
         );
         $return['info']['string']['alarm'] = array(
             'template' => 'alarm',
-            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "15px"),
+            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "0px", "#marge_haut#" => "5px"),
             'test' => array(
                 array(
-                    'operation' => "#value# == ''",
-                    'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Clock-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
-                    'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Clock-Icon-Off_dark.png' title ='" . __('En charge', __FILE__) . "'>"
+                    'operation' => "#value# == 'none'",
+                    'state_light' => "<img src='plugins/alexaapi/core/template/dashboard/cmd.info.string.alarm/Alarm-Clock-Icon-Off.png' title ='" . __('Alarm Off', __FILE__) . "'>",
+                    'state_dark' => "<img src='plugins/alexaapi/core/template/dashboard/cmd.info.string.alarm/Alarm-Clock-Icon-Off_dark.png' title ='" . __('Alarme Off', __FILE__) . "'>"
                 ),
                 array(
-                    'operation' => "#value# != ''",
-                    'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Clock-Icon-On.png' title ='" . __('En Pause', __FILE__) . "'>",
-                    'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Clock-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>"
+                    'operation' => "#value# != 'none'",
+                    'state_light' => "<img src='plugins/alexaapi/core/template/dashboard/cmd.info.string.alarm/Alarm-Clock-Icon-On.png' title ='" . __('Alarme On', __FILE__) . "'>",
+                    'state_dark' => "<img src='plugins/alexaapi/core/template/dashboard/cmd.info.string.alarm/Alarm-Clock-Icon-On_dark.png' title ='" . __('Alarme On', __FILE__) . "'>"
                 )
             )
         );
         $return['info']['string']['alarmmusical'] = array(
             'template' => 'alarm',
-            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "15px"),
+            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "0px", "#marge_haut#" => "5px"),
             'test' => array(
                 array(
-                    'operation' => "#value# == ''",
+                    'operation' => "#value# == 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-Off_dark.png' title ='" . __('En charge', __FILE__) . "'>"
                 ),
                 array(
-                    'operation' => "#value# != ''",
+                    'operation' => "#value# != 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-On.png' title ='" . __('En Pause', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>"
                 )
@@ -208,15 +208,15 @@ class alexaapi extends eqLogic
         );
         $return['info']['string']['timer'] = array(
             'template' => 'alarm',
-            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "15px"),
+            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "0px", "#marge_haut#" => "5px"),
             'test' => array(
                 array(
-                    'operation' => "#value# == ''",
+                    'operation' => "#value# == 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-Off_dark.png' title ='" . __('En charge', __FILE__) . "'>"
                 ),
                 array(
-                    'operation' => "#value# != ''",
+                    'operation' => "#value# != 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-On.png' title ='" . __('En Pause', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>"
                 )
@@ -226,15 +226,15 @@ class alexaapi extends eqLogic
 	
         $return['info']['string']['reminder'] = array(
             'template' => 'alarm',
-            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "4px"),
+            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "0px", "#marge_haut#" => "5px"),
             'test' => array(
                 array(
-                    'operation' => "#value# == ''",
+                    'operation' => "#value# == 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Reminder-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Reminder-Icon-Off_dark.png' title ='" . __('En charge', __FILE__) . "'>"
                 ),
                 array(
-                    'operation' => "#value# != ''",
+                    'operation' => "#value# != 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Reminder-Icon-On.png' title ='" . __('En Pause', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Reminder-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>"
                 )
@@ -259,7 +259,23 @@ class alexaapi extends eqLogic
         curl_close($ch);
         return (is_json($result)) ? json_decode($result, true) : $result;
     }
-
+	
+    public static function callProxyalexaapi($_url)
+    {
+        //$url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('openzwave');
+        $url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('alexaapi');
+        $ch = curl_init();
+        curl_setopt_array($ch, array(CURLOPT_URL => $url, CURLOPT_HEADER => false, CURLOPT_RETURNTRANSFER => true,));
+        $result = curl_exec($ch);
+        if (curl_errno($ch)) {
+            $curl_error = curl_error($ch);
+            curl_close($ch);
+            throw new Exception(__('Echec de la requête http : ', __FILE__) . $url . ' Curl error : ' . $curl_error, 404);
+        }
+        curl_close($ch);
+        return (is_json($result)) ? json_decode($result, true) : $result;
+    }
+	
     public static function deamon_info()
     {
         $return = array();

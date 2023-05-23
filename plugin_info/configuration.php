@@ -375,7 +375,7 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
         });
     });*/
     $('.bt_startDeamonCookie').off('click').on('click', function () {
-	clearTimeout(timeout_refreshDeamonInfo);
+	//clearTimeout(timeout_refreshDeamonInfo);
     jeedom.plugin.deamonCookieStart(
     {
       id : plugin_id,
@@ -383,14 +383,14 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
       error: function (error)
       {
         $('#div_alert').showAlert({message: error.message, level: 'danger'});
-        refreshDeamonInfo();
-        timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
+        //refreshDeamonInfo();
+        //timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
       },
       success:function(){
-        refreshDeamonInfo();
+        //refreshDeamonInfo();
         $('.bt_startDeamonCookie').hide();
         $('.bt_identificationCookie').show();
-        timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 1000);
+        //timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 1000);
 		attendre();
 }
     });

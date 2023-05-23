@@ -1,0 +1,80 @@
+<div class="cmd cmd-widget #history#" data-type="info" data-subtype="numeric" data-template="tmplmultistate" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
+  <div class="title #hide_name#">
+    <div class="cmdName">#name_display#</div>
+  </div>
+  <div class="content">
+    <span class="iconCmd"></span>
+  </div>
+  <div class="state">
+    <span class="value"></span>
+  </div>
+  <div class="timeCmd label label-default #history#" data-type="info"></div>
+  <div class="cmdStats #hide_history#">
+    <span title="{{Minimum}}" class="tooltips">#minHistoryValue#</span>|<span title="{{Moyenne}}" class="tooltips">#averageHistoryValue#</span>|<span title="{{Maximum}}" class="tooltips">#maxHistoryValue#</span> <i class="#tendance#"></i>
+  </div>
+  <template>
+    <div>time : duration|date ({{Affiche durée ou date de la valeur}})</div>
+  </template>
+  <script>
+    jeedom.cmd.addUpdateFunction('#id#', function(_options) {
+      if (is_object(cmd = document.querySelector('.cmd[data-cmd_uid="#uid#"]'))) {
+	  
+	 // console.log()
+	 //!!!!!!!!!!!!!!!!!!!  _options.display_value DEVIENT _options.value
+	  
+		//var cmd = $('.cmd[data-cmd_id=#id#]');
+		var now = new Date();
+		var inforecuperee=_options.value;
+		if (inforecuperee == "none")
+			_options.value="";
+		else {
+			// 2019-12-02 19:45:00
+			_options.value=inforecuperee.substr(11, 2)+":"+inforecuperee.substr(14, 2)+"<br>"
+			if ((now.getFullYear()==inforecuperee.substr(0, 4)) && (now.getMonth() + 1 == inforecuperee.substr(5, 2))&& (now.getDate() == inforecuperee.substr(8, 2)))
+				_options.value=_options.value+"Aujourd'hui";
+			else if ((now.getFullYear()==inforecuperee.substr(0, 4)) && (now.getMonth() + 1 == inforecuperee.substr(5, 2))&& (now.getDate() +1 == inforecuperee.substr(8, 2)))
+				_options.value=_options.value+"Demain";
+			else
+				_options.value=_options.value+inforecuperee.substr(8, 2)+"-"+inforecuperee.substr(5, 2)+"-"+inforecuperee.substr(0, 4);					
+			}	  
+
+        cmd.querySelector('.content').setAttribute('title', '{{Date de valeur}}: ' + _options.valueDate + '<br>{{Date de collecte}}: ' + _options.collectDate)
+        if ('#_time_widget_#' == '1' || '#time#' == 'duration' || '#time#' == 'date') {
+          jeedom.cmd.displayDuration(_options.valueDate, cmd.querySelector('.timeCmd'), '#time#')
+        }
+		
+        try {
+          let state = ''
+          #test#
+          cmd.querySelector('.value').innerHTML = state + _options.value
+        } catch (error) {
+          console.log(error)
+        }		
+		
+	
+
+//cmd.querySelector('.value').innerHTML = state
+
+
+        if (_options.alertLevel == 'warning') {
+         // cmd.querySelector('.value').innerHTML = '<span class="label label-warning"><i class="fas fa-bell"></i> ' + _options.value + '</span>'
+        } else if (_options.alertLevel == 'danger') {
+          //cmd.querySelector('.value').innerHTML = '<span class="label label-danger"><i class="fas fa-exclamation"></i> ' + _options.value + '</span>'
+        }
+      }
+      document.body.addEventListener('changeThemeEvent', function() {
+        if (is_object(cmd = document.querySelector('.cmd[data-cmd_uid="#uid#"]'))) {
+          let state = ''
+          #change_theme#
+          cmd.querySelector('.iconCmd').innerHTML = state
+
+          if (is_numeric('#_desktop_width_#') && is_object(img = cmd.querySelector('.iconCmd img'))) {
+            img.style.setProperty('width', '#_desktop_width_#px', 'important')
+          }
+        }
+      })
+    })
+
+    jeedom.cmd.refreshValue([{ cmd_id: '#id#', value: '#value#', display_value: '#state#', valueDate: '#valueDate#', collectDate: '#collectDate#', alertLevel: '#alertLevel#', unit: '#unite#' }])
+  </script>
+</div>
