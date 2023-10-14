@@ -1,0 +1,35 @@
+.badge-alexaapi {
+    position: absolute;
+    padding: 5px 10px;
+    min-width: 10px;
+    right:1.5rem;    
+	border-radius: 20px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    vertical-align: middle;
+    color: #fff !important;
+    background-color: #96c927;
+}
+.badge-success {
+  color: #fff;
+  background-color: #28a745;
+}
+.badge-purple {
+  color: #fff;
+  background-color: #563d7c;
+}
+.badge-info {
+  color: #fff;
+  background-color: #17a2b8;
+}
+.badge-beige {
+  color: #fff;
+  background-color: #949463;
+}
+.badge-danger {
+  color: #fff;
+  background-color: #dc3545;
+}

@@ -1,0 +1,251 @@
+<div id="plugin_container" class="eqLogic-widget eqLogic allowResize" style="width:#width#;height:#height#;border:#border#;border-radius:#border-radius#;background-color: #background-color#;color: #color#; #style#" data-translate-category="#translate_category#" data-category="#category#" data-eqLogic_id="#id#" data-version="#version#" >
+
+
+MESSAGE EN GROS MESSAGE EN GROS
+
+    <center class="widget-name" style="padding-right: 0px;"><a href="#eqLink#" style="font-size : 1.1em;#hideEqLogicName#">#name_display#<span style="font-size: 0.85em;position: relative;top:-2px;display:none;" class="object_name">#object_name#</span></a>
+
+    <span style="float: left;display: #statuts_display#;">
+		<span title="Eteindre l'équipement" class="poweroff tooltips" data-type="action" data-subtype="other" data-cmd_id="#cmd_poweroff_id#" style="float: right">
+			<a class="action" style="cursor: pointer;"><i class="fas fa-power-off" style="font-size : 0.9em;padding-right:10px"></i></a>
+
+		<script>
+		$('.poweroff[data-cmd_id=#cmd_poweroff_id#] .action').on('click', function() {
+			bootbox.confirm('Etes-vous sûr de vouloir éteindre l\'équipement #name# ?', function (result) {
+				if (result) {
+					jeedom.cmd.execute({id: '#cmd_poweroff_id#'});
+				}
+			});
+		});
+		</script>
+		</span>
+		<span title="Redémarrer l'équipement" class="reboot tooltips" data-type="action" data-subtype="other" data-cmd_id="#cmd_reboot_id#" style="float: right">
+			<a class="action" style="cursor: pointer;"><i class="fas fa-sync" style="font-size : 0.9em;padding-right:10px"></i></a>
+		<script>
+		$('.reboot[data-cmd_id=#cmd_reboot_id#] .action').on('click', function() {
+			bootbox.confirm('Etes-vous sûr de vouloir redémarrer l\'équipement #name# ?', function (result) {
+				if (result) {
+					jeedom.cmd.execute({id: '#cmd_reboot_id#'});
+				}
+			});
+		});
+		</script>
+		</span>
+		<span id="iconSSH#id#" style="float: right;width:25px;padding:2px;"></span>
+		<script>
+			if ('#cnx_ssh#' == 'OK') {
+				$('#iconSSH#id#').append('<i title="Connexion SSH OK" class="fas fa-check tooltips" style="font-size : 1.1em;color: var(--al-success-color) !important;" ></i>');
+			}
+			if ('#cnx_ssh#' == 'KO') {
+				$('#iconSSH#id#').append('<i title="Connexion SSH KO" class="fas fa-times tooltips" style="font-size : 1.1em;color: var(--al-danger-color) !important;"></i>');
+			}
+		</script>
+    </span>
+</center>
+
+
+
+	<div class="tooltips" data-cmd_id="#namedistriid#" style="margin-left:5px;display: #namedistri_display#;">
+			<span title="Distribution Linux" class="fab fa-linux" style="min-width:15px"></span>
+			<span>#namedistri#</span>
+	</div>
+	<div class="tooltips" data-cmd_id="#uptimeid#" style="margin-left:5px;display: #uptime_display#;">
+			<span title="Temps d'activité (uptime)" class="fas fa-tachometer-alt" style="min-width:15px;"></span>
+			<span id="uptime#id#"></span>
+	</div>
+	<script>
+		if ('#cnx_ssh#' == 'OK' || '#cnx_ssh#' == 'No') {
+			$('#uptime#id#').append('<span>#uptime#</span>');
+		}
+    </script>
+	<div class="tooltips" style="margin-left:5px;display: #loadavg_display#;">
+			<span title="Charge système (load average)" class="fa techno-courbes3" style="width:15px;"></span>
+			<span id="loadavg1mn#id#"></span><span id="loadavg5mn#id#"></span><span id="loadavg15mn#id#"></span>
+	</div>
+	<script>
+		if ('#cnx_ssh#' == 'OK' || '#cnx_ssh#' == 'No') {
+			if ('#loadavg1mn#' == '') {
+				$('#loadavg1mn#id#').append('<span></span>');
+			}else if ('#loadavg1mn#' < '#loadavg1mnvertinfa#') {
+				$('#loadavg1mn#id#').append('1 min : <span data-cmd_id="#loadavg1mnid#" class="history cursor" style="color: var(--al-success-color) !important;" >#loadavg1mn#</span>');
+			}else if ('#loadavg1mn#' >= '#loadavg1mnorangede#' && '#loadavg1mn#' <= '#loadavg1mnorangea#') {
+				$('#loadavg1mn#id#').append('1 min : <span data-cmd_id="#loadavg1mnid#" class="history cursor" style="color: var(--al-warning-color) !important;" >#loadavg1mn#</span>');
+			}else if ('#loadavg1mn#' > '#loadavg1mnrougesupa#' && '#loadavg1mnrougesupa#' !== '') {
+				$('#loadavg1mn#id#').append('1 min : <span data-cmd_id="#loadavg1mnid#" class="history cursor" style="color: var(--al-danger-color) !important;" >#loadavg1mn#</span>');
+			}else {
+				$('#loadavg1mn#id#').append('1 min : <span data-cmd_id="#loadavg1mnid#" class="history cursor">#loadavg1mn#</span>');
+			}
+
+			if ('#loadavg5mn#' == '#loadavg5mnvertinfa#') {
+				$('#loadavg5mn#id#').append('<span></span>');
+			}else if ('#loadavg5mn#' < '#loadavg5mnvertinfa#') {
+				$('#loadavg5mn#id#').append(' - 5 min : <span data-cmd_id="#loadavg5mnid#" class="history cursor" style="color: var(--al-success-color) !important;" >#loadavg5mn#</span>');
+			}else if ('#loadavg5mn#' >= '#loadavg5mnorangede#' && '#loadavg5mn#' <= '#loadavg5mnorangea#') {
+				$('#loadavg5mn#id#').append(' - 5 min : <span data-cmd_id="#loadavg5mnid#" class="history cursor" style="color: var(--al-warning-color) !important;" >#loadavg5mn#</span>');
+			}else if ('#loadavg5mn#' > '#loadavg5mnrougesupa#' && '#loadavg5mnrougesupa#' !== '') {
+				$('#loadavg5mn#id#').append(' - 5 min : <span data-cmd_id="#loadavg5mnid#" class="history cursor" style="color: var(--al-danger-color) !important;" >#loadavg5mn#</span>');
+			}else {
+				$('#loadavg5mn#id#').append(' - 5 min : <span data-cmd_id="#loadavg5mnid#" class="history cursor">#loadavg5mn#</span>');
+			}
+			if ('#loadavg15mn#' == '') {
+				$('#loadavg15mn#id#').append('<span></span>');
+			}else if ('#loadavg15mn#' < '#loadavg15mnvertinfa#') {
+				$('#loadavg15mn#id#').append(' - 15 min : <span data-cmd_id="#loadavg15mnid#" class="history cursor" style="color: var(--al-success-color) !important;" >#loadavg15mn#</span>');
+			}else if ('#loadavg15mn#' >= '#loadavg15mnorangede#' && '#loadavg15mn#' <= '#loadavg15mnorangea#') {
+				$('#loadavg15mn#id#').append(' - 15 min : <span data-cmd_id="#loadavg15mnid#" class="history cursor" style="color: var(--al-warning-color) !important;" >#loadavg15mn#</span>');
+			}else if ('#loadavg15mn#' > '#loadavg15mnrougesupa#' && '#loadavg15mnrougesupa#' !== '') {
+				$('#loadavg15mn#id#').append(' - 15 min : <span data-cmd_id="#loadavg15mnid#" class="history cursor" style="color: var(--al-danger-color) !important;" >#loadavg15mn#</span>');
+			}else {
+				$('#loadavg15mn#id#').append(' - 15 min : <span data-cmd_id="#loadavg15mnid#" class="history cursor">#loadavg15mn#</span>');
+			}
+		}
+    </script>
+	<div class="tooltips" data-cmd_id="#Mempourcid#" style="margin-left:5px;display: #Mem_display#;">
+			<span title="Mémoire vive" class="fa techno-memory" style="width:15px;"></span>
+			<span id="Mempourcent#id#"></span>
+	</div>
+	<script>
+		if ('#cnx_ssh#' == 'OK' || '#cnx_ssh#' == 'No') {
+			if ('#Mempourc#' == '') {
+				$('#Mempourcent#id#').append('<span>#Mem#</span>');
+			}else if ('#Mempourc#' > '#Mempourcvertsupa#' && '#Mempourcvertsupa#' != '') {
+				$('#Mempourcent#id#').append('#Mem# (<span data-cmd_id="#Mempourcid#" class="history cursor" style="color: var(--al-success-color) !important;" >#Mempourc#%</span>)');
+			}else if ('#Mempourc#' >= '#Mempourcorangede#' && '#Mempourc#' <= '#Mempourcorangea#') {
+				$('#Mempourcent#id#').append('#Mem# (<span data-cmd_id="#Mempourcid#" class="history cursor" style="color: var(--al-warning-color) !important;" >#Mempourc#%</span>)');
+			}else if ('#Mempourc#' < '#Mempourcrougeinfa#') {
+				$('#Mempourcent#id#').append('#Mem# (<span data-cmd_id="#Mempourcid#" class="history cursor" style="color: var(--al-danger-color) !important;" >#Mempourc#%</span>)');
+			}else {
+				$('#Mempourcent#id#').append('#Mem# (<span data-cmd_id="#Mempourcid#" class="history cursor" >#Mempourc#%</span>)');
+			}
+		}
+    </script>
+
+	<div class="tooltips" data-cmd_id="#Mem_swapid#" style="margin-left:5px;display: #Mem_swap_display#;">
+			<span title="Mémoire Swap" class="fas fa-list" style="width:15px;"></span>
+			<span id="Mem_swap#id#"></span>
+	</div>
+	<script>
+		if ('#cnx_ssh#' == 'OK' || '#cnx_ssh#' == 'No') {
+			$('#Mem_swap#id#').append('<span>#Mem_swap#</span>');
+		}
+    </script>
+
+	<div class="tooltips" data-cmd_id="#ethernet0id#" style="margin-left:5px;display: #ethernet0_display#;">
+			<span title="Trafic réseau" class="fa techno-fleches" style="width:15px;"></span>
+			<span id="ethernet0#id#"></span>
+	</div>
+	<script>
+		if ('#cnx_ssh#' == 'OK' || '#cnx_ssh#' == 'No') {
+			$('#ethernet0#id#').append('<span>#ethernet0#</span>');
+		}
+    </script>
+
+	<div class="tooltips" data-cmd_id="#hddpourcusedid#" style="margin-left:5px;display: #hddused_display#;">
+			<span title="Espace disque" class="fas fa-hdd" style="width:15px;"></span>
+			<span id="hddpourcused#id#"></span>
+	</div>
+	<script>
+		if ('#cnx_ssh#' == 'OK' || '#cnx_ssh#' == 'No') {
+			if ('#hddpourcused#' == '') {
+				$('#hddpourcused#id#').append('<span></span>');
+			}else if ((parseInt('#hddpourcused#')) < (parseInt('#hddpourcusedvertinfa#'))) {
+				$('#hddpourcused#id#').append('Total : #hddtotal# - Utilisé : #hddused# (<span data-cmd_id="#hddpourcusedid#" class="history cursor" style="color: var(--al-success-color) !important;">#hddpourcused#%</span>)');
+			}else if ((parseInt('#hddpourcused#')) >= (parseInt('#hddpourcusedorangede#')) && (parseInt('#hddpourcused#')) <= (parseInt('#hddpourcusedorangea#'))) {
+				$('#hddpourcused#id#').append('Total : #hddtotal# - Utilisé : #hddused# (<span data-cmd_id="#hddpourcusedid#" class="history cursor" style="color: var(--al-warning-color) !important;">#hddpourcused#%</span>)');
+			}else if ((parseInt('#hddpourcused#')) > (parseInt('#hddpourcusedrougesupa#')) && (parseInt('#hddpourcusedrougesupa#')) != '') {
+				$('#hddpourcused#id#').append('Total : #hddtotal# - Utilisé : #hddused# (<span data-cmd_id="#hddpourcusedid#" class="history cursor" style="color: var(--al-danger-color) !important;">#hddpourcused#%</span>)');
+			}else {
+				$('#hddpourcused#id#').append('Total : #hddtotal# - Utilisé : #hddused# (<span data-cmd_id="#hddpourcusedid#" class="history cursor">#hddpourcused#%</span>)');
+			}
+		}
+    </script>
+	<div id="synovol2#id#"></div>
+	<script>
+		if ('#cnx_ssh#' == 'OK' || '#cnx_ssh#' == 'No') {
+			if ('#synovolume2_display#' == 'OK'){
+				$('#synovol2#id#').append('<div id="synovol2#id#" class="tooltips" data-cmd_id="#hddpourcusedv2id#" style="margin-left:5px;display: #hddusedv2_display#;"><span title="Espace disque Volume 2 (Synology)" class="fas fa-hdd" style="width:15px"></span> <span id="hddpourcusedv2#id#"></span></div>');
+			}
+			if ('#hddpourcusedv2#' == '') {
+				$('#hddpourcusedv2#id#').append('<span></span>');
+			}else if ((parseInt('#hddpourcusedv2#')) < (parseInt('#hddpourcusedv2vertinfa#'))) {
+				$('#hddpourcusedv2#id#').append('Total : #hddtotalv2# - Utilisé : #hddusedv2# (<span data-cmd_id="#hddpourcusedv2id#" class="history cursor" style="color: var(--al-success-color) !important;">#hddpourcusedv2#%</span>)');
+			}else if ((parseInt('#hddpourcusedv2#')) >= (parseInt('#hddpourcusedv2orangede#')) && (parseInt('#hddpourcusedv2#')) <= (parseInt('#hddpourcusedv2orangea#'))) {
+				$('#hddpourcusedv2#id#').append('Total : #hddtotalv2# - Utilisé : #hddusedv2# (<span data-cmd_id="#hddpourcusedv2id#" class="history cursor" style="color: var(--al-warning-color) !important;">#hddpourcusedv2#%</span>)');
+			}else if ((parseInt('#hddpourcusedv2#')) > (parseInt('#hddpourcusedv2rougesupa#')) && (parseInt('#hddpourcusedv2rougesupa#')) != '') {
+				$('#hddpourcusedv2#id#').append('Total : #hddtotalv2# - Utilisé : #hddusedv2# (<span data-cmd_id="#hddpourcusedv2id#" class="history cursor" style="color: var(--al-danger-color) !important;">#hddpourcusedv2#%</span>)');
+			}else {
+				$('#hddpourcusedv2#id#').append('Total : #hddtotalv2# - Utilisé : #hddusedv2# (<span data-cmd_id="#hddpourcusedv2id#" class="history cursor">#hddpourcusedv2#%</span>)');
+			}
+		}
+	</script>
+	<div class="tooltips" data-cmd_id="#cpu_tempid#" style="margin-left:5px;display: #cpu_display#;">
+			<span title="Nombre CPU, fréquence et température" class="fa techno-pc" style="width:15px;"></span>
+			<span id="cpu#id#"></span><span id="cpu_temp#id#"></span>
+	</div>
+	<script>
+		if ('#cnx_ssh#' == 'OK' || '#cnx_ssh#' == 'No') {
+			if ('#cpu_temp#' != '') {
+				if ('#cpu_temp#' < '#cpu_tempvertinfa#') {
+					$('#cpu#id#').append('<span>#cpu# </span>');
+					$('#cpu_temp#id#').append('(<span data-cmd_id="#cpu_tempid#" class="history cursor" style="color: var(--al-success-color) !important;" >#cpu_temp#°C</span>)');
+				}else if ('#cpu_temp#' >= '#cpu_temporangede#' && '#cpu_temp#' <= '#cpu_temporangea#') {
+					$('#cpu#id#').append('<span>#cpu# </span>');
+					$('#cpu_temp#id#').append('(<span data-cmd_id="#cpu_tempid#" class="history cursor" style="color: var(--al-warning-color) !important;" >#cpu_temp#°C</span>)');
+				}else if ('#cpu_temp#' > '#cpu_temprougesupa#' && '#cpu_temprougesupa#' != '') {
+					$('#cpu#id#').append('<span>#cpu# </span>');
+					$('#cpu_temp#id#').append('(<span data-cmd_id="#cpu_tempid#" class="history cursor" style="color: var(--al-danger-color) !important;" >#cpu_temp#°C</span>)');
+				}else {
+					$('#cpu#id#').append('<span>#cpu# </span>');
+					$('#cpu_temp#id#').append('(<span data-cmd_id="#cpu_tempid#" class="history cursor">#cpu_temp#°C</span>)');
+				}
+			}else {
+			$('#cpu#id#').append('<span>#cpu#</span>');
+			}
+		}
+
+    </script>
+	<div class="tooltips" data-cmd_id="#perso1id#" style="margin-left:5px;display: #perso1_display#;">
+			<span class="fa" title="#nameperso1#" style="width: 15px;max-width: 15px;max-height: 15px;">#iconeperso1#</span>
+			<span id="uniteperso1#id#"></span>
+	</div>
+	<script>
+		if ('#cnx_ssh#' == 'OK' || '#cnx_ssh#' == 'No') {
+            if ('#cpu_temp#' != '') {
+				if ('#perso1#' < '#perso1vertinfa#') {
+					$('#uniteperso1#id#').append('<span data-cmd_id="#uniteperso1#id# class="history cursor" style="color: var(--al-success-color) !important;" >#perso1#</span><span>#uniteperso1#</span>');
+				}else if ('#perso1#' >= '#perso1orangede#' && '#perso1#' <= '#perso1orangea#') {
+					$('#uniteperso1#id#').append('<span data-cmd_id="#uniteperso1#id# class="history cursor" style="color: var(--al-warning-color) !important;" >#perso1#</span><span>#uniteperso1#</span>');
+				}else if ('#perso1#' > '#perso1rougesupa#' && '#perso1rougesupa#' != '') {
+					$('#uniteperso1#id#').append('<span data-cmd_id="#uniteperso1#id# class="history cursor" style="color: var(--al-danger-color) !important;" >#perso1#</span><span>#uniteperso1#</span>');
+				}else {
+                    $('#uniteperso1#id#').append('<span data-cmd_id="#perso1id#" class="history cursor">#perso1##uniteperso1#</span>');
+				}
+			}else {
+			    $('#uniteperso1#id#').append('<span data-cmd_id="#perso1id#" class="history cursor">#perso1##uniteperso1#</span>');
+			}		
+		}
+    </script>
+
+	<div class="tooltips" data-cmd_id="#perso2id#" style="margin-left:5px;display: #perso2_display#;">
+			<span class="fa" title="#nameperso2#" style="width: 15px;max-width: 15px;max-height: 15px;">#iconeperso2#</span>
+			<span id="uniteperso2#id#"></span>
+	</div>
+	<script>
+		if ('#cnx_ssh#' == 'OK' || '#cnx_ssh#' == 'No') {
+            if ('#cpu_temp#' != '') {
+				if ('#perso2#' < '#perso2vertinfa#') {
+					$('#uniteperso2#id#').append('<span data-cmd_id="#uniteperso2#id# class="history cursor" style="color: var(--al-success-color) !important;" >#perso2#</span><span>#uniteperso2#</span>');
+				}else if ('#perso2#' >= '#perso2orangede#' && '#perso2#' <= '#perso2orangea#') {
+					$('#uniteperso2#id#').append('<span data-cmd_id="#uniteperso2#id# class="history cursor" style="color: var(--al-warning-color) !important;" >#perso2#</span><span>#uniteperso2#</span>');
+				}else if ('#perso2#' > '#perso2rougesupa#' && '#perso2rougesupa#' != '') {
+					$('#uniteperso2#id#').append('<span data-cmd_id="#uniteperso2#id# class="history cursor" style="color: var(--al-danger-color) !important;" >#perso2#</span><span>#uniteperso2#</span>');
+				}else {
+                    $('#uniteperso2#id#').append('<span data-cmd_id="#perso2id#" class="history cursor">#perso2##uniteperso2#</span>');
+				}
+			}else {
+			    $('#uniteperso2#id#').append('<span data-cmd_id="#perso2id#" class="history cursor">#perso2##uniteperso2#</span>');
+			}		
+		}
+    </script>
+
+</div>
