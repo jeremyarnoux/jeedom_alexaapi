@@ -1,0 +1,22 @@
+{
+  "name": "plugin-alexaapi",
+  "version": "0.0.1",
+  "description": "Jeedom Plugin for AlexaApi",
+  "main": "resources/alexaapi.js",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeremyarnoux/jeedom_alexaapi.git"
+  },
+  "author": "Jeremy Arnoux",
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@babel/core": ">=7.23.5",
+    "@babel/eslint-parser": "^7.23.3",
+    "eslint": "^8.55.0"
+  }
+}
