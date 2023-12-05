@@ -1,0 +1,36 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/resources/"
+  schedule:
+    interval: "weekly"
+  open-pull-requests-limit: 10
+  versioning-strategy: increase
+  target-branch: "beta"
+  reviewers:
+  - jeremyarnoux
+  assignees:
+  - jeremyarnoux
+  
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: "monthly"
+  open-pull-requests-limit: 10
+  versioning-strategy: increase
+  target-branch: "beta"
+  reviewers:
+  - jeremyarnoux
+  assignees:
+  - jeremyarnoux
+  
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: "monthly"
+  target-branch: "beta"
+  reviewers:
+  - jeremyarnoux
+  assignees:
+  - jeremyarnoux
+  
