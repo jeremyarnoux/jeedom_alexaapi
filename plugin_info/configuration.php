@@ -151,9 +151,9 @@ if (config::byKey("listRoutines", "alexaapi", "") != '') {
 }
 if (!$foundSelect) $listRoutines = '<option value="">Aucune</option>' . $listRoutines;
 
-$listRoutinesValidDebut = date("d-m-Y H:i:s", config::byKey("listRoutinesValidDebut", "alexaapi", ""));
-$listRoutinesValidFin = date("d-m-Y H:i:s", config::byKey("listRoutinesValidFin", "alexaapi", ""));
-$listRoutinesProchain = date("d-m-Y H:i:s", config::byKey("listRoutinesProchain", "alexaapi", ""));
+$listRoutinesValidDebut = date("d-m-Y H:i:s", config::byKey("listRoutinesValidDebut", "alexaapi", "123"));
+$listRoutinesValidFin = date("d-m-Y H:i:s", config::byKey("listRoutinesValidFin", "alexaapi", "123"));
+$listRoutinesProchain = date("d-m-Y H:i:s", config::byKey("listRoutinesProchain", "alexaapi", "123"));
 if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutinesValidFin = $listRoutinesProchain; //si on a appuyé sur Reset
 ?>
 <form class="form-horizontal">
