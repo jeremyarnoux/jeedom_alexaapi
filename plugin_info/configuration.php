@@ -307,7 +307,7 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
         $('.bt_identificationCookie2bis').show();
         setTimeout(VerifierSiCookieGenere1, 1000);
     }
-
+var nouvellefenetre='';
     function PopUpCentre(url, width, height) {
         var leftPosition, topPosition;
         //Allow for borders.
@@ -324,7 +324,7 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
         if (nouvellefenetre) { //securité pour fermer la fenetre si le focus est perdu
 
             window.onfocus = function () {
-                nouvellefenetre.window.close();
+                nouvellefenetre.close();
                 $('.bt_identificationCookie').hide();
                 $('.bt_identificationCookie1').hide();
                 VerifierSiCookieGenere1();
@@ -374,8 +374,9 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
             }
         });
     });*/
+    var timeout_refreshDeamonInfo='';
     $('.bt_startDeamonCookie').off('click').on('click', function () {
-	//clearTimeout(timeout_refreshDeamonInfo);
+	clearTimeout(timeout_refreshDeamonInfo);
     jeedom.plugin.deamonCookieStart(
     {
       id : plugin_id,
@@ -522,16 +523,16 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
                     message: error.message,
                     level: 'danger'
                 });
-                refreshDeamonInfo();
-                timeout_refreshDeamonCookieInfo = setTimeout(refreshDeamonInfo, 5000);
+                //refreshDeamonInfo();
+                //timeout_refreshDeamonCookieInfo = setTimeout(refreshDeamonInfo, 5000);
             },
             success: function () {
-                refreshDeamonInfo();
+                //refreshDeamonInfo();
                 $('.deamonCookieState').empty().append('<span class="label label-danger" style="font-size:1em;">{{NOK}}</span>');
                 $('.bt_startDeamonCookie').show();
                 $('.bt_stopDeamonCookie').hide();
                 $('.bt_identificationCookie').hide();
-                timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
+                //timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
             }
         });
     });
