@@ -5,7 +5,7 @@
 	"licence" : "AGPL",
 	"author" : "Jexou",
 	"require" : "4.4",
-	"os":{ "min":11 }
+	"os":{ "min":11 },
 	"version": "0.0.1",
 	"changelog" : "https://youdom.net/alexa-api-et-amazonmusic-deezer-spotify-changelog-todo-list/",
 	"forum_link" : "https://community.jeedom.com/tags/plugin-alexaapi",
