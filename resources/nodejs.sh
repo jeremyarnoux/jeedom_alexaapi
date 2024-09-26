@@ -5,10 +5,8 @@ wget https://raw.githubusercontent.com/NebzHB/dependance.lib/master/dependance.l
 PLUGIN=$(basename "$(realpath $BASEDIR/..)")
 . ${BASEDIR}/dependance.lib
 ##################################################################
-wget https://raw.githubusercontent.com/NebzHB/nodejs_install/main/install_nodejs.sh -O $BASEDIR/install_nodejs.sh &>/dev/null
+wget https://raw.githubusercontent.com/NebzHB/dependance.lib/master/install_nodejs.sh -O $BASEDIR/install_nodejs.sh &>/dev/null
 TIMED=1
-
-installVer='16' 	#NodeJS major version to be installed
 
 pre
 step 0 "Vérification des droits"
@@ -22,7 +20,7 @@ step 5 "Mise à jour APT et installation des packages nécessaires"
 try sudo apt-get update
 
 #install nodejs, steps 10->50
-. ${BASEDIR}/install_nodejs.sh ${installVer}
+. ${BASEDIR}/install_nodejs.sh --firstSubStep 10 --lastSubStep 50
 
 step 60 "Nettoyage ancien modules"
 cd ${BASEDIR};

@@ -105,7 +105,14 @@ foreach ($eqLogics as $eqLogic) {
                 <br />
                 <span>{{Historique}}</span>
             </div>
-            <?php
+			
+            <div class="cursor logoSecondary" onclick="window.open('https://www.sigalou-domotique.fr/alexa-api-documentation')">
+			<i class="fas fa-book" style="font-size : 5em;"></i>
+                <br />
+                <span>{{Documentation}}</span>
+            </div>            
+			
+			<?php
 
 
             echo '</div>';

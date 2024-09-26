@@ -151,9 +151,9 @@ if (config::byKey("listRoutines", "alexaapi", "") != '') {
 }
 if (!$foundSelect) $listRoutines = '<option value="">Aucune</option>' . $listRoutines;
 
-$listRoutinesValidDebut = date("d-m-Y H:i:s", config::byKey("listRoutinesValidDebut", "alexaapi", ""));
-$listRoutinesValidFin = date("d-m-Y H:i:s", config::byKey("listRoutinesValidFin", "alexaapi", ""));
-$listRoutinesProchain = date("d-m-Y H:i:s", config::byKey("listRoutinesProchain", "alexaapi", ""));
+$listRoutinesValidDebut = date("d-m-Y H:i:s", config::byKey("listRoutinesValidDebut", "alexaapi", 0));
+$listRoutinesValidFin = date("d-m-Y H:i:s", config::byKey("listRoutinesValidFin", "alexaapi", 0));
+$listRoutinesProchain = date("d-m-Y H:i:s", config::byKey("listRoutinesProchain", "alexaapi", 0));
 if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutinesValidFin = $listRoutinesProchain; //si on a appuyé sur Reset
 ?>
 <form class="form-horizontal">
@@ -307,7 +307,7 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
         $('.bt_identificationCookie2bis').show();
         setTimeout(VerifierSiCookieGenere1, 1000);
     }
-
+var nouvellefenetre='';
     function PopUpCentre(url, width, height) {
         var leftPosition, topPosition;
         //Allow for borders.
@@ -324,7 +324,7 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
         if (nouvellefenetre) { //securité pour fermer la fenetre si le focus est perdu
 
             window.onfocus = function () {
-                nouvellefenetre.window.close();
+                nouvellefenetre.close();
                 $('.bt_identificationCookie').hide();
                 $('.bt_identificationCookie1').hide();
                 VerifierSiCookieGenere1();
@@ -374,6 +374,7 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
             }
         });
     });*/
+    var timeout_refreshDeamonInfo='';
     $('.bt_startDeamonCookie').off('click').on('click', function () {
 	clearTimeout(timeout_refreshDeamonInfo);
     jeedom.plugin.deamonCookieStart(
@@ -383,14 +384,14 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
       error: function (error)
       {
         $('#div_alert').showAlert({message: error.message, level: 'danger'});
-        refreshDeamonInfo();
-        timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
+        //refreshDeamonInfo();
+        //timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
       },
       success:function(){
-        refreshDeamonInfo();
+        //refreshDeamonInfo();
         $('.bt_startDeamonCookie').hide();
         $('.bt_identificationCookie').show();
-        timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 1000);
+        //timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 1000);
 		attendre();
 }
     });
@@ -522,16 +523,16 @@ if (config::byKey("listRoutinesValidFin", "alexaapi", "") == "123") $listRoutine
                     message: error.message,
                     level: 'danger'
                 });
-                refreshDeamonInfo();
-                timeout_refreshDeamonCookieInfo = setTimeout(refreshDeamonInfo, 5000);
+                //refreshDeamonInfo();
+                //timeout_refreshDeamonCookieInfo = setTimeout(refreshDeamonInfo, 5000);
             },
             success: function () {
-                refreshDeamonInfo();
+                //refreshDeamonInfo();
                 $('.deamonCookieState').empty().append('<span class="label label-danger" style="font-size:1em;">{{NOK}}</span>');
                 $('.bt_startDeamonCookie').show();
                 $('.bt_stopDeamonCookie').hide();
                 $('.bt_identificationCookie').hide();
-                timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
+                //timeout_refreshDeamonInfo = setTimeout(refreshDeamonInfo, 5000);
             }
         });
     });

@@ -757,7 +757,7 @@ class AlexaRemote extends EventEmitter {
                 });
 
                 if (lastFoundQueueIndex === -1) {
-                    this._options.logger && this._options.logger('{Remote} ╠═══════> No activities from stored ' + this.activityUpdateQueue.length + ' entries found in queue (' + this.activityUpdateNotFoundCounter + ')');
+                    this._options.logger && this._options.logger('{Remote} ╠═══════> No activities from stored ' + this.activityUpdateQueue.length + ' entries found in queue (' + this.activityUpdateNotFoundCounter + ')','DEBUG');
                     this.activityUpdateNotFoundCounter++;
                     if (this.activityUpdateNotFoundCounter > 5) {
                         this._options.logger && this._options.logger('{Remote} ╠═══════> Reset expected activities','DEBUG');
@@ -830,7 +830,7 @@ class AlexaRemote extends EventEmitter {
                 this._options.logger && this._options.logger('{Remote} ╠═══════> Authentication check returned error: ' + err + '. Still try request','DEBUG');
                 return this.httpsGetCall(path, callback, flags);
             }
-            this._options.logger && this._options.logger('{Remote} ╠═══════> Authentication check Error, try re-init');
+            this._options.logger && this._options.logger('{Remote} ╠═══════> Authentication check Error, try re-init','DEBUG');
             delete this._options.csrf;
             delete this._options.cookie;
             this.init(this._options, function(err) {
@@ -853,7 +853,7 @@ var flagsQuery= {};
 		
 if (path.startsWith('{')) // Pour détecter le requeteur
 	{
-	this._options.logger && this._options.logger('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+	this._options.logger && this._options.logger('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^','DEBUG');
 const query = JSON.parse(path);
 if (query.host!= null) host=query.host;
 if (query.path!= null) path=query.path;
@@ -869,7 +869,7 @@ flagsQuery["data"]=flags;
 //this._options.logger && this._options.logger(JSON.stringify(flags)); 
 flags=	flagsQuery;
 //this._options.logger && this._options.logger(JSON.stringify(flags)); 
-	this._options.logger && this._options.logger('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+	this._options.logger && this._options.logger('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^','DEBUG');
 	}
 
 //		console.log ("*************************== Données recues ==*****************************************");
@@ -992,7 +992,7 @@ this._options.logger && this._options.logger(obj.headers);
                 {
                     if (!body)
                     {
-						this._options.logger && this._options.logger('{Remote} ║ Response(3): '+resstatusMessage, "INFO");
+						this._options.logger && this._options.logger('{Remote} ║ Response(3): '+resstatusMessage,'INFO');
                         
 						if (resstatusCode=="200") // C'est OK
                         return callback && callback(null, null);
@@ -1008,7 +1008,7 @@ this._options.logger && this._options.logger(obj.headers);
                         //this._options.logger && this._options.logger('*********************DEBUG****************************','ERROR');
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
                         //this._options.logger && this._options.logger('**DEBUG**DEBUG*Alexa-Remote ║ Response: No/Invalid JSON','ERROR');
-                        this._options.logger && this._options.logger("{Remote} ║ "+body, 'ERROR');
+                        this._options.logger && this._options.logger("{Remote} ║ "+body,'ERROR');
                         //this._options.logger && this._options.logger('**DEBUG**DEBUG* Message Exception :'+e.message);
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
                         //this._options.logger && this._options.logger('******************************************************','ERROR');
@@ -1449,7 +1449,7 @@ this._options.logger && this._options.logger(obj.headers);
             notification.alarmTime = 0;
         }*/
 		
-				console.log('-->-->--notificationReminder: ' + JSON.stringify(notification) + '-----------------');
+	//console.log('-->-->--notificationReminder: ' + JSON.stringify(notification) + '-----------------');
 
 		
         return this.parseValue4Notification(notification, value);
@@ -1515,7 +1515,7 @@ this._options.logger && this._options.logger(obj.headers);
         }*/
 		
 		
-		console.log('-->-->--notificationAlarm: ' + JSON.stringify(notification) + '-----------------');
+	//console.log('-->-->--notificationAlarm: ' + JSON.stringify(notification) + '-----------------');
 		
 return this.parseValue4Notification(notification, value);    }
 
@@ -1705,7 +1705,7 @@ return this.parseValue4Notification(notification, value);    }
 
 //!!!!!!!!!!!!!!!!!!!!!! remplacé par getCustomerHistoryRecords   
    getHistory(options, callback) {
-	   			       this._options.logger && this._options.logger('-------------------------------------------------------coucou');
+	this._options.logger && this._options.logger('-------------------------------------------------------coucou','DEBUG');
 
         return this.getActivities(options, callback);
     }

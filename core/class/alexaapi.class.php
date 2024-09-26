@@ -176,31 +176,31 @@ class alexaapi extends eqLogic
         );
         $return['info']['string']['alarm'] = array(
             'template' => 'alarm',
-            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "15px"),
+            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "0px", "#marge_haut#" => "5px"),
             'test' => array(
                 array(
-                    'operation' => "#value# == ''",
-                    'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Clock-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
-                    'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Clock-Icon-Off_dark.png' title ='" . __('En charge', __FILE__) . "'>"
+                    'operation' => "#value# == 'none'",
+                    'state_light' => "<img src='plugins/alexaapi/core/template/dashboard/cmd.info.string.alarm/Alarm-Clock-Icon-Off.png' title ='" . __('Alarm Off', __FILE__) . "'>",
+                    'state_dark' => "<img src='plugins/alexaapi/core/template/dashboard/cmd.info.string.alarm/Alarm-Clock-Icon-Off_dark.png' title ='" . __('Alarme Off', __FILE__) . "'>"
                 ),
                 array(
-                    'operation' => "#value# != ''",
-                    'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Clock-Icon-On.png' title ='" . __('En Pause', __FILE__) . "'>",
-                    'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Clock-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>"
+                    'operation' => "#value# != 'none'",
+                    'state_light' => "<img src='plugins/alexaapi/core/template/dashboard/cmd.info.string.alarm/Alarm-Clock-Icon-On.png' title ='" . __('Alarme On', __FILE__) . "'>",
+                    'state_dark' => "<img src='plugins/alexaapi/core/template/dashboard/cmd.info.string.alarm/Alarm-Clock-Icon-On_dark.png' title ='" . __('Alarme On', __FILE__) . "'>"
                 )
             )
         );
         $return['info']['string']['alarmmusical'] = array(
             'template' => 'alarm',
-            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "15px"),
+            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "0px", "#marge_haut#" => "5px"),
             'test' => array(
                 array(
-                    'operation' => "#value# == ''",
+                    'operation' => "#value# == 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-Off_dark.png' title ='" . __('En charge', __FILE__) . "'>"
                 ),
                 array(
-                    'operation' => "#value# != ''",
+                    'operation' => "#value# != 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-On.png' title ='" . __('En Pause', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Musical-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>"
                 )
@@ -208,15 +208,15 @@ class alexaapi extends eqLogic
         );
         $return['info']['string']['timer'] = array(
             'template' => 'alarm',
-            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "15px"),
+            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "0px", "#marge_haut#" => "5px"),
             'test' => array(
                 array(
-                    'operation' => "#value# == ''",
+                    'operation' => "#value# == 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-Off_dark.png' title ='" . __('En charge', __FILE__) . "'>"
                 ),
                 array(
-                    'operation' => "#value# != ''",
+                    'operation' => "#value# != 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-On.png' title ='" . __('En Pause', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Timer-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>"
                 )
@@ -226,15 +226,15 @@ class alexaapi extends eqLogic
 	
         $return['info']['string']['reminder'] = array(
             'template' => 'alarm',
-            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "55px", "#marge_haut#" => "4px"),
+            'replace' => array("#hide_name#" => "hidden", "#marge_gauche#" => "0px", "#marge_haut#" => "5px"),
             'test' => array(
                 array(
-                    'operation' => "#value# == ''",
+                    'operation' => "#value# == 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Reminder-Icon-Off.png' title ='" . __('Playing', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Reminder-Icon-Off_dark.png' title ='" . __('En charge', __FILE__) . "'>"
                 ),
                 array(
-                    'operation' => "#value# != ''",
+                    'operation' => "#value# != 'none'",
                     'state_light' => "<img src='plugins/alexaapi/core/img/Alarm-Reminder-Icon-On.png' title ='" . __('En Pause', __FILE__) . "'>",
                     'state_dark' => "<img src='plugins/alexaapi/core/img/Alarm-Reminder-Icon-On_dark.png' title ='" . __('En Pause', __FILE__) . "'>"
                 )
@@ -244,7 +244,7 @@ class alexaapi extends eqLogic
     }
 
 
-    public static function callProxyAlexaapi($_url)
+    public static function callProxyalexaapi($_url)
     {
         //$url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('openzwave');
         $url = 'http://' . config::byKey('internalAddr') . ':3456/' . trim($_url, '/') . '&apikey=' . jeedom::getApiKey('alexaapi');
@@ -263,7 +263,7 @@ class alexaapi extends eqLogic
     public static function deamon_info()
     {
         $return = array();
-        $return['log'] = 'alexaapi_node';
+        $return['log'] = __CLASS__;
         $return['state'] = 'nok';
         $return['stateCookies'] = 'non lancé';
 
@@ -286,20 +286,20 @@ class alexaapi extends eqLogic
     }
 
     public static function deamon_start($_debug = false)
-    {
+      {
         self::deamon_stop();
         $deamon_info = self::deamon_info();
         if ($deamon_info['launchable'] != 'ok') throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
-        log::add('alexaapi', 'info', ' Lancement du démon alexaapi');
+        log::add(__CLASS__, 'info', ' Lancement du démon alexaapi v2');
         $url = network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/alexaapi/core/api/jeealexaapi.php?apikey=' . jeedom::getApiKey('alexaapi');
         $log = $_debug ? '1' : '0';
         $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
-        $cmd = 'nice -n 19 node ' . $sensor_path . '/alexaapi.js ' . network::getNetworkAccess('internal') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr') . ' ' . jeedom::getApiKey('alexaapi') . ' ' . log::getLogLevel('alexaapi');
+        $cmd = 'nice -n 19 node ' . $sensor_path . '/alexaapi.js ' . network::getNetworkAccess('internal') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr') . ' ' . jeedom::getApiKey('alexaapi') . ' ' . log::getLogLevel(__CLASS__);
         log::add('alexaapi', 'debug', 'Lancement démon alexaapi : ' . $cmd);
-        $result = exec('NODE_ENV=production nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_node') . ' 2>&1 &');
+        $result = exec('NODE_ENV=production nohup ' . $cmd . ' >> ' . log::getPathToLog(__CLASS__.'_node') . ' 2>&1 &');
         //$cmdStart='nohup ' . $cmd . ' | tee >(grep "WS-MQTT">>'.log::getPathToLog('alexaapi_mqtt').') >(grep -v "WS-MQTT">>'. log::getPathToLog('alexaapi_node') . ')';
         if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
-            log::add('alexaapi', 'error', $result);
+            log::add( __CLASS__, 'error', $result);
             return false;
         }
         $i = 0;
@@ -314,13 +314,13 @@ class alexaapi extends eqLogic
             return false;
         }
         message::removeAll('alexaapi', 'unableStartDeamon');
-        log::add('alexaapi', 'info', ' Démon alexaapi lancé');
+        log::add(__CLASS__, 'info', ' Démon alexaapi lancé v2');
         return true;
     }
 
     public static function deamon_stop()
     {
-        log::add('alexaapi', 'info', ' Arrêt du service alexaapi');
+        log::add(__CLASS__, 'info', ' Arrêt du service alexaapi');
         @file_get_contents("http://" . config::byKey('internalAddr') . ":3456/stop");
         sleep(3);
         if (shell_exec('ps aux | grep "resources/alexaapi.js" | grep -v "grep" | wc -l') == 1) {
@@ -359,31 +359,32 @@ class alexaapi extends eqLogic
     { //*********** Demon Cookie***************
         self::deamonCookie_stop();
         $deamon_info = self::deamon_info();
-        log::add('alexaapi_cookie', 'info', ' Lancement du démon cookie');
+        log::add(__CLASS__, 'info', ' Lancement du démon cookie');
         $log = $_debug ? '1' : '0';
         $sensor_path = realpath(dirname(__FILE__) . '/../../resources');
 
         $cmd = 'nice -n 19 node ' . $sensor_path . '/initCookie.js ' . config::byKey('internalAddr') . ' ' . config::byKey('amazonserver', 'alexaapi', 'amazon.fr') . ' ' . config::byKey('alexaserver', 'alexaapi', 'alexa.amazon.fr');
-        log::add('alexaapi', 'debug', '---- Lancement démon Alexa-API-Cookie sur port 3457 : ' . $cmd);
+        log::add(__CLASS__, 'debug', '---- Lancement démon Alexa-API-Cookie sur port 3457 : ' . $cmd);
         $result = exec('nohup ' . $cmd . ' >> ' . log::getPathToLog('alexaapi_cookie') . ' 2>&1 &');
         if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
-            log::add('alexaapi', 'error', $result);
+            log::add(__CLASS__, 'error', $result);
             return false;
         }
-        message::removeAll('alexaapi', 'unableStartDeamonCookie');
-        log::add('alexaapi_cookie', 'info', ' Démon cookie lancé');
+        message::removeAll(__CLASS__, 'unableStartDeamonCookie');
+        log::add(__CLASS__, 'info', ' Démon cookie lancé');
         return true;
     }
 
     public static function deamonCookie_stop()
     {
         if (shell_exec('ps aux | grep "resources/initCookie.js" | grep -v "grep" | wc -l') == 1) {
-            log::add('alexaapi', 'info', 'Arrêt du service cookie');
+            log::add(__CLASS__, 'info', 'Arrêt du service cookie');
             exec('sudo kill $(ps aux | grep "resources/initCookie.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
             sleep(3);
             if (shell_exec('ps aux | grep "resources/initCookie.js" | grep -v "grep" | wc -l') == 1) {
                 exec('sudo kill -9 $(ps aux | grep "resources/initCookie.js" | grep -v "grep" | awk \'{print $2}\') &>/dev/null');
             }
+            log::add(__CLASS__, 'info', 'service cookie arrêté');
         }
     }
 
@@ -425,7 +426,16 @@ class alexaapi extends eqLogic
         }
     }
 
-
+    public static function supprimeTouslesDevicesDesactives()
+    {
+        foreach (eqLogic::byType('alexasmarthome', false) as $eqLogic) {
+			if (!($eqLogic->getIsEnable())) {
+           //log::add('alexasmarthome_scan', 'debug', 'TEST---------->>>>> ' . $eqLogic->getName());
+             $eqLogic->remove();
+			}
+        }
+    }
+	
     public static function cron($_eqlogic_id = null)
     {
         // Toutes les minutes, on cherche les players en lecture et on les actualise

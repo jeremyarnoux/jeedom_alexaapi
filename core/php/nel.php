@@ -6,11 +6,11 @@ error_reporting(E_ALL);
 # Fichier : nel.php (Nombres En Lettres)
 #
 # Auteur : Olivier Miakinen
-# Création : mercredi 2 avril 2003
-# Dernière modification : dimanche 11 novembre 2007
+# CrÃ©ation : mercredi 2 avril 2003
+# DerniÃ¨re modification : dimanche 11 novembre 2007
 #
-# La fonction enlettres($nombre) retourne une chaîne de caractères
-# représentant le nombre $nombre écrit en toutes lettres, en français.
+# La fonction enlettres($nombre) retourne une chaÃ®ne de caractÃ¨res
+# reprÃ©sentant le nombre $nombre Ã©crit en toutes lettres, en franÃ§ais.
 #
 # Toute la documentation sur trouve sur :
 #  http://www.miakinen.net/vrac/nombres
@@ -19,12 +19,12 @@ error_reporting(E_ALL);
 #
 ######################################################################
 #
-# Je tiens à remercier tout particulièrement Nicolas Graner pour
-# m'avoir fourni le code source de son propre programme d'écriture
+# Je tiens Ã  remercier tout particuliÃ¨rement Nicolas Graner pour
+# m'avoir fourni le code source de son propre programme d'Ã©criture
 # des nombres en lettres.
 #
-# En effet, c'est à lui que je dois la superbe implémentation du
-# système de John Horton Conway et Allan Wechsler sous la forme de
+# En effet, c'est Ã  lui que je dois la superbe implÃ©mentation du
+# systÃ¨me de John Horton Conway et Allan Wechsler sous la forme de
 # deux ou trois preg_replace().
 #
 # Voir <http://www.graner.net/nicolas/nombres/nom.php>
@@ -34,10 +34,10 @@ error_reporting(E_ALL);
 #
 # Correction de dimanche 11 novembre 2007
 #	Dans la version 5.2.2 de PHP, le comportement de la fonction
-#	substr() a changé. Auparavant substr($nombre, -6) retournait
-#	$nombre dans le cas où sa longueur était inférieure à 6, mais
-#	maintenant cela retourne false. Merci à Benjamin (de la société
-#	Dreamnex) et à David Duret pour m'avoir signalé le problème et
+#	substr() a changÃ©. Auparavant substr($nombre, -6) retournait
+#	$nombre dans le cas oÃ¹ sa longueur Ã©tait infÃ©rieure Ã  6, mais
+#	maintenant cela retourne false. Merci Ã  Benjamin (de la sociÃ©tÃ©
+#	Dreamnex) et Ã  David Duret pour m'avoir signalÃ© le problÃ¨me et
 #	sa solution.
 #
 ######################################################################
@@ -56,10 +56,10 @@ define('NEL_RECTIF_1990',    0x0100);
 define('NEL_ORDINAL',        0x0200);
 define('NEL_NIEME',          0x0400);
 
-# Le tableau associatif $NEL contient toutes les variables utilisées
-# de façon globale dans ce module. ATTENTION : ce nom est assez court,
-# et cela pourrait poser des problèmes de collision avec une autre
-# variable si plusieurs modules sont inclus dans le même programme.
+# Le tableau associatif $NEL contient toutes les variables utilisÃ©es
+# de faÃ§on globale dans ce module. ATTENTION : ce nom est assez court,
+# et cela pourrait poser des problÃ¨mes de collision avec une autre
+# variable si plusieurs modules sont inclus dans le mÃªme programme.
 
 $NEL = array(
   '1-99' => array(
@@ -116,7 +116,7 @@ $NEL = array(
   'separateur' => ' '
 );
 
-# Si le tableau $NEL['illi'] s'arrête à 'sext', alors les deux valeurs
+# Si le tableau $NEL['illi'] s'arrÃªte Ã  'sext', alors les deux valeurs
 # suivantes sont respectivement '6' et ' de sextillions'.
 $NEL['maxilli'] = count($NEL['illi']) - 1;
 $NEL['de_maxillions'] = " de {$NEL['illi'][$NEL['maxilli']]}illions";
@@ -156,7 +156,7 @@ function enlettres_par3($par3)
  $par2 = $par3 % 100;
  $dizaine = floor($par2 / 10);
 
- # On traite à part les particularités du français de référence
+ # On traite Ã  part les particularitÃ©s du franÃ§ais de rÃ©fÃ©rence
  # 'soixante-dix', 'quatre-vingts' et 'quatre-vingt-dix'.
  $nom_par2 = NULL;
  switch ($dizaine) {
@@ -168,7 +168,7 @@ function enlettres_par3($par3)
   break;
  case 8:
   if ($NEL['huitante'] === false) {
-   //if ($par2 == 80) $nom_par2 = 'quatre-vingts'; Corrigé car le S posait un souci avec les intéractions Alexa 09/21 - Sigalou
+   //if ($par2 == 80) $nom_par2 = 'quatre-vingts'; CorrigÃ© car le S posait un souci avec les intÃ©ractions Alexa 09/21 - Sigalou
    if ($par2 == 80) $nom_par2 = 'quatre-vingt';
    else $nom_par2 = 'quatre-vingt-' . $NEL['1-99'][$par2 - 80];
   }
@@ -186,7 +186,7 @@ function enlettres_par3($par3)
   }
  }
 
- # Après les dizaines et les unités, il reste à voir les centaines
+ # AprÃ¨s les dizaines et les unitÃ©s, il reste Ã  voir les centaines
  switch ($centaine) {
  case 0: return $nom_par2;
  case 1: return rtrim("cent {$nom_par2}");
@@ -200,55 +200,55 @@ function enlettres_par3($par3)
 
 function enlettres_zilli($idx)
 {
- # Noms des 0ème à 9ème zillions
+ # Noms des 0Ã¨me Ã  9Ã¨me zillions
  static $petit = array(
     'n', 'm', 'b', 'tr', 'quatr', 'quint', 'sext', 'sept', 'oct', 'non'
  );
- # Composantes des 10ème à 999ème zillions
+ # Composantes des 10Ã¨me Ã  999Ã¨me zillions
  static $unite = array(
-    '<', 'un<', 'duo<', 'tre<sé',
-    'quattuor<', 'quin<', 'se<xsé',
-    'septe<mné', 'octo<', 'nove<mné'
+    '<', 'un<', 'duo<', 'tre<sÃ©',
+    'quattuor<', 'quin<', 'se<xsÃ©',
+    'septe<mnÃ©', 'octo<', 'nove<mnÃ©'
  );
  static $dizaine = array(
-    '', 'né>déci<', 'ms>viginti<', 'ns>triginta<',
-    'ns>quadraginta<', 'ns>quinquaginta<', 'né>sexaginta<',
-    'né>septuaginta<', 'mxs>octoginta<', 'é>nonaginta<'
+    '', 'nÃ©>dÃ©ci<', 'ms>viginti<', 'ns>triginta<',
+    'ns>quadraginta<', 'ns>quinquaginta<', 'nÃ©>sexaginta<',
+    'nÃ©>septuaginta<', 'mxs>octoginta<', 'Ã©>nonaginta<'
  );
  static $centaine = array(
-    '>', 'nxs>cent', 'né>ducent', 'ns>trécent',
-    'ns>quadringent', 'ns>quingent', 'né>sescent',
-    'né>septingent', 'mxs>octingent', 'é>nongent'
+    '>', 'nxs>cent', 'nÃ©>ducent', 'ns>trÃ©cent',
+    'ns>quadringent', 'ns>quingent', 'nÃ©>sescent',
+    'nÃ©>septingent', 'mxs>octingent', 'Ã©>nongent'
  );
 
- # Règles d'assimilation aux préfixes latins, modifiées pour accentuer
- # un éventuel 'é' de fin de préfixe.
+ # RÃ¨gles d'assimilation aux prÃ©fixes latins, modifiÃ©es pour accentuer
+ # un Ã©ventuel 'Ã©' de fin de prÃ©fixe.
  # (1) Si on trouve une lettre deux fois entre < > on la garde.
- #     S'il y a plusieurs lettres dans ce cas, on garde la première.
+ #     S'il y a plusieurs lettres dans ce cas, on garde la premiÃ¨re.
  # (2) Sinon on efface tout ce qui est entre < >.
- # (3) On remplace "treé" par "tré", "seé" par "sé", "septeé" par "septé"
- #     et "noveé" par "nové".
+ # (3) On remplace "treÃ©" par "trÃ©", "seÃ©" par "sÃ©", "septeÃ©" par "septÃ©"
+ #     et "noveÃ©" par "novÃ©".
  # (4) En cas de dizaine sans centaine, on supprime la voyelle en trop.
- #     Par exemple "déciilli" devient "décilli" et "trigintailli" devient
+ #     Par exemple "dÃ©ciilli" devient "dÃ©cilli" et "trigintailli" devient
  #     "trigintilli".
  #
- # Il est à noter que ces règles PERL (en particulier la première qui
- # est la plus complexe) sont *très* fortement inspirées du programme
- # de Nicolas Graner. On pourrait même parler de plagiat s'il n'avait
- # pas été au courant que je reprenais son code.
+ # Il est Ã  noter que ces rÃ¨gles PERL (en particulier la premiÃ¨re qui
+ # est la plus complexe) sont *trÃ¨s* fortement inspirÃ©es du programme
+ # de Nicolas Graner. On pourrait mÃªme parler de plagiat s'il n'avait
+ # pas Ã©tÃ© au courant que je reprenais son code.
  # Voir <http://www.graner.net/nicolas/nombres/nom.php>
  # et <http://www.graner.net/nicolas/nombres/nom-exp.php>
  #
  static $recherche = array(
-  '/<[a-zé]*?([a-zé])[a-zé]*\1[a-zé]*>/',       # (1)
-  '/<[a-zé]*>/',                                # (2)
-  '/eé/',                                       # (3)
+  '/<[a-zÃ©]*?([a-zÃ©])[a-zÃ©]*\1[a-zÃ©]*>/',       # (1)
+  '/<[a-zÃ©]*>/',                                # (2)
+  '/eÃ©/',                                       # (3)
   '/[ai]illi/'                                  # (4)
  );
  static $remplace = array(
   '\\1',                                        # (1)
   '',                                           # (2)
-  'é',                                          # (3)
+  'Ã©',                                          # (3)
   'illi'                                        # (4)
  );
 
@@ -311,13 +311,13 @@ function enlettres($nombre, $options=NULL, $separateur=NULL)
   return $nom;
  }
 
- # On ne garde que les chiffres, puis on supprime les 0 du début
+ # On ne garde que les chiffres, puis on supprime les 0 du dÃ©but
  $nombre = preg_replace('/[^0-9]/', '', $nombre);
  $nombre = ltrim($nombre, '0');
 
  if ($nombre == '') {
-  if ($NEL['ordinal'] === 'nieme') return 'zéroïème';
-  else return 'zéro';
+  if ($NEL['ordinal'] === 'nieme') return 'zÃ©roÃ¯Ã¨me';
+  else return 'zÃ©ro';
  }
 
  $table_noms = array();
@@ -373,7 +373,7 @@ function enlettres($nombre, $options=NULL, $separateur=NULL)
    $nombre = str_replace(' ', '-', $nombre);
   }
 
-  # Nom (éventuel) et accord (éventuel) des substantifs
+  # Nom (Ã©ventuel) et accord (Ã©ventuel) des substantifs
   $nom = rtrim("{$nombre} {$nom}");
   if ($nombre == 'un') {
    # Un seul million, milliard, etc., donc au singulier
@@ -382,7 +382,7 @@ function enlettres($nombre, $options=NULL, $separateur=NULL)
    $nom = preg_replace('/(illion|illiard)s/', '\\1', $nom, 1);
   }
 
-  # Ajout d'un séparateur entre chaque partie
+  # Ajout d'un sÃ©parateur entre chaque partie
   if ($nom_enlettres == '') {
    $nom_enlettres = $nom;
   } else {
@@ -400,34 +400,34 @@ function enlettres($nombre, $options=NULL, $separateur=NULL)
    preg_replace('/(cent|vingt|illion|illiard)s/', '\\1', $nom_enlettres);
 
  if ($NEL['ordinal'] !== 'nieme') {
-  # Nombre ordinal simple (sans '-ième')
+  # Nombre ordinal simple (sans '-iÃ¨me')
   return $nom_enlettres;
  }
 
  if ($nom_enlettres === 'un') {
-  # Le féminin n'est pas traité ici. On fait la supposition
-  # qu'il est plus facile de traiter ce cas à part plutôt
-  # que de rajouter une option rien que pour ça.
+  # Le fÃ©minin n'est pas traitÃ© ici. On fait la supposition
+  # qu'il est plus facile de traiter ce cas Ã  part plutÃ´t
+  # que de rajouter une option rien que pour Ã§a.
   return 'premier';
  }
 
  switch (substr($nom_enlettres, -1)) {
  case 'e':
-  # quatre, onze à seize, trente à nonante, mille
-  # exemple : quatre -> quatrième
-  return substr($nom_enlettres, 0, -1) . 'ième';
+  # quatre, onze Ã  seize, trente Ã  nonante, mille
+  # exemple : quatre -> quatriÃ¨me
+  return substr($nom_enlettres, 0, -1) . 'iÃ¨me';
  case 'f':
-  # neuf -> neuvième
-  return substr($nom_enlettres, 0, -1) . 'vième';
+  # neuf -> neuviÃ¨me
+  return substr($nom_enlettres, 0, -1) . 'viÃ¨me';
  case 'q':
-  # cinq -> cinquième
-  return $nom_enlettres . 'uième';
+  # cinq -> cinquiÃ¨me
+  return $nom_enlettres . 'uiÃ¨me';
  }
 
  # Tous les autres cas.
- # Exemples: deuxième, troisième, vingtième, trente et unième,
- #           neuf centième, un millionième, quatre-vingt milliardième.
- return $nom_enlettres . 'ième';
+ # Exemples: deuxiÃ¨me, troisiÃ¨me, vingtiÃ¨me, trente et uniÃ¨me,
+ #           neuf centiÃ¨me, un millioniÃ¨me, quatre-vingt milliardiÃ¨me.
+ return $nom_enlettres . 'iÃ¨me';
 }
 
 ?>

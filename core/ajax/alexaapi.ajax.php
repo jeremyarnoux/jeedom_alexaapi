@@ -65,7 +65,7 @@ try {
         case 'forcerDefaultCmd':
             $eqLogic = alexaapi::byId(init('id'));
             if (!is_object($eqLogic)) {
-                throw new Exception(__('Alexaapi eqLogic non trouvé : ', __FILE__) . init('id'));
+                throw new Exception(__('alexaapi eqLogic non trouvé : ', __FILE__) . init('id'));
             }
             alexaapi::forcerDefaultCmd(init('id'));
             ajax::success();
@@ -123,6 +123,10 @@ try {
             $ret = alexaapi::supprimeTouslesDevicesSmartHome();
             ajax::success($ret);
             break;    
+        case 'supprimeTouslesDevicesDesactives':
+            $ret = alexaapi::supprimeTouslesDevicesDesactives();
+            ajax::success($ret);
+            break; 	
 	}
     throw new \Exception('Aucune methode correspondante');
 } catch (\Exception $e) {
