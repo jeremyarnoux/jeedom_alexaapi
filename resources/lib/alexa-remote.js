@@ -1205,8 +1205,24 @@ this._options.logger && this._options.logger(obj.headers);
 
 
 /// Public
-    checkAuthentication(callback) {
-        this.httpsGetCall ('/api/bootstrap?version=0', function (err, res) {
+  checkAuthentication(callback) {
+      
+	  this.httpsGetCall('/api/customer-status', function (err, res) {
+                if (!err && res) {
+                    //this.ownerCustomerId = res.authentication.customerId;
+                    return callback(true, null);
+                }
+                if (err && !err.message.includes('401')) {
+                    return callback(null, err);
+                }
+                callback(false, err);
+            });
+      
+        /*
+		Modif le 07/11/25
+		https://community.jeedom.com/t/alexa-demarrage-demon-impossible-cookie-ok-pb-amazon-ou-changement-cote-amazon/144424/14
+		
+		this.httpsGetCall ('/api/bootstrap?version=0', function (err, res) {
             if (res && res.authentication && res.authentication.authenticated !== undefined) {
                 return callback(res.authentication.authenticated, err);
             }
@@ -1214,7 +1230,7 @@ this._options.logger && this._options.logger(obj.headers);
                 return callback(null, err);
             }
             callback(false, err);
-        });
+        });*/
     }
 
     getDevices(callback)
